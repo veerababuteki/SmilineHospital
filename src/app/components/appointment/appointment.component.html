@@ -1,0 +1,219 @@
+<p-dialog 
+  [(visible)]="display" 
+  [modal]="true" 
+  [style]="{width: '800px'}" 
+  [draggable]="false" 
+  [resizable]="false"
+  styleClass="appointment-dialog">
+  
+  <div class="appointment-form">
+    <!-- Tabs -->
+    <div class="tab-container">
+      <div class="tab" [class.active]="activeTab === 'appointment'" (click)="setActiveTab('appointment')">Appointment</div>
+      <div class="tab" *ngIf="isDoctor  && !this.editAppointment" [class.active]="activeTab === 'reminder'" (click)="setActiveTab('reminder')">Reminder</div>
+      <div class="tab" *ngIf="isDoctor  && !this.editAppointment" [class.active]="activeTab === 'blockCalendar'" (click)="setActiveTab('blockCalendar')">Block Calendar</div>
+    </div>
+
+    <form *ngIf="activeTab === 'appointment'" [formGroup]="appointmentForm" (ngSubmit)="onSubmit()" class="form-content">
+      <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
+        <label class="required">Patient ID</label>
+        <div class="input-with-button">
+          <input type="text" pInputText formControlName="patientId" placeholder="Enter Patient ID">
+          <button type="button" pButton label="Get Patient Details" (click)="getPatientDetails()"></button>
+        </div>
+      </div>
+    
+      <div class="two-column-grid">
+        <div class="column">
+          <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
+            <label class="required">Patient Name</label>
+            <input type="text" pInputText formControlName="patientName" placeholder="Enter Patient Name" readonly>
+          </div>
+          <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
+            <label class="required">Mobile Number</label>
+            <input type="text" pInputText formControlName="mobileNumber" placeholder="Enter Mobile Number" readonly>
+          </div>
+          <div class="form-row">
+            <label class="required">Booking Type</label>
+            <p-dropdown formControlName="bookingType" [options]="bookingTypes"
+            [style]="{'width':'100%'}" [placeholder]="'Select Booking Type'"></p-dropdown>
+          </div>
+          <div class="form-row">
+            <label class="required">Appointment Status</label>
+            <p-dropdown formControlName="appointmentStatus" [options]="appointmentStatus"
+            [style]="{'width':'100%'}" [placeholder]="''"></p-dropdown>
+          </div>
+          <div class="form-row">
+            <label class="required">Doctor</label>
+            <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
+                       [style]="{'width':'100%'}" [placeholder]="'Select Doctor'"></p-dropdown>
+          </div>
+        </div>
+    
+        <div class="column">
+          <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
+            <label>Email ID</label>
+            <input type="text" pInputText formControlName="emailId" placeholder="Enter Email ID" readonly>
+          </div>
+          <div class="form-row">
+            <label class="required">Status</label>
+            <p-dropdown formControlName="status" [options]="status"
+                       [style]="{'width':'100%'}" [placeholder]="''"></p-dropdown>
+          </div>
+          <div class="form-row">
+            <label class="required">Category</label>
+            <p-dropdown formControlName="category" [options]="categories" optionLabel="name" 
+                       placeholder="Select Category" [style]="{'width':'100%'}"></p-dropdown>
+          </div>
+        </div>
+      </div>
+    
+      <div class="form-row schedule-row">
+        <label class="required">Scheduled On</label>
+        <div class="schedule-inputs">
+          <p-calendar formControlName="scheduledDate" [showIcon]="true" dateFormat="dd-mm-yy"  appendTo="body"></p-calendar>
+          <span>at</span>
+          <p-calendar formControlName="scheduledTime" [timeOnly]="true" [showIcon]="false" hourFormat="12"></p-calendar>
+          <span>for</span>
+          <p-dropdown formControlName="duration" [options]="durations" [style]="{'width':'120px'}"></p-dropdown>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>Planned Procedures</label>
+        <textarea pInputTextarea formControlName="plannedProcedures" placeholder="Add Procedure"></textarea>
+      </div>
+
+      <div class="form-row">
+        <label>Notes</label>
+        <textarea pInputTextarea formControlName="notes" placeholder="Add Notes"></textarea>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="button-row">
+        <button type="button" pButton label="Cancel" (click)="cancelAppointment()" class="p-button-secondary"></button>
+        <button type="submit" pButton label="Save" class="p-button-primary"></button>
+      </div>
+    </form>
+    <form *ngIf="activeTab === 'blockCalendar'" [formGroup]="blockCalendarForm" (ngSubmit)="onBlockCalendarSubmit()" class="form-content">
+      <!-- Info Message -->
+      <div class="info-message">
+        <i class="pi pi-info-circle"></i>
+        <span>You can block your calendar for leaves or personal reasons. The patient will not be able to book appointment on the same days.</span>
+      </div>
+      <div style="display: flex; gap: 50px;">
+        <div class="form-row" style="width: 100%;">
+        <label class="required-label">Leave Details</label>
+        <input type="text" pInputText formControlName="leaveDetails" class="bordered-input">
+      </div>
+
+      <div class="form-row" style="width: 100%;">
+        <label class="required-label">Doctor</label>
+        <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
+             [style]="{'width':'100%'}" styleClass="bordered-dropdown"
+             placeholder="All Doctors"></p-dropdown>
+        </div>
+      </div>
+      
+
+      <!-- Block Type -->
+      <div class="form-row block-type-row">
+        <div class="radio-wrapper">
+          <input type="radio" formControlName="blockType" value="allDay" id="allDay">
+          <label for="allDay" class="radio-label">All Day</label>
+        </div>
+        <div class="radio-wrapper">
+          <input type="radio" formControlName="blockType" value="blockSlot" id="blockSlot">
+          <label for="blockSlot" class="radio-label">Block Slot</label>
+        </div>
+      </div>
+
+      <!-- Duration -->
+      <div class="form-row">
+        <label>Duration<span class="required">*</span></label>
+        <div class="duration-inputs">
+          <p-calendar formControlName="date" [showIcon]="true" dateFormat="dd-mm-yy"></p-calendar>
+          <p-calendar formControlName="startTime" [timeOnly]="true" [showIcon]="false" hourFormat="12"></p-calendar>
+          <span>to</span>
+          <p-calendar formControlName="endTime" [timeOnly]="true" [showIcon]="false" hourFormat="12"></p-calendar>
+        </div>
+        <small class="time-warning" *ngIf="showScheduleWarning">Scheduled at is not less than Scheduled till.</small>
+      </div>
+
+      <!-- Block Type Selection -->
+      <div class="form-row block-type-selection">
+        <label>Select the Block type<span class="required">*</span></label>
+        <div class="checkbox-group">
+          <div class="checkbox-item">
+            <p-checkbox formControlName="blockVideo" [binary]="true" label="Block Video Appointments"></p-checkbox>
+          </div>
+          <div class="checkbox-item">
+            <p-checkbox formControlName="blockInClinic" [binary]="true" label="Block In-Clinic Appointments"></p-checkbox>
+          </div>
+        </div>
+      </div>
+
+      <!-- Caution Message -->
+      <div class="caution-message">
+        <strong>Caution:</strong> The patients will not be able to book in-clinic appointments for the given duration.
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="button-row">
+        <button type="button" pButton label="Cancel" class="p-button-secondary"></button>
+        <button type="submit" pButton label="Save" class="p-button-primary"></button>
+      </div>
+    </form>
+    <form *ngIf="activeTab === 'reminder'" [formGroup]="blockCalendarForm" (ngSubmit)="onBlockCalendarSubmit()" class="form-content">
+      <!-- Info Message -->
+      <div class="info-message">
+        <i class="pi pi-info-circle"></i>
+        <span> You can add reminder to your calendar</span>
+      </div>
+      <div style="display: flex; gap: 50px;">
+        <div class="form-row" style="width: 100%;">
+        <label class="required-label">Reminder Title</label>
+        <input type="text" pInputText formControlName="leaveDetails" class="bordered-input">
+      </div>
+
+      <div class="form-row" style="width: 100%;">
+        <label class="required-label">Doctor</label>
+        <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
+             [style]="{'width':'100%'}" styleClass="bordered-dropdown"
+             placeholder="All Doctors"></p-dropdown>
+        </div>
+      </div>
+      
+
+      <!-- Block Type -->
+      <div class="form-row block-type-row">
+        <div class="radio-wrapper">
+          <input type="radio" formControlName="blockType" value="allDay" id="allDay">
+          <label for="allDay" class="radio-label">All Day</label>
+        </div>
+        <div class="radio-wrapper">
+          <input type="radio" formControlName="blockType" value="blockSlot" id="blockSlot">
+          <label for="blockSlot" class="radio-label">Custom</label>
+        </div>
+      </div>
+
+      <!-- Duration -->
+      <div class="form-row">
+        <label>Date & Time<span class="required">*</span></label>
+        <div class="duration-inputs">
+          <p-calendar formControlName="date" [showIcon]="true" dateFormat="dd-mm-yy"></p-calendar>
+          <p-calendar formControlName="startTime" [timeOnly]="true" [showIcon]="false" hourFormat="12"></p-calendar>
+        </div>
+      </div>
+      <div class="button-row">
+        <button type="button" pButton label="Cancel" class="p-button-secondary"></button>
+        <button type="submit" pButton label="Save" class="p-button-primary"></button>
+      </div>
+    </form>
+  </div>
+</p-dialog>
+<button *ngIf="activeTab === 'appointment' && !fromPatientsection" type="button" class="add-appointment-btn" label="Add Walk-in Appointment" (click)="showDialog()">{{isDoctor ? 'Add Appointment' : 'Book Appointment'}}</button>
+<button *ngIf="activeTab === 'appointment' && fromPatientsection" type="button" class="add-btn" label="Add Walk-in Appointment" (click)="showDialog()">{{isDoctor ? '+ Add' : 'Book Appointment'}}</button>
+<span *ngIf="activeTab === 'blockCalendar'" class="cursor-pointer" (click)="showDialog()">Block Calendar</span>
+
+

@@ -1,0 +1,183 @@
+<div class="treatment-plans-container">
+    <div class="header">
+      <div class="title">TREATMENT PLANS</div>
+      <div class="action-buttons">
+        <button class="cancel-btn" (click)="cancel()">Cancel</button>
+        <button class="save-btn" type="submit" (click)="onSubmit()">Save Treatment Plan</button>
+      </div>
+    </div>
+  
+    <div class="main-content">
+      <div class="treatments-section" [class.visibility-hidden]="treatments.length == 0">
+        <form [formGroup]="treatmentForm" (ngSubmit)="onSubmit()">
+          <div formArrayName="treatments">
+            <!-- Each treatment gets its own table and teeth grid -->
+            <div *ngFor="let treatment of treatments.controls; let i = index" class="treatment-block" [formGroupName]="i">
+              <!-- Individual Treatment Table -->
+              <table class="treatments-table">
+                <thead>
+                  <tr>
+                    <th>TREATMENTS</th>
+                    <th>QTY</th>
+                    <th>X</th>
+                    <th>COST</th>
+                    <th>DISCOUNT</th>
+                    <th>TOTAL</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="treatment-name">
+                      {{treatment.get('procedureName')?.value}}
+                      <!-- <span class="add-notes">+add notes</span> -->
+                    </td>
+                    <td>
+                      <input type="number" formControlName="quantity" class="qty-input" min="1">
+                    </td>
+                    <td class="multiply-symbol">x</td>
+                    <td>
+                      <input type="number" formControlName="cost" class="cost-input" min="0">
+                    </td>
+                    <td class="discount-cell">
+                      <input type="number" formControlName="discount" class="discount-input" min="0">
+                      <select formControlName="discountType" class="discount-type">
+                        <option value="%">%</option>
+                        <option value="INR">INR</option>
+                      </select>
+                    </td>
+                    <td class="total-column">{{treatment.get('total')?.value | number:'1.2-2'}}</td>
+                    <td>
+                      <button type="button" class="remove-btn" (click)="removeTreatment(i)">×</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="notes-section">
+                <button type="button" class="teeth-toggle-btn" (click)="toggleNotesVisibility(i)">
+                  {{ treatment.get('showNotes')?.value ? 'Hide notes' : 'Add notes' }}
+                </button>
+                
+                <!-- Make sure the notes input has proper visibility -->
+                <div [style.display]="treatment.get('showNotes')?.value ? 'contents' : 'none'" class="notes-input-container">
+                  <input type="text" formControlName="notes" placeholder="Enter notes here..." class="notes-input">
+                </div>
+              </div>
+              <!-- Options and Teeth Grid for this treatment -->
+              <div class="options-row">
+                <div class="checkboxes">
+                  <label class="checkbox-container">
+                    <input type="checkbox" formControlName="multiplyCost">
+                    <span class="checkbox-label">Multiply Cost</span>
+                  </label>
+                  <label class="checkbox-container">
+                    <input type="checkbox" formControlName="fullMouth">
+                    <span class="checkbox-label">Full Mouth</span>
+                  </label>
+                </div>
+                
+                <button type="button" (click)="toggleTeethVisibility(i, 'both')" *ngIf="treatment.get('showAdultTeeth')?.value || treatment.get('showChildTeeth')?.value" class="done-btn">Done</button>
+              </div>
+  
+              <div class="teeth-grid">
+                <div class="btn-display">
+                <button type="button" class="teeth-toggle-btn" *ngIf="!treatment.get('showAdultTeeth')?.value"
+                          [class.active]="treatment.get('showAdultTeeth')?.value"
+                          (click)="toggleTeethVisibility(i, 'adult')">
+                    Show Teeth
+                  </button>
+                </div>
+                <!-- Upper Adult Teeth -->
+                <div class="teeth-row" *ngIf="treatment.get('showAdultTeeth')?.value">
+                  <button type="button" *ngFor="let tooth of [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28]"
+                          (click)="toggleTooth(i, tooth)" 
+                          [class.selected]="isToothSelected(i, tooth)">
+                    {{tooth}}
+                  </button>
+                </div>
+              
+                <!-- Lower Adult Teeth -->
+                
+                <div class="teeth-row" *ngIf="treatment.get('showAdultTeeth')?.value">
+                  <button type="button" *ngFor="let tooth of [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38]"
+                          (click)="toggleTooth(i, tooth)"
+                          [class.selected]="isToothSelected(i, tooth)">
+                    {{tooth}}
+                  </button>
+                </div>
+              
+                <!-- Upper Child Teeth -->
+                <div class="btn-display">
+                <button type="button" class="teeth-toggle-btn" *ngIf="!treatment.get('showChildTeeth')?.value && treatment.get('showAdultTeeth')?.value"
+                [class.active]="treatment.get('showChildTeeth')?.value"
+                (click)="toggleTeethVisibility(i, 'child')">
+                Show Child Teeth
+                </button>
+              </div>
+                <div class="teeth-row child-teeth" *ngIf="treatment.get('showChildTeeth')?.value">
+                  <button type="button" *ngFor="let tooth of [55,54,53,52,51,61,62,63,64,65]"
+                          (click)="toggleTooth(i, tooth)"
+                          [class.selected]="isToothSelected(i, tooth)">
+                    {{tooth}}
+                  </button>
+                </div>
+              
+                <!-- Lower Child Teeth -->
+                <div class="teeth-row child-teeth" *ngIf="treatment.get('showChildTeeth')?.value">
+                  <button type="button" *ngFor="let tooth of [85,84,83,82,81,71,72,73,74,75]"
+                          (click)="toggleTooth(i, tooth)"
+                          [class.selected]="isToothSelected(i, tooth)">
+                    {{tooth}}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+  
+        <!-- Totals Section -->
+        <div class="totals-section">
+          <div class="totals-row">
+            <!-- <span>Total Cost</span>
+            <span class="amount">INR {{calculateGrandTotal() | number:'1.2-2'}}</span>
+            <span class="operator">−</span>
+            <span>Total Discount</span>
+            <span class="amount">INR 0.00</span>
+            <span class="operator">=</span> -->
+            <span>Grand Total</span>
+            <span class="amount green">INR {{calculateGrandTotal() | number:'1.2-2'}}</span>
+          </div>
+        </div>
+  
+        <div class="footer">
+          <span class="padding-span">by Dr.</span>
+          <p-dropdown [(ngModel)]="doctor" [options]="doctors" optionLabel="name"  showIcon="false" class="doctor-name no-icon-dropdown no-border-dropdown"
+            [style]="{'width':'100%'}" [placeholder]="'Select Doctor'"></p-dropdown>
+          <span class="padding-span"> on</span><p-calendar [(ngModel)]="date" dateFormat="dd-mm-yy"></p-calendar>
+        </div>
+      </div>
+  
+      <div class="procedures-section">
+        <div class="procedures-header">
+          <span>Procedures ( in INR )</span>
+          <button class="add-btn" *ngIf="!add" (click)="add = true">Add</button>
+          <button class="add-btn" *ngIf="add" (click)="addProcedure()">Save</button>
+        </div>
+        
+        <div class="search-container">
+          <input type="text" *ngIf="!add" [(ngModel)]="searchText" (input)="filterProcedures()" placeholder="Search" class="search-input">
+          <input type="text" *ngIf="add" [(ngModel)]="name" placeholder="Procedure name" class="search-input">
+          <input type="number" *ngIf="add" placeholder="Price" [(ngModel)]="cost" class="search-input">
+        </div>
+  
+        <div class="procedures-list">
+          <div class="procedure-item" 
+               *ngFor="let procedure of filteredProcedures"
+               (click)="addTreatment(procedure)">
+            <span>{{procedure.name}}</span>
+            <span class="price">{{procedure.price}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

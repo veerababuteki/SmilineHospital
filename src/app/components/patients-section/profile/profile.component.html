@@ -1,0 +1,138 @@
+<div class="profile-container">
+    <div class="header">
+        <h2 class="title">PATIENT PROFILE</h2>
+        <div class="actions">
+            <button class="btn-secondary">Change Photo</button>
+            <button class="btn-primary" (click)="sendMessage()">Edit Patient Profile</button>
+        </div>
+    </div>
+
+    <div class="profile-content">
+        <div class="main-content">
+            <div class="profile-image-section">
+                <img src="assets/user.webp" alt="Profile" class="profile-image">
+                <a href="#" class="change-photo-link">Change Photo</a>
+            </div>
+
+            <div class="details-section" *ngIf="patientDetails">
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="label">Patient name :</span>
+                        <span class="value">{{patientDetails.gender === 'Male' ? 'Mr. ' : 'Mrs. '}}{{patientDetails.first_name +' '+ patientDetails.last_name}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Patient ID :</span>
+                        <span class="value">{{patientDetails.user_details.unique_code}}</span>
+                    </div>
+                    <div class="info-row" *ngIf="patientDetails.aadhaar_id">
+                        <span class="label">Aadhaar ID :</span>
+                        <span class="value">{{patientDetails.aadhaar_id}}</span>
+                    </div>
+                    <!-- <div class="info-row">
+                        <span class="label">ABHA Id :</span>
+                        <span class="value">
+                            <span class="new-badge">New</span>
+                            <a class="add-link">Add ABHA Id</a>
+                        </span>
+                    </div> -->
+                    <div class="info-row">
+                        <span class="label">Gender :</span>
+                        <span class="value" *ngIf="patientDetails.gender">{{patientDetails.gender}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Age :</span>
+                        <span class="value" *ngIf="patientDetails.age">{{patientDetails.age}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Date of Birth :</span>
+                        <span class="value" *ngIf="patientDetails.date_of_birth">{{patientDetails.date_of_birth | date: 'dd MMM, yyyy'}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Blood Group :</span>
+                        <span class="value">{{patientDetails.blood_group}}</span>
+                    </div>
+                    <h3 class="section-title">Referral Details</h3>
+
+                    <div class="info-row">
+                        <span class="label">Referred By :</span>
+                        <span class="value">{{patientDetails.referred_by}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Name :</span>
+                        <span class="value">{{patientDetails.referred_name}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Mobile Number :</span>
+                        <span class="value">{{patientDetails.referred_mobile}}</span>
+                    </div>
+
+                    <h3 class="section-title">Contact Details</h3>
+
+                    <div class="info-row">
+                        <span class="label">Primary Mobile No. :</span>
+                        <span class="value">{{patientDetails.user_details.phone}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Secondary Mobile No. :</span>
+                        <span class="value">{{patientDetails.secondary_mobile}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">landLine No. :</span>
+                        <span class="value">{{patientDetails.land_line}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Email Address :</span>
+                        <span class="value" *ngIf="patientDetails.user_details.email">{{patientDetails.user_details.email}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Street Address :</span>
+                        <span class="value" *ngIf="patientDetails.street_address">{{patientDetails.street_address}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Locality :</span>
+                        <span class="value" *ngIf="patientDetails.locality">{{patientDetails.locality}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">City :</span>
+                        <span class="value" *ngIf="patientDetails.locality">{{patientDetails.city}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Pincode :</span>
+                        <span class="value" *ngIf="patientDetails.locality">{{patientDetails.pin_code}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-sidebar" *ngIf="patientDetails">
+            <!-- <div class="notes-section">
+                <h3>Patient Notes</h3>
+                <input type="text" placeholder="Type note here" class="note-input">
+            </div> -->
+
+            <div class="medical-history">
+                <div class="section-header">
+                    <h3>Medical History</h3>
+                    <!-- <button class="edit-btn">Edit</button> -->
+                </div>
+                <div class="condition" *ngFor="let history of patientDetails.medical_history">{{history.name}}</div>
+            </div>
+
+            <div class="groups">
+                <div class="section-header">
+                    <h3>Groups</h3>
+                    <!-- <button class="edit-btn">Edit</button> -->
+                </div>
+                <div class="condition" *ngFor="let history of patientDetails.groups">{{history.name}}</div>
+            </div>
+
+            <div class="memberships">
+                <div class="section-header">
+                    <h3>Other History</h3>
+                    <!-- <button class="edit-btn">Edit</button> -->
+                </div>
+                <div class="condition">{{patientDetails.other_history}}</div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,157 @@
+<div class="availability-container">
+    <div class="availability-slots">
+      <div class="time-slot" *ngFor="let slot of timeSlots; let i = index">
+        <div class="slot-row">
+          <div class="date-time-group">
+            <div class="field-labels">
+              <span>Start Date</span>
+              <span>Start Time</span>
+            </div>
+            <!-- Start Date and Time -->
+            <div class="input-wrapper">
+              <div class="date-input">
+                <p-calendar 
+                  [formControl]="slot.startDate"
+                  [showIcon]="true"
+                  dateFormat="dd/mm/yy"
+                  [defaultDate]="today"
+                  [style]="{'width': '100%'}"
+                  (onSelect)="updateEndDate(i)">
+                </p-calendar>
+              </div>
+              
+              <div class="time-input">
+                <p-dropdown
+                  [formControl]="slot.startTime"
+                  [options]="timeOptions"
+                  [style]="{'width': '100%'}"
+                  [showClear]="false">
+                </p-dropdown>
+              </div>
+            </div>
+          </div>
+  
+          <div class="arrow">→</div>
+  
+          <div class="date-time-group">
+            <div class="field-labels">
+              <span>End Date</span>
+              <span>End Time</span>
+            </div>
+            <div class="input-wrapper">
+              <div class="date-input">
+                <p-calendar 
+                  [formControl]="slot.endDate"
+                  [showIcon]="true"
+                  dateFormat="dd/mm/yy"
+                  [defaultDate]="today"
+                  [style]="{'width': '100%'}"
+                  [minDate]="getMinDate(slot.startDate.value)">
+                </p-calendar>
+              </div>
+              
+              <div class="time-input">
+                <p-dropdown
+                  [formControl]="slot.endTime"
+                  [options]="timeOptions"
+                  [style]="{'width': '100%'}"
+                  [showClear]="false">
+                </p-dropdown>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Delete Button -->
+          <button pButton 
+            icon="pi pi-trash" 
+            class="p-button-text p-button-danger delete-button"
+            (click)="removeSlot(i)" 
+            *ngIf="timeSlots.length > 1">
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Configuration Section -->
+    <div class="config-section">
+      <div class="repeat-config">
+        <label class="section-label">Repeat Configuration</label>
+        <p-dropdown
+          [formControl]="repeatConfig"
+          [options]="repeatOptions"
+          [style]="{'width': '200px'}"
+          [showClear]="false"
+          (onChange)="onRepeatChange($event)">
+        </p-dropdown>
+      </div>
+  
+      <!-- Conditional repeat configuration based on selection -->
+      <div class="repeat-details" *ngIf="repeatConfig.value !== 'no-repeat'">
+        <div class="repeat-frequency" *ngIf="repeatConfig.value === 'custom'">
+          <label>Repeat every</label>
+          <p-inputNumber 
+            [formControl]="repeatFrequency" 
+            [showButtons]="true" 
+            [min]="1" 
+            buttonLayout="horizontal"
+            spinnerMode="horizontal"
+            [inputStyle]="{'width': '100px'}"
+            decrementButtonClass="p-button-secondary"
+            incrementButtonClass="p-button-secondary">
+          </p-inputNumber>
+          <span class="frequency-label">{{getFrequencyLabel()}}</span>
+        </div>
+  
+        <div class="repeat-end" *ngIf="repeatConfig.value !== 'no-repeat'">
+          <label>Ends</label>
+          <div class="end-options">
+            <p-radioButton 
+              name="endType" 
+              value="never" 
+              [formControl]="endType"
+              label="Never">
+            </p-radioButton>
+            
+            <p-radioButton 
+              name="endType" 
+              value="on" 
+              [formControl]="endType"
+              label="On">
+            </p-radioButton>
+            <p-calendar 
+              *ngIf="endType.value === 'on'"
+              [formControl]="endDate"
+              [showIcon]="true"
+              dateFormat="dd/mm/yy"
+              [style]="{'width': '150px'}">
+            </p-calendar>
+            
+            <p-radioButton 
+              name="endType" 
+              value="after" 
+              [formControl]="endType"
+              label="After">
+            </p-radioButton>
+            <p-inputNumber 
+              *ngIf="endType.value === 'after'"
+              [formControl]="occurrences"
+              [showButtons]="true"
+              [min]="1"
+              [style]="{'width': '100px'}">
+            </p-inputNumber>
+            <span *ngIf="endType.value === 'after'">occurrences</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Add Button -->
+    <div class="add-slot">
+      <a pButton 
+         label="Add Time Slot" 
+         icon="pi pi-plus" 
+         class="p-button-text p-button-primary add-link"
+         (click)="addNewSlot()">
+      </a>
+    </div>
+  </div>

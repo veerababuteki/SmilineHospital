@@ -1,0 +1,32 @@
+@import "@angular/material/prebuilt-themes/indigo-pink.css";
+@import "primeng/resources/primeng.css";
+@import "primeicons/primeicons.css";
+
+@layer primeng {
+    @import "primeng/resources/themes/lara-light-blue/theme.css";
+}   
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.event-popover-overlay {
+    z-index: 1001 !important;
+  }
+  
+  .transparent-backdrop {
+    background: transparent;
+  }
+  
+  .p-dialog {
+    z-index: 1000;
+  }
+  .p-dialog-mask {
+    z-index: 1000;
+  }
+  
+  .event-popover-overlay {
+    z-index: 1100 !important;
+  }
+  
+  .cdk-overlay-container {
+    z-index: 1200 !important;
+  }

@@ -1,0 +1,509 @@
+.profile-container {
+    background: white;
+    height: 100vh;
+    overflow-y: auto;
+    width: 100%;
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0px 20px 0px 20px;
+        border-bottom: 1px solid #e0e0e0;
+
+        .title {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+
+            button {
+                padding: 6px 12px;
+                border-radius: 4px;
+                font-size: 13px;
+                cursor: pointer;
+
+                &.btn-secondary {
+                    background: white;
+                    border: 1px solid #e0e0e0;
+                    color: #333;
+                }
+
+                &.btn-primary {
+                    background: #2196f3;
+                    border: none;
+                    color: white;
+                }
+            }
+        }
+    }
+
+    .profile-content {
+        display: flex;
+        gap: 30px;
+        padding: 0px 0px 0px 20px;
+        .main-content {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+
+            .profile-image-section {
+                width: 140px;
+                text-align: center;
+                padding-top: 20px;
+
+                .profile-image {
+                    width: 140px;
+                    height: 140px;
+                    background: #f5f5f5;
+                    border: 1px solid #e0e0e0;
+                    margin-bottom: 8px;
+                }
+
+            }
+
+            .patient-form-container {
+                padding: 16px;
+                font-size: 13px;
+                
+                .form-row {
+                  display: flex;
+                  margin-bottom: 15px;
+                  align-items: center;
+                  
+                  .form-label {
+                    width: 150px;
+                    text-align: right;
+                    padding-right: 8px;
+                    color: #666;
+                    font-size: 13px;
+                    
+                    &.required::after {
+                      content: '*';
+                      color: red;
+                      margin-left: 4px;
+                    }
+                    
+                    .new-tag {
+                      background-color: #e3f2fd;
+                      color: #2196f3;
+                      padding: 2px 6px;
+                      border-radius: 3px;
+                      font-size: 12px;
+                      margin-right: 5px;
+                    }
+                  }
+                  
+                  .form-field {
+                    flex: 1;
+                    max-width: 400px;
+                    
+                    input {
+                      width: 100%;
+                    }
+                    
+                    &.abha-field {
+                      display: flex;
+                      gap: 10px;
+                      
+                      input {
+                        flex: 1;
+                      }
+                      
+                      ::ng-deep .link-button {
+                        .p-button {
+                          background-color: #95a5a6;
+                          border-color: #95a5a6;
+                        }
+                      }
+                    }
+                    
+                    &.dob-field {
+                      display: flex;
+                      align-items: center;
+                      gap: 10px;
+                      
+                      .or-text {
+                        color: #666;
+                        font-size: 14px;
+                      }
+                      
+                      .age-input {
+                        width: 60px;
+                      }
+                      
+                      ::ng-deep .p-calendar {
+                        width: 200px;
+                      }
+                    }
+                    
+                    &.anniversary-field {
+                      display: flex;
+                      align-items: center;
+                      gap: 10px;
+                      .add-new-link {
+                        color: #2196f3;
+                        text-decoration: none;
+                        font-size: 14px;
+                        cursor: pointer;
+                        &:hover {
+                          text-decoration: underline;
+                        }
+                      }
+                      ::ng-deep .remove-button {
+                        .p-button {
+                          background-color: transparent;
+                          border: none;
+                          color: #2196f3;
+                          
+                          &:hover {
+                            background-color: #e3f2fd;
+                          }
+                        }
+                      }
+                    }
+                    
+                    &.referred-field {
+                      display: flex;
+                      align-items: center;
+                      gap: 10px;
+                      
+                      .add-new-link {
+                        color: #2196f3;
+                        text-decoration: none;
+                        font-size: 14px;
+                        cursor: pointer;
+                        &:hover {
+                          text-decoration: underline;
+                        }
+                      }
+                    }
+                    
+                    &.family-field {
+                      display: flex;
+                      gap: 10px;
+                      
+                      .family-input {
+                        flex: 1;
+                      }
+                    }
+                    
+                    .radio-group {
+                      display: flex;
+                      gap: 20px;
+                      
+                      ::ng-deep .p-radiobutton {
+                        .p-radiobutton-box {
+                          width: 18px;
+                          height: 18px;
+                          
+                          .p-radiobutton-icon {
+                            width: 10px;
+                            height: 10px;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              
+              ::ng-deep {
+                // Global input styling
+                .p-inputtext {
+                  padding: 4px 8px;
+                  font-size: 13px;
+                  height: 28px;
+                  line-height: 20px;
+                }
+              
+                // Dropdown styling
+                .p-dropdown {
+                  width: 100%;
+                  height: 28px;
+                  
+                  .p-dropdown-label {
+                    padding: 4px 8px;
+                    font-size: 13px;
+                    line-height: 20px;
+                  }
+              
+                  .p-dropdown-trigger {
+                    width: 28px;
+                    
+                    .p-dropdown-trigger-icon {
+                      font-size: 12px;
+                    }
+                  }
+              
+                  .p-dropdown-panel {
+                    .p-dropdown-items {
+                      padding: 4px 0;
+                      
+                      .p-dropdown-item {
+                        padding: 4px 8px;
+                        font-size: 13px;
+                      }
+                    }
+                  }
+                }
+            }              
+            
+        }
+
+        .right-sidebar {
+            width: 300px;
+            border-left: 1px solid #e0e0e0;
+            .notes-section {
+                margin-bottom: 30px;
+
+                h3 {
+                    color: #4caf50;
+                    font-size: 16px;
+                    margin-bottom: 10px;
+                    font-weight: normal;
+                }
+
+                .note-input {
+                    width: 100%;
+                    padding: 8px;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 4px;
+                    font-size: 14px;
+                }
+            }
+
+            .section-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+
+                h3 {
+                    color: #4caf50;
+                    font-size: 16px;
+                    font-weight: normal;
+                }
+
+                .edit-btn {
+                    color: #2196f3;
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    font-size: 13px;
+                    &:hover{
+                        text-decoration: underline;
+                    }
+                }
+            }
+
+            .medical-history, .groups, .memberships {
+                margin-bottom: 30px;
+
+                .condition {
+                    color: #666;
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+}
+::ng-deep {
+    .p-dropdown {
+      width: 100%;
+      
+      .p-dropdown-label {
+        padding: 8px;
+      }
+    }
+    
+    .p-calendar {
+        .p-inputtext {
+          width: 100%;
+          padding: 4px 8px;
+        }
+    
+        .p-button {
+          width: 28px;
+          height: 28px;
+          
+          .p-button-icon {
+            font-size: 12px;
+          }
+        }
+      }
+    
+      // Radio button styling
+      .p-radiobutton {
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+    
+        .p-radiobutton-box {
+          width: 16px;
+          height: 16px;
+    
+          .p-radiobutton-icon {
+            width: 8px;
+            height: 8px;
+          }
+        }
+      }
+    
+      // Button styling
+      .p-button {
+        height: 28px;
+        padding: 4px 12px;
+        font-size: 13px;
+    
+        &.link-button {
+          background-color: #95a5a6;
+          border-color: #95a5a6;
+        }
+    
+        &.p-button-icon-only {
+          width: 28px;
+          padding: 4px;
+        }
+      }
+    
+    .p-inputtext {
+      padding: 8px;
+      font-size: 14px;
+    }
+  }
+
+  .medical-history-container {
+    padding: 16px;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+  
+      h3 {
+        font-size: 15px;
+        color: #333;
+        margin: 0;
+        font-weight: 500;
+      }
+  
+      .add-new-btn {
+        padding: 0;
+        font-size: 13px;
+        color: #2196f3;
+  
+        .pi {
+          font-size: 12px;
+          margin-right: 4px;
+        }
+  
+        &:hover {
+          background-color: transparent;
+        }
+      }
+    }
+  
+    .search-box {
+      margin-bottom: 12px;
+  
+      ::ng-deep .p-input-icon-left {
+        width: 100%;
+  
+        > i {
+          left: 8px;
+          color: #666;
+          font-size: 13px;
+        }
+  
+        > input {
+          padding-left: 28px;
+          font-size: 13px;
+          height: 28px;
+        }
+      }
+    }
+  
+    .conditions-list {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 16px;
+      padding-right: 8px;
+  
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+  
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+      }
+  
+      &::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 3px;
+      }
+  
+      .condition-item {
+        margin-bottom: 8px;
+  
+        ::ng-deep .p-checkbox {
+          width: 16px;
+          height: 16px;
+          margin-right: 8px;
+  
+          .p-checkbox-box {
+            width: 16px;
+            height: 16px;
+            border-color: #ccc;
+  
+            .p-checkbox-icon {
+              font-size: 11px;
+            }
+          }
+  
+          & + label {
+            font-size: 13px;
+            color: #666;
+          }
+        }
+      }
+    }
+  
+    .other-history {
+      h3 {
+        font-size: 14px;
+        color: #666;
+        margin: 0 0 8px 0;
+        font-weight: normal;
+      }
+  
+      ::ng-deep .p-inputtextarea {
+        font-size: 13px;
+        padding: 8px;
+        resize: none;
+        width: 100%;
+      }
+    }
+  }
+  .btn-add-complaint {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    background-color: transparent;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 14px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }

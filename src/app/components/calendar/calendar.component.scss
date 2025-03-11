@@ -1,0 +1,992 @@
+// Container styles
+.calendar-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #fff;
+  
+    .calendar-content {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      height: calc(100vh - 60px); // Adjust based on your top header height
+    }
+  }
+  
+  // Your existing styles
+  .calendar-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: #f0f0f5;
+    border-bottom: 1px solid #e0e0e0;
+  
+    .left-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+  
+      .title {
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: #333;
+      }
+  
+      .email-dropdown {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        color: #666;
+  
+        i {
+          font-size: 0.8rem;
+        }
+      }
+  
+      .learn-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        cursor: pointer;
+  
+        i {
+          color: #ffa500;
+        }
+  
+        &:hover {
+          background-color: #e9ecef;
+        }
+      }
+    }
+  
+    .right-section {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+  
+      .navigation {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+  
+        .nav-btn {
+          padding: 0.25rem 0.5rem;
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: #666;
+  
+          &:hover {
+            color: #333;
+          }
+        }
+  
+        .current-date {
+          font-weight: 500;
+          color: #333;
+        }
+      }
+  
+      .view-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+  
+        .view-btn {
+          padding: 0.5rem 1rem;
+          background: none;
+          border: 1px solid transparent;
+          border-radius: 4px;
+          cursor: pointer;
+          color: #666;
+  
+          &:hover {
+            background-color: #f8f9fa;
+          }
+  
+          &.active {
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+          }
+  
+          &.selected {
+            background-color: #6c757d;
+            color: white;
+          }
+  
+          i {
+            font-size: 1rem;
+          }
+        }
+      }
+  
+      .settings {
+        .settings-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 1rem;
+          background-color: #fff;
+          border: 1px solid #dee2e6;
+          border-radius: 4px;
+          cursor: pointer;
+          color: #666;
+  
+          &:hover {
+            background-color: #f8f9fa;
+          }
+  
+          i {
+            font-size: 0.8rem;
+          }
+        }
+      }
+    }
+  }
+  
+  // Media queries for responsiveness
+  @media screen and (max-width: 1024px) {
+    .calendar-top {
+      .right-section {
+        gap: 1rem;
+      }
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+    .calendar-top {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+  
+      .right-section {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  }
+  
+  @media screen and (max-width: 576px) {
+    .calendar-top {
+      .right-section {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+  
+        .view-controls {
+          order: 3;
+          width: 100%;
+          justify-content: space-between;
+        }
+      }
+    }
+  }
+  
+  .calendar-sidebar {
+    width: 280px;
+    background-color: #fff;
+    border-right: 1px solid #e0e0e0;
+    height: calc(100vh - 60px);
+    
+    .block-calendar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem;
+      border-bottom: 1px solid #e0e0e0;
+      color: #333;
+      font-weight: 500;
+      justify-content: center;
+
+      &:hover{
+        background-color: #f0f0f5;
+      }
+      i {
+        color: #666;
+      }
+    }
+  
+    h2 {
+      font-size: 0.8rem;
+      color: #666;
+      padding: 1rem;
+      margin: 0;
+    }
+  
+    .search-box {
+      position: relative;
+      padding: 0 1rem;
+      margin-bottom: 1rem;
+  
+      .search-input {
+        width: 100%;
+        padding: 0.5rem 2rem 0.5rem 0.75rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 0.8rem;
+  
+        &::placeholder {
+          color: #999;
+        }
+      }
+  
+      i {
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+        font-size: 0.8rem;
+      }
+    }
+  
+    .doctors-list, .categories-list {
+      .all-doctors {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 1rem;
+        background-color: #f8f9fa;
+        border-top: 1px solid #e0e0e0;
+        border-bottom: 1px solid #e0e0e0;
+        font-weight: 500;
+      }
+  
+      .doctors-scroll, .categories-scroll {
+        max-height: 300px;
+        overflow-y: auto;
+      }
+    }
+  
+    .doctor-item, .category-item {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      gap: 0.75rem;
+      cursor: pointer;
+  
+      &:hover {
+        background-color: #f8f9fa;
+      }
+  
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+  
+        &.green { background-color: #28a745; }
+        &.brown { background-color: #8B4513; }
+        &.pink { background-color: #e83e8c; }
+        &.purple { background-color: #6f42c1; }
+        &.teal { background-color: #20c997; }
+        &.magenta { background-color: #d63384; }
+        &.red { background-color: #dc3545; }
+        &.gray { background-color: #6c757d; }
+      }
+  
+      .doctor-name, .category-name {
+        flex-grow: 1;
+        font-size: 0.8rem;
+        color: #666;
+      }
+  
+      .count {
+        color: #999;
+        font-size: 0.8rem;
+      }
+    }
+  
+    .categories-section {
+        border-top: 1px solid #d5d5e1;
+        background-color: #f0f0f5;
+  
+      .categories-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-right: 1rem;
+  
+        .edit-link {
+          color: #0dcaf0;
+          font-size: 0.8rem;
+          cursor: pointer;
+          
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+  
+  // Scrollbar styling
+  .doctors-scroll, .categories-scroll {
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+  
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+  
+    &::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 3px;
+    }
+  
+    &::-webkit-scrollbar-thumb:hover {
+      background: #999;
+    }
+  }
+  
+  .calendar-main {
+    flex: 1;
+    padding: 1rem;
+    background: #fff;
+    
+    .custom-calendar {
+      // Header styles
+      .fc-col-header {
+        .fc-col-header-cell {
+          padding: 8px;
+          text-align: center;
+          background-color: #fff;
+          border-color: #e0e0e0;
+        }
+      }
+  
+      .fc-day-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.5rem;
+        
+        .day-name {
+          font-size: 0.8rem;
+          color: #666;
+          text-transform: uppercase;
+        }
+      }
+  
+      // General calendar styles
+      .fc {
+        &-header-toolbar {
+          display: none; // Using custom header
+        }
+  
+        &-day {
+          background: #fff;
+          border: 1px solid #e0e0e0;
+        }
+  
+        &-day-today {
+          background-color: #f8f9fa !important;
+        }
+  
+        &-daygrid-day-number {
+          font-size: 1rem;
+          padding: 8px;
+          color: #333;
+          font-weight: 500;
+        }
+  
+        &-daygrid-day-top {
+          justify-content: center;
+          padding-top: 5px;
+        }
+      }
+  
+      // Custom event styles
+      .custom-event-content {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+        border-radius: 4px;
+        margin: 2px 0;
+  
+        .new-indicator {
+          background: #2196f3;
+          color: white;
+          padding: 0.125rem 0.25rem;
+          border-radius: 2px;
+          font-size: 0.8rem;
+          font-weight: 500;
+        }
+  
+        .event-title {
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          color: #666 !important;
+        }
+      }
+  
+      // Event type styles
+      .available-event {
+        margin: 2px 4px;
+        border-left: 3px solid;
+      }
+  
+      .not-available-event {
+        margin: 2px 4px;
+        border-left: 3px solid;
+      }
+  
+      // More events indicator
+      .fc-more-link {
+        margin: 0 4px;
+        color: #2196f3;
+        font-size: 0.8rem;
+        font-weight: 500;
+        
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+  
+  // Calendar overrides for proper height
+  .fc {
+    height: 100% !important;
+    
+    .fc-view-harness {
+      height: calc(100% - 50px) !important;
+    }
+  
+    .fc-scroller {
+      height: 100% !important;
+    }
+  
+    .fc-daygrid-body {
+      height: 100% !important;
+    }
+  }
+  
+  // Responsive adjustments
+  @media screen and (max-width: 768px) {
+    .calendar-main {
+      padding: 0.5rem;
+      
+      .custom-calendar {
+        .fc-day-header {
+          .day-name {
+            font-size: 0.8rem;
+          }
+        }
+  
+        .fc-daygrid-day-number {
+          font-size: 0.8rem;
+        }
+        
+        .custom-event-content {
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+  .schedule-sidebar {
+    width: 320px;
+    background: #fff;
+    border-left: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  
+    // Header section
+    .schedule-header {
+      padding: 1rem;
+      border-bottom: 1px solid #e0e0e0;
+  
+      .schedule-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        font-weight: 500;
+        color: #333;
+  
+        .navigation-arrows {
+          display: flex;
+          gap: 0.5rem;
+  
+          .nav-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.25rem;
+            color: #666;
+  
+            &:hover {
+              color: #333;
+            }
+          }
+        }
+      }
+  
+      .add-appointment-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background: #fff;
+        border: 1px solid #ffa500;
+        border-radius: 4px;
+        color: #ffa500;
+        cursor: pointer;
+        font-weight: 500;
+  
+        &:hover {
+          background: #fff8e1;
+        }
+      }
+    }
+  
+    // Status tabs
+    .status-tabs {
+      border-bottom: 1px solid #e0e0e0;
+  
+      .tab-buttons {
+        display: flex;
+        padding: 0.5rem 1rem;
+        gap: 1rem;
+        background-color: #f0f0f5;
+
+        .tab-btn {
+          padding: 0.5rem 1rem;
+          background: none;
+          border: none;
+          color: #666;
+          cursor: pointer;
+          font-weight: 500;
+          position: relative;
+  
+          &.active {
+            color: #ffa500;
+  
+            &:after {
+              content: '';
+              position: absolute;
+              bottom: -0.5rem;
+              left: 0;
+              width: 100%;
+              height: 2px;
+              background: #ffa500;
+            }
+          }
+  
+          &:hover:not(.active) {
+            color: #333;
+          }
+        }
+      }
+  
+      .status-counters {
+        padding: 0.5rem 1rem;
+  
+        .counter-group {
+          display: flex;
+          gap: 1rem;
+  
+          .date-counter, .status-counter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.5rem;
+            min-width: 60px;
+  
+            .counter-label {
+              font-size: 0.8rem;
+              color: #666;
+              margin-bottom: 0.25rem;
+            }
+  
+            .counter-value {
+              font-size: 1rem;
+              font-weight: 500;
+              padding: 3px;
+              cursor: pointer;
+            }
+          }
+  
+          .date-counter {
+            border-radius: 4px;
+            color: #666666;
+  
+            .counter-label, .counter-value {
+              color: #666666;
+            }
+          }
+  
+          .status-counter {
+            &.waiting .counter-value {
+              color: #dc3545;
+            }
+  
+            &.engaged .counter-value {
+              color: #17a2b8;
+            }
+  
+            &.done .counter-value {
+              color: #28a745;
+            }
+          }
+        }
+      }
+    }
+  
+    // Appointments list
+    .appointments-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 0;
+  
+      .appointment-item {
+        display: flex;
+        gap: 1rem;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #f0f0f0;
+  
+        &:hover {
+          background: #f8f9fa;
+        }
+  
+        .appointment-time {
+          color: #666;
+          font-size: 0.8rem;
+          min-width: 70px;
+        }
+  
+        .appointment-content {
+          flex: 1;
+  
+          .appointment-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 0.25rem;
+            font-size: 0.8rem;
+            .new-tag {
+              background: #2196f3;
+              color: white;
+              padding: 0.125rem 0.25rem;
+              border-radius: 2px;
+              font-size: 0.8rem;
+              font-weight: 500;
+            }
+          }
+  
+          .appointment-details {
+            font-size: 0.8rem;
+            color: #666;
+  
+            .visit-reason {
+              margin-bottom: 0.25rem;
+            }
+  
+            .confirmation-info {
+              color: #999;
+              margin-bottom: 0.25rem;
+            }
+  
+            .doctor-name {
+              color: #2196f3;
+            }
+          }
+        }
+      }
+    }
+  
+    // Scrollbar styling
+    .appointments-list {
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+  
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+  
+      &::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 3px;
+      }
+  
+      &::-webkit-scrollbar-thumb:hover {
+        background: #999;
+      }
+    }
+  }
+  .doctors-section{
+    background-color: #f0f0f5;
+  }
+  ::ng-deep .fc {
+    .fc-event {
+      border: none !important;
+      padding: 0px 8px !important;
+      margin-bottom: 2px !important;
+      border-radius: 3px !important;
+      background-color: white !important;
+      color: #333 !important;
+      //height: 24px !important;  /* Fixed height for events */
+    }
+
+    .fc-daygrid-day {
+      height: 100px !important;
+    }
+
+    .fc-daygrid-day-frame {
+      height: 100px !important;
+      max-height: 120px !important;
+    }
+
+    .fc-daygrid-day-events {
+      position: relative !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      min-height: unset !important;
+      height: auto !important;
+    }
+
+    .fc-event-main {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100px;
+      //padding: 2px 0;
+
+      .custom-event-content {
+        border-radius: 3px;
+        .event-title {
+          color: #666;
+        }
+      }
+    }
+
+    .fc-more-link {
+      background-color: #f8f9fa;
+      padding: 2px 5px;
+      border-radius: 3px;
+      color: #666;
+      font-size: 0.9em;
+      margin-top: 2px !important;
+    }
+
+    .status-available {
+      border-left: 3px solid #4CAF50 !important;
+    }
+
+    .status-unavailable {
+      border-left: 3px solid #f44336 !important;
+    }
+
+    .status-na {
+      border-left: 3px solid #9e9e9e !important;
+      background-color: #f5f5f5 !important;
+    }
+  }
+
+  ::ng-deep .fc-event.status-na {
+    background-color: #f5f5f5 !important;
+    color: #424242 !important;
+  }
+
+  ::ng-deep .fc-more-link {
+    background-color: #f8f9fa;
+    padding: 2px 5px;
+    border-radius: 3px;
+    color: #666;
+    font-size: 0.9em;
+  }
+  
+  .counter-active{
+    background: #6c757d;
+    color:white !important;
+    border-radius: 3px;
+  }
+  .doctor-active{
+    background-color: #e0e0e0 !important;
+    color: white;
+  }
+
+  :ng-deep {
+    .fc-timegrid-event {
+      background: #4f46e5;
+      border: none;
+      border-radius: 4px;
+      padding: 2px 4px;
+      
+      .fc-v-event .fc-event-main {
+        padding: 2px 4px;
+        color: black !important;
+      }
+    }
+  
+    .fc-timegrid-slot-label {
+      font-size: 0.875rem;
+      color: #6b7280;
+      font-weight: 500;
+    }
+  
+    .fc-timegrid-axis {
+      background-color: #f9fafb;
+    }
+  
+    .fc-timegrid-now-indicator-line {
+      border-color: #dc2626;
+    }
+  
+    .fc-timegrid-now-indicator-arrow {
+      border-color: #dc2626;
+      border-width: 5px;
+    }
+  
+    .custom-event-content {
+      .event-title {
+        font-weight: 500;
+      }
+  
+      .event-details {
+        font-size: 0.75rem;
+        margin-top: 2px;
+        color: black !important;
+        .event-time {
+        color: black !important;
+        }
+        
+        .event-category {
+          color: black !important;
+
+          padding: 1px 4px;
+          border-radius: 4px;
+          margin-left: 4px;
+        }
+      }
+    }
+  
+    .fc-timegrid-event.status-unavailable {
+      background-color: #4f46e5;
+    }
+  
+    .fc-timegrid-event.status-waiting {
+      background-color: #eab308;
+    }
+  
+    .fc-timegrid-event.status-engaged {
+      background-color: #22c55e;
+    }
+  
+    .fc-timegrid-event.status-done {
+      background-color: #64748b;
+    }
+  }
+  :ng-deep {
+    .fc-v-event .fc-event-main {
+    padding: 2px 4px;
+    color: black !important;
+  }
+}
+
+:ng-deep {
+  .fc-timeGridWeek-view {
+    .fc-col-header {
+      .fc-col-header-cell {
+        .fc-day-header {
+          // Enhanced header for weekly view
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 0.5rem 0.25rem;
+          
+          .day-name {
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+          }
+          
+          .day-date {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #333;
+            margin-top: 0.25rem;
+          }
+        }
+      }
+    }
+    
+    // Adjusted event styles for weekly view
+    .fc-timegrid-event {
+      margin: 1px 0;
+      
+      .custom-event-content {
+        padding: 2px 4px;
+        
+        .event-title {
+          font-size: 0.8rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+    
+    // Highlight current day
+    .fc-day-today {
+      background-color: rgba(240, 240, 245, 0.5) !important;
+    }
+  }
+}
+::ng-deep {
+  // Style for events that can show popovers
+  .fc-event {
+    cursor: pointer;
+    transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+    
+    &:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      z-index: 100 !important;
+    }
+  }
+  
+  // Add styling for the popover panel
+  .event-popover-panel {
+    z-index: 1000;
+    
+    .cdk-overlay-pane {
+      z-index: 1000;
+    }
+  }
+}
+
+// Add a pointer indicator for events
+.custom-event-content {
+  position: relative;
+  
+  &:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.7);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  &:hover:after {
+    opacity: 1;
+  }
+}

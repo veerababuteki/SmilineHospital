@@ -1,0 +1,178 @@
+.profile-container {
+    background: white;
+    height: 100vh;
+    overflow-y: auto;
+    width: 100%;
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0px 20px 0px 20px;
+        border-bottom: 1px solid #e0e0e0;
+
+        .title {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+
+            button {
+                padding: 6px 12px;
+                border-radius: 4px;
+                font-size: 13px;
+                cursor: pointer;
+
+                &.btn-secondary {
+                    background: white;
+                    border: 1px solid #e0e0e0;
+                    color: #333;
+                }
+
+                &.btn-primary {
+                    background: #2196f3;
+                    border: none;
+                    color: white;
+                }
+            }
+        }
+    }
+
+    .profile-content {
+        display: flex;
+        gap: 30px;
+        padding: 0px 20px;
+        .main-content {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+
+            .profile-image-section {
+                width: 140px;
+                text-align: center;
+                padding-top: 20px;
+
+                .profile-image {
+                    width: 140px;
+                    height: 140px;
+                    background: #f5f5f5;
+                    border: 1px solid #e0e0e0;
+                    margin-bottom: 8px;
+                }
+
+                .change-photo-link {
+                    color: #2196f3;
+                    text-decoration: none;
+                    font-size: 13px;
+                }
+            }
+
+            .details-section {
+                flex: 1;
+                padding-top: 20px;
+
+                .info-grid {
+                    .info-row {
+                        display: flex;
+                        margin-bottom: 12px;
+                        font-size: 14px;
+
+                        .label {
+                            width: 150px;
+                            color: #666;
+                            text-align: right;
+                            padding-right: 15px;
+                        }
+
+                        .value {
+                            color: #333;
+
+                            .new-badge {
+                                background: #e3f2fd;
+                                color: #2196f3;
+                                padding: 2px 6px;
+                                border-radius: 3px;
+                                font-size: 12px;
+                                margin-right: 8px;
+                            }
+
+                            .add-link {
+                                color: #f90;
+                                text-decoration: underline;
+                                cursor: pointer;
+                            }
+                        }
+                    }
+
+                    .section-title {
+                        color: #4caf50;
+                        font-size: 16px;
+                        margin: 20px 0;
+                        font-weight: normal;
+                    }
+                }
+            }
+        }
+
+        .right-sidebar {
+            width: 300px;
+            padding-left: 20px;
+            padding-top: 20px;
+            border-left: 1px solid #e0e0e0;
+            .notes-section {
+                margin-bottom: 30px;
+
+                h3 {
+                    color: #4caf50;
+                    font-size: 16px;
+                    margin-bottom: 10px;
+                    font-weight: normal;
+                }
+
+                .note-input {
+                    width: 100%;
+                    padding: 8px;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 4px;
+                    font-size: 14px;
+                }
+            }
+
+            .section-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+
+                h3 {
+                    color: #4caf50;
+                    font-size: 16px;
+                    font-weight: normal;
+                }
+
+                .edit-btn {
+                    color: #2196f3;
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    font-size: 13px;
+                    &:hover{
+                        text-decoration: underline;
+                    }
+                }
+            }
+
+            .medical-history, .groups, .memberships {
+                margin-bottom: 30px;
+
+                .condition {
+                    color: #666;
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+}

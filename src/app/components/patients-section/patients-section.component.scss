@@ -1,0 +1,310 @@
+.calendar-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: #f0f0f5;
+    border-bottom: 1px solid #e0e0e0;
+  
+    .left-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+  
+      .title {
+        font-size: 1.6rem;
+        font-weight: 500;
+        color: #333;
+      }
+  
+      .email-dropdown {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        color: #666;
+  
+        i {
+          font-size: 0.8rem;
+        }
+      }
+  
+      
+    }
+  }
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    height: 48px;
+
+    .left-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .user-icon {
+            width: 30px;
+            height: 30px;
+            filter: invert(46%) sepia(66%) saturate(2038%) hue-rotate(177deg) brightness(97%) contrast(91%);
+            cursor: pointer;
+            padding: 2px;
+            &:hover {
+                border-radius: 4px;
+                // border: 1px solid #e0e0e0;
+                box-shadow: 2px 2px 2px 2px;
+            }
+        }
+        .profile-photo {
+            width: 47px;
+            height: 32px;
+            border-radius: 2px;
+        }
+
+        .patient-info {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
+            color: #577996;
+
+            .separator {
+                color: #666;
+            }
+
+            .id {
+                margin-left: 4px;
+                color: #666;
+            }
+        }
+    }
+
+    .medical-history-btn {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 12px;
+        background-color: white;
+        border: 1px solid #e0e0e0;
+        color: #577996;
+        font-size: 14px;
+        cursor: pointer;
+        border-radius: 5px;
+        .arrow {
+            font-size: 16px;
+            margin-left: 2px;
+        }
+
+        &:hover {
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+    }
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .top-bar {
+        .patient-info {
+            .gender, .age, .separator {
+                display: none;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .top-bar {
+        padding: 8px;
+        
+        .left-section {
+            gap: 8px;
+            
+            .user-icon {
+                width: 16px;
+                height: 16px;
+            }
+            
+            .profile-photo {
+                width: 24px;
+                height: 24px;
+            }
+            
+            .patient-info {
+                font-size: 13px;
+            }
+        }
+        
+        .medical-history-btn {
+            padding: 4px 8px;
+            font-size: 13px;
+        }
+    }
+}
+
+.adjust{
+    border-left: 1px solid #e0e0e0;
+    padding-left: 13px;
+}
+
+.side-nav {
+    width: 250px;
+    background: white;
+    height: 100vh;
+    border-right: 1px solid #e0e0e0;
+    position: relative;
+    transition: width 0.3s ease-in-out;
+    
+    &.collapsed {
+        width: 50px;
+        
+        .section-header .label,
+        .nav-item span,
+        .nav-item .count {
+            display: none;
+        }
+        
+        .section-header {
+            padding: 12px 10px;
+            justify-content: center;
+        }
+        
+        .nav-item {
+            padding: 10px;
+            justify-content: center;
+            
+            i {
+                margin: 0;
+            }
+        }
+        
+        .collapse-toggle {
+            right: 0;
+        }
+    }
+
+    .collapse-toggle {
+        position: absolute;
+        top: 10px;
+        right: -1px;
+        width: 24px;
+        height: 24px;
+        background: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        transition: right 0.3s ease-in-out;
+        
+        &:hover {
+            background: #f5f5f5;
+        }
+        
+        i {
+            font-size: 12px;
+            color: #666;
+        }
+    }
+
+    .nav-section {
+        .section-header {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 12px 15px;
+            cursor: pointer;
+            color: #666;
+            font-size: 14px;
+            border-bottom: 1px solid #e0e0e0;
+            overflow: hidden;
+
+            .pi-chevron-down {
+                font-size: 12px;
+                transition: transform 0.3s;
+
+                &.rotated {
+                    transform: rotate(-90deg);
+                }
+            }
+        }
+
+        .section-content {
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+
+            &.collapsed {
+                max-height: 0;
+            }
+
+            .nav-item {
+                display: flex;
+                align-items: center;
+                padding: 10px 15px;
+                color: #555;
+                text-decoration: none;
+                font-size: 14px;
+                cursor: pointer;
+                gap: 10px;
+                overflow: hidden;
+
+                &:hover {
+                    background-color: #f5f5f5;
+                }
+
+                &.active {
+                    background-color: #0098E5;
+                    color: white;
+
+                    .count {
+                        background: rgba(255, 255, 255, 0.2);
+                    }
+                }
+
+                i {
+                    font-size: 16px;
+                    min-width: 20px;
+                }
+
+                span {
+                    white-space: nowrap;
+                }
+
+                .count {
+                    background: #f0f0f0;
+                    border-radius: 12px;
+                    padding: 2px 8px;
+                    font-size: 12px;
+                    color: #666;
+                }
+            }
+        }
+    }
+}
+
+.display-none{
+    visibility: hidden;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+
+    .side-nav {
+        width: 250px;
+        flex-shrink: 0;
+        transition: width 0.3s ease;
+        
+        &.collapsed {
+            width: 50px;
+        }
+    }
+}

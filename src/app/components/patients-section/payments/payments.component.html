@@ -1,0 +1,49 @@
+<!-- HTML -->
+<div class="appointments-container">
+    <div class="appointments-header">
+        <h2>PAYMENTS</h2>
+        <div>
+            <button class="mark-btn-active">Refund</button>
+            <button class="add-btn">+ Add</button>
+        </div>
+    </div>
+    <div>
+    <!-- <div class="appointment-date">{{ payment.key | date: 'dd MMM, yyyy'}}</div> -->
+
+    <div class="treatment-plan" *ngFor="let payment of payments">
+        <table class="completed-procedures">
+            <thead>
+                <tr>
+                    <th class="procedure-col">RECEIPT NUMBER</th>
+                    <th class="cost-col">AMOUNT PAID</th>
+                    <th class="discount-col">INVOICES</th>
+                    <th class="total-col">TOWARDS</th>
+                    <th class="notes-col">MODE OF PAYMENT</th>
+                    <th class="actions-col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- First Procedure -->
+                <tr class="procedure-row">
+                    <td class="procedure-col">{{payment.receipt_id}}</td>
+                    <td class="cost-col">{{payment.amount_paid}}</td>
+                    <td class="discount-col">{{payment.invoice_id}}</td>
+                    <td class="total-col"></td>
+                    <td class="notes-col">{{payment.payment_mode}}</td>
+                    <td class="actions-col">
+                        <button class="edit-btn border-left-radius">
+                            <i class="pi pi-print"></i>
+                        </button>
+                        <button class="edit-btn border-right-radius">
+                            <i class="pi pi-chevron-down"></i>
+                        </button>
+                    </td>
+                </tr>
+                <!-- <tr class="completed-by">
+                    <td colspan="6"><span class="doctor">Notes:</span>&nbsp;Scaling</td>
+                </tr> -->
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>

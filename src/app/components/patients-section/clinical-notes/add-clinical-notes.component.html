@@ -1,0 +1,129 @@
+<div class="clinical-notes">
+    <header class="header">
+      <h1>CLINICAL NOTES</h1>
+      <div class="header-buttons">
+        <button class="btn-cancel" (click)="cancel()">Cancel</button>
+        <button class="btn-save" (click)="saveNote()">Save Clinical Note</button>
+      </div>
+    </header>
+  
+    <div class="main-content">
+      <div class="left-section">
+        <div class="form-group">
+          <label>Chief Complaints</label>
+          <div class="dynamic-inputs">
+            <div *ngFor="let complaint of selectedComplaints; let i = index" class="input-group">
+              <textarea type="text" [(ngModel)]="complaint.value" class="form-control"></textarea>
+              <button class="remove-btn" (click)="removeItem('complaints', i)"><i class="pi pi-trash"></i></button>
+            </div>
+            <div class="input-group" *ngIf="!hasEmptyComplaint()">
+              <textarea type="text" [(ngModel)]="newComplaint" class="form-control" placeholder="complaint"></textarea>
+              <button class="add-btn" [class.visibility-hidden]="!newComplaint"><i class="pi pi-plus"></i></button>
+            </div>
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label>Observations</label>
+          <div class="dynamic-inputs">
+            <div *ngFor="let observation of selectedObservations; let i = index" class="input-group">
+              <textarea type="text" [(ngModel)]="observation.value" class="form-control"></textarea>
+              <button class="remove-btn" (click)="removeItem('observations', i)"><i class="pi pi-trash"></i></button>
+            </div>
+            <div class="input-group" *ngIf="!hasEmptyObservation()">
+              <textarea type="text" [(ngModel)]="newObservation" class="form-control" placeholder="observation"></textarea>
+              <button class="add-btn" [class.visibility-hidden]="!newObservation"><i class="pi pi-plus"></i></button>
+            </div>
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label>Investigations</label>
+          <div class="dynamic-inputs">
+            <div *ngFor="let investigation of selectedInvestigations; let i = index" class="input-group">
+              <textarea type="text" [(ngModel)]="investigation.value" class="form-control"></textarea>
+              <button class="remove-btn" (click)="removeItem('investigations', i)"><i class="pi pi-trash"></i></button>
+            </div>
+            <div class="input-group" *ngIf="!hasEmptyInvestigation()">
+              <textarea type="text" [(ngModel)]="newInvestigation" class="form-control" placeholder="investigation"></textarea>
+              <button class="add-btn" [class.visibility-hidden]="!newInvestigation"><i class="pi pi-plus"></i></button>
+            </div>
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label>Diagnoses</label>
+          <div class="dynamic-inputs">
+            <div *ngFor="let diagnosis of selectedDiagnoses; let i = index" class="input-group">
+              <textarea type="text" [(ngModel)]="diagnosis.value" class="form-control"></textarea>
+              <button class="remove-btn" (click)="removeItem('diagnoses', i)"><i class="pi pi-trash"></i></button>
+            </div>
+            <div class="input-group" *ngIf="!hasEmptyDiagnosis()">
+              <textarea type="text" [(ngModel)]="newDiagnosis" class="form-control" placeholder="diagnosis"></textarea>
+              <button class="add-btn" [class.visibility-hidden]="!newDiagnosis"><i class="pi pi-plus"></i></button>
+            </div>
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label>Notes</label>
+          <div class="dynamic-inputs">
+            <div *ngFor="let note of selectedNotes; let i = index" class="input-group">
+              <textarea type="text" [(ngModel)]="note.value" class="form-control"></textarea>
+              <button class="remove-btn" (click)="removeItem('notes', i)"><i class="pi pi-trash"></i></button>
+            </div>
+            <div class="input-group" *ngIf="!hasEmptyNote()">
+              <textarea type="text" [(ngModel)]="newNote" class="form-control" placeholder="note"></textarea>
+              <button class="add-btn" [class.visibility-hidden]="!newNote"><i class="pi pi-plus"></i></button>
+            </div>
+          </div>
+        </div>
+  
+        <div class="follow-up">
+          <span>Next follow-up on</span>
+          <p-calendar [(ngModel)]="followupDate" dateFormat="dd-mm-yy"></p-calendar>
+        </div>
+  
+        <div class="noted-by">
+          <span class="padding-span">Noted by Dr.</span>
+          <p-dropdown [(ngModel)]="doctor" [options]="doctors" optionLabel="name" showIcon="false" 
+            class="doctor-name no-icon-dropdown no-border-dropdown"
+            [style]="{'width':'100%'}" [placeholder]="'Select Doctor'">
+          </p-dropdown>
+          <span class="padding-span">on</span>
+          <p-calendar [(ngModel)]="date" dateFormat="dd-mm-yy"></p-calendar>
+        </div>
+      </div>
+  
+      <div class="right-section">
+        <div class="complaints-header">
+          <p-dropdown 
+            [options]="categories" 
+            [(ngModel)]="selectedCategory" 
+            optionLabel="name"
+            [style]="{'min-width': '150px'}"
+            styleClass="custom-dropdown"
+            (onChange)="onCategoryChange($event)"
+          ></p-dropdown>
+          <button class="btn-add-complaint">
+            <span *ngIf="!add" (click)="add = true">Add</span>
+            <span *ngIf="add" (click)="add = false">Done</span>
+          </button>
+        </div>
+  
+        <div class="search-box">
+          <input type="text" *ngIf="!add" [(ngModel)]="searchText" (input)="filterItems()" placeholder="Search" class="search-input">
+          <input type="text" *ngIf="add" (keydown.enter)="addItem()" [(ngModel)]="addText" placeholder="Add" class="search-input">
+        </div>
+  
+        <div class="complaints-list">
+          <div *ngFor="let item of filteredItems" 
+               class="complaint-item"
+               (click)="addSelectedItem(item)"
+               [class.selected]="isItemSelected(item)">
+            {{item}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
