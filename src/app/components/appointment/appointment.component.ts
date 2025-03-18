@@ -1,5 +1,5 @@
 // appointment.component.ts
-import { Component, Input, input, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
@@ -66,6 +66,7 @@ export class AppointmentComponent implements OnInit {
   appointementId!: number;
   appointment: any;
   @Input() patientCode: any;
+  @Output() closeDialog: EventEmitter<void> = new EventEmitter<void>();
   
   constructor(private fb: FormBuilder, private router: Router, private userService: UserService, private appointmentService: AppointmentService) {}
 
@@ -250,8 +251,6 @@ export class AppointmentComponent implements OnInit {
           this.display = false;
           if(this.fromPatientsection){
             this.router.navigate(['/calendar'])
-          } else{
-            window.location.reload();
           }
         });
       }
@@ -286,6 +285,10 @@ export class AppointmentComponent implements OnInit {
       });
     }
     
+  }
+
+  onDialogClose() {
+    this.closeDialog.emit(); // Notify parent
   }
   
 }

@@ -52,7 +52,6 @@ export class TreatmentPlansComponent implements OnInit {
   loadPatientData(patientId: string){
     if(this.patientId !== null && this.patientId !== undefined){
       this.treatmentPlansService.getTreatmentPlans(Number(this.patientId)).subscribe(res => {
-        this.sortByDate(res.data.rows);
         this.treatmentPlans = this.groupByDate(res.data.rows);
       });
     }

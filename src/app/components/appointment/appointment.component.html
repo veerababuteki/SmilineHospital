@@ -4,7 +4,8 @@
   [style]="{width: '800px'}" 
   [draggable]="false" 
   [resizable]="false"
-  styleClass="appointment-dialog">
+  styleClass="appointment-dialog"
+  (onHide)="onDialogClose()">
   
   <div class="appointment-form">
     <!-- Tabs -->

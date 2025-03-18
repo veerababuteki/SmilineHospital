@@ -134,7 +134,12 @@
         </div>
       </div>
       
-      <app-appointment #myButton [editAppointment]="editAppointment" *ngIf="isDataLoaded" [data]="'appointment'" [currentUser]="currentUser" [isDoctor]="isAdmin  || isDoctor" [doctors]="doctors" [categories]="categories"></app-appointment>
+      <app-appointment #myButton [editAppointment]="editAppointment" 
+      *ngIf="isDataLoaded" [data]="'appointment'" 
+      [currentUser]="currentUser" 
+      [isDoctor]="isAdmin  || isDoctor" [doctors]="doctors" 
+      [categories]="categories"
+      (closeDialog)="handleDialogClose()"></app-appointment>
     </div>
   
     <!-- Status tabs -->

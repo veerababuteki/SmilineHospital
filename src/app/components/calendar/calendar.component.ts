@@ -255,6 +255,13 @@ export class CalendarComponent implements OnInit {
       this.myButton.showDialog(false);
     }
   }
+
+  handleDialogClose() {
+    console.log("Parent detected dialog close!");
+    // Handle any logic when the dialog closes
+    this.changeView(this.currentView);
+  }
+
   filteredDoctors() {
     return this.doctorsList.filter(doctor => 
       `${doctor.first_name} ${doctor.last_name}`.toLowerCase().includes(this.searchText.toLowerCase())
@@ -763,6 +770,9 @@ export class CalendarComponent implements OnInit {
       this.updateMonthRange();
     } else if (viewName === 'timeGridWeek') {
       this.updateWeekRange();
+    }
+    else{
+      this.changeDailyViewDate(0);
     }
   }
 
