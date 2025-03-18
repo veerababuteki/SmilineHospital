@@ -93,8 +93,9 @@ export class CalendarComponent implements OnInit {
     dayMaxEvents: 4,
     initialView: 'dayGridMonth',
     nowIndicator: true,
-    editable: false,
-    selectable: false,
+    editable: true,
+    selectable: true,
+    eventResizableFromStart: true, // Allow resizing from start
     dateClick: (info: DateClickArg) => {
       this.handleDateClick(info);
     },
@@ -108,6 +109,7 @@ export class CalendarComponent implements OnInit {
       this.showEventList(args.date, args.allSegs.map(seg => seg.event));
       return 'list';
     },
+    
     eventMouseEnter: (info) => {
       // Store the current event to track if mouse moved to another event
       this.currentHoverEvent = info.event;
@@ -205,7 +207,8 @@ export class CalendarComponent implements OnInit {
           </div>
         `
       };
-    }
+    },
+    eventResize: this.handleEventResize.bind(this), // Handle resize event
   };
   selectedEvent: any = null;
   showCancelDialog: boolean = false;
@@ -224,6 +227,21 @@ export class CalendarComponent implements OnInit {
     private authService: AuthService, private messageService: MessageService, private userService:UserService, private appointmentService: AppointmentService){
     
   }
+
+  handleEventResize(eventResizeInfo: any) {
+
+    console.log(eventResizeInfo);
+    // const updatedEvent: EventApi = eventResizeInfo.event;
+    // console.log('Event Resized:', updatedEvent.title, updatedEvent.start, updatedEvent.end);
+    
+    // // Update event in your data source (API/database)
+    // this.events = this.events.map(event =>
+    //   event.id === updatedEvent.id
+    //     ? { ...event, start: updatedEvent.start.toISOString(), end: updatedEvent.end.toISOString() }
+    //     : event
+    // );
+  }
+
   private handleDateClick(info: any) {
     // Get the clicked date
     const clickedDate = info.date;

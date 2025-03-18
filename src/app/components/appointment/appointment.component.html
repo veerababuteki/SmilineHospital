@@ -75,8 +75,14 @@
           <span>at</span>
           <p-calendar formControlName="scheduledTime" [timeOnly]="true" [showIcon]="false" hourFormat="12"></p-calendar>
           <span>for</span>
-          <p-dropdown formControlName="duration" [options]="durations" [style]="{'width':'120px'}"></p-dropdown>
-        </div>
+          <p-dropdown 
+          formControlName="duration" 
+          [options]="durations" 
+          optionLabel="label" 
+          optionValue="value" 
+          [style]="{'width':'120px'}">
+        </p-dropdown>
+                </div>
       </div>
 
       <div class="form-row">

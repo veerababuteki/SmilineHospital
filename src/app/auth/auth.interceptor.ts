@@ -1,7 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from './../services/auth.service';
-import { Observable, switchMap, throwError } from 'rxjs';
+import { catchError, Observable, switchMap, throwError } from 'rxjs';
 import { HttpRequest, HttpHandlerFn, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 
 export const AuthInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> => {
@@ -9,7 +9,10 @@ export const AuthInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
   const token = authService.getAccessToken();
   const expiresAt = localStorage.getItem('expiresAt');
 
-  if (token && expiresAt && new Date(expiresAt) < new Date()) {
+  // Bypass interceptor for refresh token API
+  var isRefreshTokenCall = req.url.includes('/refreshToken');
+
+  if (token && expiresAt && new Date(expiresAt) < new Date() && !isRefreshTokenCall) {
     return authService.refreshToken().pipe(
       switchMap(() => {
         const newToken = authService.getAccessToken();
@@ -18,7 +21,10 @@ export const AuthInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
         });
         return next(clonedRequest);
       }),
-      throwError
+      catchError((error) => {
+        console.error('Token refresh failed:', error);
+        return next(req); // Proceed with the original request (without a token) in case of failure
+      })
     );
   }
 

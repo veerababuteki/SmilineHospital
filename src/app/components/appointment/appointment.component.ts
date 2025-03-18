@@ -39,7 +39,16 @@ export class AppointmentComponent implements OnInit {
   appointmentForm!: FormGroup;
   blockCalendarForm!: FormGroup;
   display: boolean = false;
-  durations: string[] = ['15', '30', '45', '60' ];
+  durations = [
+    { label: '15 Min', value: 15 },
+    { label: '30 Min', value: 30 },
+    { label: '45 Min', value: 45 },
+    { label: '1 Hr', value: 60 },
+    { label: '2 Hrs', value: 120 },
+    { label: '3 Hrs', value: 180 },
+    { label: '4 Hrs', value: 240 },
+    { label: '5 Hrs', value: 300 }
+  ];  
   bookingTypes: string[] = ['offline', 'online'];
   status: string[] = ["Scheduled", "Completed", "Canceled", "Rescheduled"];
   appointmentStatus: string[] = ['None', 'Waiting', 'Engaged', 'Done'];

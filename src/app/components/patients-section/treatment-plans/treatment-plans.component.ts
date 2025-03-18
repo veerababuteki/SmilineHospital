@@ -52,10 +52,10 @@ export class TreatmentPlansComponent implements OnInit {
   loadPatientData(patientId: string){
     if(this.patientId !== null && this.patientId !== undefined){
       this.treatmentPlansService.getTreatmentPlans(Number(this.patientId)).subscribe(res => {
+        this.sortByDate(res.data.rows);
         this.treatmentPlans = this.groupByDate(res.data.rows);
       });
     }
-    
   }
   onCheckboxChange(treatment: any, treatmentId: number, treatment_unique_id: string){
     if(treatment.isChecked){
@@ -84,8 +84,8 @@ export class TreatmentPlansComponent implements OnInit {
   //   }, {} as Record<string, any[]>);
   // }
   groupByDate(rows: any[]) {
-    return rows.reduce((acc, row) => {
-      const dateKey = row.date.split('T')[0];
+    const groupedByDate = rows.reduce((acc, row) => {
+      const dateKey = row.date.split('T')[0]; // Extract date part
       if (!acc[dateKey]) {
         acc[dateKey] = {};
       }
@@ -102,7 +102,28 @@ export class TreatmentPlansComponent implements OnInit {
       acc[dateKey][treatmentKey].push(row);
       return acc;
     }, {} as Record<string, Record<string, any[]>>);
+  
+    Object.keys(groupedByDate).forEach(dateKey => {
+      const treatmentGroups = groupedByDate[dateKey];
+  
+      // Sort each treatment group by date (Ascending)
+      Object.values(treatmentGroups).forEach((records:any) => {
+        records.sort((a:any, b:any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      });
+  
+      // Sort treatment groups by their **latest** date (Descending)
+      groupedByDate[dateKey] = Object.fromEntries(
+        Object.entries(treatmentGroups).sort(([, recordsA]:[string,any], [, recordsB]:[string,any]) => {
+          const latestDateA = new Date(recordsA[recordsA.length - 1].date).getTime();
+          const latestDateB = new Date(recordsB[recordsB.length - 1].date).getTime();
+          return latestDateA - latestDateB; // Newest treatment first
+        })
+      );
+    });
+  
+    return groupedByDate;
   }
+  
 
   markAsComplete(){
     if(this.markCompleteList.length == 0) return;
