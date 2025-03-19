@@ -83,44 +83,40 @@ export class TreatmentPlansComponent implements OnInit {
   //   }, {} as Record<string, any[]>);
   // }
   groupByDate(rows: any[]) {
+    rows.sort((a:any, b:any) => new Date(b.date).getTime() - new Date(a.date).getTime());
     const groupedByDate = rows.reduce((acc, row) => {
       const dateKey = row.date.split('T')[0]; // Extract date part
-      if (!acc[dateKey]) {
-        acc[dateKey] = {};
-      }
   
-      const treatmentKey = row.treatment_unique_id;
-      if (!acc[dateKey][treatmentKey]) {
-        acc[dateKey][treatmentKey] = [];
+      const treatmentKey = row.date;
+      if (!acc[dateKey]) {
+        acc[dateKey] = [];
       }
   
       if (row.status === 'Completed') {
         row.isChecked = true;
       }
   
-      acc[dateKey][treatmentKey].push(row);
+      acc[dateKey].push(row);
       return acc;
     }, {} as Record<string, Record<string, any[]>>);
   
-    Object.keys(groupedByDate).forEach(dateKey => {
-      const treatmentGroups = groupedByDate[dateKey];
-  
-      // Sort each treatment group by date (Ascending)
-      Object.values(treatmentGroups).forEach((records:any) => {
-        records.sort((a:any, b:any) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      });
-  
-      // Sort treatment groups by their **latest** date (Descending)
-      groupedByDate[dateKey] = Object.fromEntries(
-        Object.entries(treatmentGroups).sort(([, recordsA]:[string,any], [, recordsB]:[string,any]) => {
-          const latestDateA = new Date(recordsA[recordsA.length - 1].date).getTime();
-          const latestDateB = new Date(recordsB[recordsB.length - 1].date).getTime();
-          return latestDateA - latestDateB; // Newest treatment first
-        })
-      );
-    });
-  
     return groupedByDate;
+  }
+
+  getSortedTreatmentIds(rows: any) {
+    // Step 1: Sort rows by date in descending order
+    rows.sort((a:any, b:any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  
+    // Step 2: Extract unique treatment IDs while maintaining order
+    const uniqueIds = new Set<string>();
+    return rows.map((row: any) => row.treatment_unique_id).filter((id: any) => uniqueIds.has(id) ? false : uniqueIds.add(id));
+  }
+
+  filterRowsByTreatment(
+    rows: any, 
+    treatmentKey: any
+  ) {
+    return rows.filter((row:any) => row.treatment_unique_id === treatmentKey);
   }
   
 

@@ -12,7 +12,7 @@
     <div *ngFor="let date of getSortedDates()">
       <div class="appointment-date">{{ date | date: 'dd MMM, yyyy'}}</div>
 
-      <div class="treatment-plan" *ngFor="let treatmentGroup of treatmentPlans[date] | keyvalue">
+      <div class="treatment-plan" *ngFor="let treatmentkey of getSortedTreatmentIds(treatmentPlans[date]) | keyvalue">
         <table class="procedures-table">
             <thead>
                 <tr>
@@ -26,7 +26,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let treatment of treatmentGroup.value">
+                <tr *ngFor="let treatment of filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)">
                     <td><input type="checkbox" class="procedure-checkbox" 
                       [checked]="treatment.status?.toLowerCase() === 'completed'" [(ngModel)]="treatment.isChecked"
                       [disabled]="treatment.status?.toLowerCase() === 'completed'"
@@ -50,10 +50,10 @@
     
         <div class="plan-footer">
             <div class="planned-by">
-                Planned by <span class="doctor-name">{{"Dr. " + treatmentGroup.value[0]?.doctor_details_treat.user_profile_details[0].first_name +" "+ treatmentGroup.value[0].doctor_details_treat.user_profile_details[0].last_name}}</span>
+                Planned by <span class="doctor-name">{{"Dr. " + filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)[0]?.doctor_details_treat.user_profile_details[0].first_name +" "+ filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)[0].doctor_details_treat.user_profile_details[0].last_name}}</span>
             </div>
             <div class="estimated-amount">
-                Estimated amount: <span class="amount">{{treatmentGroup.value[0]?.grand_total}}</span>
+                Estimated amount: <span class="amount">{{filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)[0]?.grand_total}}</span>
             </div>
         </div>
     </div>
