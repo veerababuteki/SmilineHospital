@@ -228,6 +228,7 @@ export class CalendarComponent implements OnInit {
   selectedCategory: string | null = null;
   appointments!: any[];
   displayAddPatientDialog:boolean = false;
+  uniqueCode:string = "";
   constructor(private dialogService: DialogService, private overlay: Overlay, private datePipe: DatePipe,
     private authService: AuthService, private messageService: MessageService, private userService:UserService, private appointmentService: AppointmentService){
     
@@ -265,10 +266,15 @@ export class CalendarComponent implements OnInit {
     console.log("Parent detected dialog close!");
     // Handle any logic when the dialog closes
     this.changeView(this.currentView);
-
+    this.uniqueCode = "";
     if(event.isOpenPatientDialog){
       this.displayAddPatientDialog = true;
     }
+  }
+
+  savePatient(event){
+    this.displayAddPatientDialog = false;
+    this.uniqueCode = event.
   }
 
   filteredDoctors() {

@@ -139,13 +139,14 @@
       [modal]="true"
       [draggable]="false"
       [resizable]="false">
-        <app-add-profile #addPatientButton>
+        <app-add-profile #addPatientButton (onSave)="savePatient($event)">
           + Add patient
         </app-add-profile>
       </p-dialog>
 
       <app-appointment #myButton [editAppointment]="editAppointment" 
       *ngIf="isDataLoaded" [data]="'appointment'" 
+      [patientCode]="uniqueCode"
       [currentUser]="currentUser" 
       [isDoctor]="isAdmin  || isDoctor" [doctors]="doctors" 
       [categories]="categories"
