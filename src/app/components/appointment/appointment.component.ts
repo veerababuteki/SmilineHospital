@@ -31,7 +31,7 @@ import { Router } from '@angular/router';
     CheckboxModule,
     RadioButtonModule,
     ReactiveFormsModule,
-    CommonModule
+    CommonModule,
   ]
 })
 export class AppointmentComponent implements OnInit {
@@ -66,7 +66,7 @@ export class AppointmentComponent implements OnInit {
   appointementId!: number;
   appointment: any;
   @Input() patientCode: any;
-  @Output() closeDialog: EventEmitter<void> = new EventEmitter<void>();
+  @Output() closeDialog: EventEmitter<any> = new EventEmitter<any>();
   
   constructor(private fb: FormBuilder, private router: Router, private userService: UserService, private appointmentService: AppointmentService) {}
 
@@ -287,8 +287,11 @@ export class AppointmentComponent implements OnInit {
     
   }
 
-  onDialogClose() {
-    this.closeDialog.emit(); // Notify parent
+  openPatientDialog(){
+    this.display = false;
   }
-  
+
+  onDialogClose() {
+    this.closeDialog.emit({isOpenPatientDialog:true}); // Notify parent
+  }
 }

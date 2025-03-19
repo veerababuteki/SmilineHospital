@@ -28,6 +28,7 @@ import { EventPopoverComponent } from './event-popover/event-popover.component';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MessageService } from 'primeng/api';
 import { CancelAppointmentDialogComponent } from './cancel-appointment-dialog';
+import { AddProfileComponent } from '../patients-section/edit-profile/add-profile.component';
 
 interface Doctor {
   id: string;
@@ -55,12 +56,15 @@ interface Doctor {
     AppointmentComponent,
     OverlayModule,
     CancelAppointmentDialogComponent,
+    AddProfileComponent
   ],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
 })
 export class CalendarComponent implements OnInit {
   @ViewChild('myButton', { static: false }) myButton!: AppointmentComponent;
+  @ViewChild('addPatientButton', { static: false }) addPatientButton!: AddProfileComponent ;
+
   currentView: 'dayGridMonth' | 'timeGridDay' | 'timeGridWeek' = 'dayGridMonth';
 
   doctorsList: any [] = [];
@@ -223,6 +227,7 @@ export class CalendarComponent implements OnInit {
   selectedDoctor: string | null = null;
   selectedCategory: string | null = null;
   appointments!: any[];
+  displayAddPatientDialog:boolean = false;
   constructor(private dialogService: DialogService, private overlay: Overlay, private datePipe: DatePipe,
     private authService: AuthService, private messageService: MessageService, private userService:UserService, private appointmentService: AppointmentService){
     
@@ -256,10 +261,14 @@ export class CalendarComponent implements OnInit {
     }
   }
 
-  handleDialogClose() {
+  handleDialogClose(event:any) {
     console.log("Parent detected dialog close!");
     // Handle any logic when the dialog closes
     this.changeView(this.currentView);
+
+    if(event.isOpenPatientDialog){
+      this.displayAddPatientDialog = true;
+    }
   }
 
   filteredDoctors() {
