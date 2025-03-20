@@ -57,4 +57,9 @@
         </div>
     </div>
     </div>
+    <div class="no-completed-procedure-container" *ngIf="getSortedDates().length <= 0">
+        <img class="icon" src="assets/completed-procedures.png" />
+        <h3>No completed Procedures added</h3>
+        <button class="add-treatment-btn" (click)="navigateToAddPage()">+ Add</button>
+    </div>
 </div>

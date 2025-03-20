@@ -703,9 +703,15 @@
             }
 
             .assign-button{
-              height: 15px;
+              height: 18px;
               margin-left: 10px;
               font-size: 10px;
+              width: 60px;
+            }
+
+            .doctor-details-container{
+              display: flex;
+              justify-content: space-between;
             }
           }
         }

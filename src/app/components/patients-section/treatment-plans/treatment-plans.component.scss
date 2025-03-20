@@ -192,4 +192,25 @@ tbody{
     border-left: 3px solid;
 }
 
+.no-treatment-plan-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 100px;
+    .icon {
+        height: 50px;
+        width: 50px;
+    }
+}
+
+.add-treatment-btn {
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
 /* treatment-plan.component.scss */

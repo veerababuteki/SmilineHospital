@@ -472,9 +472,28 @@
 
 .error-message{
   color: #ff0000;
+  font-size: 13px;
 }
 
-.add-paitent-btn{
-  margin-left: 10px;
-  margin-top: 10px;;
+
+
+.add-patient-container {
+  margin-top: 15px;
+  display: flex;
+  background: #e9e9ff;
+  border: solid #696cff;
+  border-width: 0 0 0 6px;
+  color: #696cff;
+  padding: 10px;
+
+  .message {
+    font-size: 13px;
+    align-self: center;
+  }
+
+  .add-paitent-btn {
+    font-size: 13px;
+    height: 25px;
+    margin-left: 20px;
+  }
 }

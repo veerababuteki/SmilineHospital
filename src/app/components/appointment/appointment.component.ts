@@ -16,6 +16,8 @@ import { AppointmentService } from '../../services/appointment.service';
 import { format } from 'date-fns';
 import { empty } from 'rxjs';
 import { Router } from '@angular/router';
+import { Message } from 'primeng/api';
+import { MessagesModule } from 'primeng/messages';
 
 @Component({
   selector: 'app-appointment',
@@ -32,6 +34,7 @@ import { Router } from '@angular/router';
     RadioButtonModule,
     ReactiveFormsModule,
     CommonModule,
+    MessagesModule
   ]
 })
 export class AppointmentComponent implements OnInit {
@@ -68,6 +71,9 @@ export class AppointmentComponent implements OnInit {
   @Input() patientCode: any;
   @Output() closeDialog: EventEmitter<any> = new EventEmitter<any>();
   paitentNotFound:boolean = false;
+  messages: Message[] =   [
+    { severity: 'info', summary: 'Info', detail: 'Message Content' },
+];
   constructor(private fb: FormBuilder, private router: Router, private userService: UserService, private appointmentService: AppointmentService) {}
 
   ngOnInit() {

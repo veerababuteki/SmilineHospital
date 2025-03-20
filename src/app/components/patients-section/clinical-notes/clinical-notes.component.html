@@ -5,54 +5,59 @@
         <button class="add-btn" (click)="navigateToAdd()">+ Add</button>
     </div>
     <div *ngFor="let note of clinicalNotes">
-    <div class="appointment-date">{{note.date | date: 'dd MMM, yyyy' }}</div>
+        <div class="appointment-date">{{note.date | date: 'dd MMM, yyyy' }}</div>
 
-    <div class="procedures-table">
-        <table>
-            <tbody>
-                <tr></tr>
-                <tr *ngFor="let complaint of formatStringToArray(note.chief_complaints); let i = index">
-                    <td class="engaged-col border-bottom-none" *ngIf="i == 0">Complaints</td>
-                    <td class="engaged-col" *ngIf="i > 0"></td>
-                    <td class="procedure-col">{{complaint}}</td>
-                    <td class="actions-col" *ngIf="i == 0">
-                        <button class="edit-btn border-left-radius">
-                            <i class="pi pi-print"></i>
-                        </button>
-                        <button class="edit-btn border-right-radius">
-                            <i class="pi pi-chevron-down"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr *ngFor="let observation of formatStringToArray(note.observations); let i = index">
-                    <td class="engaged-col border-bottom-none" *ngIf="i == 0">Observations</td>
-                    <td class="engaged-col" *ngIf="i > 0"></td>
-                    <td class="procedure-col">{{observation}}</td>
-                </tr>
-                <tr *ngFor="let investigation of formatStringToArray(note.investigations); let i = index">
-                    <td class="engaged-col border-bottom-none" *ngIf="i == 0">Investigations</td>
-                    <td class="engaged-col" *ngIf="i > 0"></td>
-                    <td class="procedure-col">{{investigation}}</td>
-                </tr>
-                <tr *ngFor="let diagnose of formatStringToArray(note.diagnoses); let i = index">
-                    <td class="engaged-col border-bottom-none" *ngIf="i == 0">Diagnoses</td>
-                    <td class="engaged-col" *ngIf="i > 0"></td>
-                    <td class="procedure-col">{{diagnose}}</td>
-                </tr>
-                <tr *ngFor="let note of formatStringToArray(note.notes); let i = index">
-                    <td class="engaged-col border-bottom-none" *ngIf="i == 0">Notes</td>
-                    <td class="engaged-col" *ngIf="i > 0"></td>
-                    <td class="procedure-col">{{note}}</td>
-                </tr>
-                <tr></tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="appointment-details">
-        <div class="doctor-info">
-            Noted by <span class="doctor-name">Dr. {{note.doctor_details_clinic.user_profile_details[0].first_name +" "+note.doctor_details_clinic.user_profile_details[0].last_name}}</span>
+        <div class="procedures-table">
+            <table>
+                <tbody>
+                    <tr></tr>
+                    <tr *ngFor="let complaint of formatStringToArray(note.chief_complaints); let i = index">
+                        <td class="engaged-col border-bottom-none" *ngIf="i == 0">Complaints</td>
+                        <td class="engaged-col" *ngIf="i > 0"></td>
+                        <td class="procedure-col">{{complaint}}</td>
+                        <td class="actions-col" *ngIf="i == 0">
+                            <button class="edit-btn border-left-radius">
+                                <i class="pi pi-print"></i>
+                            </button>
+                            <button class="edit-btn border-right-radius">
+                                <i class="pi pi-chevron-down"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr *ngFor="let observation of formatStringToArray(note.observations); let i = index">
+                        <td class="engaged-col border-bottom-none" *ngIf="i == 0">Observations</td>
+                        <td class="engaged-col" *ngIf="i > 0"></td>
+                        <td class="procedure-col">{{observation}}</td>
+                    </tr>
+                    <tr *ngFor="let investigation of formatStringToArray(note.investigations); let i = index">
+                        <td class="engaged-col border-bottom-none" *ngIf="i == 0">Investigations</td>
+                        <td class="engaged-col" *ngIf="i > 0"></td>
+                        <td class="procedure-col">{{investigation}}</td>
+                    </tr>
+                    <tr *ngFor="let diagnose of formatStringToArray(note.diagnoses); let i = index">
+                        <td class="engaged-col border-bottom-none" *ngIf="i == 0">Diagnoses</td>
+                        <td class="engaged-col" *ngIf="i > 0"></td>
+                        <td class="procedure-col">{{diagnose}}</td>
+                    </tr>
+                    <tr *ngFor="let note of formatStringToArray(note.notes); let i = index">
+                        <td class="engaged-col border-bottom-none" *ngIf="i == 0">Notes</td>
+                        <td class="engaged-col" *ngIf="i > 0"></td>
+                        <td class="procedure-col">{{note}}</td>
+                    </tr>
+                    <tr></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="appointment-details">
+            <div class="doctor-info">
+                Noted by <span class="doctor-name">Dr. {{note.doctor_details_clinic.user_profile_details[0].first_name
+                    +" "+note.doctor_details_clinic.user_profile_details[0].last_name}}</span>
+            </div>
         </div>
     </div>
-</div>
-
+    <div class="no-clinical-notes-container" *ngIf="clinicalNotes.length <= 0">
+        <img class="icon" src="assets/clinical-notes.png" />
+        <h3>No clinical notes added</h3>
+        <button class="add-treatment-btn" (click)="navigateToAdd()">+ Add</button>
+    </div>
 </div>

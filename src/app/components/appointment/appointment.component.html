@@ -22,8 +22,11 @@
           <input type="text" pInputText formControlName="patientId" placeholder="Enter Patient ID or Mobile Number">
           <button type="button" pButton label="Get Patient Details" (click)="getPatientDetails()"></button>
         </div>
-        <span class="error-message" *ngIf="paitentNotFound">No paitent found</span>
-        <button type="button" class="add-paitent-btn" pButton (click)="openPatientDialog()">+ Add patient</button>
+        <span class="error-message" *ngIf="paitentNotFound">No patient found</span>
+        <div class="add-patient-container">
+          <div class="message">Want to add a new paitent?</div>
+          <button type="button" class="add-paitent-btn" pButton (click)="openPatientDialog()">+ Add patient</button>
+        </div>
       </div>
     
       <div class="two-column-grid">

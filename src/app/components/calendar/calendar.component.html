@@ -11,7 +11,7 @@
         Learn
       </button>
     </div>
-    
+
     <div class="right-section">
       <div class="navigation" *ngIf="currentView === 'dayGridMonth'">
         <button class="nav-btn" (click)="changeMonth(-1)"><i class="pi pi-chevron-left"></i></button>
@@ -25,27 +25,24 @@
       </div>
       <div class="navigation" *ngIf="currentView === 'timeGridWeek'">
         <button class="nav-btn" (click)="changeWeeklyViewDate(-1)"><i class="pi pi-chevron-left"></i></button>
-        <span class="current-date">{{ getWeekStartDate(weeklyViewDate) | date: 'MMM d' }} - {{ getWeekEndDate(weeklyViewDate) | date: 'MMM d, yyyy' }}</span>
+        <span class="current-date">{{ getWeekStartDate(weeklyViewDate) | date: 'MMM d' }} - {{
+          getWeekEndDate(weeklyViewDate) | date: 'MMM d, yyyy' }}</span>
         <button class="nav-btn" (click)="changeWeeklyViewDate(1)"><i class="pi pi-chevron-right"></i></button>
       </div>
       <div class="view-controls">
-        <button class="view-btn" 
-                [class.selected]="currentDate.toDateString() === (currentDate | date:'shortDate')"
-                (click)="changeDate(0)">Today</button>
-        <button class="view-btn" 
-                [class.selected]="currentView === 'timeGridDay'"
-                (click)="changeView('timeGridDay')">Day</button>
-                <button class="view-btn" 
-                [class.selected]="currentView === 'timeGridWeek'"
-                (click)="changeView('timeGridWeek')">Week</button>
-        <button class="view-btn" 
-                [class.selected]="currentView === 'dayGridMonth'"
-                (click)="changeView('dayGridMonth')">Month</button>
+        <button class="view-btn" [class.selected]="currentDate.toDateString() === (currentDate | date:'shortDate')"
+          (click)="changeDate(0)">Today</button>
+        <button class="view-btn" [class.selected]="currentView === 'timeGridDay'"
+          (click)="changeView('timeGridDay')">Day</button>
+        <button class="view-btn" [class.selected]="currentView === 'timeGridWeek'"
+          (click)="changeView('timeGridWeek')">Week</button>
+        <button class="view-btn" [class.selected]="currentView === 'dayGridMonth'"
+          (click)="changeView('dayGridMonth')">Month</button>
         <button class="view-btn">
           <i class="pi pi-print"></i>
         </button>
       </div>
-      
+
       <div class="settings">
         <button class="settings-btn">
           Settings
@@ -55,159 +52,159 @@
     </div>
   </div>
   <div class="calendar-content">
-  <!-- Add this after the calendar-top div -->
-  <div *ngIf="isAdmin" class="calendar-sidebar">
-    <div class="block-calendar">
-      <i class="pi pi-calendar"></i>
-      <app-appointment [data]="'blockCalendar'"></app-appointment>
-    </div>
-  
-    <div class="doctors-section">
-      <h2>DOCTORS</h2>
-      <div class="search-box">
-        <input type="text" [(ngModel)]="searchText" placeholder="Search doctor" class="search-input">
-        <i class="pi pi-search"></i>
+    <!-- Add this after the calendar-top div -->
+    <div *ngIf="isAdmin" class="calendar-sidebar">
+      <div class="block-calendar">
+        <i class="pi pi-calendar"></i>
+        <app-appointment [data]="'blockCalendar'"></app-appointment>
       </div>
-  
-      <div class="doctors-list">
-        <div class="all-doctors">
-          <span>All doctors</span>
-          <!-- <span class="count">2100</span> -->
-        </div>
-        
-        <div class="doctors-scroll">
-          <div class="doctor-item" *ngFor="let doctor of filteredDoctors()" [ngClass]="{'doctor-active': selectedDoctor === doctor.user_id}" 
-          (click)="selectDoctor(doctor)">
-            <span class="status-dot green"></span>
-            <span class="doctor-name">Dr. {{doctor.first_name}}&nbsp;{{doctor.last_name}}</span>
-            <!-- <span class="count">197</span> -->
-          </div>
-          
-        </div>
-      </div>
-    </div>
-  
-    <div class="categories-section">
-      <div class="categories-header">
-        <h2>CATEGORIES</h2>
-        <span *ngIf="!addCategory" (click)="toggleAddCategory()" class="edit-link">Edit</span>
-        <span *ngIf="addCategory" (click)="toggleAddCategory()" class="edit-link">Done</span>
-      </div>
-      
-      <div class="search-box">
-        <input *ngIf="!addCategory" [(ngModel)]="searchCategory"  type="text" placeholder="Search category" class="search-input">
-        <input *ngIf="addCategory" type="text" placeholder="+Add Category" class="search-input" [(ngModel)]="newCategory" 
-        (keyup.enter)="saveCategory()">
-        <i *ngIf="!addCategory" class="pi pi-search"></i>
-        <i *ngIf="addCategory" class="pi pi-sign-in"></i>
-      </div>
-  
-      <div class="categories-list">
-        <div class="categories-scroll">
-          <div class="category-item" *ngFor="let category of filteredCategories()" 
-          [ngClass]="{'doctor-active': selectedCategory === category.category_id}" 
-          (click)="selectCategory(category)">
-            <span class="status-dot teal"></span>
-            <span class="category-name">{{category.name}}</span>
-          </div>
-          
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="calendar-main">
-    <full-calendar 
-      #calendar
-      [options]="calendarOptions"
-      class="custom-calendar">
-    </full-calendar>
-  </div>
-  <!-- Schedule sidebar -->
-<div class="schedule-sidebar">
-    <!-- Header -->
-    <div class="schedule-header">
-      <div class="schedule-title">
-        <span>{{currentDate | date: 'dd MMM'}} Schedule</span>
-        <div class="navigation-arrows">
-          <button class="nav-btn" (click)="changeDate(-1)"><i class="pi pi-chevron-left"></i></button>
-          <button class="nav-btn" (click)="changeDate(1)"><i class="pi pi-chevron-right"></i></button>
-        </div>
-      </div>
-      <p-dialog 
-      [(visible)]="displayAddPatientDialog" 
-      [style]="{width: '100vw'}" 
-      [modal]="true"
-      [draggable]="false"
-      [resizable]="false">
-        <app-add-profile #addPatientButton (onSave)="savePatient($event)">
-          + Add patient
-        </app-add-profile>
-      </p-dialog>
 
-      <app-appointment #myButton [editAppointment]="editAppointment" 
-      *ngIf="isDataLoaded" [data]="'appointment'" 
-      [patientCode]="uniqueCode"
-      [currentUser]="currentUser" 
-      [isDoctor]="isAdmin  || isDoctor" [doctors]="doctors" 
-      [categories]="categories"
-      (closeDialog)="handleDialogClose($event)"></app-appointment>
-    </div>
-  
-    <!-- Status tabs -->
-    <div class="status-tabs">
-      <div class="tab-buttons">
-        <button class="tab-btn" [class.active]="activeTabType === 'all'" (click)="filterDayAppointments('all')">All</button>
-        <button class="tab-btn" [class.active]="activeTabType === 'online'" (click)="filterDayAppointments('online')">Online</button>
-        <button class="tab-btn" [class.active]="activeTabType === 'offline'" (click)="filterDayAppointments('offline')">Offline</button>
+      <div class="doctors-section">
+        <h2>DOCTORS</h2>
+        <div class="search-box">
+          <input type="text" [(ngModel)]="searchText" placeholder="Search doctor" class="search-input">
+          <i class="pi pi-search"></i>
+        </div>
+
+        <div class="doctors-list">
+          <div class="all-doctors">
+            <span>All doctors</span>
+            <!-- <span class="count">2100</span> -->
+          </div>
+
+          <div class="doctors-scroll">
+            <div class="doctor-item" *ngFor="let doctor of filteredDoctors()"
+              [ngClass]="{'doctor-active': selectedDoctor === doctor.user_id}" (click)="selectDoctor(doctor)">
+              <span class="status-dot green"></span>
+              <span class="doctor-name">Dr. {{doctor.first_name}}&nbsp;{{doctor.last_name}}</span>
+              <!-- <span class="count">197</span> -->
+            </div>
+
+          </div>
+        </div>
       </div>
-      
-      <div class="status-counters">
-        <div class="counter-group">
-          <div class="date-counter">
-            <span class="counter-label">{{currentDate | date: 'dd MMM'}}</span>
-            <span class="counter-value" (click)="filterDayCounterAppointments('all')" [class.counter-active]="activeTab === 'all'">{{allAppointments}}</span>
-          </div>
-          <div class="status-counter waiting">
-            <span class="counter-label">WAITING</span>
-            <span class="counter-value" (click)="filterDayCounterAppointments('waiting')" [class.counter-active]="activeTab === 'waiting'">{{waitingAppointemts}}</span>
-          </div>
-          <div class="status-counter engaged">
-            <span class="counter-label">ENGAGED</span>
-            <span class="counter-value" (click)="filterDayCounterAppointments('engaged')" [class.counter-active]="activeTab === 'engaged'">{{engagedAppointemts}}</span>
-          </div>
-          <div class="status-counter done">
-            <span class="counter-label">DONE</span>
-            <span class="counter-value" (click)="filterDayCounterAppointments('done')" [class.counter-active]="activeTab === 'done'">{{doneAppointemts}}</span>
+
+      <div class="categories-section">
+        <div class="categories-header">
+          <h2>CATEGORIES</h2>
+          <span *ngIf="!addCategory" (click)="toggleAddCategory()" class="edit-link">Edit</span>
+          <span *ngIf="addCategory" (click)="toggleAddCategory()" class="edit-link">Done</span>
+        </div>
+
+        <div class="search-box">
+          <input *ngIf="!addCategory" [(ngModel)]="searchCategory" type="text" placeholder="Search category"
+            class="search-input">
+          <input *ngIf="addCategory" type="text" placeholder="+Add Category" class="search-input"
+            [(ngModel)]="newCategory" (keyup.enter)="saveCategory()">
+          <i *ngIf="!addCategory" class="pi pi-search"></i>
+          <i *ngIf="addCategory" class="pi pi-sign-in"></i>
+        </div>
+
+        <div class="categories-list">
+          <div class="categories-scroll">
+            <div class="category-item" *ngFor="let category of filteredCategories()"
+              [ngClass]="{'doctor-active': selectedCategory === category.category_id}"
+              (click)="selectCategory(category)">
+              <span class="status-dot teal"></span>
+              <span class="category-name">{{category.name}}</span>
+            </div>
+
           </div>
         </div>
       </div>
     </div>
-  
-    <!-- Appointments list -->
-    <div class="appointments-list">
-      <div class="appointment-item" *ngFor="let app of dayCounterAppoinments">
-        <div class="appointment-time">{{app.appointmentTime}}</div>
-        <div class="appointment-content">
-          <div class="appointment-title">{{app.patientName}}</div>
-          <div class="appointment-details">
-            <div class="confirmation-info">{{app.notes}}</div>
-            <div class="doctor-name" *ngIf = "app.doctor">Dr. {{app.doctor}}</div>
-            <div *ngIf = "!app.doctor">Doctor not assigned
-              <button pButton  class="p-button-rounded assign-button" (click)="assignDoctor(app)">Assign</button>
+    <div class="calendar-main">
+      <full-calendar #calendar [options]="calendarOptions" class="custom-calendar">
+      </full-calendar>
+    </div>
+    <!-- Schedule sidebar -->
+    <div class="schedule-sidebar">
+      <!-- Header -->
+      <div class="schedule-header">
+        <div class="schedule-title">
+          <span>{{currentDate | date: 'dd MMM'}} Schedule</span>
+          <div class="navigation-arrows">
+            <button class="nav-btn" (click)="changeDate(-1)"><i class="pi pi-chevron-left"></i></button>
+            <button class="nav-btn" (click)="changeDate(1)"><i class="pi pi-chevron-right"></i></button>
+          </div>
+        </div>
+        <p-dialog [(visible)]="displayAddPatientDialog" [style]="{width: '100vw'}" [modal]="true" [draggable]="false"
+          [resizable]="false">
+          <app-add-profile #addPatientButton (onSave)="savePatient($event)">
+            + Add patient
+          </app-add-profile>
+        </p-dialog>
+
+        <app-appointment #myButton [editAppointment]="editAppointment" *ngIf="isDataLoaded" [data]="'appointment'"
+          [patientCode]="uniqueCode" [currentUser]="currentUser" [isDoctor]="isAdmin  || isDoctor" [doctors]="doctors"
+          [categories]="categories" (closeDialog)="handleDialogClose($event)"></app-appointment>
+      </div>
+
+      <!-- Status tabs -->
+      <div class="status-tabs">
+        <div class="tab-buttons">
+          <button class="tab-btn" [class.active]="activeTabType === 'all'"
+            (click)="filterDayAppointments('all')">All</button>
+          <button class="tab-btn" [class.active]="activeTabType === 'online'"
+            (click)="filterDayAppointments('online')">Online</button>
+          <button class="tab-btn" [class.active]="activeTabType === 'offline'"
+            (click)="filterDayAppointments('offline')">Offline</button>
+        </div>
+
+        <div class="status-counters">
+          <div class="counter-group">
+            <div class="date-counter">
+              <span class="counter-label">{{currentDate | date: 'dd MMM'}}</span>
+              <span class="counter-value" (click)="filterDayCounterAppointments('all')"
+                [class.counter-active]="activeTab === 'all'">{{allAppointments}}</span>
+            </div>
+            <div class="status-counter waiting">
+              <span class="counter-label">WAITING</span>
+              <span class="counter-value" (click)="filterDayCounterAppointments('waiting')"
+                [class.counter-active]="activeTab === 'waiting'">{{waitingAppointemts}}</span>
+            </div>
+            <div class="status-counter engaged">
+              <span class="counter-label">ENGAGED</span>
+              <span class="counter-value" (click)="filterDayCounterAppointments('engaged')"
+                [class.counter-active]="activeTab === 'engaged'">{{engagedAppointemts}}</span>
+            </div>
+            <div class="status-counter done">
+              <span class="counter-label">DONE</span>
+              <span class="counter-value" (click)="filterDayCounterAppointments('done')"
+                [class.counter-active]="activeTab === 'done'">{{doneAppointemts}}</span>
             </div>
           </div>
         </div>
       </div>
-  
-      
+
+      <!-- Appointments list -->
+      <div class="appointments-list">
+        <div class="appointment-item" *ngFor="let app of dayCounterAppoinments">
+          <div class="appointment-time">{{app.appointmentTime}}</div>
+          <div class="appointment-content">
+            <div class="appointment-title">{{app.patientName}}</div>
+            <div class="appointment-details">
+              <div class="confirmation-info">{{app.notes}}</div>
+              <div class="doctor-name doctor-details-container" *ngIf="app.doctor">
+                <div>
+                  Dr. {{app.doctor}}
+                </div>
+                <button pButton class="p-button-rounded assign-button" (click)="assignDoctor(app)">Update</button>
+              </div>
+              <div *ngIf="!app.doctor" class="doctor-details-container">
+                <div>Doctor not assigned </div>
+                <button pButton class="p-button-rounded assign-button" (click)="assignDoctor(app)">Assign</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
     </div>
   </div>
 </div>
-</div>
 <!-- <app-appointment #myButton style="position: absolute;opacity: 0; pointer-events: none;" *ngIf="isDataLoaded" [data]="'appointment'" [currentUser]="currentUser" [isDoctor]="isAdmin  || isDoctor" [doctors]="doctors" [editAppointment]="true" [categories]="categories"></app-appointment> -->
-<app-cancel-appointment-dialog
-  [visible]="showCancelDialog"
-  [appointmentData]="selectedEvent"
-  (close)="onCancelDialogClose()" 
-  (confirm)="onCancelAppointmentConfirm($event)">
+<app-cancel-appointment-dialog [visible]="showCancelDialog" [appointmentData]="selectedEvent"
+  (close)="onCancelDialogClose()" (confirm)="onCancelAppointmentConfirm($event)">
 </app-cancel-appointment-dialog>
