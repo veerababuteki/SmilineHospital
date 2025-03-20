@@ -67,7 +67,7 @@ export class AppointmentComponent implements OnInit {
   appointment: any;
   @Input() patientCode: any;
   @Output() closeDialog: EventEmitter<any> = new EventEmitter<any>();
-  
+  paitentNotFound:boolean = false;
   constructor(private fb: FormBuilder, private router: Router, private userService: UserService, private appointmentService: AppointmentService) {}
 
   ngOnInit() {
@@ -192,6 +192,7 @@ export class AppointmentComponent implements OnInit {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
   showDialog(isEdit: boolean = false) {
+    debugger;
     if(isEdit)
       {this.editAppointment = true;
       }
@@ -222,6 +223,8 @@ export class AppointmentComponent implements OnInit {
         mobileNumber: this.patient.phone,
         emailId: this.patient.email
       });
+    },(error)=>{
+      this.paitentNotFound = true;
     })
   }
   cancelAppointment(){
@@ -289,9 +292,6 @@ export class AppointmentComponent implements OnInit {
 
   openPatientDialog(){
     this.display = false;
-  }
-
-  onDialogClose() {
-    this.closeDialog.emit({isOpenPatientDialog:true}); // Notify parent
+    this.closeDialog.emit({isOpenPatientDialog:true});
   }
 }

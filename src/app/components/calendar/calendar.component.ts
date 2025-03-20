@@ -258,23 +258,30 @@ export class CalendarComponent implements OnInit {
       this.myButton.editAppointment = false; // Make sure we're in "add" mode, not "edit" mode
       
       // Call the method to show the appointment dialog
+      this.myButton.patientCode = "";
+      this.myButton.paitentNotFound = false;
       this.myButton.showDialog(false);
     }
   }
 
   handleDialogClose(event:any) {
+    debugger;
     console.log("Parent detected dialog close!");
     // Handle any logic when the dialog closes
     this.changeView(this.currentView);
+ 
     this.uniqueCode = "";
     if(event.isOpenPatientDialog){
       this.displayAddPatientDialog = true;
     }
   }
 
-  savePatient(event){
+  savePatient(event:any){
+    debugger;
     this.displayAddPatientDialog = false;
-    this.uniqueCode = event.
+    this.myButton.patientCode = event.unique_code;
+    this.myButton.paitentNotFound = false;
+    this.myButton.showDialog(false);
   }
 
   filteredDoctors() {
