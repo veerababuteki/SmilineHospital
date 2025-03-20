@@ -4,7 +4,8 @@
   [style]="{width: '800px'}" 
   [draggable]="false" 
   [resizable]="false"
-  styleClass="appointment-dialog">
+  styleClass="appointment-dialog"
+  >
   
   <div class="appointment-form">
     <!-- Tabs -->
@@ -21,6 +22,8 @@
           <input type="text" pInputText formControlName="patientId" placeholder="Enter Patient ID">
           <button type="button" pButton label="Get Patient Details" (click)="getPatientDetails()"></button>
         </div>
+        <span class="error-message" *ngIf="paitentNotFound">No paitent found</span>
+        <button type="button" class="add-paitent-btn" pButton (click)="openPatientDialog()">+ Add patient</button>
       </div>
     
       <div class="two-column-grid">
@@ -75,8 +78,14 @@
           <span>at</span>
           <p-calendar formControlName="scheduledTime" [timeOnly]="true" [showIcon]="false" hourFormat="12"></p-calendar>
           <span>for</span>
-          <p-dropdown formControlName="duration" [options]="durations" [style]="{'width':'120px'}"></p-dropdown>
-        </div>
+          <p-dropdown 
+          formControlName="duration" 
+          [options]="durations" 
+          optionLabel="label" 
+          optionValue="value" 
+          [style]="{'width':'120px'}">
+        </p-dropdown>
+                </div>
       </div>
 
       <div class="form-row">

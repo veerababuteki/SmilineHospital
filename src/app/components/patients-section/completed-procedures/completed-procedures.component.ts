@@ -64,22 +64,34 @@ export class CompletedProceduresComponent implements OnInit {
 
         }
         const dateKey = row.date.split('T')[0];
-        if (!acc[dateKey]) {
-          acc[dateKey] = {};
-        }
-    
         const treatmentKey = row.treatment_unique_id;
-        if (!acc[dateKey][treatmentKey]) {
-          acc[dateKey][treatmentKey] = [];
+        if (!acc[dateKey]) {
+          acc[dateKey] = [];
         }
     
         // if (row.status === 'Completed') {
         //   row.isChecked = true;
         // }
     
-        acc[dateKey][treatmentKey].push(row);
+        acc[dateKey].push(row);
         return acc;
-      }, {} as Record<string, Record<string, any[]>>);
+      }, {} as Record<string, any[]>);
+    }
+
+    getSortedTreatmentIds(rows: any) {
+      // Step 1: Sort rows by date in descending order
+      rows.sort((a:any, b:any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    
+      // Step 2: Extract unique treatment IDs while maintaining order
+      const uniqueIds = new Set<string>();
+      return rows.map((row: any) => row.treatment_unique_id).filter((id: any) => uniqueIds.has(id) ? false : uniqueIds.add(id));
+    }
+  
+    filterRowsByTreatment(
+      rows: any, 
+      treatmentKey: any
+    ) {
+      return rows.filter((row:any) => row.treatment_unique_id === treatmentKey);
     }
 
     generateInvoice(){

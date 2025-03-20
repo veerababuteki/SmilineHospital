@@ -130,7 +130,7 @@ export class AddCompletedProceduresComponent implements OnInit {
     });
 
     const index = this.treatments.length;
-    this.treatments.push(treatment);
+    this.treatments.insert(0,treatment);
     this.setCurrentTreatment(index);
     this.calculateTotal(index);
 

@@ -1,5 +1,5 @@
 // appointment.component.ts
-import { Component, Input, input, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
@@ -31,7 +31,7 @@ import { Router } from '@angular/router';
     CheckboxModule,
     RadioButtonModule,
     ReactiveFormsModule,
-    CommonModule
+    CommonModule,
   ]
 })
 export class AppointmentComponent implements OnInit {
@@ -39,7 +39,16 @@ export class AppointmentComponent implements OnInit {
   appointmentForm!: FormGroup;
   blockCalendarForm!: FormGroup;
   display: boolean = false;
-  durations: string[] = ['15', '30', '45', '60' ];
+  durations = [
+    { label: '15 Min', value: 15 },
+    { label: '30 Min', value: 30 },
+    { label: '45 Min', value: 45 },
+    { label: '1 Hr', value: 60 },
+    { label: '2 Hrs', value: 120 },
+    { label: '3 Hrs', value: 180 },
+    { label: '4 Hrs', value: 240 },
+    { label: '5 Hrs', value: 300 }
+  ];  
   bookingTypes: string[] = ['offline', 'online'];
   status: string[] = ["Scheduled", "Completed", "Canceled", "Rescheduled"];
   appointmentStatus: string[] = ['None', 'Waiting', 'Engaged', 'Done'];
@@ -57,7 +66,8 @@ export class AppointmentComponent implements OnInit {
   appointementId!: number;
   appointment: any;
   @Input() patientCode: any;
-  
+  @Output() closeDialog: EventEmitter<any> = new EventEmitter<any>();
+  paitentNotFound:boolean = false;
   constructor(private fb: FormBuilder, private router: Router, private userService: UserService, private appointmentService: AppointmentService) {}
 
   ngOnInit() {
@@ -182,6 +192,7 @@ export class AppointmentComponent implements OnInit {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
   showDialog(isEdit: boolean = false) {
+    debugger;
     if(isEdit)
       {this.editAppointment = true;
       }
@@ -212,6 +223,8 @@ export class AppointmentComponent implements OnInit {
         mobileNumber: this.patient.phone,
         emailId: this.patient.email
       });
+    },(error)=>{
+      this.paitentNotFound = true;
     })
   }
   cancelAppointment(){
@@ -241,8 +254,6 @@ export class AppointmentComponent implements OnInit {
           this.display = false;
           if(this.fromPatientsection){
             this.router.navigate(['/calendar'])
-          } else{
-            window.location.reload();
           }
         });
       }
@@ -278,5 +289,9 @@ export class AppointmentComponent implements OnInit {
     }
     
   }
-  
+
+  openPatientDialog(){
+    this.display = false;
+    this.closeDialog.emit({isOpenPatientDialog:true});
+  }
 }

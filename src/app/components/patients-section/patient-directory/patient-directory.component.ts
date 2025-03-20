@@ -69,7 +69,7 @@ export class PatientDirectoryComponent implements OnInit {
         this.displayAddPatientDialog = true;
         
     }
-    savePatient(){
+    savePatient(event:any){
         // this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Patient Added Successfully' });
         this.displayAddPatientDialog = false;
         this.userService.getDoctors('2ac7787b-77d1-465b-9bc0-eee50933697f').subscribe(res => {

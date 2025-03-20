@@ -28,7 +28,8 @@ export class AddTreatmentPlansComponent implements OnInit {
   patientId: string | null | undefined;
   filteredProcedures = [...this.procedures];
   searchText: string = '';
-
+  adulthTeeth = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
+  childTeeth = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
   constructor(private fb: FormBuilder, 
     private userService: UserService,
     private treatmentPlansService: TreatmentPlansService,
@@ -119,7 +120,7 @@ export class AddTreatmentPlansComponent implements OnInit {
     });
 
     const index = this.treatments.length;
-    this.treatments.push(treatment);
+    this.treatments.insert(0,treatment);
     this.setCurrentTreatment(index);
     this.calculateTotal(index);
 
@@ -170,6 +171,7 @@ export class AddTreatmentPlansComponent implements OnInit {
       treatment.get('showChildTeeth')?.setValue(!currentValue);
     }
   }
+  
   setCurrentTreatment(index: number | null) {
     this.currentTreatmentIndex = index;
   }

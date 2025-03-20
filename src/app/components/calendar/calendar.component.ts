@@ -28,6 +28,7 @@ import { EventPopoverComponent } from './event-popover/event-popover.component';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MessageService } from 'primeng/api';
 import { CancelAppointmentDialogComponent } from './cancel-appointment-dialog';
+import { AddProfileComponent } from '../patients-section/edit-profile/add-profile.component';
 
 interface Doctor {
   id: string;
@@ -55,12 +56,15 @@ interface Doctor {
     AppointmentComponent,
     OverlayModule,
     CancelAppointmentDialogComponent,
+    AddProfileComponent
   ],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
 })
 export class CalendarComponent implements OnInit {
   @ViewChild('myButton', { static: false }) myButton!: AppointmentComponent;
+  @ViewChild('addPatientButton', { static: false }) addPatientButton!: AddProfileComponent ;
+
   currentView: 'dayGridMonth' | 'timeGridDay' | 'timeGridWeek' = 'dayGridMonth';
 
   doctorsList: any [] = [];
@@ -93,8 +97,9 @@ export class CalendarComponent implements OnInit {
     dayMaxEvents: 4,
     initialView: 'dayGridMonth',
     nowIndicator: true,
-    editable: false,
-    selectable: false,
+    editable: true,
+    selectable: true,
+    eventResizableFromStart: true, // Allow resizing from start
     dateClick: (info: DateClickArg) => {
       this.handleDateClick(info);
     },
@@ -108,6 +113,7 @@ export class CalendarComponent implements OnInit {
       this.showEventList(args.date, args.allSegs.map(seg => seg.event));
       return 'list';
     },
+    
     eventMouseEnter: (info) => {
       // Store the current event to track if mouse moved to another event
       this.currentHoverEvent = info.event;
@@ -205,7 +211,8 @@ export class CalendarComponent implements OnInit {
           </div>
         `
       };
-    }
+    },
+    eventResize: this.handleEventResize.bind(this), // Handle resize event
   };
   selectedEvent: any = null;
   showCancelDialog: boolean = false;
@@ -220,10 +227,27 @@ export class CalendarComponent implements OnInit {
   selectedDoctor: string | null = null;
   selectedCategory: string | null = null;
   appointments!: any[];
+  displayAddPatientDialog:boolean = false;
+  uniqueCode:string = "";
   constructor(private dialogService: DialogService, private overlay: Overlay, private datePipe: DatePipe,
     private authService: AuthService, private messageService: MessageService, private userService:UserService, private appointmentService: AppointmentService){
     
   }
+
+  handleEventResize(eventResizeInfo: any) {
+
+    console.log(eventResizeInfo);
+    // const updatedEvent: EventApi = eventResizeInfo.event;
+    // console.log('Event Resized:', updatedEvent.title, updatedEvent.start, updatedEvent.end);
+    
+    // // Update event in your data source (API/database)
+    // this.events = this.events.map(event =>
+    //   event.id === updatedEvent.id
+    //     ? { ...event, start: updatedEvent.start.toISOString(), end: updatedEvent.end.toISOString() }
+    //     : event
+    // );
+  }
+
   private handleDateClick(info: any) {
     // Get the clicked date
     const clickedDate = info.date;
@@ -234,9 +258,32 @@ export class CalendarComponent implements OnInit {
       this.myButton.editAppointment = false; // Make sure we're in "add" mode, not "edit" mode
       
       // Call the method to show the appointment dialog
+      this.myButton.patientCode = "";
+      this.myButton.paitentNotFound = false;
       this.myButton.showDialog(false);
     }
   }
+
+  handleDialogClose(event:any) {
+    debugger;
+    console.log("Parent detected dialog close!");
+    // Handle any logic when the dialog closes
+    this.changeView(this.currentView);
+ 
+    this.uniqueCode = "";
+    if(event.isOpenPatientDialog){
+      this.displayAddPatientDialog = true;
+    }
+  }
+
+  savePatient(event:any){
+    debugger;
+    this.displayAddPatientDialog = false;
+    this.myButton.patientCode = event.unique_code;
+    this.myButton.paitentNotFound = false;
+    this.myButton.showDialog(false);
+  }
+
   filteredDoctors() {
     return this.doctorsList.filter(doctor => 
       `${doctor.first_name} ${doctor.last_name}`.toLowerCase().includes(this.searchText.toLowerCase())
@@ -745,6 +792,9 @@ export class CalendarComponent implements OnInit {
       this.updateMonthRange();
     } else if (viewName === 'timeGridWeek') {
       this.updateWeekRange();
+    }
+    else{
+      this.changeDailyViewDate(0);
     }
   }
 

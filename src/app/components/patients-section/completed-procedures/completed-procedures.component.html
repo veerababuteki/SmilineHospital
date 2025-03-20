@@ -12,7 +12,7 @@
 
     <div class="appointment-date">{{ date | date: 'dd MMM, yyyy'}}</div>
 
-    <div class="treatment-plan" *ngFor="let treatmentGroup of treatmentPlans[date] | keyvalue">
+    <div class="treatment-plan" *ngFor="let treatmentkey of getSortedTreatmentIds(treatmentPlans[date]) | keyvalue">
         <table class="procedures-table">
             <thead>
                 <tr>
@@ -26,7 +26,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let treatment of treatmentGroup.value">
+                <tr *ngFor="let treatment of filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)">
                     <td *ngIf="treatment.invoice_status?.toLowerCase() !== 'generated'"><input type="checkbox" class="procedure-checkbox" [(ngModel)]="treatment.isChecked"
                       (change)="onCheckboxChange(treatment, treatment.id, treatment.treatment_unique_id)"></td>
                     <td *ngIf="treatment.invoice_status?.toLowerCase() === 'generated'"><i class="pi pi-dollar"></i></td>
@@ -49,10 +49,10 @@
     
         <div class="plan-footer">
             <div class="planned-by">
-                Completed by <span class="doctor-name">{{"Dr. " + treatmentGroup.value[0]?.doctor_details_treat.user_profile_details[0].first_name +" "+ treatmentGroup.value[0].doctor_details_treat.user_profile_details[0].last_name}}</span>
+                Completed by <span class="doctor-name">{{"Dr. " + filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)[0]?.doctor_details_treat.user_profile_details[0].first_name +" "+ filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)[0].doctor_details_treat.user_profile_details[0].last_name}}</span>
             </div>
             <div class="estimated-amount">
-                Estimated amount: <span class="amount">{{getTotalCost(treatmentGroup.value) }}</span>
+                Estimated amount: <span class="amount">{{getTotalCost(filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)) }}</span>
             </div>
         </div>
     </div>

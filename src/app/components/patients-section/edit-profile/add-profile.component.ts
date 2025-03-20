@@ -40,7 +40,7 @@ export class AddProfileComponent implements OnInit {
   uniqueCode: string | null | undefined;
   patientDetails: any = { medical_history: [], groups: [], other_history: '' }; // Initialize with default values
   
-  @Output() onSave = new EventEmitter<void>();
+  @Output() onSave = new EventEmitter<any>();
   @Output() onCancel = new EventEmitter<void>();
   
   addMedicalHistory: boolean = false;
@@ -263,8 +263,9 @@ export class AddProfileComponent implements OnInit {
         this.patientForm.reset();
         this.medicalHistoryForm.reset();
         this.groupsForm.reset();
-        this.router.navigate(['patients', res.data.user.user_id, 'profile', res.data.user.unique_code]);
-        this.onSave.emit();
+        //this.router.navigate(['patients', res.data.user.user_id, 'profile', res.data.user.unique_code]);
+        debugger;
+        this.onSave.emit({user_id:res.data.user.user_id,unique_code:res.data.user.unique_code});
       });
     }
   }

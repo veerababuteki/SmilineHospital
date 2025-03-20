@@ -133,8 +133,24 @@
           <button class="nav-btn" (click)="changeDate(1)"><i class="pi pi-chevron-right"></i></button>
         </div>
       </div>
-      
-      <app-appointment #myButton [editAppointment]="editAppointment" *ngIf="isDataLoaded" [data]="'appointment'" [currentUser]="currentUser" [isDoctor]="isAdmin  || isDoctor" [doctors]="doctors" [categories]="categories"></app-appointment>
+      <p-dialog 
+      [(visible)]="displayAddPatientDialog" 
+      [style]="{width: '100vw'}" 
+      [modal]="true"
+      [draggable]="false"
+      [resizable]="false">
+        <app-add-profile #addPatientButton (onSave)="savePatient($event)">
+          + Add patient
+        </app-add-profile>
+      </p-dialog>
+
+      <app-appointment #myButton [editAppointment]="editAppointment" 
+      *ngIf="isDataLoaded" [data]="'appointment'" 
+      [patientCode]="uniqueCode"
+      [currentUser]="currentUser" 
+      [isDoctor]="isAdmin  || isDoctor" [doctors]="doctors" 
+      [categories]="categories"
+      (closeDialog)="handleDialogClose($event)"></app-appointment>
     </div>
   
     <!-- Status tabs -->

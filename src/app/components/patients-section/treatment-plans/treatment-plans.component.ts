@@ -55,7 +55,6 @@ export class TreatmentPlansComponent implements OnInit {
         this.treatmentPlans = this.groupByDate(res.data.rows);
       });
     }
-    
   }
   onCheckboxChange(treatment: any, treatmentId: number, treatment_unique_id: string){
     if(treatment.isChecked){
@@ -84,25 +83,42 @@ export class TreatmentPlansComponent implements OnInit {
   //   }, {} as Record<string, any[]>);
   // }
   groupByDate(rows: any[]) {
-    return rows.reduce((acc, row) => {
-      const dateKey = row.date.split('T')[0];
-      if (!acc[dateKey]) {
-        acc[dateKey] = {};
-      }
+    rows.sort((a:any, b:any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const groupedByDate = rows.reduce((acc, row) => {
+      const dateKey = row.date.split('T')[0]; // Extract date part
   
-      const treatmentKey = row.treatment_unique_id;
-      if (!acc[dateKey][treatmentKey]) {
-        acc[dateKey][treatmentKey] = [];
+      const treatmentKey = row.date;
+      if (!acc[dateKey]) {
+        acc[dateKey] = [];
       }
   
       if (row.status === 'Completed') {
         row.isChecked = true;
       }
   
-      acc[dateKey][treatmentKey].push(row);
+      acc[dateKey].push(row);
       return acc;
     }, {} as Record<string, Record<string, any[]>>);
+  
+    return groupedByDate;
   }
+
+  getSortedTreatmentIds(rows: any) {
+    // Step 1: Sort rows by date in descending order
+    rows.sort((a:any, b:any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  
+    // Step 2: Extract unique treatment IDs while maintaining order
+    const uniqueIds = new Set<string>();
+    return rows.map((row: any) => row.treatment_unique_id).filter((id: any) => uniqueIds.has(id) ? false : uniqueIds.add(id));
+  }
+
+  filterRowsByTreatment(
+    rows: any, 
+    treatmentKey: any
+  ) {
+    return rows.filter((row:any) => row.treatment_unique_id === treatmentKey);
+  }
+  
 
   markAsComplete(){
     if(this.markCompleteList.length == 0) return;
