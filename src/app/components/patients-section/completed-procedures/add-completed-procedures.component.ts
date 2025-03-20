@@ -85,6 +85,8 @@ export class AddCompletedProceduresComponent implements OnInit {
 
   getProcedures(){
     this.treatmentPlansService.getProcedures().subscribe(res => {
+      debugger;
+      res.data.rows.sort((a:any, b:any) => b.procedure_id - a.procedure_id);
       res.data.rows.forEach((r: any) => {
       this.procedures.push({
         name: r.name,

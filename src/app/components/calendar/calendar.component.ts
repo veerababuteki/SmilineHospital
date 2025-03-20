@@ -308,7 +308,7 @@ export class CalendarComponent implements OnInit {
   }
   selectDoctor(doctor: any) {
     this.selectedDoctor = doctor.user_id;
-    var docAppointments = this.appointments.filter(a => a.doctor_details.doctor_id === doctor.user_id);
+    var docAppointments = this.appointments.filter(a => a.doctor_details?.doctor_id === doctor.user_id);
     var events: any[] =[]; 
     docAppointments.forEach((a: any) =>{
       //const doctor = this.doctors.find(d => d.user_id === a.doctor_details.doctor_id)
@@ -318,7 +318,7 @@ export class CalendarComponent implements OnInit {
       events.push({
         title: this.isDoctor || this.isAdmin ? a.patient_details.user_profile_details[0].first_name 
         //+ a.patient_details.user_profile_details[0].last_name 
-        : a.doctor_details.user_profile_details[0].first_name,
+        : a.doctor_details?.user_profile_details[0].first_name,
         start: startDateTime,
         allDay: false,
         extendedProps: {
@@ -342,7 +342,7 @@ export class CalendarComponent implements OnInit {
     this.calendarOptions.events = events;
   }
   selectCategory(category: any) {
-    var docAppointments = this.appointments.filter(a => a.category_details.category_id === category.category_id);
+    var docAppointments = this.appointments.filter(a => a.category_details?.category_id === category.category_id);
     var events: any[] =[]; 
     docAppointments.forEach((a: any) =>{
       //const doctor = this.doctors.find(d => d.user_id === a.doctor_details.doctor_id)
@@ -352,7 +352,7 @@ export class CalendarComponent implements OnInit {
       events.push({
         title: this.isDoctor || this.isAdmin ? a.patient_details.user_profile_details[0].first_name 
         //+ a.patient_details.user_profile_details[0].last_name 
-        : a.doctor_details.user_profile_details[0].first_name, 
+        : a.doctor_details?.user_profile_details[0].first_name, 
         //+ a.doctor_details.user_profile_details[0].last_name,
         start: startDateTime,
         allDay: false,
@@ -363,7 +363,7 @@ export class CalendarComponent implements OnInit {
           patientName: a.patient_details.user_profile_details[0].first_name +' '+ a.patient_details.user_profile_details[0].last_name,
           phone: '+91 ' + a.patient_details.phone,
           email: a.patient_details.email,
-          doctor: a.doctor_details.user_profile_details[0].first_name +' '+ a.doctor_details.user_profile_details[0].last_name,
+          doctor: a.doctor_details ? (a.doctor_details?.user_profile_details[0].first_name +' '+ a.doctor_details?.user_profile_details[0].last_name) : null,
           duration: a.duration + ' mins',
           appointmentTime: a.appointment_time,
           bookingType: a.booking_type === 'Offline' ? 'In-Clinic' : 'Online',
@@ -471,6 +471,14 @@ export class CalendarComponent implements OnInit {
     });
   }
 
+  assignDoctor(app:any){
+    debugger;
+    this.myButton.editAppointment = true;
+    this.myButton.appointementId = app.appointmentId;
+    this.myButton.appointment = this.appointments.filter(a => a.id === app.appointmentId)[0];
+    this.myButton.showDialog(true);
+  }
+
   private updateMonthRange(): void {
     const year = this.currentMonth.getFullYear();
     const month = this.currentMonth.getMonth();
@@ -541,9 +549,10 @@ export class CalendarComponent implements OnInit {
       //const doctor = this.doctors.find(d => d.user_id === a.doctor_id);
       //const patient = this.patients.find(p => p.user_id === a.patient_id);
       this.dayAppoinments.push({
+        appointmentId: a.id,
         appointmentTime: a.appointment_time,
         patientName: a.patient_details.user_profile_details[0].first_name +' '+ a.patient_details.user_profile_details[0].last_name,
-        doctor: a.doctor_details.user_profile_details[0].first_name +' '+ a.doctor_details.user_profile_details[0].last_name,
+        doctor: a.doctor_details ? (a.doctor_details?.user_profile_details[0].first_name +' '+ a.doctor_details?.user_profile_details[0].last_name) : null,
         booking_type: a.booking_type,
         appointment_status: a.appointment_status,
         notes: a.notes
@@ -578,7 +587,7 @@ export class CalendarComponent implements OnInit {
       events.push({
         title: this.isDoctor || this.isAdmin ? a.patient_details.user_profile_details[0].first_name 
         //+ a.patient_details.user_profile_details[0].last_name 
-        : a.doctor_details.user_profile_details[0].first_name, 
+        : a.doctor_details?.user_profile_details[0].first_name, 
         //+ a.doctor_details.user_profile_details[0].last_name,
         start: startDateTime,
         end: endDateTime,
@@ -590,11 +599,11 @@ export class CalendarComponent implements OnInit {
           patientName: a.patient_details.user_profile_details[0].first_name +' '+ a.patient_details.user_profile_details[0].last_name,
           phone: '+91 ' + a.patient_details.phone,
           email: a.patient_details.email,
-          doctor: a.doctor_details.user_profile_details[0].first_name +' '+ a.doctor_details.user_profile_details[0].last_name,
+          doctor:a.doctor_details ?(a.doctor_details?.user_profile_details[0].first_name +' '+ a.doctor_details?.user_profile_details[0].last_name) : null,
           duration: a.duration + ' mins',
           appointmentTime: a.appointment_time,
           bookingType: a.booking_type === 'Offline' ? 'In-Clinic' : 'Online',
-          category: a.category_details.name,
+          category: a.category_details?.name,
           notes: a.notes,
           appointmentId: a.id
         }

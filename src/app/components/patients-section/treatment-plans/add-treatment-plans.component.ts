@@ -79,6 +79,7 @@ export class AddTreatmentPlansComponent implements OnInit {
 
   getProcedures(){
     this.treatmentPlansService.getProcedures().subscribe(res => {
+      res.data.rows.sort((a:any, b:any) => b.procedure_id - a.procedure_id);
       res.data.rows.forEach((r: any) => {
       this.procedures.push({
         name: r.name,
@@ -265,6 +266,8 @@ export class AddTreatmentPlansComponent implements OnInit {
           notes: t.notes
         });
       })
+      debugger;
+      treatment.procedures_list = treatment.procedures_list.reverse();
       this.treatmentPlansService.addTreatmentPlan(treatment).subscribe(res => {
         this.router.navigate(['/patients', this.patientId, 'treatment-plans']);
 

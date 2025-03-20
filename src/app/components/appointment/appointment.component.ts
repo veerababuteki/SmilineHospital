@@ -147,8 +147,8 @@ export class AppointmentComponent implements OnInit {
         appointmentStatus:[{ value: 'None', disabled: !this.editAppointment }],
       });
     } else if (this.editAppointment){
-      const category = this.categories.find(c => c.category_id == this.appointment.category_details.category_id)
-      const doctor = this.doctors.find(d => d.user_id === this.appointment.doctor_details.doctor_id)
+      const category = this.categories.find(c => c.category_id == this.appointment.category_details?.category_id)
+      const doctor = this.doctors.find(d => d.user_id === this.appointment.doctor_details?.doctor_id)
       var formattedTime = this.convertTo24Hour(this.appointment.appointment_time);
       this.appointmentForm = this.fb.group({
         doctor: [doctor, Validators.required],

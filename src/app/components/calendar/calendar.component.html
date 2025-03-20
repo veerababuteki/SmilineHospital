@@ -191,7 +191,10 @@
           <div class="appointment-title">{{app.patientName}}</div>
           <div class="appointment-details">
             <div class="confirmation-info">{{app.notes}}</div>
-            <div class="doctor-name">Dr. {{app.doctor}}</div>
+            <div class="doctor-name" *ngIf = "app.doctor">Dr. {{app.doctor}}</div>
+            <div *ngIf = "!app.doctor">Doctor not assigned
+              <button pButton  class="p-button-rounded assign-button" (click)="assignDoctor(app)">Assign</button>
+            </div>
           </div>
         </div>
       </div>
