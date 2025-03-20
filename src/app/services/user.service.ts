@@ -37,6 +37,18 @@ export class UserService {
       );
   }  
 
+  getPatientByMobileNumber(code: any) {
+    const token = this.authService.getAccessToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get<any>(`${this.baseUrl}/getPersonByMobile/${code}`, {headers}).pipe(
+        catchError(this.handleError)
+      );
+  }  
+
+
   getMedicalHistories(){
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({

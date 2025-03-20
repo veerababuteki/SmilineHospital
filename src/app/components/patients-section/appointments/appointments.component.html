@@ -44,9 +44,11 @@
             </div>
         </div>
         
-        <div class="doctor-info">
-            with <span class="doctor-name">{{' Dr. '+appointment.doctor_details.user_profile_details[0].first_name +' '+ appointment.doctor_details.user_profile_details[0].last_name + ' '}}</span>
-            <span class="procedure-type">{{'('+appointment.category_details.name+')'}}</span>
+        <div class="doctor-info" >
+            <ng-container *ngIf="appointment.doctor_details != null">
+                with <span class="doctor-name">{{' Dr. '+appointment.doctor_details.user_profile_details[0].first_name +' '+ appointment.doctor_details.user_profile_details[0].last_name + ' '}}</span>
+            </ng-container>
+            <span class="procedure-type" *ngIf="appointment.category_details">{{'('+appointment.category_details.name+')'}}</span>
             at <span class="time">{{appointment.appointment_time}}</span>
         </div>
     </div>

@@ -32,7 +32,11 @@
             <div class="search-result-item" *ngFor="let patient of filteredPatients" (click)="selectPatient(patient)">
               <img [src]="patient.image" alt="Patient" class="patient-thumbnail">
               <div class="patient-details">
-                <div class="patient-name">{{patient.name}}</div>
+                <div class="patient-header">
+                  <div class="patient-name">{{patient.name}}</div>
+                  <div class="patient-id">{{patient.id}}</div>
+                  </div>
+                <div class="patient-email">{{patient.phone}}</div>
                 <div class="patient-email">{{patient.email}}</div>
               </div>
             </div>

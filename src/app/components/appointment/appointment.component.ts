@@ -135,8 +135,8 @@ export class AppointmentComponent implements OnInit {
         patientId: ['', Validators.required],
         mobileNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
         emailId: ['', [Validators.email]],
-        doctor: ['', Validators.required],
-        category: ['', Validators.required],
+        doctor: [''],
+        category: [''],
         scheduledDate: [this.selectedDate == null ? new Date() : new Date(this.selectedDate), Validators.required],
         scheduledTime: [this.selectedDate == null ? new Date() : new Date(this.selectedDate), Validators.required],
         duration: ['15'],
@@ -215,7 +215,7 @@ export class AppointmentComponent implements OnInit {
 
   getPatientDetails() {
     var code = this.appointmentForm.value.patientId
-    if(code == undefined || code == '') return;
+    if (code == undefined || code == '') return;
     this.userService.getPatient(code).subscribe(response => {
       this.patient = response.data;
       this.appointmentForm.patchValue({
@@ -223,10 +223,20 @@ export class AppointmentComponent implements OnInit {
         mobileNumber: this.patient.phone,
         emailId: this.patient.email
       });
-    },(error)=>{
-      this.paitentNotFound = true;
-    })
+    }, (error) => {
+      this.userService.getPatientByMobileNumber(code).subscribe(response => {
+        this.patient = response.data;
+        this.appointmentForm.patchValue({
+          patientName: this.patient.user_profile_details[0].first_name + " " + this.patient.user_profile_details[0].last_name,
+          mobileNumber: this.patient.phone,
+          emailId: this.patient.email
+        });
+      }, (error) => {
+        this.paitentNotFound = true;
+      });
+    });
   }
+
   cancelAppointment(){
     this.display = false;
     this.editAppointment = false;
@@ -255,6 +265,8 @@ export class AppointmentComponent implements OnInit {
           if(this.fromPatientsection){
             this.router.navigate(['/calendar'])
           }
+
+          this.closeDialog.emit({isOpenPatientDialog:false});
         });
       }
       else{

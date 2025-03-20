@@ -141,7 +141,7 @@ export class AddCompletedProceduresComponent implements OnInit {
   }
 
   addPlannedTreatment(procedure: any){
-    const teethArray = procedure.teeth_set.split(',').map((tooth: string) => parseInt(tooth.trim(), 10));
+    const teethArray = procedure.teeth_set != '' ? procedure.teeth_set.split(',').map((tooth: string) => parseInt(tooth.trim(), 10)) : [];
 
     const treatment = this.fb.group({
         id: [procedure.id],

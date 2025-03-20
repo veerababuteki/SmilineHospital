@@ -17,9 +17,9 @@
 
     <form *ngIf="activeTab === 'appointment'" [formGroup]="appointmentForm" (ngSubmit)="onSubmit()" class="form-content">
       <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
-        <label class="required">Patient ID</label>
+        <label class="required">Patient ID or Mobile Number</label>
         <div class="input-with-button">
-          <input type="text" pInputText formControlName="patientId" placeholder="Enter Patient ID">
+          <input type="text" pInputText formControlName="patientId" placeholder="Enter Patient ID or Mobile Number">
           <button type="button" pButton label="Get Patient Details" (click)="getPatientDetails()"></button>
         </div>
         <span class="error-message" *ngIf="paitentNotFound">No paitent found</span>
@@ -42,12 +42,12 @@
             [style]="{'width':'100%'}" [placeholder]="'Select Booking Type'"></p-dropdown>
           </div>
           <div class="form-row">
-            <label class="required">Appointment Status</label>
+            <label>Appointment Status</label>
             <p-dropdown formControlName="appointmentStatus" [options]="appointmentStatus"
             [style]="{'width':'100%'}" [placeholder]="''"></p-dropdown>
           </div>
           <div class="form-row">
-            <label class="required">Doctor</label>
+            <label>Doctor</label>
             <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
                        [style]="{'width':'100%'}" [placeholder]="'Select Doctor'"></p-dropdown>
           </div>
@@ -64,7 +64,7 @@
                        [style]="{'width':'100%'}" [placeholder]="''"></p-dropdown>
           </div>
           <div class="form-row">
-            <label class="required">Category</label>
+            <label>Category</label>
             <p-dropdown formControlName="category" [options]="categories" optionLabel="name" 
                        placeholder="Select Category" [style]="{'width':'100%'}"></p-dropdown>
           </div>
@@ -74,18 +74,17 @@
       <div class="form-row schedule-row">
         <label class="required">Scheduled On</label>
         <div class="schedule-inputs">
-          <p-calendar formControlName="scheduledDate" [showIcon]="true" dateFormat="dd-mm-yy"  appendTo="body"></p-calendar>
+          <p-calendar formControlName="scheduledDate" [showIcon]="true" dateFormat="dd-mm-yy" appendTo="body"></p-calendar>
           <span>at</span>
           <p-calendar formControlName="scheduledTime" [timeOnly]="true" [showIcon]="false" hourFormat="12"></p-calendar>
           <span>for</span>
-          <p-dropdown 
-          formControlName="duration" 
-          [options]="durations" 
-          optionLabel="label" 
-          optionValue="value" 
-          [style]="{'width':'120px'}">
-        </p-dropdown>
-                </div>
+          <p-dropdown formControlName="duration"
+                      [options]="durations"
+                      optionLabel="label"
+                      optionValue="value"
+                      [style]="{'width':'120px'}">
+          </p-dropdown>
+        </div>
       </div>
 
       <div class="form-row">

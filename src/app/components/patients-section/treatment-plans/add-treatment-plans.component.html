@@ -81,11 +81,14 @@
 
             <div class="teeth-grid">
               <div class="btn-display">
-              <button type="button" class="teeth-toggle-btn" *ngIf="!treatment.get('showAdultTeeth')?.value"
-                        [class.active]="treatment.get('showAdultTeeth')?.value"
-                        (click)="toggleTeethVisibility(i, 'adult')">
-                  Show Teeth
-                </button>
+                <div class="btn-display">
+                  <button type="button" class="teeth-toggle-btn" *ngIf="!treatment.get('showAdultTeeth')?.value"
+                            [class.active]="treatment.get('showAdultTeeth')?.value"
+                            (click)="toggleTeethVisibility(i, 'adult')">
+                            <ng-container *ngIf="treatment.get('selectedTeeth')?.value?.length > 0">Teeth: {{treatment.get('selectedTeeth')?.value}}</ng-container>
+                            <ng-container *ngIf="treatment.get('selectedTeeth')?.value.length == 0">Show Teeth</ng-container>
+                    </button>
+                  </div>
               </div>
               <!-- Upper Adult Teeth -->
               <div class="teeth-row" *ngIf="treatment.get('showAdultTeeth')?.value">

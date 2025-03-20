@@ -32,7 +32,7 @@ import { Router } from '@angular/router';
           </div>
         </div>
         <div>
-            <button pButton icon="pi pi-user-edit" class="p-button-text p-button-rounded" (click)="editEvent()"></button>
+            <button pButton  class="p-button-rounded" (click)="editEvent()">Edit Appointment</button>
             <button pButton icon="pi pi-times" class="p-button-text p-button-rounded" (click)="deleteEvent()"></button>
         </div>
       </div>
