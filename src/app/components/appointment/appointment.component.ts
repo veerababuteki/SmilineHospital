@@ -18,6 +18,7 @@ import { empty } from 'rxjs';
 import { Router } from '@angular/router';
 import { Message } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
+import { LoaderService } from '../../services/loader.service';
 
 @Component({
   selector: 'app-appointment',
@@ -74,7 +75,7 @@ export class AppointmentComponent implements OnInit {
   messages: Message[] =   [
     { severity: 'info', summary: 'Info', detail: 'Message Content' },
 ];
-  constructor(private fb: FormBuilder, private router: Router, private userService: UserService, private appointmentService: AppointmentService) {}
+  constructor(private fb: FormBuilder, private router: Router, private userService: UserService, private appointmentService: AppointmentService, private loaderService: LoaderService) {}
 
   ngOnInit() {
     this.activeTab = this.data;
@@ -253,6 +254,7 @@ export class AppointmentComponent implements OnInit {
     if (this.appointmentForm.valid) {
       const value = this.appointmentForm.value;
       if(!this.editAppointment){
+        this.loaderService.show();
         this.appointmentService.createAppointment({
           patient_id: this.isDoctor ? this.patient.user_id : this.currentUser.user_id,
           booking_type: value.bookingType,

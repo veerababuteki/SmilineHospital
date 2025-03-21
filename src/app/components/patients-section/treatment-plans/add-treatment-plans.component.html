@@ -33,17 +33,17 @@
                     <!-- <span class="add-notes">+add notes</span> -->
                   </td>
                   <td>
-                    <input type="number" formControlName="quantity" class="qty-input" min="1">
+                    <input type="number" formControlName="quantity" (change)="valuechange(treatment)"  class="qty-input" min="1">
                   </td>
                   <td class="multiply-symbol">x</td>
                   <td>
-                    <input type="number" formControlName="cost" class="cost-input" min="0">
+                    <input type="number" formControlName="cost" (change)="valuechange(treatment)" class="cost-input" min="0">
                   </td>
                   <td class="discount-cell">
-                    <input type="number" formControlName="discount" class="discount-input" min="0">
+                    <input type="number" formControlName="discount" (change)="valuechange(treatment)"  class="discount-input" min="0">
                     <select formControlName="discountType" class="discount-type">
                       <option value="%">%</option>
-                      <option value="INR">INR</option>
+                      <!-- <option value="INR">INR</option> -->
                     </select>
                   </td>
                   <td class="total-column">{{treatment.get('total')?.value | number:'1.2-2'}}</td>
@@ -59,7 +59,7 @@
               </button>
               
               <!-- Make sure the notes input has proper visibility -->
-              <div [style.display]="treatment.get('showNotes')?.value ? 'contents' : 'none'" class="notes-input-container">
+              <div class="note" [style.display]="treatment.get('showNotes')?.value ? 'contents' : 'none'" class="notes-input-container">
                 <input type="text" formControlName="notes" placeholder="Enter notes here..." class="notes-input">
               </div>
             </div>
@@ -154,9 +154,10 @@
 
       <div class="footer">
         <span class="padding-span">by Dr.</span>
-        <p-dropdown [(ngModel)]="doctor" [options]="doctors" optionLabel="name"  showIcon="false" class="doctor-name no-icon-dropdown no-border-dropdown"
+        <p-dropdown [(ngModel)]="doctor" [options]="doctors" optionLabel="name"  showIcon="false" class="doctor-name"
           [style]="{'width':'100%'}" [placeholder]="'Select Doctor'"></p-dropdown>
-        <span class="padding-span"> on</span><p-calendar [(ngModel)]="date" dateFormat="dd-mm-yy"></p-calendar>
+        <span class="padding-span"> on</span>
+        <p-calendar [(ngModel)]="date" dateFormat="dd-mm-yy"></p-calendar>
       </div>
     </div>
 
@@ -169,8 +170,15 @@
       
       <div class="search-container">
         <input type="text" *ngIf="!add" [(ngModel)]="searchText" (input)="filterProcedures()" placeholder="Search" class="search-input">
-        <input type="text" *ngIf="add" [(ngModel)]="name" placeholder="Procedure name" class="search-input">
-        <input type="number" *ngIf="add" placeholder="Price" [(ngModel)]="cost" class="search-input">
+        <div *ngIf="add">
+          <div>
+            <label>Name</label>
+            <input type="text" [(ngModel)]="name" placeholder="Procedure name" class="search-input">
+          </div>
+          <div>
+            <label>Price</label>
+            <input type="number" placeholder="Price" [(ngModel)]="cost" class="search-input">
+          </div>
       </div>
 
       <div class="procedures-list">

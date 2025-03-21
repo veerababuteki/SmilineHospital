@@ -322,11 +322,11 @@ export class AddClinicalNotesComponent implements OnInit {
   }
   validateNote(): { isValid: boolean; message: string } {
     // Check if all selected entries have values
-    const hasEmptyComplaints = this.selectedComplaints.some(complaint => !complaint.value.trim()) || this.newComplaint.trim().length > 0;
-    const hasEmptyObservations = this.selectedObservations.some(obs => !obs.value.trim()) || this.newObservation.trim().length > 0;
-    const hasEmptyInvestigations = this.selectedInvestigations.some(inv => !inv.value.trim()) || this.newInvestigation.trim().length > 0;
-    const hasEmptyDiagnoses = this.selectedDiagnoses.some(diag => !diag.value.trim()) || this.newDiagnosis.trim().length > 0;
-    const hasEmptyNotes = this.selectedNotes.some(note => !note.value.trim()) || this.newNote.trim().length > 0;
+    const hasEmptyComplaints = this.selectedComplaints.some(complaint => !complaint.value.trim()) || this.newComplaint.trim().length == 0;
+    const hasEmptyObservations = this.selectedObservations.some(obs => !obs.value.trim()) || this.newObservation.trim().length == 0;
+    const hasEmptyInvestigations = this.selectedInvestigations.some(inv => !inv.value.trim()) || this.newInvestigation.trim().length == 0;
+    const hasEmptyDiagnoses = this.selectedDiagnoses.some(diag => !diag.value.trim()) || this.newDiagnosis.trim().length == 0;
+    const hasEmptyNotes = this.selectedNotes.some(note => !note.value.trim()) || this.newNote.trim().length == 0;
 
     if (hasEmptyComplaints && hasEmptyObservations && hasEmptyInvestigations &&
         hasEmptyDiagnoses && hasEmptyNotes) {

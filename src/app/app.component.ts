@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, OnDestroy, OnInit  } from '@angular/core';
 import { RouterModule, RouterOutlet } from '@angular/router';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -16,7 +16,8 @@ import { SideTopNavComponent } from './components/side-top-nav/side-top-nav.comp
 import { PatientsSectionComponent } from './components/patients-section/patients-section.component';
 import { AuthService } from './services/auth.service';
 import { HomeComponent } from './components/home/home.component';
-
+import { LoaderService } from './services/loader.service';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 interface NavItem {
   icon: string;
   label: string;
@@ -36,10 +37,21 @@ interface NavItem {
     ButtonModule,
     SplitButtonModule,
     ButtonModule,
+    ProgressSpinnerModule
   ],
 })
-export class AppComponent {
-  constructor(){}
+export class AppComponent implements OnInit {
+  isLoading: boolean = false;
   isExpanded = false;
   searchText: string = '';
+
+  constructor(private loaderService: LoaderService){ 
+    
+  }
+
+  ngOnInit(): void {
+    this.loaderService.isLoading$.subscribe(loading => {
+      this.isLoading = loading;
+    });
+  }
 }

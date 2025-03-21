@@ -239,9 +239,21 @@
       font-size: 13px;
       color: #666;
       display: flex;
+      gap: 10px;
       justify-items: center;
+
       .doctor-name {
         color: #2196F3;
+        border: 1px solid #ddd !important;
+        border-radius: 4px;
+      }
+
+      p-calendar {
+        display: flex;
+        border: 1px solid #ddd !important;
+        border-radius: 4px;
+        margin-left: 10px;
+        width: 100px;
       }
     }
   
@@ -396,6 +408,7 @@
   color: #0095CC;
   text-decoration: underline;
   cursor: pointer;
+  margin-bottom: 10px;
 }
 .btn-display{
   display: flex;

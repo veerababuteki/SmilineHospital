@@ -9,6 +9,7 @@ import { HttpClientModule, provideHttpClient, withInterceptors } from '@angular/
 import { AuthGuard } from './app/auth/auth.guard';
 import { AuthService } from './app/services/auth.service';
 import { AuthInterceptor } from './app/auth/auth.interceptor';
+import { LoaderInterceptor } from './app/auth/loader.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -16,7 +17,7 @@ export const appConfig: ApplicationConfig = {
     AuthGuard,
     AuthService,
     provideAnimations(),
-    provideHttpClient(withInterceptors([AuthInterceptor])),
+    provideHttpClient(withInterceptors([AuthInterceptor, LoaderInterceptor])),
     provideRouter(routes)
   ]
 };

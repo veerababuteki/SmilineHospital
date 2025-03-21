@@ -144,3 +144,15 @@
 tbody{
     border-left: 3px solid;
 }
+
+.no-appointments-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 100px;
+    .icon {
+        height: 50px;
+        width: 50px;
+    }
+}

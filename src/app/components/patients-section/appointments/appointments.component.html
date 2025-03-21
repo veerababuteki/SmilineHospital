@@ -3,55 +3,69 @@
     <div class="appointments-header">
         <h2>APPOINTMENTS</h2>
         <!-- <button class="add-btn">+ Add</button> -->
-        <app-appointment #myButton [patientCode]="uniqueCode" [editAppointment]="editAppointment" [fromPatientsection]="true" *ngIf="isDataLoaded" [data]="'appointment'" [currentUser]="currentUser" [isDoctor]="true" [doctors]="doctors" [categories]="categories"></app-appointment>
+        <app-appointment #myButton [patientCode]="uniqueCode" [editAppointment]="editAppointment"
+            [fromPatientsection]="true" *ngIf="isDataLoaded" [data]="'appointment'" [currentUser]="currentUser"
+            [isDoctor]="true" [doctors]="doctors" [categories]="categories"></app-appointment>
 
     </div>
     <div *ngFor="let date of getSortedDates()">
-    <div class="appointment-date">{{date | date: 'dd MMM, yyyy' }}</div>
+        <div class="appointment-date">{{date | date: 'dd MMM, yyyy' }}</div>
 
-    <div *ngFor="let appointment of appointments[date]">
-    <div class="procedures-table">
-        <table>
-            <thead>
-                <tr>
-                    <th class="procedure-col">PROCEDURE</th>
-                    <th class="waiting-col">Status</th>
-                    <th class="engaged-col">Booking Type</th>
-                    <th class="actions-col"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="procedure-col" *ngIf="!appointment.planned_procedure">No Procedures planned</td>
-                    <td class="procedure-col" *ngIf="appointment.planned_procedure">{{appointment.planned_procedure}}</td>
-                    <td class="waiting-col">{{appointment.status}}</td>
-                    <td class="engaged-col">{{appointment.booking_type}}</td>
-                    <td class="actions-col">
-                        <button class="edit-btn" (click)="handleEventEdit(appointment)">
-                            <i class="pi pi-pencil"></i>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        <div *ngFor="let appointment of appointments[date]">
+            <div class="procedures-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="procedure-col">PROCEDURE</th>
+                            <th class="waiting-col">Status</th>
+                            <th class="engaged-col">Booking Type</th>
+                            <th class="actions-col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="procedure-col" *ngIf="!appointment.planned_procedure">No Procedures planned</td>
+                            <td class="procedure-col" *ngIf="appointment.planned_procedure">
+                                {{appointment.planned_procedure}}</td>
+                            <td class="waiting-col">{{appointment.status}}</td>
+                            <td class="engaged-col">{{appointment.booking_type}}</td>
+                            <td class="actions-col">
+                                <button class="edit-btn" (click)="handleEventEdit(appointment)">
+                                    <i class="pi pi-pencil"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-    <div class="appointment-details">
-        <div class="notes-section">
-            <div class="notes-label">APPOINTMENT NOTES</div>
-            <div class="notes-content">
-                <!-- {{appointment.notes}} -->
+            <div class="appointment-details">
+                <div class="notes-section">
+                    <div class="notes-label">APPOINTMENT NOTES</div>
+                    <div class="notes-content">
+                        <!-- {{appointment.notes}} -->
+                    </div>
+                </div>
+
+                <div class="doctor-info">
+                    <ng-container *ngIf="appointment.doctor_details != null">
+                        with <span class="doctor-name">{{' Dr.
+                            '+appointment.doctor_details.user_profile_details[0].first_name +' '+
+                            appointment.doctor_details.user_profile_details[0].last_name + ' '}}</span>
+                    </ng-container>
+                    <span class="procedure-type"
+                        *ngIf="appointment.category_details">{{'('+appointment.category_details.name+')'}}</span>
+                    at <span class="time">{{appointment.appointment_time}}</span>
+                </div>
             </div>
         </div>
-        
-        <div class="doctor-info" >
-            <ng-container *ngIf="appointment.doctor_details != null">
-                with <span class="doctor-name">{{' Dr. '+appointment.doctor_details.user_profile_details[0].first_name +' '+ appointment.doctor_details.user_profile_details[0].last_name + ' '}}</span>
-            </ng-container>
-            <span class="procedure-type" *ngIf="appointment.category_details">{{'('+appointment.category_details.name+')'}}</span>
-            at <span class="time">{{appointment.appointment_time}}</span>
-        </div>
     </div>
-</div>
-</div>
+    
+    <div class="no-appointments-container" *ngIf="getSortedDates().length <= 0">
+        <img class="icon" src="assets/no-appointments.png" />
+        <h3>No appointments booked.</h3>
+        <app-appointment #myButton [patientCode]="uniqueCode" [editAppointment]="editAppointment"
+            [fromPatientsection]="true" *ngIf="isDataLoaded" [data]="'appointment'" [currentUser]="currentUser"
+            [isDoctor]="true" [doctors]="doctors" [categories]="categories"></app-appointment>
+    </div>
 </div>

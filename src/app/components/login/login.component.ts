@@ -102,11 +102,8 @@ registrationForm!: FormGroup;
         }
         this.authService.sendOTP(mobileControl?.value).subscribe((data: any) =>{
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'OTP Sent to mobile' });
-
-
           this.otpSent = true;
         })
-        
       } 
       else if(this.isOtpLogin && this.otpSent){
         this.authService.verifyOTP(formData.mobileNumber, formData.otp).subscribe(data =>{

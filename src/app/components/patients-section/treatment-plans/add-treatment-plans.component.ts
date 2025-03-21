@@ -120,16 +120,18 @@ export class AddTreatmentPlansComponent implements OnInit {
       showNotes: [false]
     });
 
-    const index = this.treatments.length;
-    this.treatments.insert(0,treatment);
+    const index = 0;
+    this.treatments.insert(index, treatment);
     this.setCurrentTreatment(index);
     this.calculateTotal(index);
-
-    // Subscribe to value changes
-    treatment.valueChanges.subscribe(() => {
-      this.calculateTotal(index);
-    });
   }
+
+  valuechange(treatment: any){
+    const treatmentsArray = this.treatments.controls;
+    const index = treatmentsArray.findIndex((t) => t.get('id')?.value === treatment.value.id);
+    this.calculateTotal(index);
+  }
+
   toggleNotesVisibility(treatmentIndex: number): void {
     if (treatmentIndex === null || treatmentIndex >= this.treatments.length) return;
     
@@ -266,7 +268,6 @@ export class AddTreatmentPlansComponent implements OnInit {
           notes: t.notes
         });
       })
-      debugger;
       treatment.procedures_list = treatment.procedures_list.reverse();
       this.treatmentPlansService.addTreatmentPlan(treatment).subscribe(res => {
         this.router.navigate(['/patients', this.patientId, 'treatment-plans']);
