@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgFor } from '@angular/common';
 import { TreatmentPlansService } from '../../../services/treatment-plans.service';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { InvoicePrintComponent } from './invoice-print/invoice-print.component';
 
 @Component({
   selector: 'app-invoice',
   templateUrl: './invoice.component.html',
   styleUrls: ['./invoice.component.scss'],
   standalone: true,
-  imports: [ CommonModule, FormsModule
+  imports: [ CommonModule, FormsModule,
+    InvoicePrintComponent,NgFor
   ]
 })
 export class InvoiceComponent implements OnInit {
