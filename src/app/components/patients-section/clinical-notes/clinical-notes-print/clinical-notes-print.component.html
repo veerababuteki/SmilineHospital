@@ -1,0 +1,49 @@
+<button class="edit-btn border-left-radius" (click)="print()">
+    <i class="pi pi-print"></i>
+</button>
+
+<div id="clinicalNotes{{clinicalNotes.id}}" class="case-sheet-container">
+    <!-- Clinic Details -->
+    <h2 class="clinic-name">Smiline Dental Hospitals</h2>
+    <p class="clinic-address">
+      #8-3-952/10/2&2/1, Smiline House, Srinagar Colony, Panjagutta, Hyderabad-500073
+    </p>
+    <p class="clinic-phone">Phone: 040 4200 0024</p>
+  
+    <hr />
+  
+    <!-- Patient & Doctor Details -->
+    <p><strong>Date:</strong> {{ clinicalNotes.date | date: 'dd MMM, yyyy' }}</p>
+    <p><strong>Billing Incharge:</strong> Kiran</p>
+    <p><strong>Patient:</strong> {{ clinicalNotes.patient_details_clinic.user_profile_details[0].first_name }}
+      {{ clinicalNotes.patient_details_clinic.user_profile_details[0].last_name }}
+      ({{ clinicalNotes.patient_details_clinic.unique_code }})
+      {{ clinicalNotes.patient_details_clinic.user_profile_details[0].gender }}
+    </p>
+    <p><strong>By:</strong> Dr. {{ clinicalNotes.doctor_details_clinic.user_profile_details[0].first_name }}
+      {{ clinicalNotes.doctor_details_clinic.user_profile_details[0].last_name }}
+    </p>
+  
+    <hr />
+  
+    <!-- Case Details -->
+    <p class="section-title">Case Details</p>
+    <p><strong>Complaint:</strong> {{ clinicalNotes.chief_complaints }}</p>
+    <p><strong>Investigation:</strong> {{ clinicalNotes.investigations || 'N/A' }}</p>
+    <p><strong>Observations:</strong> {{ clinicalNotes.observations || 'N/A' }}</p>
+    <p><strong>Diagnoses:</strong> {{ clinicalNotes.diagnoses || 'N/A' }}</p>
+  
+    <!-- Clinical Notes Section -->
+    <p class="section-title">Clinical Notes</p>
+    <div class="notes-box">
+      {{ clinicalNotes.notes || 'No additional notes' }}
+    </div>
+  
+    <hr />
+  
+    <!-- Footer -->
+    <p class="generated-on">Generated On: {{ generatedDate }}</p>
+    <p class="powered-by">Powered by iDental</p>
+  </div>
+  
+  

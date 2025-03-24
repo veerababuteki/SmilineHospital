@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { ClinicalNotesService } from '../../../services/clinical-notes.service';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ClinicalNotesPrintComponent } from "./clinical-notes-print/clinical-notes-print.component";
 
 @Component({
   selector: 'app-clinical-notes',
   templateUrl: './clinical-notes.component.html',
   styleUrls: ['./clinical-notes.component.scss'],
   standalone: true,
-  imports: [ CommonModule, FormsModule
-  ]
+  imports: [CommonModule, FormsModule, ClinicalNotesPrintComponent]
 })
 
 export class ClinicalNotesComponent implements OnInit {

@@ -16,9 +16,7 @@
                         <td class="engaged-col" *ngIf="i > 0"></td>
                         <td class="procedure-col">{{complaint}}</td>
                         <td class="actions-col" *ngIf="i == 0">
-                            <button class="edit-btn border-left-radius">
-                                <i class="pi pi-print"></i>
-                            </button>
+                            <app-clinical-notes-print [clinicalNotes]="note"></app-clinical-notes-print>
                             <button class="edit-btn border-right-radius">
                                 <i class="pi pi-chevron-down"></i>
                             </button>
