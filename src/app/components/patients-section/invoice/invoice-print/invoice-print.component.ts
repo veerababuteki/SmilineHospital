@@ -26,7 +26,6 @@ export class InvoicePrintComponent {
 
 
   print() {
-    debugger;
     const printContent = document.getElementById(this.invoice.key)!.innerHTML;
     const printWindow = window.open('', '', 'width=1200,height=600');
     printWindow!.document.write(`
@@ -67,44 +66,65 @@ hr {
   margin: 10px 0;
 }
 
-/* Table Styles */
-table {
+/* Treatments Table */
+.treatments-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 15px;
 }
 
-table, th, td {
-  border: 1px solid #ddd;
+/* Table Header */
+.treatments-table thead {
+  font-size: 14px;
+  border-bottom: 2px solid black;
+}
+
+.treatments-table thead th {
+  padding: 10px;
+  text-align: center;
+}
+
+/* Table Rows */
+.treatments-table tbody tr {
+  border-bottom: 1px solid #ddd;
+}
+
+/* Table Cells */
+.treatments-table td {
   padding: 10px;
   text-align: left;
 }
 
-th {
-  background-color: #f8f8f8;
+/* Align Amounts to Right */
+.treatments-table td.amount {
+  text-align: right;
   font-weight: bold;
-  text-align: center;
 }
 
-td {
-  vertical-align: middle;
-}
-
-/* Align amounts to the right */
-td.amount {
+.treatments-table td.value {
   text-align: right;
 }
 
+/* Subtext Formatting */
+.subtext {
+  font-size: 12px;
+  color: #555;
+  display: block;
+  margin-top: 2px;
+}
+
+
 /* Invoice Summary */
 .summary-container {
+  width: 100%;
+  text-align: right;
   margin-top: 15px;
-  display: flex;
-  justify-content: flex-end; /* Aligns summary to the right */
 }
 
 .summary {
-  width: 350px; /* Adjust width for better alignment */
-  text-align: right; /* Ensures text is right-aligned */
+  display: inline-block;
+  text-align: right;
+  min-width: 250px; /* Ensures consistent alignment */
   font-size: 16px;
   font-weight: bold;
 }
@@ -117,21 +137,35 @@ td.amount {
 
 /* Hide button when printing */
 @media print {
-  button {
-    display: none;
-  }
-
-  body {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
+  /* Ensure the invoice fits within the print area */
   .invoice-container {
+    max-width: 100%; /* Prevents content from overflowing */
+    width: 90%; /* Ensures it fits on the page */
+    margin: auto;
+  }
+
+  .treatments-table {
+    border: 1px solid black;
+  }
+
+  .treatments-table thead {
+    font-weight: bold;
+  }
+
+  /* Prevents content from overflowing the page */
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Adjust summary to align within the printable area */
+  .summary-container {
     width: 100%;
-    border: none;
-    box-shadow: none;
+    text-align: right;
+    padding-right: 10px; /* Prevents it from touching the right margin */
   }
 }
+
 
 
         </style>
@@ -139,7 +173,10 @@ td.amount {
       <body>
         ${printContent}
         <script>
-          window.onload = function() { window.print(); window.close(); };
+         window.onload = function() { 
+            window.print(); 
+            window.close(); 
+          };
         </script>
       </body>
       </html>

@@ -19,31 +19,35 @@
       
         <hr />
       
-        <table>
+        <table class="treatments-table">
           <thead>
             <tr>
               <th>#</th>
-              <th>Treatment / Product</th>
-              <th>Doctor</th>
-              <th>Date</th>
-              <th>Unit Cost (INR)</th>
-              <th>Qty</th>
-              <th>Total Cost (INR)</th>
+              <th class="name">Treatment Details</th>
+              <th class="amount">Unit Cost (INR)</th>
+              <th class="amount">Qty</th>
+              <th class="amount">Discount</th>
+              <th class="amount">Total Cost (INR)</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let invc of getInvoiceGroupValues(invoice); let i = index">
               <td>{{ i + 1 }}</td>
-              <td>{{ invc.treatment_plans.procedure_details.name }}</td>
-              <td>{{ 'Dr. ' + invc.treatment_plans.doctor_details_treat.user_profile_details[0].first_name + ' ' +
-                       invc.treatment_plans.doctor_details_treat.user_profile_details[0].last_name }}</td>
-              <td>{{ invc.treatment_plans.treatment_date | date: 'dd MMM, yyyy' }}</td>
-              <td>{{ invc.treatment_plans.cost }}</td>
-              <td>{{ invc.treatment_plans.quantity }}</td>
-              <td>{{ invc.treatment_plans.total_cost }}</td>
+              <td>
+                <strong>{{ invc.treatment_plans.procedure_details.name }}</strong> <br />
+                <span class="subtext">By Dr. {{ invc.treatment_plans.doctor_details_treat.user_profile_details[0].first_name }} 
+                  {{ invc.treatment_plans.doctor_details_treat.user_profile_details[0].last_name }}</span> <br />
+                <span class="subtext">Date: {{ invc.treatment_plans.date | date: 'dd MMM, yyyy' }}</span>
+              </td>
+              <td class="value">{{ invc.treatment_plans.cost }}</td>
+              <td class="value">{{ invc.treatment_plans.quantity }}</td>
+              <td class="value">{{ invc.treatment_plans.discount }} %</td>
+              <td class="amount">{{ invc.treatment_plans.total_cost }}</td>
             </tr>
           </tbody>
         </table>
+        
+        
       
         <hr />
       
