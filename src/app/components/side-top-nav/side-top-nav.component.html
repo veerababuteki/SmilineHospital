@@ -83,7 +83,7 @@
     [draggable]="false"
     [resizable]="false">
     
-    <app-add-profile (onSave)="savePatient()"
+    <app-add-profile (onSave)="savePatient($event)"
     (onCancel)="hideAddPatientDialog()"></app-add-profile>
     
     <!-- <ng-template pTemplate="footer">

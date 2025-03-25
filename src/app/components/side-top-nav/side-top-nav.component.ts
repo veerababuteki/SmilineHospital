@@ -54,22 +54,10 @@ export class SideTopNavComponent {
       this.addNavItems(privilegeNames);
       this.navItems = this.navItems.filter(nav => nav.hasAccess);
     });
-    this.userService.getDoctors('2ac7787b-77d1-465b-9bc0-eee50933697f').subscribe(res => {
-      this.allPatients = res.data; 
-      this.allPatients.forEach(patient => {
-          this.patients.push({
-              id: patient.unique_code,
-              userId: patient.user_id,
-              name: patient.first_name +' '+ patient.last_name,
-              email: patient.email,
-              phone: patient.phone,
-              image: 'assets/user.webp',
-              gender: patient.gender
-          })
-          this.filteredPatients = [...this.patients]
-      })
-  })
+
+    this.getPatients();
   }
+
   displayAddPatientDialog = false;
   user: any;
   isExpanded = false;
@@ -107,10 +95,31 @@ export class SideTopNavComponent {
     this.displayAddPatientDialog = true;
   }
 
-  savePatient(){
+  getPatients(){
+    this.userService.getDoctors('2ac7787b-77d1-465b-9bc0-eee50933697f').subscribe(res => {
+      this.allPatients = res.data; 
+      this.allPatients.forEach(patient => {
+          this.patients.push({
+              id: patient.unique_code,
+              userId: patient.user_id,
+              name: patient.first_name +' '+ patient.last_name,
+              email: patient.email,
+              phone: patient.phone,
+              image: 'assets/user.webp',
+              gender: patient.gender
+          })
+          this.filteredPatients = [...this.patients]
+      })
+  })
+  }
+
+  savePatient($event:any){
     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Patient Added Successfully' });
     this.displayAddPatientDialog = false;
+    this.getPatients();
+    this.router.navigate(['patients', $event.user_id, 'profile', $event.unique_code]);
   }
+
   hideAddPatientDialog() {
     this.displayAddPatientDialog = false;
   }

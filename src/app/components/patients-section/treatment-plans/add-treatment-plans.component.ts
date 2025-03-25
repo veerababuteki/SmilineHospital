@@ -248,7 +248,7 @@ export class AddTreatmentPlansComponent implements OnInit {
     if(this.treatmentForm.valid){
       var procedureLists: any[] = []
       var treatment = {
-        doctor_id: this.doctor.user_id,
+        
         patient_id: this.patientId,
         grand_total: this.calculateGrandTotal().toString(),
         procedures_list: procedureLists
@@ -265,7 +265,8 @@ export class AddTreatmentPlansComponent implements OnInit {
           date: this.date,
           total_cost: t.total,
           total_discount: t.discount.toString(),
-          notes: t.notes
+          notes: t.notes,
+          doctor_id: this.doctor.user_id.toString(),
         });
       })
       treatment.procedures_list = treatment.procedures_list.reverse();

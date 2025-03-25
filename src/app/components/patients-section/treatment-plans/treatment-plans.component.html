@@ -38,7 +38,7 @@
                                     (change)="onCheckboxChange(treatment, treatment.id, treatment.treatment_unique_id)">
                             </td>
                             <td>{{treatment.procedure_details.name}}</td>
-                            <td class="amount">{{treatment.procedure_details.cost}}</td>
+                            <td class="amount">{{treatment.cost}}</td>
                             <td class="discount">{{treatment.discount+" "+treatment.discount_formate}}</td>
                             <td class="amount">{{treatment.total_cost}}</td>
                             <td>Teeth: <span class="teeth-number">{{treatment.teeth_set}}</span></td>
