@@ -13,7 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   templateUrl: './treatment-plans.component.html',
   styleUrls: ['./treatment-plans.component.scss'],
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule, FormsModule, DropdownModule, CalendarModule  ]
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, DropdownModule, CalendarModule]
 })
 export class TreatmentPlansComponent implements OnInit {
   treatmentForm!: FormGroup;
@@ -30,18 +30,18 @@ export class TreatmentPlansComponent implements OnInit {
   patientId: string | null | undefined;
   generateInvoiceList: any[] = [];
 
-  constructor(private fb: FormBuilder, 
+  constructor(private fb: FormBuilder,
     private treatmentPlansService: TreatmentPlansService,
     private router: Router,
     private route: ActivatedRoute
   ) {
   }
-  
+
   groupedData: { [key: string]: any[] } = {};
 
   ngOnInit() {
     this.route.parent?.paramMap.subscribe(params => {
-      if(this.patientId == null) {
+      if (this.patientId == null) {
         this.patientId = params.get('id');
       }
       if (this.patientId) {
@@ -49,22 +49,23 @@ export class TreatmentPlansComponent implements OnInit {
       }
     });
   }
-  loadPatientData(patientId: string){
-    if(this.patientId !== null && this.patientId !== undefined){
+  loadPatientData(patientId: string) {
+    if (this.patientId !== null && this.patientId !== undefined) {
       this.treatmentPlansService.getTreatmentPlans(Number(this.patientId)).subscribe(res => {
-        this.treatmentPlans = this.groupByDate(res.data.rows);
+        var activeTreatmentPlans = res.data.rows.filter((_:any) => _.status != "Completed");
+        this.treatmentPlans = this.groupByDate(activeTreatmentPlans);
       });
     }
   }
-  onCheckboxChange(treatment: any, treatmentId: number, treatment_unique_id: string){
-    if(treatment.isChecked){
-      this.markCompleteList.push({id: treatmentId, treatment_unique_id: treatment_unique_id})
-      this.generateInvoiceList.push({id: treatmentId, treatment_unique_id: treatment_unique_id})
-    } else{
-      this.markCompleteList = this.markCompleteList.filter(item => 
+  onCheckboxChange(treatment: any, treatmentId: number, treatment_unique_id: string) {
+    if (treatment.isChecked) {
+      this.markCompleteList.push({ id: treatmentId, treatment_unique_id: treatment_unique_id })
+      this.generateInvoiceList.push({ id: treatmentId, treatment_unique_id: treatment_unique_id })
+    } else {
+      this.markCompleteList = this.markCompleteList.filter(item =>
         item.id !== treatmentId || item.treatment_unique_id !== treatment_unique_id
       );
-      this.generateInvoiceList = this.generateInvoiceList.filter(item => 
+      this.generateInvoiceList = this.generateInvoiceList.filter(item =>
         item.id !== treatmentId || item.treatment_unique_id !== treatment_unique_id
       );
     }
@@ -83,49 +84,49 @@ export class TreatmentPlansComponent implements OnInit {
   //   }, {} as Record<string, any[]>);
   // }
   groupByDate(rows: any[]) {
-    rows.sort((a:any, b:any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    rows.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
     const groupedByDate = rows.reduce((acc, row) => {
       const dateKey = row.date.split('T')[0]; // Extract date part
-  
+
       const treatmentKey = row.date;
       if (!acc[dateKey]) {
         acc[dateKey] = [];
       }
-  
+
       if (row.status === 'Completed') {
         row.isChecked = true;
       }
-  
+
       acc[dateKey].push(row);
       return acc;
     }, {} as Record<string, Record<string, any[]>>);
-  
+
     return groupedByDate;
   }
 
   getSortedTreatmentIds(rows: any) {
     // Step 1: Sort rows by date in descending order
-    rows.sort((a:any, b:any) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  
+    rows.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
     // Step 2: Extract unique treatment IDs while maintaining order
     const uniqueIds = new Set<string>();
     return rows.map((row: any) => row.treatment_unique_id).filter((id: any) => uniqueIds.has(id) ? false : uniqueIds.add(id));
   }
 
   filterRowsByTreatment(
-    rows: any, 
+    rows: any,
     treatmentKey: any
   ) {
-    return rows.filter((row:any) => row.treatment_unique_id === treatmentKey);
+    return rows.filter((row: any) => row.treatment_unique_id === treatmentKey);
   }
-  
 
-  markAsComplete(){
-    if(this.markCompleteList.length == 0) return;
-    this.treatmentPlansService.markAsComplete(this.markCompleteList).subscribe(res=>{
-        if(this.patientId !== null && this.patientId !== undefined){
-          this.loadPatientData(this.patientId);
-        }
+
+  markAsComplete() {
+    if (this.markCompleteList.length == 0) return;
+    this.treatmentPlansService.markAsComplete(this.markCompleteList).subscribe(res => {
+      if (this.patientId !== null && this.patientId !== undefined) {
+        this.loadPatientData(this.patientId);
+      }
     })
   }
 
@@ -139,15 +140,15 @@ export class TreatmentPlansComponent implements OnInit {
   //   }
   // }
 
-  generateInvoice(){
+  generateInvoice() {
     this.treatmentPlansService.generateInvoice(this.generateInvoiceList).subscribe(res => {
-      if(this.patientId !== null && this.patientId !== undefined){
+      if (this.patientId !== null && this.patientId !== undefined) {
         this.loadPatientData(this.patientId)
       }
     })
   }
 
-  navigateToAddPage(){
+  navigateToAddPage() {
     this.router.navigate(['patients', this.patientId, 'add-treatment-plan']);
   }
 

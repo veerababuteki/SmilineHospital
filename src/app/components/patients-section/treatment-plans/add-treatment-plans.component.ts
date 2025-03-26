@@ -7,6 +7,7 @@ import { UserService } from '../../../services/user.service';
 import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { ActivatedRoute, Router } from '@angular/router';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-add-treatment-plans',
@@ -126,9 +127,7 @@ export class AddTreatmentPlansComponent implements OnInit {
     this.calculateTotal(index);
   }
 
-  valuechange(treatment: any){
-    const treatmentsArray = this.treatments.controls;
-    const index = treatmentsArray.findIndex((t) => t.get('id')?.value === treatment.value.id);
+  valuechange(treatment: any, index:number){
     this.calculateTotal(index);
   }
 
@@ -262,7 +261,7 @@ export class AddTreatmentPlansComponent implements OnInit {
           discount_formate: t.discountType,
           teeth_set: t.selectedTeeth.toString(),
           status: "None",
-          date: this.date,
+          date: format(this.date,"yyyy-MM-dd"),
           total_cost: t.total,
           total_discount: t.discount.toString(),
           notes: t.notes,

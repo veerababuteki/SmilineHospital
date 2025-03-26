@@ -131,8 +131,8 @@ export class AddCompletedProceduresComponent implements OnInit {
       procedureDate: [this.date],
     });
 
-    const index = this.treatments.length;
-    this.treatments.insert(0,treatment);
+    const index = 0;
+    this.treatments.insert(index,treatment);
     this.setCurrentTreatment(index);
     this.calculateTotal(index);
 
@@ -295,6 +295,10 @@ export class AddCompletedProceduresComponent implements OnInit {
 
     treatment.patchValue({ total }, { emitEvent: false });
     this.calculateGrandTotal();
+  }
+
+  valuechange(treatment: any, index: number) {
+    this.calculateTotal(index);
   }
 
   onSubmit(){

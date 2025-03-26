@@ -23,6 +23,7 @@
                             <th class="checkbox-col"></th>
                             <th class="procedure-col">PROCEDURE</th>
                             <th class="cost-col">COST</th>
+                            <th class="cost-col">QUANTITY</th>
                             <th class="discount-col">DISCOUNT</th>
                             <th class="total-col">TOTAL</th>
                             <th class="notes-col">NOTES</th>
@@ -39,9 +40,13 @@
                             </td>
                             <td>{{treatment.procedure_details.name}}</td>
                             <td class="amount">{{treatment.cost}}</td>
+                            <td class="amount">{{treatment.quantity}}</td>
                             <td class="discount">{{treatment.discount+" "+treatment.discount_formate}}</td>
                             <td class="amount">{{treatment.total_cost}}</td>
-                            <td>Teeth: <span class="teeth-number">{{treatment.teeth_set}}</span></td>
+                            <td>
+                                <div>Teeth: <span class="teeth-number">{{treatment.teeth_set}}</span></div>
+                                <div>{{treatment.notes}}</div>
+                            </td>
                             <td class="actions">
                                 <button class="edit-btn border-left-radius">
                                     <i class="pi pi-print"></i>
