@@ -67,7 +67,7 @@
             <div class="options-row">
               <div class="checkboxes">
                 <label class="checkbox-container">
-                  <input type="checkbox" formControlName="multiplyCost">
+                  <input type="checkbox" formControlName="multiplyCost" (change)="toggleMultiplyCost(i)">
                   <span class="checkbox-label">Multiply Cost</span>
                 </label>
                 <label class="checkbox-container">

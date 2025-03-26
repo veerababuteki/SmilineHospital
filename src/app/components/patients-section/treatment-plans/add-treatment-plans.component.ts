@@ -188,6 +188,17 @@ export class AddTreatmentPlansComponent implements OnInit {
     this.calculateGrandTotal();
   }
 
+  toggleMultiplyCost(index:number){
+    const treatment = this.treatments.at(index);
+    const selectedTeethControl = treatment.get('selectedTeeth');
+
+    if(treatment.get('multiplyCost')?.value){
+      treatment.get('quantity')?.setValue(selectedTeethControl?.value.length)
+    }
+
+    this.calculateTotal(index);
+  }
+
   isToothSelected(treatmentIndex: number, toothNumber: number): boolean {
     if (treatmentIndex === null || treatmentIndex >= this.treatments.length) return false;
     
@@ -217,6 +228,10 @@ export class AddTreatmentPlansComponent implements OnInit {
     }
     
     selectedTeethControl.setValue(selectedTeeth);
+    if(treatment.get('multiplyCost')?.value){
+      treatment.get('quantity')?.setValue(selectedTeeth.length)
+    }
+
     this.calculateTotal(treatmentIndex);
   }
 
@@ -227,9 +242,9 @@ export class AddTreatmentPlansComponent implements OnInit {
     const values = treatment.value;
     let total = values.cost * values.quantity;
 
-    if (values.multiplyCost && values.selectedTeeth.length > 0) {
-      total *= values.selectedTeeth.length;
-    }
+    // if (values.multiplyCost && values.selectedTeeth.length > 0) {
+    //   total *= values.selectedTeeth.length;
+    // }
 
     if (values.discount > 0) {
       if (values.discountType === '%') {
@@ -285,9 +300,9 @@ export class AddTreatmentPlansComponent implements OnInit {
       const values = treatment.value;
       let cost = values.cost * values.quantity;
       
-      if (values.multiplyCost && values.selectedTeeth.length > 0) {
-        cost *= values.selectedTeeth.length;
-      }
+      // if (values.multiplyCost && values.selectedTeeth.length > 0) {
+      //   cost *= values.selectedTeeth.length;
+      // }
       
       totalCost += cost;
       
