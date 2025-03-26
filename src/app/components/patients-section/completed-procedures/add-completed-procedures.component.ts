@@ -8,6 +8,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-add-completed-procedures',
@@ -85,7 +86,6 @@ export class AddCompletedProceduresComponent implements OnInit {
 
   getProcedures(){
     this.treatmentPlansService.getProcedures().subscribe(res => {
-      debugger;
       res.data.rows.sort((a:any, b:any) => b.procedure_id - a.procedure_id);
       res.data.rows.forEach((r: any) => {
       this.procedures.push({
@@ -317,7 +317,7 @@ export class AddCompletedProceduresComponent implements OnInit {
           discount_formate: t.discountType,
           teeth_set: t.selectedTeeth.toString(),
           status: "Completed",
-          date: t.procedureDate,
+          date: format(t.procedureDate,"yyyy-MM-dd"),
           total_cost: t.total,
           total_discount: t.discount.toString(),
           notes: t.notes,
@@ -349,7 +349,7 @@ export class AddCompletedProceduresComponent implements OnInit {
           discount_formate: t.discountType,
           teeth_set: t.selectedTeeth.toString(),
           status: "Completed",
-          date: t.procedureDate,
+          date: format(t.procedureDate,"yyyy-MM-dd"),
           total_cost: t.total,
           total_discount: t.discount.toString(),
           notes: t.notes,

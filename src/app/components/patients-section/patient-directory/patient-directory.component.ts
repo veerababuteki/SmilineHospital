@@ -87,6 +87,8 @@ export class PatientDirectoryComponent implements OnInit {
                 this.filteredPatients = [...this.patients]
             })
         })
+        this.router.navigate(['patients', event.user_id, 'profile', event.unique_code]);
+
     }
 
     hideAddPatientDialog() {
