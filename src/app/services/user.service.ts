@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
-import { catchError, Observable, tap, throwError } from 'rxjs';
+import { catchError, Observable, Subject, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { options } from '@fullcalendar/core/preact.js';
@@ -12,8 +12,14 @@ export class UserService {
   private baseUrl = 'https://apis.idental.ai/auth';  // Replace with actual API
   loggedIn: boolean = false;
 
+  private loadPatients = new Subject<void>();
+  loadPatients$ = this.loadPatients.asObservable();
+
   constructor(private http: HttpClient, private router: Router, private authService: AuthService) {}
 
+  sendLoadPatients(){
+    this.loadPatients.next();
+  }
 
   getDoctors(docRoleID: any) {
     const token = this.authService.getAccessToken();

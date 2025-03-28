@@ -266,6 +266,7 @@ export class AddProfileComponent implements OnInit {
         this.patientForm.reset();
         this.medicalHistoryForm.reset();
         this.groupsForm.reset();
+        this.userService.sendLoadPatients();
         this.onSave.emit({user_id:res.data.user.user_id,unique_code:res.data.user.unique_code});
       });
     }

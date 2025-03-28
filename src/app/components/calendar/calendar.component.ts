@@ -29,6 +29,7 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { MessageService } from 'primeng/api';
 import { CancelAppointmentDialogComponent } from './cancel-appointment-dialog';
 import { AddProfileComponent } from '../patients-section/edit-profile/add-profile.component';
+import { AppointmentsPrintComponent } from "./appointments-print/appointments-print.component";
 
 interface Doctor {
   id: string;
@@ -56,29 +57,30 @@ interface Doctor {
     AppointmentComponent,
     OverlayModule,
     CancelAppointmentDialogComponent,
-    AddProfileComponent
+    AddProfileComponent,
+    AppointmentsPrintComponent
   ],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
 })
 export class CalendarComponent implements OnInit {
   @ViewChild('myButton', { static: false }) myButton!: AppointmentComponent;
-  @ViewChild('addPatientButton', { static: false }) addPatientButton!: AddProfileComponent ;
+  @ViewChild('addPatientButton', { static: false }) addPatientButton!: AddProfileComponent;
 
   currentView: 'dayGridMonth' | 'timeGridDay' | 'timeGridWeek' = 'dayGridMonth';
 
-  doctorsList: any [] = [];
+  doctorsList: any[] = [];
   editAppointment: boolean = false;
   doctors: any[] = [];
   patients: any[] = [];
   currentUser: any;
   admins: any[] = [];
-  categories: any [] = [];
+  categories: any[] = [];
   isAdmin: boolean = false;
   isDoctor: boolean = false;
   @ViewChild('calendar') calendarComponent!: FullCalendarComponent;
   addCategory: boolean = false;
-  newCategory:  string = '';
+  newCategory: string = '';
   isDataLoaded: boolean = false;
   private overlayRef: OverlayRef | null = null;
   activeTab!: 'all' | 'waiting' | 'engaged' | 'done';
@@ -113,16 +115,16 @@ export class CalendarComponent implements OnInit {
       this.showEventList(args.date, args.allSegs.map(seg => seg.event));
       return 'list';
     },
-    
+
     eventMouseEnter: (info) => {
       // Store the current event to track if mouse moved to another event
       this.currentHoverEvent = info.event;
-      
+
       // Clear any existing timer to prevent multiple popovers
       if (this.hoverTimer) {
         clearTimeout(this.hoverTimer);
       }
-      
+
       // Set a timer to show the popover after delay (1000ms = 1 second)
       this.hoverTimer = setTimeout(() => {
         // Only show if we're still hovering the same event
@@ -138,10 +140,10 @@ export class CalendarComponent implements OnInit {
         clearTimeout(this.hoverTimer);
         this.hoverTimer = null;
       }
-      
+
       // Set the current hover event to null
       this.currentHoverEvent = null;
-      
+
       // Add a small delay to prevent flickering when moving within the popover
       setTimeout(() => {
         if (!this.isMouseOverPopover) {
@@ -202,11 +204,11 @@ export class CalendarComponent implements OnInit {
           <div class="custom-event-content ${extraClass}">
             ${arg.event.extendedProps['isNew'] ? '<span class="new-indicator">N</span>' : ''}
             <span class="event-title">${arg.event.title}</span>
-            ${this.currentView === 'timeGridDay' ? 
-              `<div class="event-details">
+            ${this.currentView === 'timeGridDay' ?
+            `<div class="event-details">
                 <span class="event-time">${arg.timeText}</span>
-                ${arg.event.extendedProps['category'] ? 
-                  `<span class="event-category">${arg.event.extendedProps['category']}</span>` : ''}
+                ${arg.event.extendedProps['category'] ?
+              `<span class="event-category">${arg.event.extendedProps['category']}</span>` : ''}
               </div>` : ''}
           </div>
         `
@@ -226,12 +228,14 @@ export class CalendarComponent implements OnInit {
   lastDayOfMonth!: string;
   selectedDoctor: string | null = null;
   selectedCategory: string | null = null;
-  appointments!: any[];
-  displayAddPatientDialog:boolean = false;
-  uniqueCode:string = "";
+  appointments: any[] = [];
+  displayAddPatientDialog: boolean = false;
+  uniqueCode: string = "";
+
+  displayPrintAppointment = false;
   constructor(private dialogService: DialogService, private overlay: Overlay, private datePipe: DatePipe,
-    private authService: AuthService, private messageService: MessageService, private userService:UserService, private appointmentService: AppointmentService){
-    
+    private authService: AuthService, private messageService: MessageService, private userService: UserService, private appointmentService: AppointmentService) {
+
   }
 
   handleEventResize(eventResizeInfo: any) {
@@ -239,7 +243,7 @@ export class CalendarComponent implements OnInit {
     console.log(eventResizeInfo);
     // const updatedEvent: EventApi = eventResizeInfo.event;
     // console.log('Event Resized:', updatedEvent.title, updatedEvent.start, updatedEvent.end);
-    
+
     // // Update event in your data source (API/database)
     // this.events = this.events.map(event =>
     //   event.id === updatedEvent.id
@@ -251,12 +255,12 @@ export class CalendarComponent implements OnInit {
   private handleDateClick(info: any) {
     // Get the clicked date
     const clickedDate = info.date;
-    
+
     // Trigger the appointment component button
     if (this.myButton) {
       this.myButton.selectedDate = clickedDate;
       this.myButton.editAppointment = false; // Make sure we're in "add" mode, not "edit" mode
-      
+
       // Call the method to show the appointment dialog
       this.myButton.patientCode = "";
       this.myButton.paitentNotFound = false;
@@ -264,19 +268,19 @@ export class CalendarComponent implements OnInit {
     }
   }
 
-  handleDialogClose(event:any) {
+  handleDialogClose(event: any) {
     debugger;
     console.log("Parent detected dialog close!");
     // Handle any logic when the dialog closes
     this.changeView(this.currentView);
- 
+
     this.uniqueCode = "";
-    if(event.isOpenPatientDialog){
+    if (event.isOpenPatientDialog) {
       this.displayAddPatientDialog = true;
     }
   }
 
-  savePatient(event:any){
+  savePatient(event: any) {
     debugger;
     this.displayAddPatientDialog = false;
     this.myButton.patientCode = event.unique_code;
@@ -285,13 +289,13 @@ export class CalendarComponent implements OnInit {
   }
 
   filteredDoctors() {
-    return this.doctorsList.filter(doctor => 
+    return this.doctorsList.filter(doctor =>
       `${doctor.first_name} ${doctor.last_name}`.toLowerCase().includes(this.searchText.toLowerCase())
     );
   }
 
   filteredCategories() {
-    return this.categories.filter(category => 
+    return this.categories.filter(category =>
       category.name.toLowerCase().includes(this.searchCategory.toLowerCase())
     );
   }
@@ -309,23 +313,23 @@ export class CalendarComponent implements OnInit {
   selectDoctor(doctor: any) {
     this.selectedDoctor = doctor.user_id;
     var docAppointments = this.appointments.filter(a => a.doctor_details?.doctor_id === doctor.user_id);
-    var events: any[] =[]; 
-    docAppointments.forEach((a: any) =>{
+    var events: any[] = [];
+    docAppointments.forEach((a: any) => {
       //const doctor = this.doctors.find(d => d.user_id === a.doctor_details.doctor_id)
       //const patient = this.patients.find(p => p.user_id === a.patient_id)
       const formattedTime = this.convertTo24Hour(a.appointment_time);
       const startDateTime = new Date(`${a.appointment_date}T${formattedTime}`);
       events.push({
-        title: this.isDoctor || this.isAdmin ? a.patient_details.user_profile_details[0].first_name 
-        //+ a.patient_details.user_profile_details[0].last_name 
-        : a.doctor_details?.user_profile_details[0].first_name,
+        title: this.isDoctor || this.isAdmin ? a.patient_details.user_profile_details[0].first_name
+          //+ a.patient_details.user_profile_details[0].last_name 
+          : a.doctor_details?.user_profile_details[0].first_name,
         start: startDateTime,
         allDay: false,
         extendedProps: {
           status: 'unavailable',
           patientCode: a.patient_details.unique_code,
           patientId: a.patient_details.patient_id,
-          patientName: a.patient_details.user_profile_details[0].first_name +' '+ a.patient_details.user_profile_details[0].last_name,
+          patientName: a.patient_details.user_profile_details[0].first_name + ' ' + a.patient_details.user_profile_details[0].last_name,
           phone: '+91 ' + a.patient_details.phone,
           email: a.patient_details.email,
           doctor: doctor.name,
@@ -343,16 +347,16 @@ export class CalendarComponent implements OnInit {
   }
   selectCategory(category: any) {
     var docAppointments = this.appointments.filter(a => a.category_details?.category_id === category.category_id);
-    var events: any[] =[]; 
-    docAppointments.forEach((a: any) =>{
+    var events: any[] = [];
+    docAppointments.forEach((a: any) => {
       //const doctor = this.doctors.find(d => d.user_id === a.doctor_details.doctor_id)
       //const patient = this.patients.find(p => p.user_id === a.patient_id)
       const formattedTime = this.convertTo24Hour(a.appointment_time);
       const startDateTime = new Date(`${a.appointment_date}T${formattedTime}`);
       events.push({
-        title: this.isDoctor || this.isAdmin ? a.patient_details.user_profile_details[0].first_name 
-        //+ a.patient_details.user_profile_details[0].last_name 
-        : a.doctor_details?.user_profile_details[0].first_name, 
+        title: this.isDoctor || this.isAdmin ? a.patient_details.user_profile_details[0].first_name
+          //+ a.patient_details.user_profile_details[0].last_name 
+          : a.doctor_details?.user_profile_details[0].first_name,
         //+ a.doctor_details.user_profile_details[0].last_name,
         start: startDateTime,
         allDay: false,
@@ -360,10 +364,10 @@ export class CalendarComponent implements OnInit {
           status: 'unavailable',
           patientCode: a.patient_details.unique_code,
           patientId: a.patient_details.patient_id,
-          patientName: a.patient_details.user_profile_details[0].first_name +' '+ a.patient_details.user_profile_details[0].last_name,
+          patientName: a.patient_details.user_profile_details[0].first_name + ' ' + a.patient_details.user_profile_details[0].last_name,
           phone: '+91 ' + a.patient_details.phone,
           email: a.patient_details.email,
-          doctor: a.doctor_details ? (a.doctor_details?.user_profile_details[0].first_name +' '+ a.doctor_details?.user_profile_details[0].last_name) : null,
+          doctor: a.doctor_details ? (a.doctor_details?.user_profile_details[0].first_name + ' ' + a.doctor_details?.user_profile_details[0].last_name) : null,
           duration: a.duration + ' mins',
           appointmentTime: a.appointment_time,
           bookingType: a.booking_type === 'Offline' ? 'In-Clinic' : 'Online',
@@ -393,14 +397,14 @@ export class CalendarComponent implements OnInit {
       patients: this.userService.getDoctors('2ac7787b-77d1-465b-9bc0-eee50933697f'),
       categories: this.userService.getCategories(),
       currentUser: this.authService.getUser(),
-      appointments: this. appointmentService.getAppointments(firstDay, lastDay),
+      appointments: this.appointmentService.getAppointments(firstDay, lastDay),
       admins: this.userService.getDoctors('486320ca-8dc7-45bb-a42a-0fc0c3bb3156'),
     }).subscribe({
       next: ({ doctors, patients, categories, currentUser, appointments, admins }) => {
         this.admins = admins.data;
         this.currentUser = currentUser.data;
         var admin = this.admins.find(a => a.user_id === currentUser.data.user_id);
-        if(admin !== undefined){
+        if (admin !== undefined) {
           this.isAdmin = true;
         }
 
@@ -408,13 +412,13 @@ export class CalendarComponent implements OnInit {
         this.patients = patients.data;
         this.doctorsList.forEach(doc => {
           this.doctors.push({
-            name: doc.first_name+" "+doc.last_name,
+            name: doc.first_name + " " + doc.last_name,
             user_id: doc.user_id
           });
         });
-        if(!this.isAdmin){
+        if (!this.isAdmin) {
           const doctor = this.doctors.find(a => a.user_id === currentUser.data.user_id);
-          if(doctor !== undefined)
+          if (doctor !== undefined)
             this.isDoctor = true;
         }
         this.categories = categories.data;
@@ -427,7 +431,7 @@ export class CalendarComponent implements OnInit {
       }
     });
   }
-  
+
   changeDate(days: number): void {
     const updatedDate = new Date(this.currentDate);
     updatedDate.setDate(this.currentDate.getDate() + days);
@@ -446,9 +450,9 @@ export class CalendarComponent implements OnInit {
     });
   }
 
-  changeMonth(direction: number){
+  changeMonth(direction: number) {
     const updatedMonth = new Date(this.currentMonth);
-    updatedMonth.setMonth(this.currentMonth.getMonth() + direction); 
+    updatedMonth.setMonth(this.currentMonth.getMonth() + direction);
     this.currentMonth = updatedMonth;
     const calendarApi = this.calendarComponent.getApi();
     if (direction === -1) {
@@ -458,20 +462,20 @@ export class CalendarComponent implements OnInit {
     }
     this.updateMonthRange();
   }
-  
-  changeDailyViewDate(direction: number){
+
+  changeDailyViewDate(direction: number) {
     const updatedDate = new Date(this.dailyViewDate);
     updatedDate.setDate(this.dailyViewDate.getDate() + direction);
     this.dailyViewDate = updatedDate;
     const calendarApi = this.calendarComponent.getApi();
     calendarApi.gotoDate(this.dailyViewDate);
     const firstDay = this.formatDateToYYYYMMDD(this.dailyViewDate)
-    this.appointmentService.getAppointments(firstDay, firstDay).subscribe(appointments=>{
+    this.appointmentService.getAppointments(firstDay, firstDay).subscribe(appointments => {
       this.addAppointmentsToCalendar(appointments);
     });
   }
 
-  assignDoctor(app:any){
+  assignDoctor(app: any) {
     debugger;
     this.myButton.editAppointment = true;
     this.myButton.appointementId = app.appointmentId;
@@ -488,7 +492,7 @@ export class CalendarComponent implements OnInit {
 
     const lastDay = new Date(year, month + 1, 6);
     this.lastDayOfMonth = this.formatDateToYYYYMMDD(lastDay);
-    this.appointmentService.getAppointments(firstDay, lastDay).subscribe(appointments=>{
+    this.appointmentService.getAppointments(firstDay, lastDay).subscribe(appointments => {
       this.addAppointmentsToCalendar(appointments);
     });
   }
@@ -500,15 +504,15 @@ export class CalendarComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
   filterDayCounterAppointments(counterType: 'all' | 'waiting' | 'engaged' | 'done') {
-    if(this.activeTabType === 'all'){
+    if (this.activeTabType === 'all') {
       this.allAppointments = this.dayAppoinments.length;
       this.waitingAppointemts = this.dayAppoinments.filter(a => a.appointment_status.toLowerCase() === 'waiting').length;
       this.engagedAppointemts = this.dayAppoinments.filter(a => a.appointment_status.toLowerCase() === 'engaged').length;
       this.doneAppointemts = this.dayAppoinments.filter(a => a.appointment_status.toLowerCase() === 'done').length;
-      if(counterType === 'all'){
+      if (counterType === 'all') {
         this.dayCounterAppoinments = this.dayAppoinments;
       }
-      else{
+      else {
         this.dayCounterAppoinments = this.dayAppoinments.filter(a => a.appointment_status.toLowerCase() === counterType);
       }
     }
@@ -517,18 +521,18 @@ export class CalendarComponent implements OnInit {
       this.waitingAppointemts = this.dayAppoinments.filter(a => a.appointment_status.toLowerCase() === 'waiting' && a.booking_type === this.activeTabType).length;
       this.engagedAppointemts = this.dayAppoinments.filter(a => a.appointment_status.toLowerCase() === 'engaged' && a.booking_type === this.activeTabType).length;
       this.doneAppointemts = this.dayAppoinments.filter(a => a.appointment_status.toLowerCase() === 'done' && a.booking_type === this.activeTabType).length;
-      if(counterType === 'all'){
+      if (counterType === 'all') {
         this.dayCounterAppoinments = this.dayAppoinments.filter(a => a.booking_type === this.activeTabType);
       }
-      else{
+      else {
         this.dayCounterAppoinments = this.dayAppoinments.filter(a => a.appointment_status.toLowerCase() === counterType && a.booking_type === this.activeTabType);
       }
     }
     this.activeTab = counterType;
   }
 
-  filterDayAppointments(counter: 'all' | 'online' | 'offline'){
-    if(counter === 'all'){
+  filterDayAppointments(counter: 'all' | 'online' | 'offline') {
+    if (counter === 'all') {
       this.dayCounterAppoinments = this.dayAppoinments;
     }
     else {
@@ -542,17 +546,17 @@ export class CalendarComponent implements OnInit {
     this.activeTabType = counter;
   }
 
-  createDayappointment(dAppointments: any[]){
+  createDayappointment(dAppointments: any[]) {
     dAppointments = dAppointments.filter(a => a.booking_type !== 'Invalid date');
     this.dayAppoinments = [];
-    dAppointments.forEach(a =>{
+    dAppointments.forEach(a => {
       //const doctor = this.doctors.find(d => d.user_id === a.doctor_id);
       //const patient = this.patients.find(p => p.user_id === a.patient_id);
       this.dayAppoinments.push({
         appointmentId: a.id,
         appointmentTime: a.appointment_time,
-        patientName: a.patient_details.user_profile_details[0].first_name +' '+ a.patient_details.user_profile_details[0].last_name,
-        doctor: a.doctor_details ? (a.doctor_details?.user_profile_details[0].first_name +' '+ a.doctor_details?.user_profile_details[0].last_name) : null,
+        patientName: a.patient_details.user_profile_details[0].first_name + ' ' + a.patient_details.user_profile_details[0].last_name,
+        doctor: a.doctor_details ? (a.doctor_details?.user_profile_details[0].first_name + ' ' + a.doctor_details?.user_profile_details[0].last_name) : null,
         booking_type: a.booking_type,
         appointment_status: a.appointment_status,
         notes: a.notes
@@ -564,19 +568,19 @@ export class CalendarComponent implements OnInit {
   }
 
   addAppointmentsToCalendar(appointments: any) {
-    var events: any[] =[]; 
+    var events: any[] = [];
     var dAppointments: any[] = appointments.data.rows;
     this.appointments = appointments.data.rows;
-    if(this.isDoctor){
+    if (this.isDoctor) {
       dAppointments = dAppointments.filter(a => a.doctor_details.doctor_id === this.currentUser.user_id)
-    } else if (!this.isAdmin && !this.isDoctor){
+    } else if (!this.isAdmin && !this.isDoctor) {
       dAppointments = dAppointments.filter(a => a.patient_details.patient_id === this.currentUser.user_id)
     }
-    if(this.selectedDoctor !== null){
+    if (this.selectedDoctor !== null) {
       dAppointments = dAppointments.filter(a => a.doctor_details.doctor_id === this.selectedDoctor)
     }
 
-    dAppointments.forEach((a: any) =>{
+    dAppointments.forEach((a: any) => {
       //const doctor = this.doctors.find(d => d.user_id === a.doctor_id)
       //const patient = this.patients.find(p => p.user_id === a.patient_id)
       const formattedTime = this.convertTo24Hour(a.appointment_time);
@@ -585,9 +589,9 @@ export class CalendarComponent implements OnInit {
       const minutesToAdd = Number(a.duration); // replace with your desired duration
       endDateTime.setMinutes(startDateTime.getMinutes() + minutesToAdd);
       events.push({
-        title: this.isDoctor || this.isAdmin ? a.patient_details.user_profile_details[0].first_name 
-        //+ a.patient_details.user_profile_details[0].last_name 
-        : a.doctor_details?.user_profile_details[0].first_name, 
+        title: this.isDoctor || this.isAdmin ? a.patient_details.user_profile_details[0].first_name
+          //+ a.patient_details.user_profile_details[0].last_name 
+          : a.doctor_details?.user_profile_details[0].first_name,
         //+ a.doctor_details.user_profile_details[0].last_name,
         start: startDateTime,
         end: endDateTime,
@@ -596,10 +600,10 @@ export class CalendarComponent implements OnInit {
           status: 'unavailable',
           patientCode: a.patient_details.unique_code,
           patientId: a.patient_details.patient_id,
-          patientName: a.patient_details.user_profile_details[0].first_name +' '+ a.patient_details.user_profile_details[0].last_name,
+          patientName: a.patient_details.user_profile_details[0].first_name + ' ' + a.patient_details.user_profile_details[0].last_name,
           phone: '+91 ' + a.patient_details.phone,
           email: a.patient_details.email,
-          doctor:a.doctor_details ?(a.doctor_details?.user_profile_details[0].first_name +' '+ a.doctor_details?.user_profile_details[0].last_name) : null,
+          doctor: a.doctor_details ? (a.doctor_details?.user_profile_details[0].first_name + ' ' + a.doctor_details?.user_profile_details[0].last_name) : null,
           duration: a.duration + ' mins',
           appointmentTime: a.appointment_time,
           bookingType: a.booking_type === 'Offline' ? 'In-Clinic' : 'Online',
@@ -615,26 +619,26 @@ export class CalendarComponent implements OnInit {
   convertTo24Hour(time12h: string): string {
     const [time, modifier] = time12h.split(' '); // Split time and AM/PM
     let [hours, minutes] = time.split(':').map(Number); // Extract hours and minutes
-  
+
     if (modifier === 'PM' && hours !== 12) {
       hours += 12; // Convert PM hours (except 12 PM)
     } else if (modifier === 'AM' && hours === 12) {
       hours = 0; // Convert 12 AM to 00
     }
-  
+
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
-  toggleAddCategory(){
+  toggleAddCategory() {
     this.addCategory = !this.addCategory;
   }
   private showEventPopover(event: any, element: HTMLElement) {
     this.closePopover();
-  
+
     // If the event is no longer the current hover event, don't show popover
     if (this.currentHoverEvent !== event) {
       return;
     }
-  
+
     // Create overlay position strategy
     const positionStrategy = this.overlay.position()
       .flexibleConnectedTo(element)
@@ -654,7 +658,7 @@ export class CalendarComponent implements OnInit {
           offsetY: -8 // Add some space for the arrow when showing above
         }
       ]);
-  
+
     // Create overlay
     this.overlayRef = this.overlay.create({
       positionStrategy,
@@ -663,14 +667,14 @@ export class CalendarComponent implements OnInit {
       backdropClass: 'transparent-backdrop',
       panelClass: 'event-popover-panel'
     });
-    
+
     // Create and attach component
     const componentPortal = new ComponentPortal(EventPopoverComponent);
     const componentRef = this.overlayRef.attach(componentPortal);
-  
+
     // Set component inputs and outputs
     componentRef.instance.event = event;
-    
+
     // Add mouse enter/leave handlers for the popover itself
     componentRef.instance.mouseEnter.subscribe(() => {
       this.isMouseOverPopover = true;
@@ -679,7 +683,7 @@ export class CalendarComponent implements OnInit {
       this.isMouseOverPopover = false;
       this.closePopover();
     });
-  
+
     componentRef.instance.close.subscribe(() => this.closePopover());
     componentRef.instance.edit.subscribe((evt) => this.handleEventEdit(evt));
     componentRef.instance.delete.subscribe((evt) => this.handleEventDelete(evt));
@@ -701,19 +705,19 @@ export class CalendarComponent implements OnInit {
 
   private handleEventDelete(event: any) {
     this.selectedEvent = event;
-  this.showCancelDialog = true;
+    this.showCancelDialog = true;
   }
   onCancelDialogClose() {
     this.showCancelDialog = false;
   }
-  
+
   onCancelAppointmentConfirm(cancelData: any) {
     // First, close the dialog
     this.showCancelDialog = false;
-    
+
     // Close any open popover
     this.closePopover();
-    
+
     this.appointmentService.deleteAppointment(cancelData).subscribe({
       next: (response) => {
         window.location.reload();
@@ -733,8 +737,8 @@ export class CalendarComponent implements OnInit {
       console.log(`${severity}: ${summary} - ${detail}`);
     }
   }
-  saveCategory(){
-    if (this.newCategory.trim()){
+  saveCategory() {
+    if (this.newCategory.trim()) {
       this.userService.addCategory(this.newCategory).subscribe(res => {
         this.userService.getCategories().subscribe(categories => {
           this.categories = categories.data;
@@ -789,20 +793,20 @@ export class CalendarComponent implements OnInit {
     this.currentView = viewName;
     const calendarApi = this.calendarComponent.getApi();
     calendarApi.changeView(viewName);
-    
+
     // Update the current date based on the view
     if (viewName === 'timeGridDay') {
       this.dailyViewDate = calendarApi.getDate();
     } else if (viewName === 'timeGridWeek') {
       this.weeklyViewDate = calendarApi.getDate();
     }
-    
+
     if (viewName === 'dayGridMonth') {
       this.updateMonthRange();
     } else if (viewName === 'timeGridWeek') {
       this.updateWeekRange();
     }
-    else{
+    else {
       this.changeDailyViewDate(0);
     }
   }
@@ -813,26 +817,26 @@ export class CalendarComponent implements OnInit {
     this.weeklyViewDate = updatedDate;
     const calendarApi = this.calendarComponent.getApi();
     calendarApi.gotoDate(this.weeklyViewDate);
-    
+
     // Update appointments for the new week range
     this.updateWeekRange();
   }
-  
+
   // Add method to update week range and fetch appointments
   private updateWeekRange(): void {
     // Calculate first day (Sunday) and last day (Saturday) of the current week
     const currentDate = new Date(this.weeklyViewDate);
     const day = currentDate.getDay();
-    
+
     const firstDay = new Date(currentDate);
     firstDay.setDate(currentDate.getDate() - day);
-    
+
     const lastDay = new Date(currentDate);
     lastDay.setDate(currentDate.getDate() + (6 - day));
-    
+
     const firstDayFormatted = this.formatDateToYYYYMMDD(firstDay);
     const lastDayFormatted = this.formatDateToYYYYMMDD(lastDay);
-    
+
     // Fetch appointments for the week
     this.appointmentService.getAppointments(firstDayFormatted, lastDayFormatted).subscribe(appointments => {
       this.addAppointmentsToCalendar(appointments);
@@ -840,19 +844,23 @@ export class CalendarComponent implements OnInit {
   }
 
   getWeekStartDate(date: Date): Date {
-  const result = new Date(date);
-  const day = result.getDay();
-  // Calculate days to subtract to get to Sunday
-  result.setDate(result.getDate() - day);
-  return result;
-}
+    const result = new Date(date);
+    const day = result.getDay();
+    // Calculate days to subtract to get to Sunday
+    result.setDate(result.getDate() - day);
+    return result;
+  }
 
-// Get week end date (Saturday)
-getWeekEndDate(date: Date): Date {
-  const result = new Date(date);
-  const day = result.getDay();
-  // Calculate days to add to get to Saturday
-  result.setDate(result.getDate() + (6 - day));
-  return result;
-}
+  // Get week end date (Saturday)
+  getWeekEndDate(date: Date): Date {
+    const result = new Date(date);
+    const day = result.getDay();
+    // Calculate days to add to get to Saturday
+    result.setDate(result.getDate() + (6 - day));
+    return result;
+  }
+
+  showPrintAppointment() {
+    this.displayPrintAppointment = true;
+  }
 }

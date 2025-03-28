@@ -38,9 +38,14 @@
           (click)="changeView('timeGridWeek')">Week</button>
         <button class="view-btn" [class.selected]="currentView === 'dayGridMonth'"
           (click)="changeView('dayGridMonth')">Month</button>
-        <button class="view-btn">
+        <button class="view-btn" (click)="showPrintAppointment()">
           <i class="pi pi-print"></i>
         </button>
+
+        <p-dialog [(visible)]="displayPrintAppointment" [style]="{width: '100vw'}">
+          <app-appointments-print [appointments]="appointments"></app-appointments-print>
+        </p-dialog>
+
       </div>
 
       <div class="settings">

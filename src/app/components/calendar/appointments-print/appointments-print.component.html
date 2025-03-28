@@ -1,0 +1,52 @@
+<div class="container">
+    <!-- Left: Schedule Table (Wrapped for Printing) -->
+    <div id="appointments-container" class="schedule">
+        <h3>Schedule for All doctors on {{ selectedDate }}</h3>
+
+        <div *ngFor="let doctor of groupedAppointments">
+            <h4>{{ doctor.name }}</h4>
+            <p-table [value]="doctor.appointments">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Time</th>
+                        <th>Patient</th>
+                        <th *ngIf="showContactNumber">Contact</th>
+                        <th *ngIf="showNotes">Notes</th>
+                        <th *ngIf="showAppointmentCategories">Category</th>
+                        <th>Status</th>
+                        <th>Booking Type</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-appointment>
+                    <tr>
+                        <td>{{appointment.appointment_date}} {{ appointment.appointment_time }}</td>
+                        <td>{{ appointment.patient_details.user_profile_details[0]?.first_name }} {{
+                            appointment.patient_details.user_profile_details[0]?.last_name }}</td>
+                        <td *ngIf="showContactNumber">{{ appointment.patient_details.phone }}</td>
+                        <td *ngIf="showNotes">{{ appointment.notes || 'N/A' }}</td>
+                        <td *ngIf="showAppointmentCategories">{{ appointment.category_details?.name }}</td>
+                        <td>{{ appointment.status }}</td>
+                        <td>{{ appointment.booking_type }}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+
+    <!-- Right: Filters -->
+    <div class="filters">
+        <h4>Print Schedule Settings</h4>
+
+        <!-- <p-dropdown [options]="dateOptions" [(ngModel)]="selectedDate"></p-dropdown>
+        <p-dropdown [options]="doctorOptions" [(ngModel)]="selectedDoctor"></p-dropdown>
+        <p-dropdown [options]="fontSizeOptions" [(ngModel)]="selectedFontSize"></p-dropdown> -->
+
+        <div class="checkbox"><p-checkbox [(ngModel)]="showContactNumber" [binary]="true"></p-checkbox> Show contact number</div>
+        <div class="checkbox"><p-checkbox [(ngModel)]="showNotes" [binary]="true"></p-checkbox> Show notes</div>
+        <div class="checkbox"><p-checkbox [(ngModel)]="showAppointmentCategories" [binary]="true"></p-checkbox> Show appointment categories</div>
+        <!-- <div class="checkbox"><p-checkbox [(ngModel)]="showTreatmentPlans" [binary]="true"></p-checkbox> Show treatment plans</div> -->
+        <div class="checkbox"><p-checkbox [(ngModel)]="groupByDoctors" [binary]="true"></p-checkbox> Group by doctors</div>
+
+        <button pButton label="Print" (click)="printAppointments()">Print</button>
+    </div>
+</div>

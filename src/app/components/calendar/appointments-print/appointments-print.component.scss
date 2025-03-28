@@ -1,0 +1,70 @@
+.container {
+    display: flex;
+    overflow: hidden; /* Prevent unwanted scrolling */
+}
+
+/* Schedule Table - Scrollable */
+.schedule {
+    flex-grow: 1;
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding: 20px;
+}
+
+/* Filters - Fixed on Right */
+.filters {
+    width: 280px; /* Fixed width */
+    position: sticky;
+    right: 0;
+    top: 0;
+    overflow-y: auto; /* Enable scrolling */
+    background: #f9f9f9;
+    padding: 20px;
+    border-left: 1px solid #ccc;
+}
+
+/* Add some space between each filter */
+.filters h4 {
+    margin-bottom: 15px;
+}
+
+.filters .checkbox {
+    margin: 10px 0px;
+}
+
+.filters button {
+    margin-top: 20px;
+    width: 100%;
+}
+
+
+p-table {
+    width: 100%;
+    min-width: 600px; /* Prevent table from shrinking */
+    table-layout: fixed;  /* Ensures equal column width */
+}
+
+p-table th, p-table td {
+    padding: 8px;
+    text-align: left;
+    white-space: nowrap; /* Prevent text wrapping */
+    width: auto;
+}
+
+@media print {
+    .filters {
+        display: none !important; /* Hide the right-side filters */
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        display: block !important;
+    }
+
+    #appointments-container {
+        width: 100%;
+    }
+}

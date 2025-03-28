@@ -28,7 +28,7 @@ interface NavItem {
   selector: 'app-side-top-nav',
   templateUrl: './side-top-nav.component.html',
   styleUrl: './side-top-nav.component.scss',
-  imports:[
+  imports: [
     CommonModule,
     FormsModule,
     RouterModule,
@@ -47,14 +47,18 @@ export class SideTopNavComponent {
   patients: any[] = [];
   filteredPatients: any[] = [];
   showSearchResults: boolean = false;
-  constructor(private authService: AuthService, private userService: UserService, private router: Router,private messageService: MessageService){
-    this.authService.getUser().subscribe(user =>{
+  loadPaitentsSubscriber: any;
+
+  constructor(private authService: AuthService, private userService: UserService, private router: Router, private messageService: MessageService) {
+    this.authService.getUser().subscribe(user => {
       this.user = user.data
       const privilegeNames = this.user.privileges.map((p: any) => p.name);
       this.addNavItems(privilegeNames);
       this.navItems = this.navItems.filter(nav => nav.hasAccess);
     });
-
+    this.userService.loadPatients$.subscribe(_ => {
+      this.getPatients();
+    });
     this.getPatients();
   }
 
@@ -65,14 +69,14 @@ export class SideTopNavComponent {
   addPatientItems: MenuItem[] = [
     { label: 'Merge Patients', icon: 'pi pi-merge' }
   ];
-  navItems: NavItem [] = [];
-  addNavItems(privilegeNames: any[]){
+  navItems: NavItem[] = [];
+  addNavItems(privilegeNames: any[]) {
     this.navItems = [
-      { icon: 'pi pi-calendar', label: 'Calendar', link: '/calendar', hasAccess: privilegeNames.includes("Calendar")  },
+      { icon: 'pi pi-calendar', label: 'Calendar', link: '/calendar', hasAccess: privilegeNames.includes("Calendar") },
       { icon: 'pi pi-users', label: 'Patients', link: '/patients', hasAccess: privilegeNames.includes("Patients") }
     ];
   }
-  
+
   menuItems: MenuItem[] = [
     { label: 'Profile', icon: 'pi pi-user', command: () => this.viewProfile() },
     { label: 'Settings', icon: 'pi pi-cog', command: () => this.openSettings() },
@@ -95,25 +99,25 @@ export class SideTopNavComponent {
     this.displayAddPatientDialog = true;
   }
 
-  getPatients(){
+  getPatients() {
     this.userService.getDoctors('2ac7787b-77d1-465b-9bc0-eee50933697f').subscribe(res => {
-      this.allPatients = res.data; 
+      this.allPatients = res.data;
       this.allPatients.forEach(patient => {
-          this.patients.push({
-              id: patient.unique_code,
-              userId: patient.user_id,
-              name: patient.first_name +' '+ patient.last_name,
-              email: patient.email,
-              phone: patient.phone,
-              image: 'assets/user.webp',
-              gender: patient.gender
-          })
-          this.filteredPatients = [...this.patients]
+        this.patients.push({
+          id: patient.unique_code,
+          userId: patient.user_id,
+          name: patient.first_name + ' ' + patient.last_name,
+          email: patient.email,
+          phone: patient.phone,
+          image: 'assets/user.webp',
+          gender: patient.gender
+        })
+        this.filteredPatients = [...this.patients]
       })
-  })
+    })
   }
 
-  savePatient($event:any){
+  savePatient($event: any) {
     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Patient Added Successfully' });
     this.displayAddPatientDialog = false;
     this.getPatients();
@@ -128,7 +132,7 @@ export class SideTopNavComponent {
       this.filteredPatients = [...this.patients];
     } else {
       const searchValue = this.searchText.toLowerCase().trim();
-      this.filteredPatients = this.patients.filter(patient => 
+      this.filteredPatients = this.patients.filter(patient =>
         patient.name.toLowerCase().includes(searchValue) ||
         patient.email.toLowerCase().includes(searchValue) ||
         patient.phone.toLowerCase().includes(searchValue) ||
@@ -136,7 +140,7 @@ export class SideTopNavComponent {
       );
     }
   }
-  
+
   selectPatient(patient: any) {
     // You can handle what happens when a patient is selected here
     // For example, navigate to patient details page
@@ -145,7 +149,7 @@ export class SideTopNavComponent {
     this.showSearchResults = false; // Hide dropdown
     // Example: this.router.navigate(['/patients', patient.id]);
   }
-  
+
   // Add this to handle clicking outside the dropdown
   @HostListener('document:click', ['$event'])
   handleDocumentClick(event: MouseEvent) {

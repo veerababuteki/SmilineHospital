@@ -27,12 +27,21 @@ export class PatientDirectoryComponent implements OnInit {
     allPatients: any[] = [];
     patients: any[] = [];
     displayAddPatientDialog = false;
-
+    loadPaitentsSubscriber:any;
     constructor(private messageService: MessageService, private userService: UserService, private router: Router){
-
+        this.userService.loadPatients$.subscribe(_=>{
+            this.getPatients();
+        })
     }
 
     ngOnInit() {
+        this.getPatients();
+    }
+
+    filteredPatients: any[] = [];
+    searchText: string = '';
+
+    getPatients(){
         this.userService.getDoctors('2ac7787b-77d1-465b-9bc0-eee50933697f').subscribe(res => {
             this.allPatients = res.data; 
             this.allPatients.forEach(patient => {
@@ -49,8 +58,6 @@ export class PatientDirectoryComponent implements OnInit {
             })
         })
     }
-    filteredPatients: any[] = [];
-    searchText: string = '';
 
     filterPatients() {
         const searchLower = this.searchText.toLowerCase();

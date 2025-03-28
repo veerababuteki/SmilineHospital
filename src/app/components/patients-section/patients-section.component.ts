@@ -15,7 +15,7 @@ import { FilesComponent } from './files/files.component';
 import { TimelineComponent } from './timeline/timeline.component';
 import { PaymentsComponent } from './payments/payments.component';
 import { InvoiceComponent } from './invoice/invoice.component';
-import { Router, RouterModule, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { MessageService } from '../../services/message.service';
 import { AuthService } from '../../services/auth.service';
 import { AppointmentService } from '../../services/appointment.service';
@@ -48,11 +48,13 @@ export class PatientsSectionComponent implements OnInit {
         this.userPrivileges = this.patient.privileges.map((p: any) => p.name)
       });
     }
+
     constructor(private messageService: MessageService, 
         private authService: AuthService, 
         private router: Router,
         private useService: UserService,
         private appointmentService: AppointmentService,
+        private route:ActivatedRoute
     ) {}
 
     patientExpanded = true;
