@@ -24,7 +24,7 @@ export class CompletedProceduresComponent implements OnInit {
     generateInvoiceList: any[] = [];
     treatmentPlanList: any[] = [];
     patientId: string | null | undefined;
-
+    formattedData:any[] = [];
     constructor(private treatmentPlanService: TreatmentPlansService, private route: ActivatedRoute, private router: Router){
 
     }
@@ -41,6 +41,8 @@ export class CompletedProceduresComponent implements OnInit {
   loadPatientData(patientId: string) {
     this.treatmentPlanService.getCompletedTreatmentPlans(Number(patientId)).subscribe(res => {
       this.treatmentPlans = this.groupByDate(res.data.rows);
+      console.log(this.getFormattedData());
+      this.formattedData = this.getFormattedData();
     });
   }
   navigateToAddPage(){
@@ -78,6 +80,8 @@ export class CompletedProceduresComponent implements OnInit {
       }, {} as Record<string, any[]>);
     }
 
+
+
     getSortedTreatmentIds(rows: any) {
       // Step 1: Sort rows by date in descending order
       rows.sort((a:any, b:any) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -94,6 +98,29 @@ export class CompletedProceduresComponent implements OnInit {
       return rows.filter((row:any) => row.treatment_unique_id === treatmentKey);
     }
 
+    groupByDoctor(rows: any[], treatmentKey: any):any[] {
+      const filteredRows = this.filterRowsByTreatment(rows, treatmentKey);
+  
+      const grouped = filteredRows.reduce((acc: Record<string, any[]>, row: any) => {
+          if (!row.doctor_details_treat) return acc; // Skip if doctor details are missing
+  
+          const doctorId = row.doctor_details_treat.doctor_id;
+          if (!acc[doctorId]) {
+              acc[doctorId] = [];
+          }
+  
+          acc[doctorId].push(row);
+          return acc;
+      }, {});
+  
+      // Convert the object into an array format for *ngFor
+      return Object.entries(grouped).map(([doctorId, appointments]) => ({
+          doctorId,
+          appointments,
+      }));
+  }
+  
+
     generateInvoice(){
       this.treatmentPlanService.generateInvoice(this.generateInvoiceList).subscribe(res => {
         if(this.patientId !== null && this.patientId !== undefined){
@@ -105,6 +132,41 @@ export class CompletedProceduresComponent implements OnInit {
     getTotalCost(treatmentGroup: any[]): number {
       return treatmentGroup.reduce((acc, treatment) => acc + Number(treatment.total_cost || 0), 0);
     }
+
+    getFormattedData() {
+      var dates = this.getSortedDates();
+      var treatmentPlans:any[] = [];
+    
+      dates.forEach(date => {
+        var treatmentsArray:any[] = [];
+        var treatmentKeys = this.getSortedTreatmentIds(this.treatmentPlans[date]);
+    
+        treatmentKeys.forEach((treatmentKey: any) => {
+          var doctorTreatmentsArray:any[] = [];
+          var treatmentDoctorGroups = this.groupByDoctor(this.treatmentPlans[date], treatmentKey);
+    
+          treatmentDoctorGroups.forEach((doctorTreatment:any) => {
+            doctorTreatmentsArray.push({
+              doctorId: doctorTreatment.doctorId,
+              treatments: doctorTreatment.appointments
+            });
+          });
+    
+          treatmentsArray.push({
+            treatmentKey: treatmentKey,
+            doctorTreatments: doctorTreatmentsArray
+          });
+        });
+    
+        treatmentPlans.push({
+          date: date,
+          treatments: treatmentsArray
+        });
+      });
+    
+      return treatmentPlans;
+    }
+    
 
     getSortedDates(): string[] {
       // Filter out null or undefined keys first, then sort
@@ -131,5 +193,9 @@ export class CompletedProceduresComponent implements OnInit {
           // If both are invalid, maintain original order
           return 0;
         });
+    }
+
+    getData():any[]{
+      return [];
     }
 }

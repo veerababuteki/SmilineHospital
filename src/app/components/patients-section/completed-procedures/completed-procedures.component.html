@@ -8,11 +8,12 @@
             <button class="add-btn" (click)="navigateToAddPage()">+ Add</button>
         </div>
     </div>
-    <div *ngFor="let date of getSortedDates()">
+    <div *ngFor="let dateTreatment of formattedData">
 
-    <div class="appointment-date">{{ date | date: 'dd MMM, yyyy'}}</div>
+    <div class="appointment-date">{{ dateTreatment.date | date: 'dd MMM, yyyy'}}</div>
 
-    <div class="treatment-plan" *ngFor="let treatmentkey of getSortedTreatmentIds(treatmentPlans[date]) | keyvalue">
+    <div class="treatment-plan" *ngFor="let treatmentPlan of dateTreatment.treatments">
+        <div *ngFor="let treatmentDoctorGroup of treatmentPlan.doctorTreatments" class="doctor-group">
         <table class="procedures-table">
             <thead>
                 <tr>
@@ -27,7 +28,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let treatment of filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)">
+                <tr *ngFor="let treatment of treatmentDoctorGroup.treatments">
                     <td *ngIf="treatment.invoice_status?.toLowerCase() !== 'generated'"><input type="checkbox" class="procedure-checkbox" [(ngModel)]="treatment.isChecked"
                       (change)="onCheckboxChange(treatment, treatment.id, treatment.treatment_unique_id)"></td>
                     <td *ngIf="treatment.invoice_status?.toLowerCase() === 'generated'"><i class="pi pi-dollar"></i></td>
@@ -49,15 +50,17 @@
                 </tr>
             </tbody>
         </table>
-    
+
         <div class="plan-footer">
             <div class="planned-by">
-                Completed by <span class="doctor-name">{{"Dr. " + filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)[0]?.doctor_details_treat.user_profile_details[0].first_name +" "+ filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)[0].doctor_details_treat.user_profile_details[0].last_name}}</span>
+                Completed by <span class="doctor-name">{{"Dr. " + treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].first_name +" "+ treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].last_name}}</span>
             </div>
             <div class="estimated-amount">
-                Estimated amount: <span class="amount">{{getTotalCost(filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)) | number  }}</span>
+                Estimated amount: <span class="amount">{{getTotalCost(treatmentDoctorGroup.treatments) | number  }}</span>
             </div>
         </div>
+        </div>
+       
     </div>
     </div>
     <div class="no-completed-procedure-container" *ngIf="getSortedDates().length <= 0">
