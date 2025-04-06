@@ -269,7 +269,6 @@ export class CalendarComponent implements OnInit {
   }
 
   handleDialogClose(event: any) {
-    debugger;
     console.log("Parent detected dialog close!");
     // Handle any logic when the dialog closes
     this.changeView(this.currentView);
@@ -281,7 +280,6 @@ export class CalendarComponent implements OnInit {
   }
 
   savePatient(event: any) {
-    debugger;
     this.displayAddPatientDialog = false;
     this.myButton.patientCode = event.unique_code;
     this.myButton.paitentNotFound = false;
@@ -476,7 +474,6 @@ export class CalendarComponent implements OnInit {
   }
 
   assignDoctor(app: any) {
-    debugger;
     this.myButton.editAppointment = true;
     this.myButton.appointementId = app.appointmentId;
     this.myButton.appointment = this.appointments.filter(a => a.id === app.appointmentId)[0];

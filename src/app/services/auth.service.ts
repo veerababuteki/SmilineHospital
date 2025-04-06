@@ -32,7 +32,8 @@ export class AuthService {
   registerUser(patientDetails: any) {
     return this.http.post<any>(`${this.baseUrl}/register`, {
         first_name: patientDetails.first_name,
-        last_name: patientDetails.last_name,
+        last_name: '',
+        manual_unique_code: patientDetails.manual_unique_code,
         date_of_birth: patientDetails.date_of_birth,
         address: patientDetails.address,
         aadhaar_id: patientDetails.aadhaar_id,
@@ -111,15 +112,22 @@ export class AuthService {
 
   refreshToken(): Observable<any> {
     const refreshToken = localStorage.getItem('refreshToken');
-    this.logout();
+    const accessToken = localStorage.getItem('accessToken');
+    const token = this.getAccessToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
     if (!refreshToken) {
       this.logout();
       return throwError(() => new Error('No refresh token found'));
     }
 
-    return this.http.post<any>(`${this.baseUrl}/refresh`, { refreshToken }).pipe(
+    return this.http.post<any>(`${this.baseUrl}/refreshToken`, { 
+      accessToken: accessToken,
+      refreshToken:  refreshToken 
+    }, {headers}).pipe(
       tap((response: any) => {
-        this.storeTokens(response);
+        this.storeTokens(response.data);
       }),
       catchError((error: any) => {
         this.logout();

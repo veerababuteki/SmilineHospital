@@ -22,6 +22,24 @@
           <input type="text" pInputText formControlName="patientId" placeholder="Enter Patient ID or Mobile Number">
           <button type="button" pButton label="Get Patient Details" (click)="getPatientDetails()"></button>
         </div>
+        <!-- Multiple patients dropdown -->
+        <div class="patient-dropdown-container" *ngIf="showPatientDropdown">
+          <p class="multiple-patients-message">Multiple patients found. Please select one:</p>
+          <ul class="patient-dropdown">
+            <li *ngFor="let patient of multiplePatients" class="patient-item" (click)="selectPatient(patient)">
+              <div class="patient-info">
+                <span class="patient-name">
+                  {{ patient.profile ? 
+                    (patient.profile.first_name + ' ' + patient.profile.last_name) : 
+                    (patient.user_profile_details[0].first_name + ' ' + patient.user_profile_details[0].last_name) 
+                  }}
+                </span>
+                <span class="patient-mobile">{{ patient.phone }}</span>
+                <span class="patient-email">{{ patient.email }}</span>
+              </div>
+            </li>
+          </ul>
+        </div>
         <span class="error-message" *ngIf="paitentNotFound">No patient found</span>
         <div class="add-patient-container">
           <div class="message">Want to add a new paitent?</div>

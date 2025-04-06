@@ -134,6 +134,17 @@ export class TreatmentPlansService {
         catchError(this.handleError)
       );
   }
+  
+  cancelInvoice(invoiceId: string){
+    const token = this.authService.getAccessToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.post<any>(`${this.baseUrl}/cancelInvoice/${invoiceId}`, {headers}).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   makePayment(invoice: any){
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({

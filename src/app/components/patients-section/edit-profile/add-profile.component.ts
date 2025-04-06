@@ -136,7 +136,7 @@ export class AddProfileComponent implements OnInit {
   private createPatientForm(): FormGroup {
     return this.fb.group({
       firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      customId: [''],
       aadhaarId: [''],
       gender: ['', Validators.required],
       dateOfBirth: [''],
@@ -235,7 +235,7 @@ export class AddProfileComponent implements OnInit {
       
       this.authService.registerUser({
         first_name: patientDetails.firstName,
-        last_name: patientDetails.lastName,
+        manual_unique_code: patientDetails.customId,
         date_of_birth: patientDetails.dateOfBirth,
         address: patientDetails.streetAddress,
         aadhaar_id: patientDetails.aadhaarId,

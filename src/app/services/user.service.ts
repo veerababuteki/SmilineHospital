@@ -38,7 +38,7 @@ export class UserService {
       'Authorization': `Bearer ${token}`
     });
 
-    return this.http.get<any>(`${this.baseUrl}/getProfileForAppointment/${code}`, {headers}).pipe(
+    return this.http.get<any>(`${this.baseUrl}/ProfileForAppointment/${code}`, {headers}).pipe(
         catchError(this.handleError)
       );
   }  
@@ -115,6 +115,7 @@ export class UserService {
       id: patientDetails.id,
         first_name: patientDetails.first_name,
         last_name: patientDetails.last_name,
+        manual_unique_code: patientDetails.manual_unique_code,
         date_of_birth: patientDetails.date_of_birth,
         address: patientDetails.address,
         aadhaar_id: patientDetails.aadhaar_id,

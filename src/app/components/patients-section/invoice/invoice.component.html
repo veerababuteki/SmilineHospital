@@ -32,9 +32,17 @@
                     <th width="65">
                         <div class="actions">
                             <app-invoice-print [invoice]="invoiceGroup"></app-invoice-print>
-                            <button class="edit-btn border-right-radius">
-                                <i class="pi pi-chevron-down"></i>
-                            </button>
+                            <div *ngIf="invoiceGroup.value[0].payment_status === 'Pending'" class="action-menu">
+                                <button 
+                                  #menuButton
+                                  type="button" 
+                                  pButton 
+                                  icon="pi pi-chevron-down" 
+                                  class="edit-btn border-right-radius p-button-text"
+                                  (click)="invoiceMenu.toggle($event); setCurrentInvoice(invoiceGroup.key)">
+                                </button>
+                                <p-menu #invoiceMenu [popup]="true" [model]="items"></p-menu>
+                            </div>
                         </div>
                     </th>
                 </tr>

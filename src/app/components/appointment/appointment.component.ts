@@ -58,7 +58,8 @@ export class AppointmentComponent implements OnInit {
   appointmentStatus: string[] = ['None', 'Waiting', 'Engaged', 'Done'];
   showScheduleWarning: boolean = false;
   public selectedDate: any;
-
+  multiplePatients: any[] = [];
+  showPatientDropdown: boolean = false;
   @Input() data!: 'appointment' | 'reminder' | 'blockCalendar';
   @Input() doctors!: any[];
   @Input() categories!: any[];
@@ -199,7 +200,6 @@ export class AppointmentComponent implements OnInit {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
   showDialog(isEdit: boolean = false) {
-    debugger;
     if(isEdit)
       {this.editAppointment = true;
       }
@@ -223,13 +223,21 @@ export class AppointmentComponent implements OnInit {
   getPatientDetails() {
     var code = this.appointmentForm.value.patientId
     if (code == undefined || code == '') return;
+    this.showPatientDropdown = false;
+    this.multiplePatients = [];
+
     this.userService.getPatient(code).subscribe(response => {
-      this.patient = response.data;
-      this.appointmentForm.patchValue({
-        patientName: this.patient.profile.first_name + " " + this.patient.profile.last_name,
-        mobileNumber: this.patient.phone,
-        emailId: this.patient.email
-      });
+      if(response.data.length == 1){
+        this.patient = response.data[0];
+        this.appointmentForm.patchValue({
+          patientName: this.patient.profile.first_name + " " + this.patient.profile.last_name,
+          mobileNumber: this.patient.phone,
+          emailId: this.patient.email
+        });
+      } else if (response.data.length > 1){
+        this.multiplePatients = response.data;
+        this.showPatientDropdown = true;
+      }
     }, (error) => {
       this.userService.getPatientByMobileNumber(code).subscribe(response => {
         this.patient = response.data;
@@ -243,7 +251,28 @@ export class AppointmentComponent implements OnInit {
       });
     });
   }
-
+  selectPatient(patient: any) {
+    this.patient = patient;
+    
+    // Check which data structure we're dealing with
+    if (patient.profile) {
+      // First data structure
+      this.appointmentForm.patchValue({
+        patientName: patient.profile.first_name + " " + patient.profile.last_name,
+        mobileNumber: patient.phone,
+        emailId: patient.email
+      });
+    } else if (patient.user_profile_details && patient.user_profile_details.length > 0) {
+      // Second data structure
+      this.appointmentForm.patchValue({
+        patientName: patient.user_profile_details[0].first_name + " " + patient.user_profile_details[0].last_name,
+        mobileNumber: patient.phone,
+        emailId: patient.email
+      });
+    }
+    
+    this.showPatientDropdown = false;
+  }
   cancelAppointment(){
     this.display = false;
     this.editAppointment = false;

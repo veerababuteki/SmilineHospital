@@ -4,6 +4,9 @@ import { TreatmentPlansService } from '../../../services/treatment-plans.service
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { InvoicePrintComponent } from './invoice-print/invoice-print.component';
+import { MenuModule } from 'primeng/menu';
+import { ButtonModule } from 'primeng/button';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-invoice',
@@ -11,17 +14,33 @@ import { InvoicePrintComponent } from './invoice-print/invoice-print.component';
   styleUrls: ['./invoice.component.scss'],
   standalone: true,
   imports: [ CommonModule, FormsModule,
-    InvoicePrintComponent,NgFor
+    InvoicePrintComponent,NgFor,
+    MenuModule,
+    ButtonModule
   ]
 })
 export class InvoiceComponent implements OnInit {
   invoices: Record<string, any[]> = {};
   selectedInvoiceList: any[] = [];
   patientId: string | null | undefined;
-
+  items: MenuItem[] = [];
+  currentInvoiceKey: any;
+  
   constructor(private treatmentPlansService: TreatmentPlansService, private router: Router, private route: ActivatedRoute){}
 
     ngOnInit(): void {
+      this.items = [
+        // {
+        //   label: 'Pay',
+        //   icon: 'pi pi-money-bill',
+        //   command: (event) => this.payInvoice(event)
+        // },
+        {
+          label: 'Cancel',
+          icon: 'pi pi-times',
+          command: (event) => this.cancelInvoice(event)
+        }
+      ];
       this.route.parent?.paramMap.subscribe(params => {
         if(this.patientId == null) {
           this.patientId = params.get('id');
@@ -31,7 +50,38 @@ export class InvoiceComponent implements OnInit {
         }
       });
     }
-
+    payInvoice(event: any) {
+      const invoiceKey = event.item.data;
+      console.log('Paying invoice:', invoiceKey);
+    }
+    
+    cancelInvoice(event: any) {
+      const invoiceKey = event;
+      this.treatmentPlansService.cancelInvoice(invoiceKey).subscribe(res => {
+        if(this.patientId !== null && this.patientId !== undefined){
+          this.fetchInvoices(this.patientId)
+        }
+      });
+    }
+    
+    setCurrentInvoice(invoiceKey: any): void {
+      this.currentInvoiceKey = invoiceKey;
+      console.log(invoiceKey)
+      // Update menu items with the current invoice key as data
+      this.items = [
+        // {
+        //   label: 'Pay',
+        //   icon: 'pi pi-money-bill',
+        //   command: () => this.payInvoice(this.currentInvoiceKey)
+        // },
+        {
+          label: 'Cancel',
+          icon: 'pi pi-times',
+          command: () => this.cancelInvoice(this.currentInvoiceKey)
+        }
+      ];
+    }
+    
     fetchInvoices(patientId: string){
       this.treatmentPlansService.getInvoices(Number(patientId)).subscribe(res => {
         this.invoices = this.groupByDate( res.data.rows)

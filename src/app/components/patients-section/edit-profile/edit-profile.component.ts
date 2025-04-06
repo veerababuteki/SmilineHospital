@@ -63,7 +63,7 @@ export class EditProfileComponent implements OnInit {
       this.patientDetails = res.data;
       this.patientForm.patchValue({
         firstName: this.patientDetails.first_name,
-        lastName: this.patientDetails.last_name,
+        customId: this.patientDetails.user_details.manual_unique_code,
         aadhaarId: this.patientDetails.aadhaar_id,
         gender: this.patientDetails.gender,
         dateOfBirth: this.patientDetails.date_of_birth !== '' ? new Date(this.patientDetails.date_of_birth) : '',
@@ -162,7 +162,7 @@ export class EditProfileComponent implements OnInit {
   initiateForm(){
     this.patientForm = this.fb.group({
       firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      customId: [''],
       aadhaarId: [''],
       gender: ['', Validators.required],
       dateOfBirth: [''],
@@ -211,7 +211,7 @@ export class EditProfileComponent implements OnInit {
       this.userService.updateUserProfile({
         id: this.patientDetails.id,
         first_name: patientDetails.firstName,
-        last_name: patientDetails.lastName,
+        manual_unique_code: patientDetails.customId,
         date_of_birth: patientDetails.dateOfBirth,
         address: patientDetails.streetAddress,
         aadhaar_id: patientDetails.aadhaarId,
@@ -221,7 +221,7 @@ export class EditProfileComponent implements OnInit {
         referred_by: patientDetails.referredBy,
         referred_name: patientDetails.referredByName,
         referred_mobile: patientDetails.referredByMobile,
-        blood_group: patientDetails.bloodGroup !== null ? patientDetails.bloodGroup.label: '',
+        blood_group: patientDetails.bloodGroup !== null && patientDetails.bloodGroup !== undefined ? patientDetails.bloodGroup.label: '',
         family: null,
         gender: patientDetails.gender,
         secondary_mobile: patientDetails.primaryMobile,

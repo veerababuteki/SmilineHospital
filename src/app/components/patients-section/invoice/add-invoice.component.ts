@@ -6,8 +6,8 @@ import { TreatmentPlansService } from '../../../services/treatment-plans.service
 import { UserService } from '../../../services/user.service';
 import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
-import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { filter, forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-add-invoice',
@@ -32,6 +32,9 @@ export class AddInvoiceComponent implements OnInit {
   plannedTreatmentPlans: any[] = [];
   makePaymentList: any[] = [];
   completedTreatmentPlans: any[] = [];
+  currentProcedureId: any;
+  currentTreatmentPlanId: any;
+
   constructor(private fb: FormBuilder, 
     private userService: UserService,
     private treatmentPlansService: TreatmentPlansService,
@@ -39,6 +42,15 @@ export class AddInvoiceComponent implements OnInit {
     private route: ActivatedRoute
   ) {
     this.initForm();
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      const currentState = this.router.getCurrentNavigation?.()?.extras?.state;
+      if (history.state && history.state.procedureId) {
+        this.currentProcedureId = history.state.procedureId;
+        this.currentTreatmentPlanId = history.state.treatmentKey;
+      }
+    });
   }
 
   ngOnInit() {
@@ -50,8 +62,14 @@ export class AddInvoiceComponent implements OnInit {
         });
         this.treatmentPlansService.getCompletedTreatmentPlans(Number(this.patientId)).subscribe(res => {
             this.completedTreatmentPlans = res.data.rows.filter((p: any) => p.status.toLowerCase() == 'completed' && p.invoice_status.toLowerCase() === 'pending' );
+            if (this.currentProcedureId !== undefined) {
+              
+              const procedure = this.completedTreatmentPlans.find(t => t.id === this.currentProcedureId && t.treatment_unique_id === this.currentTreatmentPlanId)
+              this.addPlannedTreatment(procedure)
+            }
           });
       }
+      
     });
     this.getProcedures();
     this.userService.getDoctors('bce9f008-d447-4fe2-a29e-d58d579534f0').subscribe(res => {

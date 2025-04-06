@@ -2,14 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TreatmentPlansService } from '../../../services/treatment-plans.service';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { MenuModule } from 'primeng/menu';
+import { ButtonModule } from 'primeng/button';
+import { MenuItem } from 'primeng/api';
+import { filter } from 'rxjs';
 @Component({
   selector: 'app-completed-procedures',
   templateUrl: './completed-procedures.component.html',
   styleUrls: ['./completed-procedures.component.scss'],
   standalone: true,
-  imports: [ CommonModule, FormsModule
+  imports: [ CommonModule, FormsModule, MenuModule, ButtonModule
   ]
 })
 export class CompletedProceduresComponent implements OnInit {
@@ -25,10 +28,24 @@ export class CompletedProceduresComponent implements OnInit {
     treatmentPlanList: any[] = [];
     patientId: string | null | undefined;
     formattedData:any[] = [];
+    items: MenuItem[] = [];
+    currentProcedure: any;
     constructor(private treatmentPlanService: TreatmentPlansService, private route: ActivatedRoute, private router: Router){
-
+      
     }
     ngOnInit() {
+      this.items = [
+        {
+          label: 'Invoice Procedure',
+          icon: 'pi pi-money-bill',
+          command: (event) => this.generateInvoiceForProcedure(event)
+        },
+        // {
+        //   label: 'Cancel',
+        //   icon: 'pi pi-times',
+        //   command: (event) => this.cancelInvoice(event)
+        // }
+      ];
       this.route.parent?.paramMap.subscribe(params => {
         if(this.patientId == null) {
           this.patientId = params.get('id');
@@ -38,10 +55,36 @@ export class CompletedProceduresComponent implements OnInit {
         }
       });  
     }
+
+    generateInvoiceForProcedure(event: any){
+      this.router.navigate(['patients', this.patientId, 'add-invoice'], 
+        {
+          state: {
+            procedureId : event.id,
+            treatmentKey : event.treatment_unique_id
+          }}
+      );
+    }
+
+    setCurrentProcedure(event: any): void {
+      // Update menu items with the current invoice key as data
+      this.currentProcedure = event
+      this.items = [
+        {
+          label: 'Invoice Procedure',
+          icon: 'pi pi-money-bill',
+          command: () => this.generateInvoiceForProcedure(this.currentProcedure)
+        },
+        // {
+        //   label: 'Cancel',
+        //   icon: 'pi pi-times',
+        //   command: () => this.cancelInvoice(this.currentInvoiceKey)
+        // }
+      ];
+    }
   loadPatientData(patientId: string) {
     this.treatmentPlanService.getCompletedTreatmentPlans(Number(patientId)).subscribe(res => {
       this.treatmentPlans = this.groupByDate(res.data.rows);
-      console.log(this.getFormattedData());
       this.formattedData = this.getFormattedData();
     });
   }
