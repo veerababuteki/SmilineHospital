@@ -43,9 +43,8 @@
         </button>
 
         <p-dialog [(visible)]="displayPrintAppointment" [style]="{width: '100vw'}">
-          <app-appointments-print [appointments]="appointments"></app-appointments-print>
+          <app-appointments-print (closeDialog)="displayPrintAppointment = false"></app-appointments-print>
         </p-dialog>
-
       </div>
 
       <div class="settings">

@@ -31,13 +31,12 @@ export class InvoicePrintComponent {
     printWindow!.document.write(`
       <html>
       <head>
-        <title>Invoice ${this.invoice.number}</title>
+        <title>Invoice ${this.invoice.value[0].invoice_id}</title>
         <style>
           .invoice-container {
   width: 700px;
   margin: auto;
   padding: 20px;
-  border: 1px solid #000;
   font-family: 'Arial', sans-serif;
   font-size: 14px;
   color: #333;
