@@ -66,8 +66,7 @@ export class PatientDirectoryComponent implements OnInit {
           patient.id.toLowerCase().includes(searchLower) ||
           patient.email.toLowerCase().includes(searchLower) ||
           patient.phone.includes(searchLower) ||
-          patient.manual_unique_code.toLowerCase().includes(searchLower)
-
+          (patient.manual_unique_code ? patient.manual_unique_code.toString().toLowerCase().includes(searchLower) : false)
         );
       }
 

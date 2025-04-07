@@ -137,7 +137,7 @@ export class SideTopNavComponent {
         patient.email.toLowerCase().includes(searchValue) ||
         patient.phone.toLowerCase().includes(searchValue) ||
         patient.id.toLowerCase().includes(searchValue) ||
-        patient.manual_unique_code.toLowerCase().includes(searchValue)
+        (patient.manual_unique_code ? patient.manual_unique_code.toLowerCase().includes(searchValue) : false)
       );
     }
   }
