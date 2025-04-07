@@ -335,7 +335,7 @@ export class AddCompletedProceduresComponent implements OnInit {
           discount_formate: t.discountType,
           teeth_set: t.selectedTeeth.toString(),
           status: "Completed",
-          date: format(t.procedureDate,"yyyy-MM-dd"),
+          date: t.procedureDate,
           total_cost: t.total,
           total_discount: t.discount.toString(),
           notes: t.notes,

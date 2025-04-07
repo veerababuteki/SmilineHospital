@@ -276,7 +276,7 @@ export class AddTreatmentPlansComponent implements OnInit {
           discount_formate: t.discountType,
           teeth_set: t.selectedTeeth.toString(),
           status: "None",
-          date: format(this.date,"yyyy-MM-dd"),
+          date: this.date,
           total_cost: t.total,
           total_discount: t.discount.toString(),
           notes: t.notes,
