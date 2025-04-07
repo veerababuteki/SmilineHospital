@@ -64,7 +64,10 @@ export class PatientDirectoryComponent implements OnInit {
         this.filteredPatients = this.patients.filter(patient =>
           patient.name.toLowerCase().includes(searchLower) ||
           patient.id.toLowerCase().includes(searchLower) ||
-          patient.phone.includes(searchLower)
+          patient.email.toLowerCase().includes(searchLower) ||
+          patient.phone.includes(searchLower) ||
+          patient.manual_unique_code.toLowerCase().includes(searchLower)
+
         );
       }
 
