@@ -86,7 +86,12 @@ export class TreatmentPlansComponent implements OnInit {
   groupByDate(rows: any[]) {
     rows.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
     const groupedByDate = rows.reduce((acc, row) => {
-      const dateKey = row.date.split('T')[0]; // Extract date part
+      const newDate = new Date(row.date)
+        const options = { timeZone: 'Asia/Kolkata' };
+        const istDateStr = newDate.toLocaleDateString('en-CA', options); // en-CA gives YYYY-MM-DD format
+    
+        // Use IST date as the key
+        const dateKey = istDateStr;
 
       const treatmentKey = row.date;
       if (!acc[dateKey]) {

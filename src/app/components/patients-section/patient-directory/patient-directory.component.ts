@@ -52,7 +52,9 @@ export class PatientDirectoryComponent implements OnInit {
                     email: patient.email,
                     phone: patient.phone,
                     image: 'assets/user.webp',
-                    gender: patient.gender
+                    gender: patient.gender,
+                    manual_unique_code: patient.manual_unique_code
+
                 })
                 this.filteredPatients = [...this.patients]
             })

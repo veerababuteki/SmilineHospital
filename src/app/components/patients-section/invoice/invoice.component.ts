@@ -107,7 +107,12 @@ export class InvoiceComponent implements OnInit {
     }
     groupByDate(rows: any[]) {
       return rows.reduce((acc, row) => {
-        const dateKey = row.created_at.split('T')[0];
+        const newDate = new Date(row.date)
+        const options = { timeZone: 'Asia/Kolkata' };
+        const istDateStr = newDate.toLocaleDateString('en-CA', options); // en-CA gives YYYY-MM-DD format
+    
+        // Use IST date as the key
+        const dateKey = istDateStr;
         if (!acc[dateKey]) {
           acc[dateKey] = {};
         }

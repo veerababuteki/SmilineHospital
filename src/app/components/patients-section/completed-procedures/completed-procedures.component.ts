@@ -108,7 +108,12 @@ export class CompletedProceduresComponent implements OnInit {
           return;
 
         }
-        const dateKey = row.date.split('T')[0];
+        const newDate = new Date(row.date)
+        const options = { timeZone: 'Asia/Kolkata' };
+        const istDateStr = newDate.toLocaleDateString('en-CA', options); // en-CA gives YYYY-MM-DD format
+    
+        // Use IST date as the key
+        const dateKey = istDateStr;
         const treatmentKey = row.treatment_unique_id;
         if (!acc[dateKey]) {
           acc[dateKey] = [];
