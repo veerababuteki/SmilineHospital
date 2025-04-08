@@ -47,6 +47,19 @@ export class EditProfileComponent implements OnInit {
   ngOnInit(): void {
     
     this.initiateForm()
+    const dateOfBirthControl = this.patientForm.get('dateOfBirth');
+  const ageControl = this.patientForm.get('age');
+  
+  if (dateOfBirthControl && ageControl) {
+    dateOfBirthControl.valueChanges.subscribe(date => {
+      if (date) {
+        const age = this.calculateAge(date);
+        ageControl.setValue(age, { emitEvent: false });
+      } else {
+        ageControl.setValue('', { emitEvent: false });
+      }
+    });
+  }
     this.route.paramMap.subscribe(params => {
       if(this.uniqueCode == null) {
         this.uniqueCode = params.get('source');
@@ -56,6 +69,19 @@ export class EditProfileComponent implements OnInit {
       }
       
     });
+  }
+  
+  calculateAge(dateOfBirth: Date): number {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age;
   }
 
   loadPatientData(patientId: string){
@@ -219,8 +245,8 @@ export class EditProfileComponent implements OnInit {
         age: patientDetails.age,
         anniversary: null,
         referred_by: patientDetails.referredBy,
-        referred_name: patientDetails.referredByName,
-        referred_mobile: patientDetails.referredByMobile,
+        referred_name: patientDetails.refferedByName,
+        referred_mobile: patientDetails.refferedByMobile,
         blood_group: patientDetails.bloodGroup !== null && patientDetails.bloodGroup !== undefined ? patientDetails.bloodGroup.label: '',
         family: null,
         gender: patientDetails.gender,

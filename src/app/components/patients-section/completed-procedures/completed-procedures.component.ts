@@ -57,11 +57,17 @@ export class CompletedProceduresComponent implements OnInit {
     }
 
     generateInvoiceForProcedure(event: any){
+      this.generateInvoiceList = [];
+      const id = event.id;
+      const treatment_unique_id = event.treatment_unique_id;
+      this.generateInvoiceList.push({ id, treatment_unique_id })
       this.router.navigate(['patients', this.patientId, 'add-invoice'], 
         {
           state: {
-            procedureId : event.id,
-            treatmentKey : event.treatment_unique_id
+            procedures: this.generateInvoiceList.map(event => ({
+              procedureId: event.id,
+              treatmentKey: event.treatment_unique_id
+          }))
           }}
       );
     }
@@ -170,11 +176,20 @@ export class CompletedProceduresComponent implements OnInit {
   
 
     generateInvoice(){
-      this.treatmentPlanService.generateInvoice(this.generateInvoiceList).subscribe(res => {
-        if(this.patientId !== null && this.patientId !== undefined){
-          this.loadPatientData(this.patientId)
-        }
-      })
+      // this.treatmentPlanService.generateInvoice(this.generateInvoiceList).subscribe(res => {
+      //   if(this.patientId !== null && this.patientId !== undefined){
+      //     this.loadPatientData(this.patientId)
+      //   }
+      // })
+      this.router.navigate(['patients', this.patientId, 'add-invoice'], 
+        {
+          state: {
+            procedures: this.generateInvoiceList.map(event => ({
+              procedureId: event.id,
+              treatmentKey: event.treatment_unique_id
+            }))
+          }}
+      );
     }
 
     getTotalCost(treatmentGroup: any[]): number {

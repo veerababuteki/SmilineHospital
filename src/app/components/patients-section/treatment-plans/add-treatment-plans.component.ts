@@ -121,8 +121,11 @@ export class AddTreatmentPlansComponent implements OnInit {
       showNotes: [false]
     });
 
-    const index = 0;
-    this.treatments.insert(index, treatment);
+    // Get the current length as the new index
+  const index = this.treatments.length;
+  
+  // Use push instead of insert(0, ...)
+  this.treatments.push(treatment);
     this.setCurrentTreatment(index);
     this.calculateTotal(index);
   }

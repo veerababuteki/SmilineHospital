@@ -123,6 +123,8 @@ export class UserService {
         age: patientDetails.age,
         anniversary: null,
         referred_by: patientDetails.referred_by,
+        referred_name: patientDetails.referred_name,
+        referred_mobile: patientDetails.referred_mobile,
         blood_group: patientDetails.blood_group,
         family: null,
         gender: patientDetails.gender,

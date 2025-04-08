@@ -17,7 +17,7 @@
             <span class="gender">{{patientDetails.gender}}</span>
             <span class="separator">,</span>
             <span class="age">{{patientDetails.age}} Years&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <span class="id">(ID : {{patientDetails.user_details.unique_code}})</span>
+            <span class="id">(ID : {{patientDetails.user_details.manual_unique_code}})</span>
         </div>
     </div>
     <button class="medical-history-btn">
@@ -31,7 +31,6 @@
             <i class="pi" [ngClass]="isNavCollapsed ? 'pi-angle-double-right' : 'pi-angle-double-left'"></i>
         </button>
 
-        <!-- Patient Section -->
         <div class="nav-section" *ngIf="userPrivileges.includes('Profile') || userPrivileges.includes('Appointments')">
             <div class="section-header" (click)="toggleSection('patient')">
                 <span class="label">Patient</span>

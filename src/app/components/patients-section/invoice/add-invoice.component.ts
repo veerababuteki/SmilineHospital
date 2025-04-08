@@ -34,6 +34,7 @@ export class AddInvoiceComponent implements OnInit {
   completedTreatmentPlans: any[] = [];
   currentProcedureId: any;
   currentTreatmentPlanId: any;
+  proceduresToProcess: {procedureId: any, treatmentKey: any}[] = [];
 
   constructor(private fb: FormBuilder, 
     private userService: UserService,
@@ -46,9 +47,9 @@ export class AddInvoiceComponent implements OnInit {
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
       const currentState = this.router.getCurrentNavigation?.()?.extras?.state;
-      if (history.state && history.state.procedureId) {
-        this.currentProcedureId = history.state.procedureId;
-        this.currentTreatmentPlanId = history.state.treatmentKey;
+      if (history.state && history.state.procedures) {
+        // Now procedures is an array of objects with procedureId and treatmentKey
+        this.proceduresToProcess = history.state.procedures;
       }
     });
   }
@@ -62,10 +63,17 @@ export class AddInvoiceComponent implements OnInit {
         });
         this.treatmentPlansService.getCompletedTreatmentPlans(Number(this.patientId)).subscribe(res => {
             this.completedTreatmentPlans = res.data.rows.filter((p: any) => p.status.toLowerCase() == 'completed' && p.invoice_status.toLowerCase() === 'pending' );
-            if (this.currentProcedureId !== undefined) {
-              
-              const procedure = this.completedTreatmentPlans.find(t => t.id === this.currentProcedureId && t.treatment_unique_id === this.currentTreatmentPlanId)
-              this.addPlannedTreatment(procedure)
+            // Check if we have procedures to process
+            if (this.proceduresToProcess && this.proceduresToProcess.length > 0) {
+              // Process each procedure in the array
+              this.proceduresToProcess.forEach(proc => {
+                const procedure = this.completedTreatmentPlans.find(
+                  t => t.id === proc.procedureId && t.treatment_unique_id === proc.treatmentKey
+                );
+                if (procedure) {
+                  this.addPlannedTreatment(procedure);
+                }
+              });
             }
           });
       }

@@ -124,6 +124,19 @@ export class AddProfileComponent implements OnInit {
       this.medicalConditions = res.data.rows;
       this.updateMedicalHistoryForm();
     });
+    const dateOfBirthControl = this.patientForm.get('dateOfBirth');
+  const ageControl = this.patientForm.get('age');
+  
+  if (dateOfBirthControl && ageControl) {
+    dateOfBirthControl.valueChanges.subscribe(date => {
+      if (date) {
+        const age = this.calculateAge(date);
+        ageControl.setValue(age, { emitEvent: false });
+      } else {
+        ageControl.setValue('', { emitEvent: false });
+      }
+    });
+  }
     
     // Load insurance groups
     this.userService.getInsuranceGroups().subscribe(res => {
@@ -297,7 +310,18 @@ export class AddProfileComponent implements OnInit {
       });
     }
   }
-
+  calculateAge(dateOfBirth: Date): number {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age;
+  }
   cancel() {
     this.onCancel.emit();
   }
