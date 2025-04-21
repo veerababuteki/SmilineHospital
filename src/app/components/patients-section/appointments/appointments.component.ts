@@ -71,7 +71,7 @@ export class AppointmentsComponent implements OnInit {
         });
         
         // Make sure categories is an array with the correct structure for PrimeNG dropdown
-        this.categories = categories.data.map((category: any) => ({
+        this.categories = categories.data.rows.map((category: any) => ({
           ...category,
           label: category.name, // Add this for dropdown display
           value: category.category_id // Add this for dropdown value
