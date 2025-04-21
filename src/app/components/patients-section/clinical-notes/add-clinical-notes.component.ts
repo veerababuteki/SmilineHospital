@@ -67,13 +67,24 @@ export class AddClinicalNotesComponent implements OnInit {
   notesList: string[] = ['Regular checkup needed', 'Follow-up required', 'Patient reported improvement'];
   
   currentList: string[] = [];
-    masterDataFetched: boolean = false;
-
+  masterDataFetched: boolean = false;
+  isEditMode: boolean = false;
+  editNoteData: any = null;
+  
   constructor(private userService: UserService, 
     private router: Router,
     private clinicalNotesService: ClinicalNotesService,
     private route: ActivatedRoute
-  ) {}
+  ) {
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras.state) {
+      const state = navigation.extras.state as { mode: string; noteData: any };
+      if (state.mode === 'edit' && state.noteData) {
+        this.isEditMode = true;
+        this.editNoteData = state.noteData;
+      }
+    }
+  }
 
   ngOnInit() {
     this.route.parent?.paramMap.subscribe(params => {
@@ -84,7 +95,63 @@ export class AddClinicalNotesComponent implements OnInit {
     this.initializeCategories();
     this.loadDoctors();
     this.fetchMasterData();
+    if (this.isEditMode) {
+      this.populateFormWithNote(this.editNoteData);
+    }
   }
+
+  populateFormWithNote(note: any) {
+    // Set dates
+    this.date = new Date(note.date);
+    this.followupDate = note.followup_appointment ? new Date(note.followup_appointment) : new Date();
+
+    // Set doctor
+    const doctorId = note.doctor_id;
+    
+    // Helper to set the doctor when the doctor list is available
+    const setDoctor = () => {
+      if (this.doctors.length > 0) {
+        this.doctor = this.doctors.find(doc => doc.user_id === doctorId) || this.doctors[0];
+      }
+    };
+    
+    // Try to set the doctor now if possible
+    setDoctor();
+    
+    // Also set up a listener for when doctors are loaded
+    const originalLoadDoctors = this.loadDoctors;
+    this.loadDoctors = () => {
+      originalLoadDoctors.call(this);
+      // After doctors are loaded, set the correct doctor
+      setDoctor();
+    };
+
+    // Clear existing arrays before populating
+    this.selectedComplaints = [];
+    this.selectedObservations = [];
+    this.selectedInvestigations = [];
+    this.selectedDiagnoses = [];
+    this.selectedNotes = [];
+
+    // Split and set the selected items
+    this.parseAndSetSelectedItems(note.chief_complaints, 'COMP', this.selectedComplaints);
+    this.parseAndSetSelectedItems(note.observations, 'OBS', this.selectedObservations);
+    this.parseAndSetSelectedItems(note.investigations, 'INV', this.selectedInvestigations);
+    this.parseAndSetSelectedItems(note.diagnoses, 'DIAG', this.selectedDiagnoses);
+    this.parseAndSetSelectedItems(note.notes, 'NOTE', this.selectedNotes);
+  }
+
+  parseAndSetSelectedItems(itemsString: string, category: string, targetArray: SelectedItem[]) {
+    if (itemsString && itemsString.trim()) {
+      const items = itemsString.split(',');
+      for (const item of items) {
+        if (item.trim()) {
+          targetArray.push({ value: item.trim(), category });
+        }
+      }
+    }
+  }
+
   fetchMasterData(){
     forkJoin({
       investigations: this.clinicalNotesService.getInvestigations(),
@@ -322,14 +389,14 @@ export class AddClinicalNotesComponent implements OnInit {
   }
   validateNote(): { isValid: boolean; message: string } {
     // Check if all selected entries have values
-    const hasEmptyComplaints = this.selectedComplaints.some(complaint => !complaint.value.trim()) || this.newComplaint.trim().length == 0;
-    const hasEmptyObservations = this.selectedObservations.some(obs => !obs.value.trim()) || this.newObservation.trim().length == 0;
-    const hasEmptyInvestigations = this.selectedInvestigations.some(inv => !inv.value.trim()) || this.newInvestigation.trim().length == 0;
-    const hasEmptyDiagnoses = this.selectedDiagnoses.some(diag => !diag.value.trim()) || this.newDiagnosis.trim().length == 0;
-    const hasEmptyNotes = this.selectedNotes.some(note => !note.value.trim()) || this.newNote.trim().length == 0;
+    const hasEmptyComplaints = this.selectedComplaints.some(complaint => !complaint.value.trim());
+    const hasEmptyObservations = this.selectedObservations.some(obs => !obs.value.trim());
+    const hasEmptyInvestigations = this.selectedInvestigations.some(inv => !inv.value.trim());
+    const hasEmptyDiagnoses = this.selectedDiagnoses.some(diag => !diag.value.trim());
+    const hasEmptyNotes = this.selectedNotes.some(note => !note.value.trim());
 
-    if (hasEmptyComplaints && hasEmptyObservations && hasEmptyInvestigations &&
-        hasEmptyDiagnoses && hasEmptyNotes) {
+    if (hasEmptyComplaints || hasEmptyObservations || hasEmptyInvestigations ||
+        hasEmptyDiagnoses || hasEmptyNotes) {
       return {
         isValid: false,
         message: 'Please fill in all fields or remove empty ones'
@@ -407,11 +474,34 @@ export class AddClinicalNotesComponent implements OnInit {
       patient_id: this.patientId,
       appointment_id: 5,
     };
-    console.log('Saving clinical note:', clinicalNote);
-    // TODO: Add your API call here
-    this.clinicalNotesService.saveClinicalNotes(clinicalNote).subscribe(res=>{
-        this.router.navigate(['/patients', this.patientId, 'clinical-notes']);
-    } )
+
+    if (this.isEditMode && this.editNoteData) {
+      const noteToUpdate = {
+        ...clinicalNote,
+        id: this.editNoteData.id,
+        // Preserve any other fields that might be required by the API but not in the form
+        appointment_id: this.editNoteData.appointment_id || clinicalNote.appointment_id
+      };
+      
+      this.clinicalNotesService.updateClinicalNotes(noteToUpdate).subscribe({
+        next: (res) => {
+          this.router.navigate(['/patients', this.patientId, 'clinical-notes']);
+        },
+        error: (err) => {
+          console.error('Error updating clinical note:', err);
+        }
+      });
+    } else {
+      // Otherwise, use the existing saveClinicalNotes method
+      this.clinicalNotesService.saveClinicalNotes(clinicalNote).subscribe({
+        next: (res) => {
+          this.router.navigate(['/patients', this.patientId, 'clinical-notes']);
+        },
+        error: (err) => {
+          console.error('Error saving clinical note:', err);
+        }
+      });
+    }
   }
 
   cancel() {

@@ -47,14 +47,20 @@
                                 <div>Teeth: <span class="teeth-number">{{treatment.teeth_set}}</span></div>
                                 <div>{{treatment.notes}}</div>
                             </td>
-                            <!-- <td class="actions">
+                            <td class="actions">
                                 <button class="edit-btn border-left-radius">
                                     <i class="pi pi-print"></i>
                                 </button>
-                                <button class="edit-btn border-right-radius">
-                                    <i class="pi pi-chevron-down"></i>
-                                </button>
-                            </td> -->
+                                <button 
+                              #menuButton
+                              type="button" 
+                              pButton 
+                              icon="pi pi-chevron-down" 
+                              class="edit-btn border-right-radius p-button-text"
+                              (click)="invoiceMenu.toggle($event); setCurrentTreatmentPlan(treatmentPlans[date],treatmentkey.value)">
+                            </button>
+                            <p-menu #invoiceMenu [popup]="true" [model]="items"></p-menu>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

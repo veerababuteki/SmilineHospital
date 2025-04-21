@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TreatmentPlansService } from '../../../services/treatment-plans.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-payments',
@@ -26,6 +26,9 @@ export class PaymentsComponent implements OnInit {
       });
       
     }
+    navigateToAddPayment(){
+      this.router.navigate(['/patients', this.patientId, 'add-payment'])
+    }
     loadPatientData(patientId: string){
       this.treatmentPlansService.getPayments(Number(patientId)).subscribe(res=>{
         this.payments = res.data;
@@ -42,7 +45,7 @@ export class PaymentsComponent implements OnInit {
       return acc;
     }, {} as Record<string, any[]>);
   }
-    constructor(private treatmentPlansService: TreatmentPlansService, private route: ActivatedRoute){
+    constructor(private treatmentPlansService: TreatmentPlansService, private route: ActivatedRoute, private router: Router){
 
     }
 }

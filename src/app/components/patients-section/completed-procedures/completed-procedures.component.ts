@@ -6,7 +6,7 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
-import { filter } from 'rxjs';
+
 @Component({
   selector: 'app-completed-procedures',
   templateUrl: './completed-procedures.component.html',
@@ -15,6 +15,7 @@ import { filter } from 'rxjs';
   imports: [ CommonModule, FormsModule, MenuModule, ButtonModule
   ]
 })
+
 export class CompletedProceduresComponent implements OnInit {
     currentTreatmentIndex: number | null = null;
     cost: number = 0;
@@ -30,6 +31,7 @@ export class CompletedProceduresComponent implements OnInit {
     formattedData:any[] = [];
     items: MenuItem[] = [];
     currentProcedure: any;
+  currentTreatmentPlan: any;
     constructor(private treatmentPlanService: TreatmentPlansService, private route: ActivatedRoute, private router: Router){
       
     }
@@ -40,11 +42,11 @@ export class CompletedProceduresComponent implements OnInit {
           icon: 'pi pi-money-bill',
           command: (event) => this.generateInvoiceForProcedure(event)
         },
-        // {
-        //   label: 'Cancel',
-        //   icon: 'pi pi-times',
-        //   command: (event) => this.cancelInvoice(event)
-        // }
+        {
+          label: 'Edit',
+          icon: 'pi pi-pencil',
+          command: (event) => this.updateTreatmentPlans(event)
+        }
       ];
       this.route.parent?.paramMap.subscribe(params => {
         if(this.patientId == null) {
@@ -54,6 +56,12 @@ export class CompletedProceduresComponent implements OnInit {
           this.loadPatientData(this.patientId);
         }
       });  
+    }
+
+    updateTreatmentPlans(treatmentPlan: any): void {
+      this.router.navigate(['patients', this.patientId, 'add-completed-procedures'], {
+        state: { mode: 'edit', procedureData: treatmentPlan }
+      });
     }
 
     generateInvoiceForProcedure(event: any){
@@ -81,13 +89,14 @@ export class CompletedProceduresComponent implements OnInit {
           icon: 'pi pi-money-bill',
           command: () => this.generateInvoiceForProcedure(this.currentProcedure)
         },
-        // {
-        //   label: 'Cancel',
-        //   icon: 'pi pi-times',
-        //   command: () => this.cancelInvoice(this.currentInvoiceKey)
-        // }
+        {
+          label: 'Edit',
+          icon: 'pi pi-pencil',
+          command: () => this.updateTreatmentPlans(this.currentProcedure)
+        }
       ];
     }
+
   loadPatientData(patientId: string) {
     this.treatmentPlanService.getCompletedTreatmentPlans(Number(patientId)).subscribe(res => {
       this.treatmentPlans = this.groupByDate(res.data.rows);

@@ -30,11 +30,11 @@ export class InvoiceComponent implements OnInit {
 
     ngOnInit(): void {
       this.items = [
-        // {
-        //   label: 'Pay',
-        //   icon: 'pi pi-money-bill',
-        //   command: (event) => this.payInvoice(event)
-        // },
+        {
+          label: 'Edit',
+          icon: 'pi pi-pencil',
+          command: (event) => this.editInvoice(event)
+        },
         {
           label: 'Cancel',
           icon: 'pi pi-times',
@@ -50,6 +50,16 @@ export class InvoiceComponent implements OnInit {
         }
       });
     }
+
+    editInvoice(invoiceKey: any): void {
+      // Find the invoice data and pass it to the add-invoice component
+      const invoiceData = this.findInvoiceByKey(invoiceKey);
+      
+      this.router.navigate(['patients', this.patientId, 'add-invoice'], {
+        state: { mode: 'edit', invoiceData: invoiceData, invoiceKey: invoiceKey }
+      });
+    }
+
     payInvoice(event: any) {
       const invoiceKey = event.item.data;
       console.log('Paying invoice:', invoiceKey);
@@ -69,11 +79,11 @@ export class InvoiceComponent implements OnInit {
       console.log(invoiceKey)
       // Update menu items with the current invoice key as data
       this.items = [
-        // {
-        //   label: 'Pay',
-        //   icon: 'pi pi-money-bill',
-        //   command: () => this.payInvoice(this.currentInvoiceKey)
-        // },
+        {
+          label: 'Edit',
+          icon: 'pi pi-pencil',
+          command: (event) => this.editInvoice(this.currentInvoiceKey)
+        },
         {
           label: 'Cancel',
           icon: 'pi pi-times',
@@ -81,7 +91,16 @@ export class InvoiceComponent implements OnInit {
         }
       ];
     }
-    
+
+    findInvoiceByKey(invoiceKey: any): any[] {
+      for (const date of this.getSortedDates()) {
+        if (this.invoices[date] && this.invoices[date][invoiceKey]) {
+          return this.invoices[date][invoiceKey];
+        }
+      }
+      return [];
+    }
+
     fetchInvoices(patientId: string){
       this.treatmentPlansService.getInvoices(Number(patientId)).subscribe(res => {
         this.invoices = this.groupByDate( res.data.rows)
@@ -107,7 +126,7 @@ export class InvoiceComponent implements OnInit {
     }
     groupByDate(rows: any[]) {
       return rows.reduce((acc, row) => {
-        const newDate = new Date(row.date)
+        const newDate = new Date(row.created_at)
         const options = { timeZone: 'Asia/Kolkata' };
         const istDateStr = newDate.toLocaleDateString('en-CA', options); // en-CA gives YYYY-MM-DD format
     

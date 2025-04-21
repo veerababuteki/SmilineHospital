@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
-  private baseUrl = 'https://apis.idental.ai/auth';  // Replace with actual API
+  private baseUrl = 'https://apis.idental.ai/api/v1';  // Replace with actual API
   loggedIn: boolean = false;
 
   constructor(private http: HttpClient, private router: Router) {}
@@ -26,11 +26,11 @@ export class AuthService {
         const headers = new HttpHeaders({
           'Authorization': `Bearer ${token}`
         });
-    return this.http.get<any>(`${this.baseUrl}/getCurrentUser`, {headers});
+    return this.http.get<any>(`${this.baseUrl}/auth/user/getCurrentUser`, {headers});
   }
 
   registerUser(patientDetails: any) {
-    return this.http.post<any>(`${this.baseUrl}/register`, {
+    return this.http.post<any>(`${this.baseUrl}/auth/user/register`, {
         first_name: patientDetails.first_name,
         last_name: '',
         manual_unique_code: patientDetails.manual_unique_code,
@@ -74,14 +74,14 @@ export class AuthService {
   }
 
   verifyOTP(mobileNumber: any, otp: any){
-    return this.http.post<any>(`${this.baseUrl}/verifyOtp`, {
+    return this.http.post<any>(`${this.baseUrl}/auth/user/verifyOtp`, {
         username: mobileNumber,
         otp: otp
     });
   }
 
   loginWithPassword(input: any, password:any){
-    return this.http.post<any>(`${this.baseUrl}/login`, {
+    return this.http.post<any>(`${this.baseUrl}/auth/user/login`, {
         login_type: "password",
         username: input,
         password: password

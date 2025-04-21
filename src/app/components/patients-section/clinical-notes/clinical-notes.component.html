@@ -17,9 +17,15 @@
                         <td class="procedure-col">{{complaint}}</td>
                         <td class="actions-col" *ngIf="i == 0">
                             <app-clinical-notes-print [clinicalNotes]="note"></app-clinical-notes-print>
-                            <button class="edit-btn border-right-radius">
-                                <i class="pi pi-chevron-down"></i>
+                            <button 
+                              #menuButton
+                              type="button" 
+                              pButton 
+                              icon="pi pi-chevron-down" 
+                              class="edit-btn border-right-radius p-button-text"
+                              (click)="invoiceMenu.toggle($event); setCurrentClinicalNotes(note)">
                             </button>
+                            <p-menu #invoiceMenu [popup]="true" [model]="items"></p-menu>
                         </td>
                     </tr>
                     <tr *ngFor="let observation of formatStringToArray(note.observations); let i = index">

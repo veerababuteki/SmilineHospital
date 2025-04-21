@@ -7,13 +7,16 @@ import { UserService } from '../../../services/user.service';
 import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MenuItem, MenuItemCommandEvent } from 'primeng/api';
+import { MenuModule } from 'primeng/menu';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-treatment-plans',
   templateUrl: './treatment-plans.component.html',
   styleUrls: ['./treatment-plans.component.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, DropdownModule, CalendarModule]
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, DropdownModule, CalendarModule, MenuModule, ButtonModule]
 })
 export class TreatmentPlansComponent implements OnInit {
   treatmentForm!: FormGroup;
@@ -29,6 +32,7 @@ export class TreatmentPlansComponent implements OnInit {
   markCompleteList: { id: number, treatment_unique_id: string }[] = []
   patientId: string | null | undefined;
   generateInvoiceList: any[] = [];
+  currentTreatmentPlan: any;
 
   constructor(private fb: FormBuilder,
     private treatmentPlansService: TreatmentPlansService,
@@ -38,6 +42,7 @@ export class TreatmentPlansComponent implements OnInit {
   }
 
   groupedData: { [key: string]: any[] } = {};
+  items: MenuItem[] = [];
 
   ngOnInit() {
     this.route.parent?.paramMap.subscribe(params => {
@@ -48,7 +53,35 @@ export class TreatmentPlansComponent implements OnInit {
         this.loadPatientData(this.patientId);
       }
     });
+
+    this.items = [
+      {
+        label: 'Edit',
+        icon: 'pi pi-pencil',
+        command: (event) => this.updateTreatmentPlans(event)
+      }
+    ];
   }
+
+  updateTreatmentPlans(treatmentPlan: any): void {
+    this.router.navigate(['patients', this.patientId, 'add-treatment-plan'], {
+      state: { mode: 'edit', treatmentData: treatmentPlan }
+    });
+  }
+
+  setCurrentTreatmentPlan(rows: any,
+  treatmentKey: any): void {
+    // Update menu items with the current invoice key as data
+    this.currentTreatmentPlan = rows.filter((row: any) => row.treatment_unique_id === treatmentKey)
+    this.items = [
+      {
+        label: 'Edit',
+        icon: 'pi pi-pencil',
+        command: () => this.updateTreatmentPlans(this.currentTreatmentPlan)
+      }
+    ];
+  }
+
   loadPatientData(patientId: string) {
     if (this.patientId !== null && this.patientId !== undefined) {
       this.treatmentPlansService.getTreatmentPlans(Number(this.patientId)).subscribe(res => {
@@ -70,19 +103,7 @@ export class TreatmentPlansComponent implements OnInit {
       );
     }
   }
-  // groupByDate(rows: any[]) {
-  //   return rows.reduce((acc, row) => {
-  //     const dateKey = row.date;
-  //     if (!acc[dateKey]) {
-  //       acc[dateKey] = [];
-  //     }
-  //     if(row.status == 'Completed'){
-  //       row.isChecked = true
-  //     }
-  //     acc[dateKey].push(row);
-  //     return acc;
-  //   }, {} as Record<string, any[]>);
-  // }
+  
   groupByDate(rows: any[]) {
     rows.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
     const groupedByDate = rows.reduce((acc, row) => {
@@ -134,16 +155,6 @@ export class TreatmentPlansComponent implements OnInit {
       }
     })
   }
-
-  // onInvoiceCheckboxChange(treatment: any, id: number, treatment_unique_id: string){
-  //   if(treatment.isChecked){
-  //     this.generateInvoiceList.push({id, treatment_unique_id})
-  //   } else{
-  //     this.generateInvoiceList = this.generateInvoiceList.filter(item => 
-  //       item.id !== id && item.treatment_unique_id !== treatment_unique_id
-  //     );
-  //   }
-  // }
 
   generateInvoice() {
     this.treatmentPlansService.generateInvoice(this.generateInvoiceList).subscribe(res => {

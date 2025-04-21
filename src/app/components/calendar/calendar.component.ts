@@ -419,7 +419,7 @@ export class CalendarComponent implements OnInit {
           if (doctor !== undefined)
             this.isDoctor = true;
         }
-        this.categories = categories.data;
+        this.categories = categories.data.rows;
         this.addAppointmentsToCalendar(appointments);
         this.changeDate(0);
         this.isDataLoaded = true
