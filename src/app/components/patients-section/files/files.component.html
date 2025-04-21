@@ -1,4 +1,3 @@
-<!-- HTML -->
 <div class="appointments-container">
     <div class="appointments-header">
         <h2>Files</h2>
@@ -6,7 +5,7 @@
             <button class="mark-btn" *ngIf="selectedFileIds.length == 0">Delete</button>
             <button class="mark-btn-active" (click)="deleteFiles()" *ngIf="selectedFileIds.length > 0">Delete</button>
             <button class="mark-btn">Email</button>
-            <input type="file" #fileInput (change)="onFileSelected($event)" hidden>
+            <input type="file" #fileInput (change)="onFileSelected($event)" multiple hidden>
             <button class="add-btn" (click)="fileInput.click()">+ Add</button>
         </div>
     </div>
@@ -31,14 +30,6 @@
                         (click)="filterFiles(label.file_label_id)">{{label.name}}</div>
                     </div>
                 </div>
-        
-                <!-- <div class="generated-files">
-                    <h3>Generated Files</h3>
-                    <div class="file-categories">
-                        <div class="category-item">Emailed files</div>
-                        <div class="category-item">Medical Leave Certificate</div>
-                    </div>
-                </div> -->
             </div>
         
             <!-- Main Content Area -->
@@ -62,5 +53,4 @@
             </div>
         </div>
     </div>
-    
 </div>
