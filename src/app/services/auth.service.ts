@@ -61,7 +61,8 @@ export class AuthService {
         medical_history: patientDetails.medical_history,
         groups_list: patientDetails.groups_list,
         other_history: patientDetails.other_history,
-        role_id: '2ac7787b-77d1-465b-9bc0-eee50933697f'
+        role_id: '2ac7787b-77d1-465b-9bc0-eee50933697f',
+        branch_id: 1,
     });
   }
 

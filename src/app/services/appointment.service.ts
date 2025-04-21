@@ -96,6 +96,7 @@ export class AppointmentService {
             duration: appointment.duration,
             planned_procedure: appointment.planned_procedure,
             notes: appointment.notes,
+            branch_id: 1
         }, 
         {headers}).pipe(
         catchError(this.handleError)
