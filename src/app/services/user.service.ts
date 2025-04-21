@@ -38,7 +38,7 @@ export class UserService {
       'Authorization': `Bearer ${token}`
     });
 
-    return this.http.get<any>(`${this.baseUrl}/ProfileForAppointment/${code}`, {headers}).pipe(
+    return this.http.get<any>(`${this.baseUrl}/auth/appointment/ProfileForAppointment/${code}`, {headers}).pipe(
         catchError(this.handleError)
       );
   }  
