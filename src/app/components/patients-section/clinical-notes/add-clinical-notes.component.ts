@@ -496,7 +496,7 @@ export class AddClinicalNotesComponent implements OnInit {
       
       this.clinicalNotesService.updateClinicalNotes(noteToUpdate).subscribe({
         next: (res) => {
-          this.router.navigate(['/patients', this.patientId, 'clinical-notes']);
+          this.router.navigate(['/patients', this.patientId, 'clinical-notes', this.uniqueCode]);
         },
         error: (err) => {
           console.error('Error updating clinical note:', err);
@@ -506,7 +506,7 @@ export class AddClinicalNotesComponent implements OnInit {
       // Otherwise, use the existing saveClinicalNotes method
       this.clinicalNotesService.saveClinicalNotes(clinicalNote).subscribe({
         next: (res) => {
-          this.router.navigate(['/patients', this.patientId, 'clinical-notes']);
+          this.router.navigate(['/patients', this.patientId, 'clinical-notes', this.uniqueCode]);
         },
         error: (err) => {
           console.error('Error saving clinical note:', err);

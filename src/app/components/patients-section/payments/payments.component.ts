@@ -36,7 +36,6 @@ export class PaymentsComponent implements OnInit {
           this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
         }
       });
-      
     }
 
     navigateToAddPayment(){

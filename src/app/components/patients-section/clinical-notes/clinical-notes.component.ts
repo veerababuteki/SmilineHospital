@@ -76,7 +76,7 @@ export class ClinicalNotesComponent implements OnInit {
     ];
   }
   updateClinicalNotes(event: any): void {
-    this.router.navigate(['/patients', this.patientId, 'add-clinical-note'], {
+    this.router.navigate(['/patients', this.patientId, 'add-clinical-note', this.uniqueCode], {
       state: { mode: 'edit', noteData: event }
     });
   }
