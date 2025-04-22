@@ -50,7 +50,7 @@ export class PaymentsComponent implements OnInit {
 
     groupByDate(rows: any[]) {
       const grouped = rows.reduce((acc, row) => {
-        const dateKey = row.created_at;
+        const dateKey = row.created_at.split('T')[0];
         if (!acc[dateKey]) {
           acc[dateKey] = [];
         }

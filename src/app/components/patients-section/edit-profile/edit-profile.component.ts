@@ -272,7 +272,7 @@ export class EditProfileComponent implements OnInit {
         groups_list: selectedGroups,
         other_history: historyDetails.otherHistory,
       }).subscribe(res=>{
-        this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode, this.uniqueCode])
+        this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode])
       })
     }
   }
