@@ -22,6 +22,7 @@ import { PatientDirectoryComponent } from './app/components/patients-section/pat
 import { AddProfileComponent } from './app/components/patients-section/edit-profile/add-profile.component';
 import { AddCompletedProceduresComponent } from './app/components/patients-section/completed-procedures/add-completed-procedures.component';
 import { AddInvoiceComponent } from './app/components/patients-section/invoice/add-invoice.component';
+import { AddPaymentComponent } from './app/components/patients-section/payments/add-payment.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -52,6 +53,7 @@ export const routes: Routes = [
               { path: 'add-invoice', component: AddInvoiceComponent },
               { path: 'invoices', component: InvoiceComponent },
               { path: 'payments', component: PaymentsComponent },
+              { path: 'add-payment', component: AddPaymentComponent },
             ]}
           ] 
         }

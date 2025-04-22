@@ -1,0 +1,72 @@
+<button class="edit-btn border-left-radius" (click)="print()">
+    <i class="pi pi-print"></i>
+</button>
+
+<div id="treatmentPlan{{treatmentPlan.id}}" class="case-sheet-container">
+    <!-- Clinic Details -->
+    <h2 class="clinic-name">Smiline Dental Hospitals</h2>
+    <p class="clinic-address">
+      #8-3-952/10/2&2/1, Smiline House, Srinagar Colony, Panjagutta, Hyderabad-500073
+    </p>
+    <p class="clinic-phone">Phone: 040 4200 0024</p>
+  
+    <hr />
+  
+    <!-- Patient & Doctor Details -->
+    <p><strong>Date:</strong> {{ treatmentPlan.date | date: 'dd MMM, yyyy' }}</p>
+    <p><strong>Billing Incharge:</strong> Kiran</p>
+    <p><strong>Patient:</strong> {{ treatmentPlan.patient_details_treat.user_profile_details[0].first_name }}
+      {{ treatmentPlan.patient_details_treat.user_profile_details[0].last_name }}
+      ({{ treatmentPlan.patient_details_treat.unique_code }})
+      {{ treatmentPlan.patient_details_treat.user_profile_details[0].gender }}
+    </p>
+    <p><strong>By:</strong> Dr. {{ treatmentPlan.doctor_details_treat.user_profile_details[0].first_name }}
+      {{ treatmentPlan.doctor_details_treat.user_profile_details[0].last_name }}
+    </p>
+  
+    <hr />
+  
+    <!-- Treatment Details -->
+    <p class="section-title">Treatment Details</p>
+    <p><strong>Procedure:</strong> {{ treatmentPlan.procedure_details.name }}</p>
+    <p><strong>Teeth:</strong> {{ treatmentPlan.teeth_set }}</p>
+    <p><strong>Quantity:</strong> {{ treatmentPlan.quantity }}</p>
+    <p><strong>Status:</strong> {{ treatmentPlan.status }}</p>
+
+    <!-- Cost Details -->
+    <p class="section-title">Cost Details</p>
+    <div class="treatment-totals">
+      <div class="total-row">
+        <span class="total-label">Base Cost:</span>
+        <span>INR {{ treatmentPlan.cost }}</span>
+      </div>
+      <div class="total-row">
+        <span class="total-label">Discount:</span>
+        <span>{{ treatmentPlan.discount }}{{ treatmentPlan.discount_formate }}</span>
+      </div>
+      <div class="total-row">
+        <span class="total-label">Total Cost:</span>
+        <span>INR {{ treatmentPlan.total_cost }}</span>
+      </div>
+      <div class="total-row">
+        <span class="total-label">Total Discount:</span>
+        <span>INR {{ treatmentPlan.total_discount }}</span>
+      </div>
+      <div class="total-row grand-total">
+        <span class="total-label">Grand Total:</span>
+        <span>INR {{ treatmentPlan.grand_total }}</span>
+      </div>
+    </div>
+  
+    <!-- Notes Section -->
+    <p class="section-title">Notes</p>
+    <div class="notes-box">
+      {{ treatmentPlan.notes || 'No additional notes' }}
+    </div>
+  
+    <hr />
+  
+    <!-- Footer -->
+    <p class="generated-on">Generated On: {{ generatedDate }}</p>
+    <p class="powered-by">Powered by iDental</p>
+  </div>

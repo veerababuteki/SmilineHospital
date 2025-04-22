@@ -64,6 +64,15 @@ export class UserService {
     return this.http.get<any>(`${this.baseUrl}/admin/group/getAllMedicalHistory`, { headers});
   }
 
+  getBranches(){
+    const token = this.authService.getAccessToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get<any>(`${this.baseUrl}/admin/role/branches`, { headers});
+  }
+
   getInsuranceGroups(){
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({

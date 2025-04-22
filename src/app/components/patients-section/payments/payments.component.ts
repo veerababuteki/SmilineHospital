@@ -12,7 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   ]
 })
 export class PaymentsComponent implements OnInit {
-    payments: any[] = [];
+    payments:Record<string, any[]> = {};
   patientId: string | null | undefined;
 
     ngOnInit(): void {
@@ -31,20 +31,33 @@ export class PaymentsComponent implements OnInit {
     }
     loadPatientData(patientId: string){
       this.treatmentPlansService.getPayments(Number(patientId)).subscribe(res=>{
-        this.payments = res.data;
+        this.payments = this.groupByDate(res.data);
       })
     }
     groupByDate(rows: any[]) {
-    return rows.reduce((acc, row) => {
-      const dateKey = row.date;
-      if (!acc[dateKey]) {
-        acc[dateKey] = [];
-      }
-      
-      acc[dateKey].push(row);
-      return acc;
-    }, {} as Record<string, any[]>);
-  }
+      const grouped = rows.reduce((acc, row) => {
+        const dateKey = row.created_at;
+        if (!acc[dateKey]) {
+          acc[dateKey] = [];
+        }
+        acc[dateKey].push(row);
+        return acc;
+      }, {} as Record<string, any[]>);
+  
+      return Object.fromEntries(
+        Object.entries(grouped).sort(([dateA], [dateB]) => {
+          const timestampA = new Date(dateA).getTime();
+          const timestampB = new Date(dateB).getTime();
+          return timestampB - timestampA;
+        })
+      ) as Record<string, any[]>;
+    }
+    
+    getSortedDates(): string[] {
+      return Object.keys(this.payments).sort((a, b) => 
+        new Date(b).getTime() - new Date(a).getTime()
+      );
+    }
     constructor(private treatmentPlansService: TreatmentPlansService, private route: ActivatedRoute, private router: Router){
 
     }

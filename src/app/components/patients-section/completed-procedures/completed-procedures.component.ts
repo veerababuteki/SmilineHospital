@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TreatmentPlansService } from '../../../services/treatment-plans.service';
 import { FormsModule } from '@angular/forms';
@@ -269,5 +269,158 @@ export class CompletedProceduresComponent implements OnInit {
 
     getData():any[]{
       return [];
+    }
+    
+    printCompletedProcedures() {
+      // Save the current body content
+      const originalContent = document.body.innerHTML;
+      
+      // Get only the completed procedures container
+      const completedProceduresElement = document.getElementById('completed-procedures-container');
+      
+      if (!completedProceduresElement) {
+        console.error('Completed procedures container not found');
+        return;
+      }
+      
+      // Get patient information from the first treatment plan
+      let patientName = 'Patient Name';
+      let patientId = 'Patient ID';
+      
+      // Find first available treatment plan with patient data
+      const dates = this.getSortedDates();
+      if (dates.length > 0) {
+        const firstDate = dates[0];
+        const plans = this.treatmentPlans[firstDate];
+        if (plans && plans.length > 0) {
+          const firstPlan = plans[0];
+          if (firstPlan.patient_details_treat) {
+            const patientDetails = firstPlan.patient_details_treat;
+            
+            // Get patient name
+            if (patientDetails.user_profile_details && patientDetails.user_profile_details.length > 0) {
+              const profile = patientDetails.user_profile_details[0];
+              patientName = `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+            }
+            
+            // Get patient ID/code
+            patientId = patientDetails.unique_code || patientId;
+          }
+        }
+      }
+      
+      // Create a styled version for printing
+      const printContent = `
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+          }
+          .print-header {
+            text-align: center;
+            margin-bottom: 20px;
+          }
+          .print-header h1 {
+            margin: 0;
+            font-size: 24px;
+          }
+          .print-header p {
+            margin: 5px 0;
+            font-size: 14px;
+          }
+          .patient-info {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+          }
+          .treatment-date {
+            font-weight: bold;
+            margin: 15px 0 10px;
+            font-size: 16px;
+            background: #f5f5f5;
+            padding: 5px;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+          }
+          th {
+            background-color: #f5f5f5;
+          }
+          .estimated-amount {
+            text-align: right;
+            font-weight: bold;
+            margin-bottom: 20px;
+          }
+          .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #777;
+          }
+          /* Hide print buttons and checkboxes */
+          .actions-col, .hide-on-print, 
+          {
+            display: none !important;
+          }
+        </style>
+        <body>
+        <div class="print-header">
+          <h1>Smiline Dental Hospitals</h1>
+          <p>#8-3-952/10/2&2/1, Smiline House, Srinagar Colony, Panjagutta, Hyderabad-500073</p>
+          <p>Phone: 040 4200 0024</p>
+        </div>
+        <div class="patient-info">
+          <p><strong>Patient:</strong> ${patientName}</p>
+          <p><strong>ID:</strong> ${patientId}</p>
+          <p><strong>Generated Date:</strong> ${new Date().toLocaleDateString()}</p>
+        </div>
+        <h2>COMPLETED PROCEDURES</h2>
+        ${completedProceduresElement.innerHTML}
+        <div class="footer">
+          <p>Generated on: ${new Date().toLocaleString()}</p>
+          <p>Powered by iDental</p>
+        </div>
+        <script>
+        window.onload = function() {
+          window.print();
+        }
+      </script>
+        </body>
+      `;
+      
+      // Replace the body content with our print content
+      document.body.innerHTML = printContent;
+      
+      // Trigger the print dialog
+      window.print();
+      
+      // Restore the original content after printing
+      setTimeout(() => {
+        document.body.innerHTML = originalContent;
+        // Need to reinitialize component to restore functionality
+        this.ngOnInit();
+      }, 500);
+    }
+    
+    // Add a keyboard listener for Ctrl+P
+    @HostListener('document:keydown', ['$event'])
+    handleKeyboardEvent(event: KeyboardEvent) {
+      // Check if Ctrl+P was pressed
+      if (event.ctrlKey && event.key === 'p') {
+        // Prevent default browser print
+        event.preventDefault();
+        
+        // Make sure we have data before trying to print
+        if (Object.keys(this.treatmentPlans).length > 0) {
+          this.printCompletedProcedures();
+        }
+      }
     }
 }

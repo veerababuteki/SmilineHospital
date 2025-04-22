@@ -223,3 +223,24 @@ tbody{
     cursor: pointer;
     font-size: 13px;
 }
+@media print {
+    .hide-on-print,
+    .actions,
+    .procedure-checkbox,
+    .edit-btn,
+    p-menu,
+    button,
+    .action-menu {
+      display: none !important;
+    }
+    
+    /* Add other print-specific styles as needed */
+    table {
+      width: 100%;
+    }
+    
+    /* Make sure the table still looks good when columns are hidden */
+    .procedures-table {
+      page-break-inside: avoid;
+    }
+  }

@@ -2,15 +2,16 @@
     <div class="appointments-header">
         <h2>TREATMENT PLANS</h2>
         <div>
-            <button class="mark-btn" *ngIf="generateInvoiceList.length == 0">Invoice selected Procedure</button>
-            <button class="mark-btn-active" *ngIf="generateInvoiceList.length > 0" (click)="generateInvoice()">Invoice
-                selected Procedure</button>
+            <!-- <button class="mark-btn" *ngIf="generateInvoiceList.length == 0">Invoice selected Procedure</button> -->
+            <!-- <button class="mark-btn-active" *ngIf="generateInvoiceList.length > 0" (click)="generateInvoice()">Invoice
+                selected Procedure</button> -->
             <button [class.mark-btn]="markCompleteList.length == 0"
                 [class.mark-btn-active]="markCompleteList.length > 0" (click)="markAsComplete()">Mark As
                 Complete</button>
             <button class="add-treatment-btn" (click)="navigateToAddPage()">+ Add</button>
         </div>
     </div>
+    <div id="treatment-plans-container">
     <ng-container *ngIf="getSortedDates().length > 0">
         <div *ngFor="let date of getSortedDates()">
             <div class="appointment-date">{{ date | date: 'dd MMM, yyyy'}}</div>
@@ -27,7 +28,7 @@
                             <th class="discount-col">DISCOUNT</th>
                             <th class="total-col">TOTAL</th>
                             <th class="notes-col">NOTES</th>
-                            <th class="actions-col"></th>
+                            <th class="actions-col hide-on-print"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -47,19 +48,17 @@
                                 <div>Teeth: <span class="teeth-number">{{treatment.teeth_set}}</span></div>
                                 <div>{{treatment.notes}}</div>
                             </td>
-                            <td class="actions">
-                                <button class="edit-btn border-left-radius">
-                                    <i class="pi pi-print"></i>
-                                </button>
+                            <td class="actions hide-on-print">
+                                <app-treatment-plans-print [treatmentPlan]="treatment"></app-treatment-plans-print>
                                 <button 
-                              #menuButton
-                              type="button" 
-                              pButton 
-                              icon="pi pi-chevron-down" 
-                              class="edit-btn border-right-radius p-button-text"
-                              (click)="invoiceMenu.toggle($event); setCurrentTreatmentPlan(treatmentPlans[date],treatmentkey.value)">
-                            </button>
-                            <p-menu #invoiceMenu [popup]="true" [model]="items"></p-menu>
+                                  #menuButton
+                                  type="button" 
+                                  pButton 
+                                  icon="pi pi-chevron-down" 
+                                  class="edit-btn border-right-radius p-button-text"
+                                  (click)="invoiceMenu.toggle($event); setCurrentTreatmentPlan(treatmentPlans[date],treatmentkey.value)">
+                                </button>
+                                <p-menu #invoiceMenu [popup]="true" [model]="items"></p-menu>
                             </td>
                         </tr>
                     </tbody>
@@ -74,7 +73,7 @@
                     </div>
                     <div class="estimated-amount">
                         Estimated amount: <span
-                            class="amount">{{filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)[0]?.grand_total}}</span>
+                            class="amount">{{getTotalCost(treatmentPlans[date])}}</span>
                     </div>
                 </div>
             </div>
@@ -84,7 +83,7 @@
 
         </div>
     </ng-container>
-
+    </div>
     <div class="no-treatment-plan-container" *ngIf="getSortedDates().length <= 0">
         <img class="icon" src="assets/no-treatment-plans.png" />
         <h3>No Treatment plans added</h3>

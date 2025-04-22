@@ -8,9 +8,10 @@
         </div>
     </div>
     <div>
-    <!-- <div class="appointment-date">{{ payment.key | date: 'dd MMM, yyyy'}}</div> -->
+    <div *ngFor="let date of getSortedDates()">
+    <div class="appointment-date">{{ date | date: 'dd MMM, yyyy'}}</div>
 
-    <div class="treatment-plan" *ngFor="let payment of payments">
+    <div class="treatment-plan" *ngFor="let payment of payments[date]">
         <table class="completed-procedures">
             <thead>
                 <tr>
@@ -44,6 +45,7 @@
                 </tr> -->
             </tbody>
         </table>
+    </div>
     </div>
 </div>
 </div>

@@ -217,3 +217,18 @@ tbody{
     font-size: 13px;
 }
 /* treatment-plan.component.scss */
+@media print {
+    .hide-on-print {
+      display: none !important;
+    }
+    
+    /* Add other print-specific styles as needed */
+    table {
+      width: 100%;
+    }
+    
+    /* Make sure the table still looks good when columns are hidden */
+    .procedures-table {
+      page-break-inside: avoid;
+    }
+  }

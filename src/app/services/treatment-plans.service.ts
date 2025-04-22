@@ -212,6 +212,39 @@ export class TreatmentPlansService {
         catchError(this.handleError)
       );
   }
+  getPatientAdvance(patientId: number) {
+    const token = this.authService.getAccessToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get<any>(`${this.baseUrl}/auth/payment/fetchPatientAdvacnce/${patientId}`, {headers}).pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  savePayment(paymentData: any){
+    const token = this.authService.getAccessToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.post<any>(`${this.baseUrl}/auth/payment/savePaymentByInvoice`, {
+      "patient_id": paymentData.patient_id,
+      "payment_method": paymentData.payment_method,
+      "cheque_number": paymentData.cheque_number,
+      "bank_account_no": paymentData.bank_account_no,
+      "record_type": paymentData.record_type,
+      "bank_name": paymentData.bank_name,
+      "card_digits": paymentData.card_digits,
+      "amount_paid": paymentData.amount_paid,
+      "notes": paymentData.notes,
+      "use_advance_amount": paymentData.use_advance_amount,
+      "invoices_data": paymentData.invoices_data
+    }, {headers}).pipe(
+        catchError(this.handleError)
+      );
+  }
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error.message || 'Server error');

@@ -8,6 +8,7 @@
             <button class="add-btn" (click)="navigateToAddPage()">+ Add</button>
         </div>
     </div>
+    <div id="completed-procedures-container">
     <div *ngFor="let dateTreatment of formattedData">
 
     <div class="appointment-date">{{ dateTreatment.date | date: 'dd MMM, yyyy'}}</div>
@@ -24,7 +25,7 @@
                     <th class="discount-col">DISCOUNT</th>
                     <th class="total-col">TOTAL</th>
                     <th class="notes-col">NOTES</th>
-                    <th class="actions-col"></th>
+                    <th class="actions-col hide-on-print"></th>
                 </tr>
             </thead>
             <tbody>
@@ -37,8 +38,10 @@
                     <td class="amount">{{treatment.quantity}}</td>
                     <td class="discount">{{treatment.discount+" "+treatment.discount_formate}}</td>
                     <td class="amount">{{treatment.total_cost | number }}</td>
-                    <td><div>Teeth: <span class="teeth-number">{{treatment.teeth_set}}</span></div>
-                    <div>{{treatment.notes}}</div></td>
+                    <td>
+                        <div>Teeth: <span class="teeth-number">{{treatment.teeth_set}}</span></div>
+                        <div>{{treatment.notes}}</div>
+                    </td>
                     <td class="actions">
                         <!-- <button class="edit-btn border-left-radius">
                             <i class="pi pi-print"></i>
@@ -69,6 +72,7 @@
         </div>
         </div>
        
+    </div>
     </div>
     </div>
     <div class="no-completed-procedure-container" *ngIf="getSortedDates().length <= 0">

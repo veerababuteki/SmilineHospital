@@ -106,15 +106,18 @@ export class InvoiceComponent implements OnInit {
         this.invoices = this.groupByDate( res.data.rows)
       })
     }
+
     getTotalCost(invoiceGroup: unknown): number {
       if (!Array.isArray(invoiceGroup)) {
         return 0; // Return 0 if the value is not an array
       }
       return invoiceGroup.reduce((acc, invoice) => acc + Number(invoice.treatment_plans.total_cost || 0), 0);
     }
+
     getInvoiceGroupValues(invoiceGroup: any): any[] {
       return Array.isArray(invoiceGroup.value) ? invoiceGroup.value : [];
     }
+
     onCheckboxChange(invoice: any, invoice_id: any){
       if(invoice[0].isChecked){
         this.selectedInvoiceList.push({invoice_id, amount_paid: this.getTotalCost(invoice)})
@@ -151,21 +154,31 @@ export class InvoiceComponent implements OnInit {
     }
 
     makePayment(){
-      this.selectedInvoiceList.forEach(invoice => {
-        this.treatmentPlansService.makePayment({invoice_id: invoice.invoice_id, amount_paid: invoice.amount_paid, payment_mode: 'Cash'}).subscribe(res => {
-          if(this.patientId !== null && this.patientId !== undefined){
-            this.fetchInvoices(this.patientId)
-          }
-          this.selectedInvoiceList = this.selectedInvoiceList.filter(item => 
-            item.invoice_id !== invoice.invoice_id
-          );
-        });
-      })
+      this.router.navigate(['patients', this.patientId, 'add-payment'], 
+        {
+          state: {
+            procedures: this.selectedInvoiceList.map(event => ({
+              invoice_id: event.invoice_id,
+            }))
+          }}
+      );
+      // this.selectedInvoiceList.forEach(invoice => {
+      //   this.treatmentPlansService.makePayment({invoice_id: invoice.invoice_id, amount_paid: invoice.amount_paid, payment_mode: 'Cash'}).subscribe(res => {
+      //     if(this.patientId !== null && this.patientId !== undefined){
+      //       this.fetchInvoices(this.patientId)
+      //     }
+      //     this.selectedInvoiceList = this.selectedInvoiceList.filter(item => 
+      //       item.invoice_id !== invoice.invoice_id
+      //     );
+      //   });
+      // })
       
     }
+
     navigateToAddPage(){
       this.router.navigate(['patients', this.patientId, 'add-invoice']);
     }
+
     getSortedDates(): string[] {
       return Object.keys(this.invoices).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
     }
