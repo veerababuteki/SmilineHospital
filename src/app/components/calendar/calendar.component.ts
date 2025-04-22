@@ -569,12 +569,12 @@ export class CalendarComponent implements OnInit {
     var dAppointments: any[] = appointments.data.rows;
     this.appointments = appointments.data.rows;
     if (this.isDoctor) {
-      dAppointments = dAppointments.filter(a => a.doctor_details.doctor_id === this.currentUser.user_id)
+      dAppointments = dAppointments.filter(a => a.doctor_details && a.doctor_details.doctor_id === this.currentUser.user_id)
     } else if (!this.isAdmin && !this.isDoctor) {
       dAppointments = dAppointments.filter(a => a.patient_details.patient_id === this.currentUser.user_id)
     }
     if (this.selectedDoctor !== null) {
-      dAppointments = dAppointments.filter(a => a.doctor_details.doctor_id === this.selectedDoctor)
+      dAppointments = dAppointments.filter(a => a.doctor_details && a.doctor_details.doctor_id === this.currentUser.user_id)
     }
 
     dAppointments.forEach((a: any) => {
