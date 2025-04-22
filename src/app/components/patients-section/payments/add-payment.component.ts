@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { TreatmentPlansService } from '../../../services/treatment-plans.service';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-add-payment',
@@ -52,10 +53,11 @@ export class AddPaymentComponent implements OnInit {
   availableAdvance: number = 0;
   invoices: any[] = [];
   proceduresToProcess: any[] = [];
+  uniqueCode: string | null | undefined;
 
   constructor(
     private treatmentPlansService: TreatmentPlansService,
-    private route: ActivatedRoute,
+    private route: ActivatedRoute, private messageService:MessageService,
     private router: Router,
   ) { 
     this.router.events.pipe(
@@ -75,6 +77,14 @@ export class AddPaymentComponent implements OnInit {
       if(this.patientId == null) {
         this.patientId = params.get('id');
         this.loadPatientData();
+      }
+    });
+    this.route.paramMap.subscribe(params => {
+      if(this.uniqueCode == null) {
+        this.uniqueCode = params.get('source');
+      }
+      if(this.uniqueCode !== null){
+        this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
       }
     });
   }
@@ -834,15 +844,15 @@ export class AddPaymentComponent implements OnInit {
     }
     
     this.treatmentPlansService.savePayment(paymentData).subscribe(res => {
-      this.router.navigate(['patients', this.patientId, 'payments'])
+      this.router.navigate(['patients', this.patientId, 'payments', this.uniqueCode])
     });
   }
   
   navigateToPayment(){
-    this.router.navigate(['patients', this.patientId, 'payments'])
+    this.router.navigate(['patients', this.patientId, 'payments', this.uniqueCode])
   }
   
   navigateToAddInvoice(){
-    this.router.navigate(['patients', this.patientId, 'add-invoice']);
+    this.router.navigate(['patients', this.patientId, 'add-invoice', this.uniqueCode]);
   }
 }

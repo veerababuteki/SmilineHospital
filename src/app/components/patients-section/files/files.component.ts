@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FileService } from '../../../services/file.service';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-files',
@@ -21,7 +22,8 @@ export class FilesComponent implements OnInit {
     files: any[] = [];
     patientId: string | null | undefined;
     selectedFileIds: any[] = [];
-    uploadProgress: number = 0; // Optional: to track upload progress
+    uploadProgress: number = 0;
+    uniqueCode: string | null | undefined;
 
     filesDict: Record<string, any[]> = {};
     
@@ -34,9 +36,17 @@ export class FilesComponent implements OnInit {
           this.loadPatientData(this.patientId);
         }
       });  
+      this.route.paramMap.subscribe(params => {
+        if(this.uniqueCode == null) {
+          this.uniqueCode = params.get('source');
+        }
+        if(this.uniqueCode !== null){
+          this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
+        }
+      });
     }
     
-    constructor(private fileService: FileService, private route: ActivatedRoute){
+    constructor(private fileService: FileService, private route: ActivatedRoute, private messageService:MessageService,){
     }
     
     loadPatientData(patientId: string) {

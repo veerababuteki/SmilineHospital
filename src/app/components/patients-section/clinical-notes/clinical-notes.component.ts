@@ -7,6 +7,7 @@ import { ClinicalNotesPrintComponent } from "./clinical-notes-print/clinical-not
 import { MenuItem, MenuItemCommandEvent } from 'primeng/api';
 import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-clinical-notes',
@@ -21,8 +22,9 @@ export class ClinicalNotesComponent implements OnInit {
   patientId: string | null | undefined;
   items: MenuItem[] = [];
   currentClinicalNotes: any;
+  uniqueCode: string | null | undefined;
 
-  constructor(private clinicalNotesService: ClinicalNotesService, 
+  constructor(private messageService: MessageService, private clinicalNotesService: ClinicalNotesService, 
     private router: Router,
     private route: ActivatedRoute
   ){
@@ -36,6 +38,15 @@ export class ClinicalNotesComponent implements OnInit {
       }
       if (this.patientId) {
         this.loadPatientData(this.patientId);
+      }
+    });
+    this.route.paramMap.subscribe(params => {
+      if(this.uniqueCode == null) {
+        this.uniqueCode = params.get('source');
+      }
+      if (this.uniqueCode) {
+        this.messageService.sendMessage(this.patientId ? this.patientId : '', this.uniqueCode ? this.uniqueCode : '');
+
       }
     });
 
@@ -77,7 +88,7 @@ export class ClinicalNotesComponent implements OnInit {
   }
 
   navigateToAdd(){
-    this.router.navigate(['/patients', this.patientId, 'add-clinical-note'])
+    this.router.navigate(['/patients', this.patientId, 'add-clinical-note', this.uniqueCode])
   }
   formatStringToArray(value: string){
     if (typeof value !== "string") {

@@ -9,6 +9,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import { format } from 'date-fns';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-add-completed-procedures',
@@ -24,6 +25,8 @@ export class AddCompletedProceduresComponent implements OnInit {
   name: string = '';
   procedures: Procedure[] = [];
   add: boolean = false;
+  uniqueCode: string | null | undefined;
+
   doctors: any[] = [];
   doctor: any;
   date: Date = new Date()
@@ -36,7 +39,7 @@ export class AddCompletedProceduresComponent implements OnInit {
   isEditMode: boolean = false;
   editProcedureData: any = null;
 
-  constructor(private fb: FormBuilder, 
+  constructor(private messageService: MessageService,private fb: FormBuilder, 
     private userService: UserService,
     private treatmentPlansService: TreatmentPlansService,
     private router:Router,
@@ -54,12 +57,22 @@ export class AddCompletedProceduresComponent implements OnInit {
   }
 
   ngOnInit() {
+    
     this.route.parent?.paramMap.subscribe(params => {
       if(this.patientId == null) {
         this.patientId = params.get('id');
         this.treatmentPlansService.getTreatmentPlans(Number(this.patientId)).subscribe(res => {
             this.plannedTreatmentPlans = res.data.rows.filter((p: any) => p.status.toLowerCase() == 'none');
         });
+      }
+    });
+    this.route.paramMap.subscribe(params => {
+      if(this.uniqueCode == null) {
+        this.uniqueCode = params.get('source');
+        if (this.uniqueCode) {
+          this.messageService.sendMessage(this.patientId ? this.patientId : '', this.uniqueCode ? this.uniqueCode : '');
+  
+        }
       }
     });
     this.getProcedures();
@@ -430,12 +443,12 @@ export class AddCompletedProceduresComponent implements OnInit {
       
       if(this.isEditMode){
         this.treatmentPlansService.updateCompletedProcedure(treatment).subscribe(res => {
-          this.router.navigate(['/patients', this.patientId, 'completed-procedures']);
+          this.router.navigate(['/patients', this.patientId, 'completed-procedures', this.uniqueCode]);
         }); 
       }
       else{
         this.treatmentPlansService.addCompletedProcedure(treatment).subscribe(res => {
-          this.router.navigate(['/patients', this.patientId, 'completed-procedures']);
+          this.router.navigate(['/patients', this.patientId, 'completed-procedures', this.uniqueCode]);
         }); 
       }
     }
@@ -504,7 +517,7 @@ export class AddCompletedProceduresComponent implements OnInit {
         .subscribe(invoiceRes => {
           // Only navigate if we got a successful response
           if (invoiceRes && this.patientId) {
-            this.router.navigate(['/patients', this.patientId, 'invoices']);
+            this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
           }
         });
     } else {
@@ -543,6 +556,6 @@ export class AddCompletedProceduresComponent implements OnInit {
   }
 
   cancel(){
-    this.router.navigate(['/patients', this.patientId, 'completed-procedures']);
+    this.router.navigate(['/patients', this.patientId, 'completed-procedures', this.uniqueCode]);
   }
 }

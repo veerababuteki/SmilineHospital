@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TreatmentPlansService } from '../../../services/treatment-plans.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-payments',
@@ -14,7 +15,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class PaymentsComponent implements OnInit {
     payments:Record<string, any[]> = {};
   patientId: string | null | undefined;
+  uniqueCode: string | null | undefined;
+  constructor(private treatmentPlansService: TreatmentPlansService, private messageService:MessageService, private route: ActivatedRoute, private router: Router){
 
+  }
     ngOnInit(): void {
       this.route.parent?.paramMap.subscribe(params => {
         if(this.patientId == null) {
@@ -24,16 +28,27 @@ export class PaymentsComponent implements OnInit {
           this.loadPatientData(this.patientId);
         }
       });
+      this.route.paramMap.subscribe(params => {
+        if(this.uniqueCode == null) {
+          this.uniqueCode = params.get('source');
+        }
+        if(this.uniqueCode !== null){
+          this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
+        }
+      });
       
     }
+
     navigateToAddPayment(){
-      this.router.navigate(['/patients', this.patientId, 'add-payment'])
+      this.router.navigate(['/patients', this.patientId, 'add-payment', this.uniqueCode])
     }
+
     loadPatientData(patientId: string){
       this.treatmentPlansService.getPayments(Number(patientId)).subscribe(res=>{
         this.payments = this.groupByDate(res.data);
       })
     }
+
     groupByDate(rows: any[]) {
       const grouped = rows.reduce((acc, row) => {
         const dateKey = row.created_at;
@@ -58,7 +73,5 @@ export class PaymentsComponent implements OnInit {
         new Date(b).getTime() - new Date(a).getTime()
       );
     }
-    constructor(private treatmentPlansService: TreatmentPlansService, private route: ActivatedRoute, private router: Router){
-
-    }
+   
 }

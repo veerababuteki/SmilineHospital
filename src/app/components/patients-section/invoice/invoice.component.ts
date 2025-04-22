@@ -7,6 +7,7 @@ import { InvoicePrintComponent } from './invoice-print/invoice-print.component';
 import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-invoice',
@@ -25,8 +26,11 @@ export class InvoiceComponent implements OnInit {
   patientId: string | null | undefined;
   items: MenuItem[] = [];
   currentInvoiceKey: any;
+  uniqueCode: string | null | undefined;
   
-  constructor(private treatmentPlansService: TreatmentPlansService, private router: Router, private route: ActivatedRoute){}
+  constructor(private treatmentPlansService: TreatmentPlansService, 
+              private messageService: MessageService,
+    private router: Router, private route: ActivatedRoute){}
 
     ngOnInit(): void {
       this.items = [
@@ -49,13 +53,21 @@ export class InvoiceComponent implements OnInit {
           this.fetchInvoices(this.patientId);
         }
       });
+      this.route.paramMap.subscribe(params => {
+        if(this.uniqueCode == null) {
+          this.uniqueCode = params.get('source');
+        }
+        if(this.uniqueCode !== null){
+          this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
+        }
+      });
     }
 
     editInvoice(invoiceKey: any): void {
       // Find the invoice data and pass it to the add-invoice component
       const invoiceData = this.findInvoiceByKey(invoiceKey);
       
-      this.router.navigate(['patients', this.patientId, 'add-invoice'], {
+      this.router.navigate(['patients', this.patientId, 'add-invoice', this.uniqueCode], {
         state: { mode: 'edit', invoiceData: invoiceData, invoiceKey: invoiceKey }
       });
     }
@@ -154,7 +166,7 @@ export class InvoiceComponent implements OnInit {
     }
 
     makePayment(){
-      this.router.navigate(['patients', this.patientId, 'add-payment'], 
+      this.router.navigate(['patients', this.patientId, 'add-payment', this.uniqueCode], 
         {
           state: {
             procedures: this.selectedInvoiceList.map(event => ({
@@ -176,7 +188,7 @@ export class InvoiceComponent implements OnInit {
     }
 
     navigateToAddPage(){
-      this.router.navigate(['patients', this.patientId, 'add-invoice']);
+      this.router.navigate(['patients', this.patientId, 'add-invoice', this.uniqueCode]);
     }
 
     getSortedDates(): string[] {

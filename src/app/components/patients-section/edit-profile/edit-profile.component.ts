@@ -44,6 +44,8 @@ export class EditProfileComponent implements OnInit {
   addGroup: boolean = false;
   addMedicalHistoryText: string = '';
   addNewGroupText: string = '';
+  patientId: string | null | undefined;
+
   ngOnInit(): void {
     
     this.initiateForm()
@@ -60,12 +62,19 @@ export class EditProfileComponent implements OnInit {
       }
     });
   }
+  this.route.parent?.paramMap.subscribe(params => {
+    if(this.patientId == null) {
+      this.patientId = params.get('id');
+    }
+    
+  });  
     this.route.paramMap.subscribe(params => {
       if(this.uniqueCode == null) {
         this.uniqueCode = params.get('source');
       }
       if(this.uniqueCode){
         this.loadPatientData(this.uniqueCode)
+        this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
       }
       
     });
@@ -263,7 +272,7 @@ export class EditProfileComponent implements OnInit {
         groups_list: selectedGroups,
         other_history: historyDetails.otherHistory,
       }).subscribe(res=>{
-        this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode])
+        this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode, this.uniqueCode])
       })
     }
   }

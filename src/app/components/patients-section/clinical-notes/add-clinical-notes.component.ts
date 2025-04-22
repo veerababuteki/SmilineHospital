@@ -7,6 +7,7 @@ import { UserService } from '../../../services/user.service';
 import { ClinicalNotesService } from '../../../services/clinical-notes.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import { MessageService } from '../../../services/message.service';
 
 interface Category {
   name: string;
@@ -70,8 +71,9 @@ export class AddClinicalNotesComponent implements OnInit {
   masterDataFetched: boolean = false;
   isEditMode: boolean = false;
   editNoteData: any = null;
+  uniqueCode: string | null | undefined;
   
-  constructor(private userService: UserService, 
+  constructor(private messageService: MessageService, private userService: UserService, 
     private router: Router,
     private clinicalNotesService: ClinicalNotesService,
     private route: ActivatedRoute
@@ -90,6 +92,15 @@ export class AddClinicalNotesComponent implements OnInit {
     this.route.parent?.paramMap.subscribe(params => {
       if(this.patientId == null) {
         this.patientId = params.get('id');
+      }
+    });
+    this.route.paramMap.subscribe(params => {
+      if(this.uniqueCode == null) {
+        this.uniqueCode = params.get('source');
+      }
+      if (this.uniqueCode) {
+        this.messageService.sendMessage(this.patientId ? this.patientId : '', this.uniqueCode ? this.uniqueCode : '');
+
       }
     });
     this.initializeCategories();
@@ -505,6 +516,6 @@ export class AddClinicalNotesComponent implements OnInit {
   }
 
   cancel() {
-    this.router.navigate(['/patients', this.patientId, 'clinical-notes']);
+    this.router.navigate(['/patients', this.patientId, 'clinical-notes', this.uniqueCode]);
   }
 }

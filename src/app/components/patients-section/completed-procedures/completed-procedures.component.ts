@@ -6,6 +6,7 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-completed-procedures',
@@ -21,6 +22,7 @@ export class CompletedProceduresComponent implements OnInit {
     cost: number = 0;
     name: string = '';
     add: boolean = false;
+    uniqueCode: string | null | undefined;
     doctors: any[] = [];
     doctor: any;
     date: Date = new Date()
@@ -32,7 +34,9 @@ export class CompletedProceduresComponent implements OnInit {
     items: MenuItem[] = [];
     currentProcedure: any;
   currentTreatmentPlan: any;
-    constructor(private treatmentPlanService: TreatmentPlansService, private route: ActivatedRoute, private router: Router){
+    constructor(private treatmentPlanService: TreatmentPlansService, 
+          private messageService: MessageService,
+      private route: ActivatedRoute, private router: Router){
       
     }
     ngOnInit() {
@@ -48,6 +52,11 @@ export class CompletedProceduresComponent implements OnInit {
           command: (event) => this.updateTreatmentPlans(event)
         }
       ];
+      this.route.paramMap.subscribe(params => {
+        if(this.uniqueCode == null) {
+          this.uniqueCode = params.get('source');
+        }
+      });
       this.route.parent?.paramMap.subscribe(params => {
         if(this.patientId == null) {
           this.patientId = params.get('id');
@@ -59,7 +68,7 @@ export class CompletedProceduresComponent implements OnInit {
     }
 
     updateTreatmentPlans(treatmentPlan: any): void {
-      this.router.navigate(['patients', this.patientId, 'add-completed-procedures'], {
+      this.router.navigate(['patients', this.patientId, 'add-completed-procedures', this.uniqueCode], {
         state: { mode: 'edit', procedureData: treatmentPlan }
       });
     }
@@ -69,7 +78,7 @@ export class CompletedProceduresComponent implements OnInit {
       const id = event.id;
       const treatment_unique_id = event.treatment_unique_id;
       this.generateInvoiceList.push({ id, treatment_unique_id })
-      this.router.navigate(['patients', this.patientId, 'add-invoice'], 
+      this.router.navigate(['patients', this.patientId, 'add-invoice', this.uniqueCode], 
         {
           state: {
             procedures: this.generateInvoiceList.map(event => ({
@@ -98,13 +107,14 @@ export class CompletedProceduresComponent implements OnInit {
     }
 
   loadPatientData(patientId: string) {
+    this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
     this.treatmentPlanService.getCompletedTreatmentPlans(Number(patientId)).subscribe(res => {
       this.treatmentPlans = this.groupByDate(res.data.rows);
       this.formattedData = this.getFormattedData();
     });
   }
   navigateToAddPage(){
-    this.router.navigate(['patients', this.patientId, 'add-completed-procedures']);
+    this.router.navigate(['patients', this.patientId, 'add-completed-procedures', this.uniqueCode]);
   }
 
     onCheckboxChange(treatment: any, id: number, treatment_unique_id: string){
@@ -190,7 +200,7 @@ export class CompletedProceduresComponent implements OnInit {
       //     this.loadPatientData(this.patientId)
       //   }
       // })
-      this.router.navigate(['patients', this.patientId, 'add-invoice'], 
+      this.router.navigate(['patients', this.patientId, 'add-invoice', this.uniqueCode], 
         {
           state: {
             procedures: this.generateInvoiceList.map(event => ({

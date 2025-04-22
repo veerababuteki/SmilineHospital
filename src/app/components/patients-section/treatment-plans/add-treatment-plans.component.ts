@@ -8,6 +8,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { format } from 'date-fns';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-add-treatment-plans',
@@ -33,9 +34,11 @@ export class AddTreatmentPlansComponent implements OnInit {
   childTeeth = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
   isEditMode: boolean = false;
   editTreatmentData: any = null;
+  uniqueCode: string | null | undefined;
 
   constructor(private fb: FormBuilder, 
-    private userService: UserService,
+    private userService: UserService,    private messageService: MessageService,
+    
     private treatmentPlansService: TreatmentPlansService,
     private router:Router,
     private route: ActivatedRoute
@@ -55,7 +58,14 @@ export class AddTreatmentPlansComponent implements OnInit {
     this.route.parent?.paramMap.subscribe(params => {
       if(this.patientId == null) {
         this.patientId = params.get('id');
-        
+      }
+    });
+    this.route.paramMap.subscribe(params => {
+      if(this.uniqueCode == null) {
+        this.uniqueCode = params.get('source');
+        if (this.uniqueCode) {
+          this.messageService.sendMessage(this.patientId ? this.patientId : '', this.uniqueCode ? this.uniqueCode : '');
+        }
       }
     });
     this.getProcedures();
@@ -380,7 +390,7 @@ export class AddTreatmentPlansComponent implements OnInit {
           procedures_list: procedureLists
         }).subscribe({
           next: (res) => {
-            this.router.navigate(['/patients', this.patientId, 'treatment-plans']);
+            this.router.navigate(['/patients', this.patientId, 'treatment-plans', this.uniqueCode]);
           },
           error: (err) => {
             console.error('Error updating treatment plan:', err);
@@ -416,7 +426,7 @@ export class AddTreatmentPlansComponent implements OnInit {
         
         this.treatmentPlansService.addTreatmentPlan(treatment).subscribe({
           next: (res) => {
-            this.router.navigate(['/patients', this.patientId, 'treatment-plans']);
+            this.router.navigate(['/patients', this.patientId, 'treatment-plans', this.uniqueCode]);
           },
           error: (err) => {
             console.error('Error adding treatment plan:', err);
@@ -452,6 +462,6 @@ export class AddTreatmentPlansComponent implements OnInit {
     return totalCost - totalDiscount;
   }
   cancel(){
-    this.router.navigate(['/patients', this.patientId, 'treatment-plans']);
+    this.router.navigate(['/patients', this.patientId, 'treatment-plans', this.uniqueCode]);
   }
 }

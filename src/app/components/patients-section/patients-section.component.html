@@ -59,23 +59,23 @@
                 <i class="pi pi-chevron-down" [ngClass]="{'display-none': isNavCollapsed}" [class.rotated]="!emrExpanded"></i>
             </div>
             <div class="section-content" [class.collapsed]="!emrExpanded">
-                <a  *ngIf="userPrivileges.includes('ClinicalNotes')" class="nav-item" [routerLink]="['/patients', patientId, 'clinical-notes']" routerLinkActive="active">
+                <a  *ngIf="userPrivileges.includes('ClinicalNotes')" class="nav-item" [routerLink]="['/patients', patientId, 'clinical-notes', uniqueCode]" routerLinkActive="active">
                     <i class="pi pi-file-edit"></i>
                     <span>Clinical Notes</span>
                 </a>
-                <a  *ngIf="userPrivileges.includes('TreatmentPlans')" class="nav-item" [routerLink]="['/patients', patientId, 'treatment-plans']" routerLinkActive="active">
+                <a  *ngIf="userPrivileges.includes('TreatmentPlans')" class="nav-item" [routerLink]="['/patients', patientId, 'treatment-plans', uniqueCode]" routerLinkActive="active">
                     <i class="pi pi-list"></i>
                     <span>Treatment Plans</span>
                 </a>
-                <a *ngIf="userPrivileges.includes('CompletedProcedures')" class="nav-item" [routerLink]="['/patients', patientId, 'completed-procedures']" routerLinkActive="active">
+                <a *ngIf="userPrivileges.includes('CompletedProcedures')" class="nav-item" [routerLink]="['/patients', patientId, 'completed-procedures', uniqueCode]" routerLinkActive="active">
                     <i class="pi pi-check-circle"></i>
                     <span>Completed Procedures</span>
                 </a>
-                <a *ngIf="userPrivileges.includes('Files')" class="nav-item" [routerLink]="['/patients', patientId, 'files']"routerLinkActive="active">
+                <a *ngIf="userPrivileges.includes('Files')" class="nav-item" [routerLink]="['/patients', patientId, 'files', uniqueCode]"routerLinkActive="active">
                     <i class="pi pi-folder"></i>
                     <span>Files</span>
                 </a>
-                <a *ngIf="userPrivileges.includes('Timeline')" class="nav-item" [routerLink]="['/patients', patientId, 'timeline']" routerLinkActive="active">
+                <a *ngIf="userPrivileges.includes('Timeline')" class="nav-item" [routerLink]="['/patients', patientId, 'timeline', uniqueCode]" routerLinkActive="active">
                     <i class="pi pi-clock"></i>
                     <span>Timeline</span>
                 </a>
@@ -89,12 +89,12 @@
                 <i class="pi pi-chevron-down" [ngClass]="{'display-none': isNavCollapsed}" [class.rotated]="!billingExpanded"></i>
             </div>
             <div class="section-content" [class.collapsed]="!billingExpanded">
-                <a class="nav-item" *ngIf="userPrivileges.includes('Invoices')" [routerLink]="['/patients', patientId, 'invoices']" routerLinkActive="active">
+                <a class="nav-item" *ngIf="userPrivileges.includes('Invoices')" [routerLink]="['/patients', patientId, 'invoices', uniqueCode]" routerLinkActive="active">
                     <i class="pi pi-dollar"></i>
                     <span>Invoices</span>
                     <!-- <span class="count">1</span> -->
                 </a>
-                <a class="nav-item" *ngIf="userPrivileges.includes('Payments')" [routerLink]="['/patients', patientId, 'payments']" routerLinkActive="active">
+                <a class="nav-item" *ngIf="userPrivileges.includes('Payments')" [routerLink]="['/patients', patientId, 'payments', uniqueCode]" routerLinkActive="active">
                     <i class="pi pi-money-bill"></i>
                     <span>Payments</span>
                     <!-- <span class="count">1</span> -->

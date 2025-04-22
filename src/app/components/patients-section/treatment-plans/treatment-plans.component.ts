@@ -11,6 +11,7 @@ import { MenuItem, MenuItemCommandEvent } from 'primeng/api';
 import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import { TreatmentPlansPrintComponent } from './treatment-plans-print/treatment-plans-print.component';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-treatment-plans',
@@ -34,8 +35,10 @@ export class TreatmentPlansComponent implements OnInit {
   patientId: string | null | undefined;
   generateInvoiceList: any[] = [];
   currentTreatmentPlan: any;
+  uniqueCode: string | null | undefined;
 
   constructor(private fb: FormBuilder,
+    private messageService: MessageService,
     private treatmentPlansService: TreatmentPlansService,
     private router: Router,
     private route: ActivatedRoute
@@ -54,7 +57,14 @@ export class TreatmentPlansComponent implements OnInit {
         this.loadPatientData(this.patientId);
       }
     });
-
+    this.route.paramMap.subscribe(params => {
+      if(this.uniqueCode == null) {
+        this.uniqueCode = params.get('source');
+        if (this.uniqueCode) {
+          this.messageService.sendMessage(this.patientId ? this.patientId : '', this.uniqueCode ? this.uniqueCode : '');
+        }
+      }
+    });
     this.items = [
       {
         label: 'Edit',
@@ -65,7 +75,7 @@ export class TreatmentPlansComponent implements OnInit {
   }
 
   updateTreatmentPlans(treatmentPlan: any): void {
-    this.router.navigate(['patients', this.patientId, 'add-treatment-plan'], {
+    this.router.navigate(['patients', this.patientId, 'add-treatment-plan', this.uniqueCode], {
       state: { mode: 'edit', treatmentData: treatmentPlan }
     });
   }
@@ -166,7 +176,7 @@ export class TreatmentPlansComponent implements OnInit {
   }
 
   navigateToAddPage() {
-    this.router.navigate(['patients', this.patientId, 'add-treatment-plan']);
+    this.router.navigate(['patients', this.patientId, 'add-treatment-plan', this.uniqueCode]);
   }
 
   getSortedDates(): string[] {

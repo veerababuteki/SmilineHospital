@@ -8,6 +8,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter, forkJoin } from 'rxjs';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-add-invoice',
@@ -38,9 +39,12 @@ export class AddInvoiceComponent implements OnInit {
   isEditMode: boolean = false;
   editInvoiceData: any[] = [];
   editInvoiceKey: string | null = null;
+  uniqueCode: string | null | undefined;
 
   constructor(private fb: FormBuilder, 
-    private userService: UserService,
+    private userService: UserService,              
+    private messageService: MessageService,
+    
     private treatmentPlansService: TreatmentPlansService,
     private router:Router,
     private route: ActivatedRoute
@@ -90,6 +94,14 @@ export class AddInvoiceComponent implements OnInit {
           });
       }
       
+    });
+    this.route.paramMap.subscribe(params => {
+      if(this.uniqueCode == null) {
+        this.uniqueCode = params.get('source');
+      }
+      if(this.uniqueCode !== null){
+        this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
+      }
     });
     this.getProcedures();
     this.userService.getDoctors('bce9f008-d447-4fe2-a29e-d58d579534f0').subscribe(res => {
@@ -442,13 +454,13 @@ export class AddInvoiceComponent implements OnInit {
       if(this.isEditMode) {
         this.treatmentPlansService.updateInvoiceWithTreatmentPlan(treatment).subscribe(res => {
           console.log(res)
-          this.router.navigate(['/patients', this.patientId, 'invoices']);
+          this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
         });
       }
       else {
         this.treatmentPlansService.addInvoiceWithTreatmentPlan(treatment).subscribe(res => {
           console.log(res)
-          this.router.navigate(['/patients', this.patientId, 'invoices']);
+          this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
         });
       }
        
@@ -504,7 +516,7 @@ export class AddInvoiceComponent implements OnInit {
             next: () => {
               // Navigate only once after all payments are processed
               if (this.patientId !== null && this.patientId !== undefined) {
-                this.router.navigate(['/patients', this.patientId, 'invoices']);
+                this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
               }
             },
             error: (error) => {
@@ -515,7 +527,7 @@ export class AddInvoiceComponent implements OnInit {
         } else {
           // If no payments were needed, navigate anyway
           if (this.patientId !== null && this.patientId !== undefined) {
-            this.router.navigate(['/patients', this.patientId, 'invoices']);
+            this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
           }
         }
       });
@@ -549,6 +561,6 @@ export class AddInvoiceComponent implements OnInit {
   }
 
   cancel(){
-    this.router.navigate(['/patients', this.patientId, 'invoices']);
+    this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
   }
 }
