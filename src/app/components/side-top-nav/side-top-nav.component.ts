@@ -98,22 +98,31 @@ export class SideTopNavComponent {
   showAddPatientDialog() {
     this.displayAddPatientDialog = true;
   }
+  practices: any[] = [];
 
   getPatients() {
-    this.userService.getDoctors('2ac7787b-77d1-465b-9bc0-eee50933697f').subscribe(res => {
-      this.allPatients = res.data;
-      this.allPatients.forEach(patient => {
-        this.patients.push({
-          id: patient.unique_code,
-          userId: patient.user_id,
-          name: patient.first_name + ' ' + patient.last_name,
-          email: patient.email,
-          phone: patient.phone,
-          image: 'assets/user.webp',
-          gender: patient.gender,
-          manual_unique_code: patient.manual_unique_code
+    this.userService.getBranches().subscribe(res=>{
+      this.practices = res.data;
+      const savedPractice = localStorage.getItem('selectedPractice');
+      if (savedPractice) {
+      } else {
+        localStorage.setItem('selectedPractice', JSON.stringify(this.practices[0]));
+      }
+      this.userService.getDoctors('2ac7787b-77d1-465b-9bc0-eee50933697f').subscribe(res => {
+        this.allPatients = res.data;
+        this.allPatients.forEach(patient => {
+          this.patients.push({
+            id: patient.unique_code,
+            userId: patient.user_id,
+            name: patient.first_name + ' ' + patient.last_name,
+            email: patient.email,
+            phone: patient.phone,
+            image: 'assets/user.webp',
+            gender: patient.gender,
+            manual_unique_code: patient.manual_unique_code
+          })
+          this.filteredPatients = [...this.patients]
         })
-        this.filteredPatients = [...this.patients]
       })
     })
   }
