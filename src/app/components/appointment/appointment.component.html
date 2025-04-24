@@ -70,7 +70,8 @@
           <div class="form-row">
             <label>Doctor</label>
             <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
-                       [style]="{'width':'100%'}" [placeholder]="'Select Doctor'"></p-dropdown>
+                       [style]="{'width':'100%'}" [placeholder]="'Select Doctor'"
+                       [filter]="true" filterBy="name"></p-dropdown>
           </div>
         </div>
     
@@ -87,7 +88,8 @@
           <div class="form-row">
             <label>Category</label>
             <p-dropdown formControlName="category" [options]="categories" optionLabel="name" 
-                       placeholder="Select Category" [style]="{'width':'100%'}"></p-dropdown>
+                       placeholder="Select Category" [style]="{'width':'100%'}"
+                       [filter]="true" filterBy="name"></p-dropdown>
           </div>
         </div>
       </div>
@@ -140,7 +142,7 @@
         <label class="required-label">Doctor</label>
         <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
              [style]="{'width':'100%'}" styleClass="bordered-dropdown"
-             placeholder="All Doctors"></p-dropdown>
+             placeholder="All Doctors" [filter]="true" filterBy="name"></p-dropdown>
         </div>
       </div>
       
@@ -209,7 +211,7 @@
         <label class="required-label">Doctor</label>
         <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
              [style]="{'width':'100%'}" styleClass="bordered-dropdown"
-             placeholder="All Doctors"></p-dropdown>
+             placeholder="All Doctors" [filter]="true" filterBy="name"></p-dropdown>
         </div>
       </div>
       

@@ -65,15 +65,18 @@
                 <i class="pi pi-chevron-down" [ngClass]="{'display-none': isNavCollapsed}" [class.rotated]="!patientExpanded"></i>
             </div>
             <div class="section-content" [class.collapsed]="!patientExpanded">
-                <a class="nav-item" *ngIf="userPrivileges.includes('Profile')" [routerLink]="['/patients', patientId, 'profile', uniqueCode]" routerLinkActive="active">
+                <a class="nav-item" *ngIf="userPrivileges.includes('Profile')" 
+                   [routerLink]="handleNavigation('/profile')" 
+                   routerLinkActive="active">
                     <i class="pi pi-user"></i>
                     <span>Profile</span>
                 </a>
                 <div routerLinkActive="active" *ngIf="userPrivileges.includes('Appointments')">
-                    <a class="nav-item" [routerLink]="['/patients', patientId, 'appointments', uniqueCode]" routerLinkActive="active">
+                    <a class="nav-item" 
+                       [routerLink]="handleNavigation('/appointments')" 
+                       routerLinkActive="active">
                         <i class="pi pi-calendar"></i>
                         <span>Appointments</span>
-                        <!-- <span class="count">{{appointments?.count || 0}}</span> -->
                     </a>
                 </div>
             </div>
@@ -81,29 +84,39 @@
 
         <!-- EMR Section -->
         <div class="nav-section" 
-        *ngIf="userPrivileges.includes('Timeline') || userPrivileges.includes('Files') || userPrivileges.includes('CompletedProcedures') || userPrivileges.includes('ClinicalNotes') || userPrivileges.includes('TreatmentPlans')">
+             *ngIf="userPrivileges.includes('Timeline') || userPrivileges.includes('Files') || userPrivileges.includes('CompletedProcedures') || userPrivileges.includes('ClinicalNotes') || userPrivileges.includes('TreatmentPlans')">
             <div class="section-header" (click)="toggleSection('emr')">
                 <span class="label">EMR</span>
                 <i class="pi pi-chevron-down" [ngClass]="{'display-none': isNavCollapsed}" [class.rotated]="!emrExpanded"></i>
             </div>
             <div class="section-content" [class.collapsed]="!emrExpanded">
-                <a  *ngIf="userPrivileges.includes('ClinicalNotes')" class="nav-item" [routerLink]="['/patients', patientId, 'clinical-notes', uniqueCode]" routerLinkActive="active">
+                <a *ngIf="userPrivileges.includes('ClinicalNotes')" class="nav-item" 
+                   [routerLink]="handleNavigation('/clinical-notes')" 
+                   routerLinkActive="active">
                     <i class="pi pi-file-edit"></i>
                     <span>Clinical Notes</span>
                 </a>
-                <a  *ngIf="userPrivileges.includes('TreatmentPlans')" class="nav-item" [routerLink]="['/patients', patientId, 'treatment-plans', uniqueCode]" routerLinkActive="active">
+                <a *ngIf="userPrivileges.includes('TreatmentPlans')" class="nav-item" 
+                   [routerLink]="handleNavigation('/treatment-plans')" 
+                   routerLinkActive="active">
                     <i class="pi pi-list"></i>
                     <span>Treatment Plans</span>
                 </a>
-                <a *ngIf="userPrivileges.includes('CompletedProcedures')" class="nav-item" [routerLink]="['/patients', patientId, 'completed-procedures', uniqueCode]" routerLinkActive="active">
+                <a *ngIf="userPrivileges.includes('CompletedProcedures')" class="nav-item" 
+                   [routerLink]="handleNavigation('/completed-procedures')" 
+                   routerLinkActive="active">
                     <i class="pi pi-check-circle"></i>
                     <span>Completed Procedures</span>
                 </a>
-                <a *ngIf="userPrivileges.includes('Files')" class="nav-item" [routerLink]="['/patients', patientId, 'files', uniqueCode]"routerLinkActive="active">
+                <a *ngIf="userPrivileges.includes('Files')" class="nav-item" 
+                   [routerLink]="handleNavigation('/files')" 
+                   routerLinkActive="active">
                     <i class="pi pi-folder"></i>
                     <span>Files</span>
                 </a>
-                <a *ngIf="userPrivileges.includes('Timeline')" class="nav-item" [routerLink]="['/patients', patientId, 'timeline', uniqueCode]" routerLinkActive="active">
+                <a *ngIf="userPrivileges.includes('Timeline')" class="nav-item" 
+                   [routerLink]="handleNavigation('/timeline')" 
+                   routerLinkActive="active">
                     <i class="pi pi-clock"></i>
                     <span>Timeline</span>
                 </a>
@@ -117,15 +130,17 @@
                 <i class="pi pi-chevron-down" [ngClass]="{'display-none': isNavCollapsed}" [class.rotated]="!billingExpanded"></i>
             </div>
             <div class="section-content" [class.collapsed]="!billingExpanded">
-                <a class="nav-item" *ngIf="userPrivileges.includes('Invoices')" [routerLink]="['/patients', patientId, 'invoices', uniqueCode]" routerLinkActive="active">
+                <a class="nav-item" *ngIf="userPrivileges.includes('Invoices')" 
+                   [routerLink]="handleNavigation('/invoices')" 
+                   routerLinkActive="active">
                     <i class="pi pi-dollar"></i>
                     <span>Invoices</span>
-                    <!-- <span class="count">1</span> -->
                 </a>
-                <a class="nav-item" *ngIf="userPrivileges.includes('Payments')" [routerLink]="['/patients', patientId, 'payments', uniqueCode]" routerLinkActive="active">
+                <a class="nav-item" *ngIf="userPrivileges.includes('Payments')" 
+                   [routerLink]="handleNavigation('/payments')" 
+                   routerLinkActive="active">
                     <i class="pi pi-money-bill"></i>
                     <span>Payments</span>
-                    <!-- <span class="count">1</span> -->
                 </a>
             </div>
         </div>

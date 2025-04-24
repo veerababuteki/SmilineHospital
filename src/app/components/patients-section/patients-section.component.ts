@@ -64,7 +64,7 @@ export class PatientsSectionComponent implements OnInit {
       });
     }
 
-    constructor(private messageService: MessageService, 
+    constructor(private messageService: MessageService,
         private authService: AuthService, 
         private router: Router,
         private elementRef: ElementRef,
@@ -136,7 +136,11 @@ togglePracticesDropdown() {
       practice.branch_id.toString().includes(searchTerm)
     );
   }
-  
+
+  handleNavigation(route: string): (string | null | undefined)[] | null {
+    return ['/patients', this.patientId, route.substring(1), this.uniqueCode];
+  }
+
   // Close dropdown when clicking outside
   @HostListener('document:click', ['$event'])
   handleDocumentClick(event: MouseEvent) {
