@@ -28,8 +28,13 @@ export class AuthService {
         });
     return this.http.get<any>(`${this.baseUrl}/auth/user/getCurrentUser`, {headers});
   }
+  selectedPractice: any;
 
   registerUser(patientDetails: any) {
+    const savedPractice = localStorage.getItem('selectedPractice');
+    if(savedPractice){
+      this.selectedPractice = JSON.parse(savedPractice);
+    }
     return this.http.post<any>(`${this.baseUrl}/auth/user/register`, {
         first_name: patientDetails.first_name,
         last_name: '',
@@ -62,7 +67,7 @@ export class AuthService {
         groups_list: patientDetails.groups_list,
         other_history: patientDetails.other_history,
         role_id: '2ac7787b-77d1-465b-9bc0-eee50933697f',
-        branch_id: 1,
+        branch_id: this.selectedPractice.branch_id,
     });
   }
 

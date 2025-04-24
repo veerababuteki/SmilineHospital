@@ -30,6 +30,7 @@ import { MessageService } from 'primeng/api';
 import { CancelAppointmentDialogComponent } from './cancel-appointment-dialog';
 import { AddProfileComponent } from '../patients-section/edit-profile/add-profile.component';
 import { AppointmentsPrintComponent } from "./appointments-print/appointments-print.component";
+import { HostListener } from '@angular/core';
 
 interface Doctor {
   id: string;
@@ -231,13 +232,66 @@ export class CalendarComponent implements OnInit {
   appointments: any[] = [];
   displayAddPatientDialog: boolean = false;
   uniqueCode: string = "";
-
+  practices: any[] = [];
+  selectedPractice: any;
+  showPracticesDropdown: boolean = false;
+  practiceSearchText: string = '';
+  filteredPractices: any[] = [];
   displayPrintAppointment = false;
-  constructor(private dialogService: DialogService, private overlay: Overlay, private datePipe: DatePipe,
+  constructor(private dialogService: DialogService, private overlay: Overlay, private datePipe: DatePipe, private elementRef: ElementRef,
     private authService: AuthService, private messageService: MessageService, private userService: UserService, private appointmentService: AppointmentService) {
 
   }
-
+  togglePracticesDropdown() {
+    this.showPracticesDropdown = !this.showPracticesDropdown;
+    
+    if (this.showPracticesDropdown) {
+      this.practiceSearchText = '';
+      this.filteredPractices = [...this.practices];
+      
+      // Focus on the search input after a short delay
+      setTimeout(() => {
+        const searchInput = this.elementRef.nativeElement.querySelector('.practice-search');
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }, 100);
+    }
+  }
+  
+  // Select a practice and save to localStorage
+  selectPractice(practice: any) {
+    this.selectedPractice = practice;
+    this.showPracticesDropdown = false;
+    
+    // Save to localStorage
+    localStorage.setItem('selectedPractice', JSON.stringify(practice));
+    window.location.reload();
+  }
+  
+  // Filter practices based on search text
+  filterPractices() {
+    if (!this.practiceSearchText.trim()) {
+      this.filteredPractices = [...this.practices];
+      return;
+    }
+    
+    const searchTerm = this.practiceSearchText.toLowerCase().trim();
+    this.filteredPractices = this.practices.filter(practice => 
+      practice.branch_name.toLowerCase().includes(searchTerm) || 
+      practice.branch_id.toString().includes(searchTerm)
+    );
+  }
+  
+  // Close dropdown when clicking outside
+  @HostListener('document:click', ['$event'])
+  handleDocumentClick(event: MouseEvent) {
+  if (this.showPracticesDropdown && 
+      !this.elementRef.nativeElement.querySelector('.email-dropdown').contains(event.target)) {
+    this.showPracticesDropdown = false;
+  }
+  }
+  
   handleEventResize(eventResizeInfo: any) {
 
     console.log(eventResizeInfo);
@@ -379,6 +433,20 @@ export class CalendarComponent implements OnInit {
     this.selectedCategory = category.category_id;
   }
   ngOnInit() {
+    this.userService.getBranches().subscribe(res=>{
+      this.practices = res.data;
+      const savedPractice = localStorage.getItem('selectedPractice');
+      if (savedPractice) {
+        this.selectedPractice = JSON.parse(savedPractice);
+      } else {
+        this.selectedPractice = this.practices[0];
+        localStorage.setItem('selectedPractice', JSON.stringify(this.selectedPractice));
+      }
+      this.loadComponentData()
+    })
+  }
+
+  loadComponentData(){
     this.currentDate = new Date();
     this.activeTab = 'all'
     this.activeTabType = 'all'
@@ -429,7 +497,6 @@ export class CalendarComponent implements OnInit {
       }
     });
   }
-
   changeDate(days: number): void {
     const updatedDate = new Date(this.currentDate);
     updatedDate.setDate(this.currentDate.getDate() + days);

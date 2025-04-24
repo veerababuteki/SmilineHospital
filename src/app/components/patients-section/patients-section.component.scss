@@ -308,3 +308,100 @@
         }
     }
 }
+.email-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    .pi-chevron-down {
+      font-size: 0.8rem;
+      color: #666;
+    }
+  }
+  
+  .practices-dropdown-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 280px;
+    max-height: 320px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+  }
+  
+  .search-container {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    position: relative;
+    
+    .search-icon {
+      position: absolute;
+      left: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+    }
+    
+    .practice-search {
+      width: 100%;
+      padding: 8px 16px 8px 36px;
+      border: 1px solid #e0e0e0;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      
+      &:focus {
+        outline: none;
+        border-color: #3b82f6;
+      }
+    }
+  }
+  
+  .practices-list {
+    overflow-y: auto;
+    max-height: 250px;
+    
+    .practice-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      
+      &:hover {
+        background-color: #f5f5f5;
+      }
+      
+      &.selected {
+        background-color: #f0f7ff;
+      }
+      
+      .practice-name {
+        font-weight: 500;
+        margin-bottom: 2px;
+      }
+      
+      .practice-id {
+        font-size: 0.8rem;
+        color: #666;
+      }
+    }
+  }
+  
+  .no-results {
+    padding: 24px 16px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    font-size: 0.9rem;
+  }

@@ -14,6 +14,7 @@ export class UserService {
 
   private loadPatients = new Subject<void>();
   loadPatients$ = this.loadPatients.asObservable();
+  selectedPractice: any;
 
   constructor(private http: HttpClient, private router: Router, private authService: AuthService) {}
 
@@ -26,8 +27,12 @@ export class UserService {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
+    const savedPractice = localStorage.getItem('selectedPractice');
+    if(savedPractice){
+      this.selectedPractice = JSON.parse(savedPractice);
+    }
 
-    return this.http.get<any>(`${this.baseUrl}/auth/user/getExistingUser/${docRoleID}`, {headers}).pipe(
+    return this.http.get<any>(`${this.baseUrl}/auth/user/usersByBranchAndRole?branch_id=${this.selectedPractice.branch_id}&role_id=${docRoleID}`, {headers}).pipe(
         catchError(this.handleError)
       );
   }

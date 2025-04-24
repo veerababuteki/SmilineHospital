@@ -1,9 +1,37 @@
 <div class="calendar-top">
     <div class="left-section">
       <span class="title">Patients</span>
-      <div class="email-dropdown">
-        <span>Smiline&#64;Panjagutta</span>
+      <div class="email-dropdown" (click)="togglePracticesDropdown(); $event.stopPropagation()">
+        <span>{{ selectedPractice?.branch_name || 'Select Practice' }}</span>
         <i class="pi pi-chevron-down"></i>
+        <!-- Dropdown panel -->
+        <div class="practices-dropdown-panel" *ngIf="showPracticesDropdown" (click)="$event.stopPropagation()">
+          <div class="search-container">
+            <i class="pi pi-search search-icon"></i>
+            <input 
+              type="text" 
+              placeholder="Search by name" 
+              class="practice-search" 
+              [(ngModel)]="practiceSearchText"
+              (input)="filterPractices()"
+            >
+          </div>
+          
+          <div class="practices-list">
+            <div class="practice-item" 
+     *ngFor="let practice of filteredPractices" 
+     (click)="selectPractice(practice); $event.stopPropagation()"
+     [class.selected]="selectedPractice?.branch_id === practice.branch_id">
+  <div class="practice-name">{{ practice.branch_name }}</div>
+  <div class="practice-id">Practice ID: {{ practice.branch_id }}</div>
+</div>
+            
+            <!-- No results message -->
+            <div class="no-results" *ngIf="practiceSearchText && filteredPractices.length === 0">
+              No practices found matching "{{ practiceSearchText }}"
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 </div>

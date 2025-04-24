@@ -11,6 +11,7 @@ import { AuthService } from './auth.service';
 export class AppointmentService {
   private baseUrl = 'https://apis.idental.ai/api/v1/auth/appointment';  // Replace with actual API
   loggedIn: boolean = false;
+  selectedPractice: any;
 
   constructor(private http: HttpClient, private router: Router, private authService: AuthService) {}
 
@@ -39,14 +40,12 @@ export class AppointmentService {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-    const params = new HttpParams()
-        .set('from_date', from_date)
-        .set('to_date', to_date);
+    const savedPractice = localStorage.getItem('selectedPractice');
+    if(savedPractice){
+      this.selectedPractice = JSON.parse(savedPractice);
+    }
 
-    return this.http.post<any>(`${this.baseUrl}/getAppointmentByDates`,{
-        'from_date': from_date,
-        'to_date': to_date
-    }, { headers });
+    return this.http.get<any>(`${this.baseUrl}/appointmentsByDateAndBranch?from_date=${from_date}&to_date=${to_date}&branch_id=${this.selectedPractice.branch_id}`, { headers });
   }
 
   updateAppointment(appointment: any){
@@ -81,7 +80,10 @@ export class AppointmentService {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-
+    const savedPractice = localStorage.getItem('selectedPractice');
+    if(savedPractice){
+      this.selectedPractice = JSON.parse(savedPractice);
+    }
 
     return this.http.post<any>(`${this.baseUrl}/createAppointment`,
         {
@@ -96,7 +98,7 @@ export class AppointmentService {
             duration: appointment.duration,
             planned_procedure: appointment.planned_procedure,
             notes: appointment.notes,
-            branch_id: 1
+            branch_id: this.selectedPractice.branch_id
         }, 
         {headers}).pipe(
         catchError(this.handleError)
