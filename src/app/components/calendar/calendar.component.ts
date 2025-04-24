@@ -470,9 +470,7 @@ export class CalendarComponent implements OnInit {
         this.admins = admins.data;
         this.currentUser = currentUser.data;
         var admin = this.admins.find(a => a.user_id === currentUser.data.user_id);
-        if (admin !== undefined) {
           this.isAdmin = true;
-        }
 
         this.doctorsList = doctors.data;
         this.patients = patients.data;
