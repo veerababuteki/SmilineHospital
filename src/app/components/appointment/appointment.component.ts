@@ -16,6 +16,9 @@ import { AppointmentService } from '../../services/appointment.service';
 import { format } from 'date-fns';
 import { empty } from 'rxjs';
 import { Router } from '@angular/router';
+import { Message } from 'primeng/api';
+import { MessagesModule } from 'primeng/messages';
+import { LoaderService } from '../../services/loader.service';
 
 @Component({
   selector: 'app-appointment',
@@ -32,6 +35,7 @@ import { Router } from '@angular/router';
     RadioButtonModule,
     ReactiveFormsModule,
     CommonModule,
+    MessagesModule
   ]
 })
 export class AppointmentComponent implements OnInit {
@@ -54,7 +58,8 @@ export class AppointmentComponent implements OnInit {
   appointmentStatus: string[] = ['None', 'Waiting', 'Engaged', 'Done'];
   showScheduleWarning: boolean = false;
   public selectedDate: any;
-
+  multiplePatients: any[] = [];
+  showPatientDropdown: boolean = false;
   @Input() data!: 'appointment' | 'reminder' | 'blockCalendar';
   @Input() doctors!: any[];
   @Input() categories!: any[];
@@ -68,7 +73,10 @@ export class AppointmentComponent implements OnInit {
   @Input() patientCode: any;
   @Output() closeDialog: EventEmitter<any> = new EventEmitter<any>();
   paitentNotFound:boolean = false;
-  constructor(private fb: FormBuilder, private router: Router, private userService: UserService, private appointmentService: AppointmentService) {}
+  messages: Message[] =   [
+    { severity: 'info', summary: 'Info', detail: 'Message Content' },
+];
+  constructor(private fb: FormBuilder, private router: Router, private userService: UserService, private appointmentService: AppointmentService, private loaderService: LoaderService) {}
 
   ngOnInit() {
     this.activeTab = this.data;
@@ -135,8 +143,8 @@ export class AppointmentComponent implements OnInit {
         patientId: ['', Validators.required],
         mobileNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
         emailId: ['', [Validators.email]],
-        doctor: ['', Validators.required],
-        category: ['', Validators.required],
+        doctor: [''],
+        category: [''],
         scheduledDate: [this.selectedDate == null ? new Date() : new Date(this.selectedDate), Validators.required],
         scheduledTime: [this.selectedDate == null ? new Date() : new Date(this.selectedDate), Validators.required],
         duration: ['15'],
@@ -147,8 +155,8 @@ export class AppointmentComponent implements OnInit {
         appointmentStatus:[{ value: 'None', disabled: !this.editAppointment }],
       });
     } else if (this.editAppointment){
-      const category = this.categories.find(c => c.category_id == this.appointment.category_details.category_id)
-      const doctor = this.doctors.find(d => d.user_id === this.appointment.doctor_details.doctor_id)
+      const category = this.categories.find(c => c.category_id == this.appointment.category_details?.category_id)
+      const doctor = this.doctors.find(d => d.user_id === this.appointment.doctor_details?.doctor_id)
       var formattedTime = this.convertTo24Hour(this.appointment.appointment_time);
       this.appointmentForm = this.fb.group({
         doctor: [doctor, Validators.required],
@@ -192,7 +200,6 @@ export class AppointmentComponent implements OnInit {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
   showDialog(isEdit: boolean = false) {
-    debugger;
     if(isEdit)
       {this.editAppointment = true;
       }
@@ -215,17 +222,56 @@ export class AppointmentComponent implements OnInit {
 
   getPatientDetails() {
     var code = this.appointmentForm.value.patientId
-    if(code == undefined || code == '') return;
+    if (code == undefined || code == '') return;
+    this.showPatientDropdown = false;
+    this.multiplePatients = [];
+
     this.userService.getPatient(code).subscribe(response => {
-      this.patient = response.data;
-      this.appointmentForm.patchValue({
-        patientName: this.patient.profile.first_name + " " + this.patient.profile.last_name,
-        mobileNumber: this.patient.phone,
-        emailId: this.patient.email
+      if(response.data.length == 1){
+        this.patient = response.data[0];
+        this.appointmentForm.patchValue({
+          patientName: this.patient.profile.first_name + " " + this.patient.profile.last_name,
+          mobileNumber: this.patient.phone,
+          emailId: this.patient.email
+        });
+      } else if (response.data.length > 1){
+        this.multiplePatients = response.data;
+        this.showPatientDropdown = true;
+      }
+    }, (error) => {
+      this.userService.getPatientByMobileNumber(code).subscribe(response => {
+        this.patient = response.data;
+        this.appointmentForm.patchValue({
+          patientName: this.patient.user_profile_details[0].first_name + " " + this.patient.user_profile_details[0].last_name,
+          mobileNumber: this.patient.phone,
+          emailId: this.patient.email
+        });
+      }, (error) => {
+        this.paitentNotFound = true;
       });
-    },(error)=>{
-      this.paitentNotFound = true;
-    })
+    });
+  }
+  selectPatient(patient: any) {
+    this.patient = patient;
+    
+    // Check which data structure we're dealing with
+    if (patient.profile) {
+      // First data structure
+      this.appointmentForm.patchValue({
+        patientName: patient.profile.first_name + " " + patient.profile.last_name,
+        mobileNumber: patient.phone,
+        emailId: patient.email
+      });
+    } else if (patient.user_profile_details && patient.user_profile_details.length > 0) {
+      // Second data structure
+      this.appointmentForm.patchValue({
+        patientName: patient.user_profile_details[0].first_name + " " + patient.user_profile_details[0].last_name,
+        mobileNumber: patient.phone,
+        emailId: patient.email
+      });
+    }
+    
+    this.showPatientDropdown = false;
   }
   cancelAppointment(){
     this.display = false;
@@ -237,6 +283,7 @@ export class AppointmentComponent implements OnInit {
     if (this.appointmentForm.valid) {
       const value = this.appointmentForm.value;
       if(!this.editAppointment){
+        this.loaderService.show();
         this.appointmentService.createAppointment({
           patient_id: this.isDoctor ? this.patient.user_id : this.currentUser.user_id,
           booking_type: value.bookingType,
@@ -255,6 +302,8 @@ export class AppointmentComponent implements OnInit {
           if(this.fromPatientsection){
             this.router.navigate(['/calendar'])
           }
+
+          this.closeDialog.emit({isOpenPatientDialog:false});
         });
       }
       else{

@@ -8,6 +8,8 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
+import { format } from 'date-fns';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-add-completed-procedures',
@@ -23,6 +25,8 @@ export class AddCompletedProceduresComponent implements OnInit {
   name: string = '';
   procedures: Procedure[] = [];
   add: boolean = false;
+  uniqueCode: string | null | undefined;
+
   doctors: any[] = [];
   doctor: any;
   date: Date = new Date()
@@ -32,23 +36,43 @@ export class AddCompletedProceduresComponent implements OnInit {
   plannedTreatmentPlans: any[] = [];
   generateInvoiceList: any[] = [];
   isLoading: boolean = false;
+  isEditMode: boolean = false;
+  editProcedureData: any = null;
 
-  constructor(private fb: FormBuilder, 
+  constructor(private messageService: MessageService,private fb: FormBuilder, 
     private userService: UserService,
     private treatmentPlansService: TreatmentPlansService,
     private router:Router,
     private route: ActivatedRoute
   ) {
     this.initForm();
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras.state) {
+    const state = navigation.extras.state as { mode: string; procedureData: any };
+    if (state.mode === 'edit' && state.procedureData) {
+      this.isEditMode = true;
+      this.editProcedureData = state.procedureData;
+    }
+  }
   }
 
   ngOnInit() {
+    
     this.route.parent?.paramMap.subscribe(params => {
       if(this.patientId == null) {
         this.patientId = params.get('id');
         this.treatmentPlansService.getTreatmentPlans(Number(this.patientId)).subscribe(res => {
             this.plannedTreatmentPlans = res.data.rows.filter((p: any) => p.status.toLowerCase() == 'none');
         });
+      }
+    });
+    this.route.paramMap.subscribe(params => {
+      if(this.uniqueCode == null) {
+        this.uniqueCode = params.get('source');
+        if (this.uniqueCode) {
+          this.messageService.sendMessage(this.patientId ? this.patientId : '', this.uniqueCode ? this.uniqueCode : '');
+  
+        }
       }
     });
     this.getProcedures();
@@ -60,9 +84,59 @@ export class AddCompletedProceduresComponent implements OnInit {
         });
         this.doctor = this.doctors[0];
       });
+      if (this.isEditMode && this.editProcedureData && this.treatments.length === 0) {
+        this.populateFormWithProcedure(this.editProcedureData);
+      }
     });
+    
   }
   
+  populateFormWithProcedure(procedure: any) {
+    if (!procedure) return;
+    
+    // Clear the existing treatments array if needed
+    while (this.treatments.length) {
+      this.treatments.removeAt(0);
+    }
+    
+    // Parse teeth set to an array of numbers
+    const teethArray = procedure.teeth_set !== '' 
+      ? procedure.teeth_set.split(',').map((tooth: string) => parseInt(tooth.trim(), 10))
+      : [];
+    
+    const treatment = this.fb.group({
+      id: [procedure.id],
+      unique_id: [procedure.treatment_unique_id],
+      procedureName: [procedure.procedure_details.name],
+      procedureId: [procedure.procedure_details.procedure_id || procedure.procedure_id],
+      quantity: [parseInt(procedure.quantity)],
+      cost: [parseFloat(procedure.cost)],
+      discount: [parseFloat(procedure.discount)],
+      discountType: [procedure.discount_formate || '%'],
+      total: [parseFloat(procedure.total_cost)],
+      selectedTeeth: [teethArray],
+      multiplyCost: [true],
+      fullMouth: [false],
+      showAdultTeeth: [false],
+      showChildTeeth: [false],
+      notes: [procedure.notes || ''],
+      showNotes: [!!procedure.notes],
+      doctorId: [procedure.doctor_details_treat?.doctor_id || procedure.doctor_id || this.doctor?.user_id || ''],
+      doctorObj: [this.doctors.find(d => d.user_id === (procedure.doctor_details_treat?.doctor_id || procedure.doctor_id)) || this.doctor || null],
+      procedureDate: [procedure.date ? new Date(procedure.date) : this.date],
+    });
+  
+    const index = this.treatments.length;
+    this.treatments.push(treatment);
+    this.setCurrentTreatment(index);
+    this.calculateTotal(index);
+  
+    // Subscribe to value changes
+    treatment.valueChanges.subscribe(() => {
+      this.calculateTotal(index);
+    });
+  }
+
   filterProcedures() {
     const search = this.searchText.toLowerCase().trim();
     this.filteredProcedures = this.procedures.filter(procedure => 
@@ -85,6 +159,7 @@ export class AddCompletedProceduresComponent implements OnInit {
 
   getProcedures(){
     this.treatmentPlansService.getProcedures().subscribe(res => {
+      res.data.rows.sort((a:any, b:any) => b.procedure_id - a.procedure_id);
       res.data.rows.forEach((r: any) => {
       this.procedures.push({
         name: r.name,
@@ -129,8 +204,11 @@ export class AddCompletedProceduresComponent implements OnInit {
       procedureDate: [this.date],
     });
 
+    // Get the current length as the new index
     const index = this.treatments.length;
-    this.treatments.insert(0,treatment);
+  
+    // Use push instead of insert(0, ...)
+    this.treatments.push(treatment);
     this.setCurrentTreatment(index);
     this.calculateTotal(index);
 
@@ -141,7 +219,7 @@ export class AddCompletedProceduresComponent implements OnInit {
   }
 
   addPlannedTreatment(procedure: any){
-    const teethArray = procedure.teeth_set.split(',').map((tooth: string) => parseInt(tooth.trim(), 10));
+    const teethArray = procedure.teeth_set != '' ? procedure.teeth_set.split(',').map((tooth: string) => parseInt(tooth.trim(), 10)) : [];
 
     const treatment = this.fb.group({
         id: [procedure.id],
@@ -269,6 +347,9 @@ export class AddCompletedProceduresComponent implements OnInit {
     }
     
     selectedTeethControl.setValue(selectedTeeth);
+    if(treatment.get('multiplyCost')?.value){
+      treatment.get('quantity')?.setValue(selectedTeeth.length)
+    }
     this.calculateTotal(treatmentIndex);
   }
 
@@ -279,9 +360,9 @@ export class AddCompletedProceduresComponent implements OnInit {
     const values = treatment.value;
     let total = values.cost * values.quantity;
 
-    if (values.multiplyCost && values.selectedTeeth.length > 0) {
-      total *= values.selectedTeeth.length;
-    }
+    // if (values.multiplyCost && values.selectedTeeth.length > 0) {
+    //   total *= values.selectedTeeth.length;
+    // }
 
     if (values.discount > 0) {
       if (values.discountType === '%') {
@@ -295,6 +376,21 @@ export class AddCompletedProceduresComponent implements OnInit {
     this.calculateGrandTotal();
   }
 
+  valuechange(treatment: any, index: number) {
+    this.calculateTotal(index);
+  }
+
+  toggleMultiplyCost(index:number){
+    const treatment = this.treatments.at(index);
+    const selectedTeethControl = treatment.get('selectedTeeth');
+
+    if(treatment.get('multiplyCost')?.value){
+      treatment.get('quantity')?.setValue(selectedTeethControl?.value.length)
+    }
+
+    this.calculateTotal(index);
+  }
+
   onSubmit(){
     if(this.treatmentForm.valid){
       var procedureLists: any[] = [];
@@ -303,30 +399,61 @@ export class AddCompletedProceduresComponent implements OnInit {
         grand_total: this.calculateGrandTotal().toString(),
         procedures_list: procedureLists
       };
-      this.treatmentForm.value.treatments.forEach((t: any)=>{
-        treatment.procedures_list.push({
-          procedure_id: t.procedureId,
-          treatment_plan_id: t.id,
-          treatment_unique_id: t.unique_id,
-          doctor_id: t.doctorId,
-          quantity: t.quantity,
-          cost: t.cost,
-          discount: t.discount.toString(),
-          discount_formate: t.discountType,
-          teeth_set: t.selectedTeeth.toString(),
-          status: "Completed",
-          date: t.procedureDate,
-          total_cost: t.total,
-          total_discount: t.discount.toString(),
-          notes: t.notes,
-        });
-      })
-      this.treatmentPlansService.addCompletedProcedure(treatment).subscribe(res => {
-        console.log(res)
-        this.router.navigate(['/patients', this.patientId, 'completed-procedures']);
-      }); 
+      if(this.isEditMode){
+        this.treatmentForm.value.treatments.forEach((t: any)=>{
+          treatment.procedures_list.push({
+            procedure_id: t.procedureId,
+            id: t.id,
+            treatment_unique_id: t.unique_id,
+            doctor_id: t.doctorId,
+            quantity: t.quantity,
+            cost: t.cost,
+            discount: t.discount.toString(),
+            discount_formate: t.discountType,
+            teeth_set: t.selectedTeeth.toString(),
+            status: "Completed",
+            date: t.procedureDate,
+            total_cost: t.total,
+            total_discount: t.discount.toString(),
+            notes: t.notes,
+            action: this.isEditMode ? 'Update' : 'Add'
+          });
+        })
+      }
+      else{
+        this.treatmentForm.value.treatments.forEach((t: any)=>{
+          treatment.procedures_list.push({
+            procedure_id: t.procedureId,
+            treatment_plan_id: t.id,
+            treatment_unique_id: t.unique_id,
+            doctor_id: t.doctorId,
+            quantity: t.quantity,
+            cost: t.cost,
+            discount: t.discount.toString(),
+            discount_formate: t.discountType,
+            teeth_set: t.selectedTeeth.toString(),
+            status: "Completed",
+            date: t.procedureDate,
+            total_cost: t.total,
+            total_discount: t.discount.toString(),
+            notes: t.notes,
+          });
+        })
+      }
+      
+      if(this.isEditMode){
+        this.treatmentPlansService.updateCompletedProcedure(treatment).subscribe(res => {
+          this.router.navigate(['/patients', this.patientId, 'completed-procedures', this.uniqueCode]);
+        }); 
+      }
+      else{
+        this.treatmentPlansService.addCompletedProcedure(treatment).subscribe(res => {
+          this.router.navigate(['/patients', this.patientId, 'completed-procedures', this.uniqueCode]);
+        }); 
+      }
     }
   }
+
   saveAndGenerateInvoice(){
     if(this.treatmentForm.valid){
       var procedureLists: any[] = [];
@@ -347,7 +474,7 @@ export class AddCompletedProceduresComponent implements OnInit {
           discount_formate: t.discountType,
           teeth_set: t.selectedTeeth.toString(),
           status: "Completed",
-          date: t.procedureDate,
+          date: format(t.procedureDate,"yyyy-MM-dd"),
           total_cost: t.total,
           total_discount: t.discount.toString(),
           notes: t.notes,
@@ -390,7 +517,7 @@ export class AddCompletedProceduresComponent implements OnInit {
         .subscribe(invoiceRes => {
           // Only navigate if we got a successful response
           if (invoiceRes && this.patientId) {
-            this.router.navigate(['/patients', this.patientId, 'completed-procedures']);
+            this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
           }
         });
     } else {
@@ -401,6 +528,7 @@ export class AddCompletedProceduresComponent implements OnInit {
   }); 
     }
   }
+  
   calculateGrandTotal(): number {
     let totalCost = 0;
     let totalDiscount = 0;
@@ -409,9 +537,9 @@ export class AddCompletedProceduresComponent implements OnInit {
       const values = treatment.value;
       let cost = values.cost * values.quantity;
       
-      if (values.multiplyCost && values.selectedTeeth.length > 0) {
-        cost *= values.selectedTeeth.length;
-      }
+      // if (values.multiplyCost && values.selectedTeeth.length > 0) {
+      //   cost *= values.selectedTeeth.length;
+      // }
       
       totalCost += cost;
       
@@ -428,6 +556,6 @@ export class AddCompletedProceduresComponent implements OnInit {
   }
 
   cancel(){
-    this.router.navigate(['/patients', this.patientId, 'completed-procedures']);
+    this.router.navigate(['/patients', this.patientId, 'completed-procedures', this.uniqueCode]);
   }
 }

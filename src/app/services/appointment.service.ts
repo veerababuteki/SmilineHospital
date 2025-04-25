@@ -9,32 +9,12 @@ import { AuthService } from './auth.service';
 })
 
 export class AppointmentService {
-  private baseUrl = 'https://apis.idental.ai/auth';  // Replace with actual API
+  private baseUrl = 'https://apis.idental.ai/api/v1/auth/appointment';  // Replace with actual API
   loggedIn: boolean = false;
+  selectedPractice: any;
 
   constructor(private http: HttpClient, private router: Router, private authService: AuthService) {}
 
-  getDoctors(docRoleID: any) {
-    const token = this.authService.getAccessToken();
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-    return this.http.get<any>(`${this.baseUrl}/getExistingUser/${docRoleID}`, {headers}).pipe(
-        catchError(this.handleError)
-      );
-  }
-
-  getPatient(code: any) {
-    const token = this.authService.getAccessToken();
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-    return this.http.get<any>(`${this.baseUrl}/getProfileForAppointment/${code}`, {headers}).pipe(
-        catchError(this.handleError)
-      );
-  }  
   getAppointmentsByPatientID(patientId: any){
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({
@@ -44,15 +24,7 @@ export class AppointmentService {
         catchError(this.handleError)
       );
   }
-  getCategories(){
-    const token = this.authService.getAccessToken();
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-    return this.http.get<any>(`${this.baseUrl}/getAllCategories`, { headers});
-  }
-
+  
   getAppointment(id: number){
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({
@@ -62,20 +34,20 @@ export class AppointmentService {
         .set('id', id);
     return this.http.get<any>(`${this.baseUrl}/getAppointment`, {headers, params});
   }
+
   getAppointments(from_date: any, to_date: any){
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-    const params = new HttpParams()
-        .set('from_date', from_date)
-        .set('to_date', to_date);
+    const savedPractice = localStorage.getItem('selectedPractice');
+    if(savedPractice){
+      this.selectedPractice = JSON.parse(savedPractice);
+    }
 
-    return this.http.post<any>(`${this.baseUrl}/getAppointmentByDates`,{
-        'from_date': from_date,
-        'to_date': to_date
-    }, { headers });
+    return this.http.get<any>(`${this.baseUrl}/appointmentsByDateAndBranch?from_date=${from_date}&to_date=${to_date}&branch_id=${this.selectedPractice.branch_id}`, { headers });
   }
+
   updateAppointment(appointment: any){
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({
@@ -102,12 +74,16 @@ export class AppointmentService {
         catchError(this.handleError)
       );
   }
+
   createAppointment(appointment: any){
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-
+    const savedPractice = localStorage.getItem('selectedPractice');
+    if(savedPractice){
+      this.selectedPractice = JSON.parse(savedPractice);
+    }
 
     return this.http.post<any>(`${this.baseUrl}/createAppointment`,
         {
@@ -122,11 +98,13 @@ export class AppointmentService {
             duration: appointment.duration,
             planned_procedure: appointment.planned_procedure,
             notes: appointment.notes,
+            branch_id: this.selectedPractice.branch_id
         }, 
         {headers}).pipe(
         catchError(this.handleError)
       );
   }
+
   deleteAppointment(appointmentData: any){
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({
@@ -159,6 +137,7 @@ export class AppointmentService {
     );
 
   }
+  
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error.message || 'Server error');
   }

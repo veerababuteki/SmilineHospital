@@ -6,8 +6,9 @@ import { TreatmentPlansService } from '../../../services/treatment-plans.service
 import { UserService } from '../../../services/user.service';
 import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
-import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { filter, forkJoin } from 'rxjs';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-add-invoice',
@@ -32,13 +33,37 @@ export class AddInvoiceComponent implements OnInit {
   plannedTreatmentPlans: any[] = [];
   makePaymentList: any[] = [];
   completedTreatmentPlans: any[] = [];
+  currentProcedureId: any;
+  currentTreatmentPlanId: any;
+  proceduresToProcess: {procedureId: any, treatmentKey: any}[] = [];
+  isEditMode: boolean = false;
+  editInvoiceData: any[] = [];
+  editInvoiceKey: string | null = null;
+  uniqueCode: string | null | undefined;
+
   constructor(private fb: FormBuilder, 
-    private userService: UserService,
+    private userService: UserService,              
+    private messageService: MessageService,
+    
     private treatmentPlansService: TreatmentPlansService,
     private router:Router,
     private route: ActivatedRoute
   ) {
     this.initForm();
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      const currentState = this.router.getCurrentNavigation?.()?.extras?.state;
+      if (history.state && history.state.mode === 'edit' && history.state.invoiceData) {
+        this.isEditMode = true;
+        this.editInvoiceData = history.state.invoiceData;
+        this.editInvoiceKey = history.state.invoiceKey;
+      }
+      if (history.state && history.state.procedures) {
+        // Now procedures is an array of objects with procedureId and treatmentKey
+        this.proceduresToProcess = history.state.procedures;
+      }
+    });
   }
 
   ngOnInit() {
@@ -48,9 +73,34 @@ export class AddInvoiceComponent implements OnInit {
         this.treatmentPlansService.getTreatmentPlans(Number(this.patientId)).subscribe(res => {
             this.plannedTreatmentPlans = res.data.rows.filter((p: any) => p.status.toLowerCase() == 'none');
         });
+        if (this.isEditMode && this.editInvoiceData) {
+          this.populateFormWithInvoice(this.editInvoiceData);
+        }
         this.treatmentPlansService.getCompletedTreatmentPlans(Number(this.patientId)).subscribe(res => {
             this.completedTreatmentPlans = res.data.rows.filter((p: any) => p.status.toLowerCase() == 'completed' && p.invoice_status.toLowerCase() === 'pending' );
+            // Check if we have procedures to process
+            if (this.proceduresToProcess && this.proceduresToProcess.length > 0) {
+              // Process each procedure in the array
+              this.proceduresToProcess.forEach(proc => {
+                const procedure = this.completedTreatmentPlans.find(
+                  t => t.id === proc.procedureId && t.treatment_unique_id === proc.treatmentKey
+                );
+                if (procedure) {
+                  this.addPlannedTreatment(procedure);
+                }
+              });
+            }
+            
           });
+      }
+      
+    });
+    this.route.paramMap.subscribe(params => {
+      if(this.uniqueCode == null) {
+        this.uniqueCode = params.get('source');
+      }
+      if(this.uniqueCode !== null){
+        this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
       }
     });
     this.getProcedures();
@@ -65,6 +115,61 @@ export class AddInvoiceComponent implements OnInit {
     });
   }
   
+  populateFormWithInvoice(invoiceData: any[]) {
+    if (!invoiceData || invoiceData.length === 0) return;
+    
+    // Clear the existing treatments array
+    while (this.treatments.length) {
+      this.treatments.removeAt(0);
+    }
+    
+    // Add each treatment from the invoice to the form
+    for (const item of invoiceData) {
+      const treatment = item.treatment_plans;
+      
+      // Parse teeth set to an array of numbers
+      const teethArray = treatment.teeth_set 
+        ? treatment.teeth_set.split(',').map((tooth: string) => parseInt(tooth.trim(), 10))
+        : [];
+      
+      const treatmentFormGroup = this.fb.group({
+        id: [item.treatment_id],
+        unique_id: [item.treatment_unique_id],
+        procedureName: [treatment.procedure_details?.name || ''],
+        procedureId: [treatment.procedure_details?.procedure_id || treatment.procedure_id],
+        quantity: [parseInt(treatment.quantity) || 1],
+        cost: [parseFloat(treatment.cost) || 0],
+        discount: [parseFloat(treatment.discount) || 0],
+        discountType: [treatment.discount_formate || '%'],
+        total: [parseFloat(treatment.total_cost) || 0],
+        selectedTeeth: [teethArray],
+        multiplyCost: [true],
+        fullMouth: [false],
+        showAdultTeeth: [false],
+        showChildTeeth: [false],
+        notes: [treatment.notes || ''],
+        showNotes: [!!treatment.notes],
+        doctorId: [treatment.doctor_details_treat?.doctor_id || treatment.doctor_id || this.doctor?.user_id || ''],
+        doctorObj: [this.doctors.find(d => d.user_id === (treatment.doctor_details_treat?.doctor_id || treatment.doctor_id)) || this.doctor || null],
+        procedureDate: [treatment.date ? new Date(treatment.date) : this.date],
+        // Additional fields for invoice editing
+        invoice_id: [item.invoice_id],
+        invoice_item_id: [item.id],
+        payment_status: [item.payment_status]
+      });
+      
+      const index = this.treatments.length;
+      this.treatments.push(treatmentFormGroup);
+      this.calculateTotal(index);
+      
+      // Subscribe to value changes
+      treatmentFormGroup.valueChanges.subscribe(() => {
+        this.calculateTotal(index);
+      });
+    }
+  }
+
+
   filterProcedures() {
     const search = this.searchText.toLowerCase().trim();
     this.filteredProcedures = this.procedures.filter(procedure => 
@@ -305,28 +410,60 @@ export class AddInvoiceComponent implements OnInit {
         grand_total: this.calculateGrandTotal().toString(),
         procedures_list: procedureLists
       };
-      this.treatmentForm.value.treatments.forEach((t: any)=>{
-        treatment.procedures_list.push({
-          procedure_id: t.procedureId,
-          treatment_plan_id: t.id,
-          treatment_unique_id: t.unique_id,
-          doctor_id: t.doctorId,
-          quantity: t.quantity,
-          cost: t.cost,
-          discount: t.discount.toString(),
-          discount_formate: t.discountType,
-          teeth_set: t.selectedTeeth.toString(),
-          status: "Completed",
-          date: t.procedureDate,
-          total_cost: t.total,
-          total_discount: t.discount.toString(),
-          notes: t.notes,
+      if(this.isEditMode){
+        this.treatmentForm.value.treatments.forEach((t: any)=>{
+          treatment.procedures_list.push({
+            procedure_id: t.procedureId,
+            treatment_id: t.id,
+            treatment_unique_id: t.unique_id,
+            doctor_id: t.doctorId,
+            quantity: t.quantity,
+            cost: t.cost,
+            discount: t.discount.toString(),
+            discount_formate: t.discountType,
+            teeth_set: t.selectedTeeth.toString(),
+            status: "Completed",
+            date: t.procedureDate,
+            total_cost: t.total,
+            total_discount: t.discount.toString(),
+            notes: t.notes,
+            action: 'Update'
+          });
         });
-      })
-      this.treatmentPlansService.addInvoiceWithTreatmentPlan(treatment).subscribe(res => {
-        console.log(res)
-        this.router.navigate(['/patients', this.patientId, 'invoices']);
-      }); 
+      }
+      else{
+        this.treatmentForm.value.treatments.forEach((t: any)=>{
+          treatment.procedures_list.push({
+            procedure_id: t.procedureId,
+            treatment_plan_id: t.id,
+            treatment_unique_id: t.unique_id,
+            doctor_id: t.doctorId,
+            quantity: t.quantity,
+            cost: t.cost,
+            discount: t.discount.toString(),
+            discount_formate: t.discountType,
+            teeth_set: t.selectedTeeth.toString(),
+            status: "Completed",
+            date: t.procedureDate,
+            total_cost: t.total,
+            total_discount: t.discount.toString(),
+            notes: t.notes,
+          });
+        });
+      }
+      if(this.isEditMode) {
+        this.treatmentPlansService.updateInvoiceWithTreatmentPlan(treatment).subscribe(res => {
+          console.log(res)
+          this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
+        });
+      }
+      else {
+        this.treatmentPlansService.addInvoiceWithTreatmentPlan(treatment).subscribe(res => {
+          console.log(res)
+          this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
+        });
+      }
+       
     }
   }
 
@@ -379,7 +516,7 @@ export class AddInvoiceComponent implements OnInit {
             next: () => {
               // Navigate only once after all payments are processed
               if (this.patientId !== null && this.patientId !== undefined) {
-                this.router.navigate(['/patients', this.patientId, 'invoices']);
+                this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
               }
             },
             error: (error) => {
@@ -390,7 +527,7 @@ export class AddInvoiceComponent implements OnInit {
         } else {
           // If no payments were needed, navigate anyway
           if (this.patientId !== null && this.patientId !== undefined) {
-            this.router.navigate(['/patients', this.patientId, 'invoices']);
+            this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
           }
         }
       });
@@ -424,6 +561,6 @@ export class AddInvoiceComponent implements OnInit {
   }
 
   cancel(){
-    this.router.navigate(['/patients', this.patientId, 'invoices']);
+    this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
   }
 }

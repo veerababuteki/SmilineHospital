@@ -31,12 +31,18 @@
                     </th>
                     <th width="65">
                         <div class="actions">
-                            <button class="edit-btn border-left-radius">
-                                <i class="pi pi-print"></i>
-                            </button>
-                            <button class="edit-btn border-right-radius">
-                                <i class="pi pi-chevron-down"></i>
-                            </button>
+                            <app-invoice-print [invoice]="invoiceGroup"></app-invoice-print>
+                            <div *ngIf="invoiceGroup.value[0].payment_status === 'Pending'" class="action-menu">
+                                <button 
+                                  #menuButton
+                                  type="button" 
+                                  pButton 
+                                  icon="pi pi-chevron-down" 
+                                  class="edit-btn border-right-radius p-button-text"
+                                  (click)="invoiceMenu.toggle($event); setCurrentInvoice(invoiceGroup.key)">
+                                </button>
+                                <p-menu #invoiceMenu [popup]="true" [model]="items"></p-menu>
+                            </div>
                         </div>
                     </th>
                 </tr>

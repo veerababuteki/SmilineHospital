@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
-  private baseUrl = 'https://apis.idental.ai/auth';  // Replace with actual API
+  private baseUrl = 'https://apis.idental.ai/api/v1';  // Replace with actual API
   loggedIn: boolean = false;
 
   constructor(private http: HttpClient, private router: Router) {}
@@ -26,13 +26,19 @@ export class AuthService {
         const headers = new HttpHeaders({
           'Authorization': `Bearer ${token}`
         });
-    return this.http.get<any>(`${this.baseUrl}/getCurrentUser`, {headers});
+    return this.http.get<any>(`${this.baseUrl}/auth/user/getCurrentUser`, {headers});
   }
+  selectedPractice: any;
 
   registerUser(patientDetails: any) {
-    return this.http.post<any>(`${this.baseUrl}/register`, {
+    const savedPractice = localStorage.getItem('selectedPractice');
+    if(savedPractice){
+      this.selectedPractice = JSON.parse(savedPractice);
+    }
+    return this.http.post<any>(`${this.baseUrl}/auth/user/register`, {
         first_name: patientDetails.first_name,
-        last_name: patientDetails.last_name,
+        last_name: '',
+        manual_unique_code: patientDetails.manual_unique_code,
         date_of_birth: patientDetails.date_of_birth,
         address: patientDetails.address,
         aadhaar_id: patientDetails.aadhaar_id,
@@ -60,7 +66,8 @@ export class AuthService {
         medical_history: patientDetails.medical_history,
         groups_list: patientDetails.groups_list,
         other_history: patientDetails.other_history,
-        role_id: '2ac7787b-77d1-465b-9bc0-eee50933697f'
+        role_id: '2ac7787b-77d1-465b-9bc0-eee50933697f',
+        branch_id: this.selectedPractice.branch_id,
     });
   }
 
@@ -73,14 +80,14 @@ export class AuthService {
   }
 
   verifyOTP(mobileNumber: any, otp: any){
-    return this.http.post<any>(`${this.baseUrl}/verifyOtp`, {
+    return this.http.post<any>(`${this.baseUrl}/auth/user/verifyOtp`, {
         username: mobileNumber,
         otp: otp
     });
   }
 
   loginWithPassword(input: any, password:any){
-    return this.http.post<any>(`${this.baseUrl}/login`, {
+    return this.http.post<any>(`${this.baseUrl}/auth/user/login`, {
         login_type: "password",
         username: input,
         password: password
@@ -111,15 +118,22 @@ export class AuthService {
 
   refreshToken(): Observable<any> {
     const refreshToken = localStorage.getItem('refreshToken');
-    this.logout();
+    const accessToken = localStorage.getItem('accessToken');
+    const token = this.getAccessToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
     if (!refreshToken) {
       this.logout();
       return throwError(() => new Error('No refresh token found'));
     }
 
-    return this.http.post<any>(`${this.baseUrl}/refresh`, { refreshToken }).pipe(
+    return this.http.post<any>(`${this.baseUrl}/refreshToken`, { 
+      accessToken: accessToken,
+      refreshToken:  refreshToken 
+    }, {headers}).pipe(
       tap((response: any) => {
-        this.storeTokens(response);
+        this.storeTokens(response.data);
       }),
       catchError((error: any) => {
         this.logout();

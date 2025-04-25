@@ -1,0 +1,231 @@
+<div class="print-container">
+    <div class="header">
+      <h2>Print Schedule</h2>
+      <h2>Print Schedule Settings</h2>
+    </div>
+  
+    <div class="content-wrapper">
+      <!-- Left: Schedule Table (Wrapped for Printing) -->
+      <div id="appointments-container" class="schedule" [ngClass]="getFontSizeClass()">
+        <div class="schedule-header">
+          <h3>Schedule for {{selectedDoctor}}</h3>
+          <p class="date" *ngIf="appointments.length > 0">{{dateRangeText}}</p>
+          <p class="no-appointments" *ngIf="appointments.length === 0">No appointments found for this period</p>
+        </div>
+  
+        <!-- When showing single day appointments (Today, Tomorrow, Specific) -->
+        <div *ngIf="!shouldGroupByDate()">
+          <!-- When not grouped by doctors -->
+          <table class="appointments-table" *ngIf="!groupByDoctors && appointments.length > 0">
+            <tbody>
+              <ng-container *ngFor="let appointment of filterAppointmentsByDoctor()">
+                <tr>
+                  <td class="time-column">{{appointment.appointment_time}}</td>
+                  <td class="doctor-column">{{appointment.doctor_details?.user_profile_details[0]?.first_name}} {{appointment.doctor_details?.user_profile_details[0]?.last_name}}</td>
+                  <td class="patient-column">
+                    <ng-container *ngIf="appointment.patient_details">
+                      {{appointment.patient_details.user_profile_details[0]?.first_name}} {{appointment.patient_details.user_profile_details[0]?.last_name}} 
+                      <span *ngIf="appointment.patient_details.unique_code">({{appointment.patient_details.unique_code}})</span>
+                    </ng-container>
+                    <ng-container *ngIf="!appointment.patient_details">
+                      <span *ngIf="appointment.status === 'Not Available'">Not Available</span>
+                      <span *ngIf="appointment.status === 'Cancelled'">not available</span>
+                    </ng-container>
+                  </td>
+                  <td *ngIf="showContactNumber">
+                    {{appointment.patient_details?.phone || 'N/A'}}
+                  </td>
+                  <td *ngIf="showNotes">
+                    {{appointment.notes || 'N/A'}}
+                  </td>
+                  <td *ngIf="showAppointmentCategories">
+                    {{appointment.category_details?.name || 'N/A'}}
+                  </td>
+                  <td *ngIf="showTreatmentPlans">
+                    {{appointment.planned_procedure || 'N/A'}}
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+  
+          <!-- When grouped by doctors for single day -->
+          <div *ngIf="groupByDoctors && appointments.length > 0">
+            <div *ngFor="let doctorGroup of getGroupedAppointments()" class="doctor-group">
+              <h4 class="doctor-name">{{doctorGroup.doctorName}}</h4>
+              <table class="appointments-table">
+                <tbody>
+                  <ng-container *ngFor="let appointment of doctorGroup.appointments">
+                    <tr>
+                      <td class="time-column">{{appointment.appointment_time}}</td>
+                      <td class="patient-column">
+                        <ng-container *ngIf="appointment.patient_details">
+                          {{appointment.patient_details.user_profile_details[0]?.first_name}} {{appointment.patient_details.user_profile_details[0]?.last_name}} 
+                          <span *ngIf="appointment.patient_details.unique_code">({{appointment.patient_details.unique_code}})</span>
+                        </ng-container>
+                        <ng-container *ngIf="!appointment.patient_details">
+                          <span *ngIf="appointment.status === 'Not Available'">Not Available</span>
+                          <span *ngIf="appointment.status === 'Cancelled'">not available</span>
+                        </ng-container>
+                      </td>
+                      <td *ngIf="showContactNumber">
+                        {{appointment.patient_details?.phone || 'N/A'}}
+                      </td>
+                      <td *ngIf="showNotes">
+                        {{appointment.notes || 'N/A'}}
+                      </td>
+                      <td *ngIf="showAppointmentCategories">
+                        {{appointment.category_details?.name || 'N/A'}}
+                      </td>
+                      <td *ngIf="showTreatmentPlans">
+                        {{appointment.planned_procedure || 'N/A'}}
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+  
+        <!-- When showing multiple days grouped by date (This Week, Next Seven Days) -->
+        <div *ngIf="shouldGroupByDate() && appointments.length > 0">
+          <div *ngFor="let dateGroup of getDateGroupedAppointments()" class="date-group">
+            <h4 class="date-header">{{ dateGroup.displayDate }}</h4>
+            
+            <!-- When not grouped by doctors -->
+            <table class="appointments-table" *ngIf="!groupByDoctors">
+              <tbody>
+                <ng-container *ngFor="let appointment of dateGroup.appointments">
+                  <tr>
+                    <td class="time-column">{{appointment.appointment_time}}</td>
+                    <td class="doctor-column">{{appointment.doctor_details?.user_profile_details[0]?.first_name}} {{appointment.doctor_details?.user_profile_details[0]?.last_name}}</td>
+                    <td class="patient-column">
+                      <ng-container *ngIf="appointment.patient_details">
+                        {{appointment.patient_details.user_profile_details[0]?.first_name}} {{appointment.patient_details.user_profile_details[0]?.last_name}} 
+                        <span *ngIf="appointment.patient_details.unique_code">({{appointment.patient_details.unique_code}})</span>
+                      </ng-container>
+                      <ng-container *ngIf="!appointment.patient_details">
+                        <span *ngIf="appointment.status === 'Not Available'">Not Available</span>
+                        <span *ngIf="appointment.status === 'Cancelled'">not available</span>
+                      </ng-container>
+                    </td>
+                    <td *ngIf="showContactNumber">
+                      {{appointment.patient_details?.phone || 'N/A'}}
+                    </td>
+                    <td *ngIf="showNotes">
+                      {{appointment.notes || 'N/A'}}
+                    </td>
+                    <td *ngIf="showAppointmentCategories">
+                      {{appointment.category_details?.name || 'N/A'}}
+                    </td>
+                    <td *ngIf="showTreatmentPlans">
+                      {{appointment.planned_procedure || 'N/A'}}
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+            
+            <!-- When grouped by doctors -->
+            <div *ngIf="groupByDoctors">
+              <div *ngFor="let doctorGroup of getGroupedAppointmentsForDate(dateGroup.appointments)" class="doctor-group">
+                <h5 class="doctor-name">{{doctorGroup.doctorName}}</h5>
+                <table class="appointments-table">
+                  <tbody>
+                    <ng-container *ngFor="let appointment of doctorGroup.appointments">
+                      <tr>
+                        <td class="time-column">{{appointment.appointment_time}}</td>
+                        <td class="patient-column">
+                          <ng-container *ngIf="appointment.patient_details">
+                            {{appointment.patient_details.user_profile_details[0]?.first_name}} {{appointment.patient_details.user_profile_details[0]?.last_name}} 
+                            <span *ngIf="appointment.patient_details.unique_code">({{appointment.patient_details.unique_code}})</span>
+                          </ng-container>
+                          <ng-container *ngIf="!appointment.patient_details">
+                            <span *ngIf="appointment.status === 'Not Available'">Not Available</span>
+                            <span *ngIf="appointment.status === 'Cancelled'">not available</span>
+                          </ng-container>
+                        </td>
+                        <td *ngIf="showContactNumber">
+                          {{appointment.patient_details?.phone || 'N/A'}}
+                        </td>
+                        <td *ngIf="showNotes">
+                          {{appointment.notes || 'N/A'}}
+                        </td>
+                        <td *ngIf="showAppointmentCategories">
+                          {{appointment.category_details?.name || 'N/A'}}
+                        </td>
+                        <td *ngIf="showTreatmentPlans">
+                          {{appointment.planned_procedure || 'N/A'}}
+                        </td>
+                      </tr>
+                    </ng-container>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Right: Filters -->
+      <div class="filters">
+        <div class="filter-section">
+          <label>Date Range</label>
+          <p-dropdown [options]="dateOptions" [(ngModel)]="selectedDate" styleClass="full-width" (onChange)="onDateOptionChange()"></p-dropdown>
+          
+          <!-- Date picker for specific date option -->
+          <div *ngIf="selectedDate === 'Specific'" class="specific-date-picker">
+            <p-calendar [(ngModel)]="specificDate" [showIcon]="true" appendTo="body" styleClass="full-width" [readonlyInput]="true" (onSelect)="onSpecificDateChange()" dateFormat="mm/dd/yy"></p-calendar>
+          </div>
+        </div>
+  
+        <div class="filter-section">
+          <label>Doctor</label>
+          <p-dropdown [options]="doctorOptions" [(ngModel)]="selectedDoctor" styleClass="full-width"></p-dropdown>
+        </div>
+  
+        <div class="filter-section">
+          <label>Font Size</label>
+          <p-dropdown [options]="fontSizeOptions" [(ngModel)]="selectedFontSize" styleClass="full-width"></p-dropdown>
+        </div>
+  
+        <div class="checkbox-group">
+          <div class="checkbox">
+            <p-checkbox [(ngModel)]="showContactNumber" [binary]="true" inputId="contactNumber"></p-checkbox>
+            <label for="contactNumber">Show contact number</label>
+          </div>
+          
+          <div class="checkbox">
+            <p-checkbox [(ngModel)]="showNotes" [binary]="true" inputId="notes"></p-checkbox>
+            <label for="notes">Show notes</label>
+          </div>
+          
+          <div class="checkbox">
+            <p-checkbox [(ngModel)]="showAppointmentCategories" [binary]="true" inputId="categories"></p-checkbox>
+            <label for="categories">Show appointment categories</label>
+          </div>
+          
+          <div class="checkbox">
+            <p-checkbox [(ngModel)]="showTreatmentPlans" [binary]="true" inputId="treatmentPlans"></p-checkbox>
+            <label for="treatmentPlans">Show treatment plans</label>
+          </div>
+          
+          <div class="checkbox">
+            <p-checkbox [(ngModel)]="showFreeSlots" [binary]="true" inputId="freeSlots"></p-checkbox>
+            <label for="freeSlots">Show free slots</label>
+          </div>
+          
+          <div class="checkbox">
+            <p-checkbox [(ngModel)]="groupByDoctors" [binary]="true" inputId="groupByDoctors"></p-checkbox>
+            <label for="groupByDoctors">Group by doctors</label>
+          </div>
+        </div>
+  
+        <div class="button-group">
+          <button pButton label="Cancel" class="p-button-outlined" (click)="cancelPrint()"></button>
+          <button pButton label="Print" (click)="printAppointments()" class="p-button-primary"></button>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -1,349 +1,368 @@
 .sidebar {
-    width: 60px;
-    height: 100vh;
-    background-color: white;
-    position: fixed;
-    left: 0;
-    top: 0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    color: white;
-    z-index: 999;
-  
-    &.expanded {
-      width: 240px;
+  width: 60px;
+  height: 100vh;
+  background-color: white;
+  position: fixed;
+  left: 0;
+  top: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  color: white;
+  z-index: 999;
+
+  &.expanded {
+    width: 240px;
+  }
+
+  .logo-container {
+    padding: 20px 10px;
+    min-height: 60px;
+
+    .logo {
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
     }
-  
-    .logo-container {
-      padding: 20px 10px;
-      min-height: 60px;
-      .logo {
-        max-width: 100%;
-        height: auto;
-        object-fit: contain;
-      }
-      .expanded-logo{
-        max-width: 100%;
-        height: 60px;
-      }
-    }
-  
-    .ray-section {
-      padding: 15px;
-      font-size: 18px;
-      font-weight: 300;
-      border-bottom: 1px solid #e0e0e0;
-    }
-  
-    .nav-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      flex-grow: 1;
-    }
-  
-    .nav-item {
-      .nav-link {
-        display: flex;
-        align-items: center;
-        padding: 12px 15px;
-        text-decoration: none;
-        color: black;
-        transition: background-color 0.2s ease;
-  
-        &:hover {
-          background-color: #e0e0e0
-        }
-  
-        .icon-wrapper {
-          width: 24px;
-          height: 24px;
-          margin-right: 15px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          opacity: 0.7;
-  
-          i {
-            font-size: 1.2rem;
-          }
-        }
-  
-        .label {
-          white-space: nowrap;
-          opacity: 0;
-          transition: opacity 0.2s ease;
-        }
-  
-        &.active {
-          background-color: #e0e0e0;
-          
-          .icon-wrapper {
-            opacity: 1;
-          }
-        }
-      }
-    }
-  
-    .domain {
-      padding: 15px;
-      font-size: 14px;
-      opacity: 0.7;
-      border-top: 1px solid #e0e0e0;
-    }
-  
-    &.expanded {
-      .label {
-        opacity: 1;
-      }
+
+    .expanded-logo {
+      max-width: 100%;
+      height: 60px;
     }
   }
-  .expanded-label{
-    opacity: 1;
-  }
-  // styles.scss (or your global styles file)
-  // Add these imports at the top of your global styles
-  @import "primeng/resources/themes/lara-light-blue/theme.css";
-  @import "primeng/resources/primeng.css";
-  @import "primeicons/primeicons.css";
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 1rem;
-    background: #fff;
+
+  .ray-section {
+    padding: 15px;
+    font-size: 18px;
+    font-weight: 300;
     border-bottom: 1px solid #e0e0e0;
-    height: 48px;
-    margin-left: 60px;
-    z-index: 999;
-    .header-left {
+  }
+
+  .nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+  }
+
+  .nav-item {
+    .nav-link {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-  
-      .search-wrapper {
-        position: relative;
-        width: 240px;
-  
-        .search-icon {
-          position: absolute;
-          left: 8px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: #666;
-          font-size: 0.875rem;
-        }
-  
-        .search-input {
-          width: 100%;
-          height: 32px;
-          border: 1px solid #e0e0e0;
-          border-radius: 4px;
-          padding: 0 8px 0 32px;
-          font-size: 0.875rem;
-          
-          &:focus {
-            outline: none;
-            border-color: #999;
-          }
-  
-          &::placeholder {
-            color: #999;
-          }
-        }
+      padding: 12px 15px;
+      text-decoration: none;
+      color: black;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: #e0e0e0
       }
-  
-      .add-patient-wrapper {
-        display: flex;
-        height: 32px;
-  
-        .add-patient-btn {
-          border: 1px solid #e0e0e0;
-          background: #fff;
-          color: #333;
-          font-size: 0.875rem;
-          padding: 0 12px;
-          border-radius: 4px 0 0 4px;
-          height: 100%;
-  
-          &:hover {
-            background: #f5f5f5;
-          }
-        }
-  
-        .dropdown-btn {
-          border: 1px solid #e0e0e0;
-          border-left: none;
-          background: #fff;
-          color: #333;
-          padding: 0 8px;
-          border-radius: 0 4px 4px 0;
-          height: 100%;
-  
-          i {
-            font-size: 0.75rem;
-          }
-  
-          &:hover {
-            background: #f5f5f5;
-          }
-        }
-      }
-    }
-  
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-  
-      .help-button,
-      .notification-button {
-        width: 32px;
-        height: 32px;
-        color: #666;
-  
-        i {
-          font-size: 1.125rem;
-        }
-  
-        &:hover {
-          background: #f5f5f5;
-        }
-      }
-  
-      .notification-wrapper {
-        position: relative;
-        
-        .notification-badge {
-          position: absolute;
-          top: 2px;
-          right: 2px;
-          background: #ff4444;
-          color: white;
-          border-radius: 10px;
-          padding: 1px 4px;
-          font-size: 0.6875rem;
-          min-width: 16px;
-          text-align: center;
-        }
-      }
-  
-      .user-button {
+
+      .icon-wrapper {
+        width: 24px;
+        height: 24px;
+        margin-right: 15px;
         display: flex;
         align-items: center;
-        gap: 4px;
-        padding: 4px 8px;
-        border-radius: 4px;
-  
-        .user-image {
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          object-fit: cover;
-        }
-  
+        justify-content: center;
+        opacity: 0.7;
+
         i {
-          font-size: 0.75rem;
-          color: #666;
-        }
-  
-        &:hover {
-          background: #f5f5f5;
+          font-size: 1.2rem;
         }
       }
-    }
-  }
-  
-  // Add to your global styles.scss
-  .p-button {
-    &.p-button-text {
-      padding: 0;
-      
-      &:enabled:hover {
-        background: transparent;
+
+      .label {
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+
+      &.active {
+        background-color: #e0e0e0;
+
+        .icon-wrapper {
+          opacity: 1;
+        }
       }
     }
   }
 
-  .search-wrapper {
-    position: relative;
-    width: 300px;
-    
-    .search-icon {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #6c757d;
-      z-index: 1;
+  .domain {
+    padding: 15px;
+    font-size: 14px;
+    opacity: 0.7;
+    border-top: 1px solid #e0e0e0;
+  }
+
+  &.expanded {
+    .label {
+      opacity: 1;
     }
-    
-    .search-input {
-      padding-left: 35px;
-      width: 100%;
-      height: 40px;
-      border-radius: 4px;
-    }
-    
-    .search-results-dropdown {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      width: 100%;
-      max-height: 300px;
-      overflow-y: auto;
-      background-color: white;
-      border-radius: 4px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      z-index: 1000;
-      margin-top: 5px;
-      
-      .search-results-list {
-        padding: 8px 0;
-        
-        .search-result-item {
-          display: flex;
-          align-items: center;
-          padding: 8px 16px;
-          cursor: pointer;
-          
-          &:hover {
-            background-color: #f8f9fa;
-          }
-          
-          .patient-thumbnail {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 12px;
-          }
-          
-          .patient-details {
-            display: flex;
-            flex-direction: column;
-            
-            .patient-name {
-              font-weight: 500;
-              color: #212529;
-            }
-            
-            .patient-email {
-              font-size: 12px;
-              color: #6c757d;
-            }
-          }
+  }
+}
+
+.expanded-label {
+  opacity: 1;
+}
+
+// styles.scss (or your global styles file)
+// Add these imports at the top of your global styles
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.css";
+@import "primeicons/primeicons.css";
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  height: 48px;
+  margin-left: 60px;
+  z-index: 999;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .search-wrapper {
+      position: relative;
+      width: 300px;
+
+      .search-icon {
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+        font-size: 0.875rem;
+      }
+
+      .search-input {
+        width: 100%;
+        height: 32px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 0 8px 0 32px;
+        font-size: 0.875rem;
+
+        &:focus {
+          outline: none;
+          border-color: #999;
+        }
+
+        &::placeholder {
+          color: #999;
         }
       }
-      
-      .no-results-found {
-        padding: 16px;
-        text-align: center;
-        color: #6c757d;
-        font-style: italic;
+    }
+
+    .add-patient-wrapper {
+      display: flex;
+      height: 32px;
+
+      .add-patient-btn {
+        border: 1px solid #e0e0e0;
+        background: #fff;
+        color: #333;
+        font-size: 0.875rem;
+        padding: 0 12px;
+        border-radius: 4px 0 0 4px;
+        height: 100%;
+
+        &:hover {
+          background: #f5f5f5;
+        }
+      }
+
+      .dropdown-btn {
+        border: 1px solid #e0e0e0;
+        border-left: none;
+        background: #fff;
+        color: #333;
+        padding: 0 8px;
+        border-radius: 0 4px 4px 0;
+        height: 100%;
+
+        i {
+          font-size: 0.75rem;
+        }
+
+        &:hover {
+          background: #f5f5f5;
+        }
       }
     }
   }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .help-button,
+    .notification-button {
+      width: 32px;
+      height: 32px;
+      color: #666;
+
+      i {
+        font-size: 1.125rem;
+      }
+
+      &:hover {
+        background: #f5f5f5;
+      }
+    }
+
+    .notification-wrapper {
+      position: relative;
+
+      .notification-badge {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        background: #ff4444;
+        color: white;
+        border-radius: 10px;
+        padding: 1px 4px;
+        font-size: 0.6875rem;
+        min-width: 16px;
+        text-align: center;
+      }
+    }
+
+    .user-button {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 4px;
+
+      .user-image {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      i {
+        font-size: 0.75rem;
+        color: #666;
+      }
+
+      &:hover {
+        background: #f5f5f5;
+      }
+    }
+  }
+}
+
+// Add to your global styles.scss
+.p-button {
+  &.p-button-text {
+    padding: 0;
+
+    &:enabled:hover {
+      background: transparent;
+    }
+  }
+}
+
+.search-wrapper {
+  position: relative;
+  width: 300px;
+
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    z-index: 1;
+  }
+
+  .search-input {
+    padding-left: 35px;
+    width: 100%;
+    height: 40px;
+    border-radius: 4px;
+  }
+
+  .search-results-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    margin-top: 5px;
+
+    .search-results-list {
+      padding: 8px 0;
+
+      .search-result-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 16px;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #f8f9fa;
+        }
+
+        .patient-thumbnail {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          object-fit: cover;
+          margin-right: 12px;
+        }
+
+        .patient-details {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+
+          .patient-header {
+            display: flex;
+            justify-content: space-between;
+            /* Pushes elements to opposite sides */
+            width: 100%;
+            /* Ensures it takes the full width */
+          }
+
+          .patient-id {
+            font-size: 12px;
+            color: #6c757d;
+          }
+
+          .patient-name {
+            font-weight: 500;
+            color: #212529;
+          }
+
+          .patient-email {
+            font-size: 12px;
+            color: #6c757d;
+          }
+        }
+      }
+    }
+
+    .no-results-found {
+      padding: 16px;
+      text-align: center;
+      color: #6c757d;
+      font-style: italic;
+    }
+  }
+}

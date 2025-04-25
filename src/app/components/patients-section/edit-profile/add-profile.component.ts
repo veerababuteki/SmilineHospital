@@ -124,6 +124,19 @@ export class AddProfileComponent implements OnInit {
       this.medicalConditions = res.data.rows;
       this.updateMedicalHistoryForm();
     });
+    const dateOfBirthControl = this.patientForm.get('dateOfBirth');
+  const ageControl = this.patientForm.get('age');
+  
+  if (dateOfBirthControl && ageControl) {
+    dateOfBirthControl.valueChanges.subscribe(date => {
+      if (date) {
+        const age = this.calculateAge(date);
+        ageControl.setValue(age, { emitEvent: false });
+      } else {
+        ageControl.setValue('', { emitEvent: false });
+      }
+    });
+  }
     
     // Load insurance groups
     this.userService.getInsuranceGroups().subscribe(res => {
@@ -136,7 +149,7 @@ export class AddProfileComponent implements OnInit {
   private createPatientForm(): FormGroup {
     return this.fb.group({
       firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      customId: [''],
       aadhaarId: [''],
       gender: ['', Validators.required],
       dateOfBirth: [''],
@@ -145,7 +158,10 @@ export class AddProfileComponent implements OnInit {
       refferedByName: [''],
       refferedByMobile: [''],
       bloodGroup: [null],
-      primaryMobile: ['', Validators.required],
+      primaryMobile: ['', [
+        Validators.required,
+        Validators.pattern('^[1-9]\\d{9}$'), // Starts with 6-9 and has 10 digits
+      ]],
       email: [''],
       secondaryMobile: [''],
       languagePreference: [this.languages[0]],  // Default to first option
@@ -232,7 +248,7 @@ export class AddProfileComponent implements OnInit {
       
       this.authService.registerUser({
         first_name: patientDetails.firstName,
-        last_name: patientDetails.lastName,
+        manual_unique_code: patientDetails.customId,
         date_of_birth: patientDetails.dateOfBirth,
         address: patientDetails.streetAddress,
         aadhaar_id: patientDetails.aadhaarId,
@@ -263,8 +279,7 @@ export class AddProfileComponent implements OnInit {
         this.patientForm.reset();
         this.medicalHistoryForm.reset();
         this.groupsForm.reset();
-        //this.router.navigate(['patients', res.data.user.user_id, 'profile', res.data.user.unique_code]);
-        debugger;
+        this.userService.sendLoadPatients();
         this.onSave.emit({user_id:res.data.user.user_id,unique_code:res.data.user.unique_code});
       });
     }
@@ -295,7 +310,18 @@ export class AddProfileComponent implements OnInit {
       });
     }
   }
-
+  calculateAge(dateOfBirth: Date): number {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age;
+  }
   cancel() {
     this.onCancel.emit();
   }

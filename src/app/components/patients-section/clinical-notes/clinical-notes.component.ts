@@ -3,20 +3,28 @@ import { CommonModule } from '@angular/common';
 import { ClinicalNotesService } from '../../../services/clinical-notes.service';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ClinicalNotesPrintComponent } from "./clinical-notes-print/clinical-notes-print.component";
+import { MenuItem, MenuItemCommandEvent } from 'primeng/api';
+import { MenuModule } from 'primeng/menu';
+import { ButtonModule } from 'primeng/button';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-clinical-notes',
   templateUrl: './clinical-notes.component.html',
   styleUrls: ['./clinical-notes.component.scss'],
   standalone: true,
-  imports: [ CommonModule, FormsModule
-  ]
+  imports: [CommonModule, FormsModule, ClinicalNotesPrintComponent, MenuModule, ButtonModule]
 })
 
 export class ClinicalNotesComponent implements OnInit {
   clinicalNotes: any[] = [];
   patientId: string | null | undefined;
-  constructor(private clinicalNotesService: ClinicalNotesService, 
+  items: MenuItem[] = [];
+  currentClinicalNotes: any;
+  uniqueCode: string | null | undefined;
+
+  constructor(private messageService: MessageService, private clinicalNotesService: ClinicalNotesService, 
     private router: Router,
     private route: ActivatedRoute
   ){
@@ -32,6 +40,45 @@ export class ClinicalNotesComponent implements OnInit {
         this.loadPatientData(this.patientId);
       }
     });
+    this.route.paramMap.subscribe(params => {
+      if(this.uniqueCode == null) {
+        this.uniqueCode = params.get('source');
+      }
+      if (this.uniqueCode) {
+        this.messageService.sendMessage(this.patientId ? this.patientId : '', this.uniqueCode ? this.uniqueCode : '');
+
+      }
+    });
+
+    this.items = [
+      {
+        label: 'Edit',
+        icon: 'pi pi-pencil',
+        command: (event) => this.updateClinicalNotes(event)
+      }
+    ];
+  }
+  
+  setCurrentClinicalNotes(event: any): void {
+    // Update menu items with the current invoice key as data
+    this.currentClinicalNotes = event
+    this.items = [
+      {
+        label: 'Edit',
+        icon: 'pi pi-pencil',
+        command: () => this.updateClinicalNotes(this.currentClinicalNotes)
+      },
+      // {
+      //   label: 'Cancel',
+      //   icon: 'pi pi-times',
+      //   command: () => this.cancelInvoice(this.currentInvoiceKey)
+      // }
+    ];
+  }
+  updateClinicalNotes(event: any): void {
+    this.router.navigate(['/patients', this.patientId, 'add-clinical-note', this.uniqueCode], {
+      state: { mode: 'edit', noteData: event }
+    });
   }
   
   loadPatientData(patientId: string){
@@ -41,7 +88,7 @@ export class ClinicalNotesComponent implements OnInit {
   }
 
   navigateToAdd(){
-    this.router.navigate(['/patients', this.patientId, 'add-clinical-note'])
+    this.router.navigate(['/patients', this.patientId, 'add-clinical-note', this.uniqueCode])
   }
   formatStringToArray(value: string){
     if (typeof value !== "string") {

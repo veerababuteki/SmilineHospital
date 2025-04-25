@@ -34,14 +34,14 @@
                     <!-- <span class="add-notes">+add notes</span> -->
                   </td>
                   <td>
-                    <input type="number" formControlName="quantity" class="qty-input" min="1">
+                    <input type="number" formControlName="quantity" (change) = "valuechange(treatment,i)" class="qty-input" min="1">
                   </td>
                   <td class="multiply-symbol">x</td>
                   <td>
-                    <input type="number" formControlName="cost" class="cost-input" min="0">
+                    <input type="number" formControlName="cost" (change) = "valuechange(treatment,i)" class="cost-input" min="0">
                   </td>
                   <td class="discount-cell">
-                    <input type="number" formControlName="discount" class="discount-input" min="0">
+                    <input type="number" formControlName="discount" (change) = "valuechange(treatment,i)" class="discount-input" min="0">
                     <select formControlName="discountType" class="discount-type">
                       <option value="%">%</option>
                       <option value="INR">INR</option>
@@ -77,7 +77,7 @@
             <div class="options-row" *ngIf="treatment.get('showAdultTeeth')?.value || treatment.get('showChildTeeth')?.value">
               <div class="checkboxes">
                 <label class="checkbox-container">
-                  <input type="checkbox" formControlName="multiplyCost">
+                  <input type="checkbox" formControlName="multiplyCost" (change)="toggleMultiplyCost(i)">
                   <span class="checkbox-label">Multiply Cost</span>
                 </label>
                 <label class="checkbox-container">

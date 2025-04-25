@@ -17,13 +17,34 @@
 
     <form *ngIf="activeTab === 'appointment'" [formGroup]="appointmentForm" (ngSubmit)="onSubmit()" class="form-content">
       <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
-        <label class="required">Patient ID</label>
+        <label class="required">Patient ID or Mobile Number</label>
         <div class="input-with-button">
-          <input type="text" pInputText formControlName="patientId" placeholder="Enter Patient ID">
+          <input type="text" pInputText formControlName="patientId" placeholder="Enter Patient ID or Mobile Number">
           <button type="button" pButton label="Get Patient Details" (click)="getPatientDetails()"></button>
         </div>
-        <span class="error-message" *ngIf="paitentNotFound">No paitent found</span>
-        <button type="button" class="add-paitent-btn" pButton (click)="openPatientDialog()">+ Add patient</button>
+        <!-- Multiple patients dropdown -->
+        <div class="patient-dropdown-container" *ngIf="showPatientDropdown">
+          <p class="multiple-patients-message">Multiple patients found. Please select one:</p>
+          <ul class="patient-dropdown">
+            <li *ngFor="let patient of multiplePatients" class="patient-item" (click)="selectPatient(patient)">
+              <div class="patient-info">
+                <span class="patient-name">
+                  {{ patient.profile ? 
+                    (patient.profile.first_name + ' ' + patient.profile.last_name) : 
+                    (patient.user_profile_details[0].first_name + ' ' + patient.user_profile_details[0].last_name) 
+                  }}
+                </span>
+                <span class="patient-mobile">{{ patient.phone }}</span>
+                <span class="patient-email">{{ patient.email }}</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <span class="error-message" *ngIf="paitentNotFound">No patient found</span>
+        <div class="add-patient-container">
+          <div class="message">Want to add a new paitent?</div>
+          <button type="button" class="add-paitent-btn" pButton (click)="openPatientDialog()">+ Add patient</button>
+        </div>
       </div>
     
       <div class="two-column-grid">
@@ -42,14 +63,15 @@
             [style]="{'width':'100%'}" [placeholder]="'Select Booking Type'"></p-dropdown>
           </div>
           <div class="form-row">
-            <label class="required">Appointment Status</label>
+            <label>Appointment Status</label>
             <p-dropdown formControlName="appointmentStatus" [options]="appointmentStatus"
             [style]="{'width':'100%'}" [placeholder]="''"></p-dropdown>
           </div>
           <div class="form-row">
-            <label class="required">Doctor</label>
+            <label>Doctor</label>
             <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
-                       [style]="{'width':'100%'}" [placeholder]="'Select Doctor'"></p-dropdown>
+                       [style]="{'width':'100%'}" [placeholder]="'Select Doctor'"
+                       [filter]="true" filterBy="name"></p-dropdown>
           </div>
         </div>
     
@@ -64,9 +86,10 @@
                        [style]="{'width':'100%'}" [placeholder]="''"></p-dropdown>
           </div>
           <div class="form-row">
-            <label class="required">Category</label>
+            <label>Category</label>
             <p-dropdown formControlName="category" [options]="categories" optionLabel="name" 
-                       placeholder="Select Category" [style]="{'width':'100%'}"></p-dropdown>
+                       placeholder="Select Category" [style]="{'width':'100%'}"
+                       [filter]="true" filterBy="name"></p-dropdown>
           </div>
         </div>
       </div>
@@ -74,18 +97,17 @@
       <div class="form-row schedule-row">
         <label class="required">Scheduled On</label>
         <div class="schedule-inputs">
-          <p-calendar formControlName="scheduledDate" [showIcon]="true" dateFormat="dd-mm-yy"  appendTo="body"></p-calendar>
+          <p-calendar formControlName="scheduledDate" [showIcon]="true" dateFormat="dd-mm-yy" appendTo="body"></p-calendar>
           <span>at</span>
           <p-calendar formControlName="scheduledTime" [timeOnly]="true" [showIcon]="false" hourFormat="12"></p-calendar>
           <span>for</span>
-          <p-dropdown 
-          formControlName="duration" 
-          [options]="durations" 
-          optionLabel="label" 
-          optionValue="value" 
-          [style]="{'width':'120px'}">
-        </p-dropdown>
-                </div>
+          <p-dropdown formControlName="duration"
+                      [options]="durations"
+                      optionLabel="label"
+                      optionValue="value"
+                      [style]="{'width':'120px'}">
+          </p-dropdown>
+        </div>
       </div>
 
       <div class="form-row">
@@ -120,7 +142,7 @@
         <label class="required-label">Doctor</label>
         <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
              [style]="{'width':'100%'}" styleClass="bordered-dropdown"
-             placeholder="All Doctors"></p-dropdown>
+             placeholder="All Doctors" [filter]="true" filterBy="name"></p-dropdown>
         </div>
       </div>
       
@@ -189,7 +211,7 @@
         <label class="required-label">Doctor</label>
         <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
              [style]="{'width':'100%'}" styleClass="bordered-dropdown"
-             placeholder="All Doctors"></p-dropdown>
+             placeholder="All Doctors" [filter]="true" filterBy="name"></p-dropdown>
         </div>
       </div>
       

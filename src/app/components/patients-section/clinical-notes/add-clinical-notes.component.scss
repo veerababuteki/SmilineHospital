@@ -1,249 +1,279 @@
 /* clinical-notes.component.scss */
 .clinical-notes {
-    padding: 0;
-    background-color: white;
-    .header {
+  padding: 0;
+  background-color: white;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+
+    h1 {
+      margin: 0;
+      font-size: 16px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .header-buttons {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 20px;
-      border-bottom: 1px solid #ddd;
-  
-      h1 {
-        margin: 0;
-        font-size: 16px;
-        color: #333;
-        font-weight: 500;
+      gap: 10px;
+
+      .btn-cancel {
+        padding: 6px 12px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
       }
-  
-      .header-buttons {
-        display: flex;
-        gap: 10px;
-  
-        .btn-cancel {
-          padding: 6px 12px;
-          background-color: #fff;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-          cursor: pointer;
-        }
-  
-        .btn-save {
-          padding: 6px 12px;
-          background-color: #5cb85c;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-  
-          &:hover {
-            background-color: #4cae4c;
-          }
-        }
-      }
-    }
-  
-    .main-content {
-      display: flex;
-      height: calc(100vh - 60px);
-    }
-  
-    .left-section {
-      flex: 1;
-      padding: 20px;
-      border-right: 1px solid #ddd;
-      overflow-y: auto;
-  
-      .form-group {
-        margin-bottom: 20px;
-  
-        label {
-          display: block;
-          color: #666;
-          margin-bottom: 5px;
-        }
-  
-        .form-control {
-          width: 100%;
-          padding: 8px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          font-size: 14px;
-          margin-bottom: 5px;
-          &:focus {
-            outline: none;
-            border-color: #80bdff;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-          }
-        }
-      }
-  
-      .follow-up {
-        align-items: center;
-        margin-top: 20px;
-        color: #666;
-        font-size: 14px;
-  
-        .action-links {
-          display: flex;
-          gap: 10px;
-  
-          a {
-            color: #007bff;
-            text-decoration: none;
-  
-            &:hover {
-              text-decoration: underline;
-            }
-  
-            &.delete-link {
-              color: #dc3545;
-            }
-          }
-        }
-      }
-  
-      .noted-by {
-        margin-top: 20px;
-        color: #666;
-        font-size: 14px;
-        display: flex;
-      }
-    }
-  
-    .right-section {
-      width: 300px;
-      padding: 20px;
-      background-color: #fff;
-      overflow-y: auto;
-  
-      .complaints-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-  
-        :host ::ng-deep {
-          .custom-dropdown {
-            .p-dropdown {
-              border: none;
-              background: transparent;
-  
-              &:not(.p-disabled).p-focus {
-                box-shadow: none;
-                border-color: transparent;
-              }
-  
-              .p-dropdown-label {
-                padding: 6px 12px;
-                font-size: 16px;
-                color: #333;
-              }
-  
-              .p-dropdown-trigger {
-                width: 2rem;
-                
-                .p-dropdown-trigger-icon {
-                  color: #666;
-                }
-              }
-            }
-  
-            .p-dropdown-panel {
-              .p-dropdown-items {
-                .p-dropdown-item {
-                  padding: 8px 16px;
-                  color: #333;
-  
-                  &:hover {
-                    background-color: #f8f9fa;
-                    color: #007bff;
-                  }
-                }
-              }
-            }
-          }
-        }
-  
-        .btn-add-complaint {
-          display: flex;
-          align-items: center;
-          padding: 6px 12px;
-          background-color: transparent;
-          border: none;
-          color: #007bff;
-          cursor: pointer;
-          font-size: 14px;
-  
-          &:hover {
-            text-decoration: underline;
-          }
-        }
-      }
-  
-      .search-box {
-        margin-bottom: 20px;
-  
-        .search-input {
-          width: 100%;
-          padding: 8px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          font-size: 14px;
-  
-          &:focus {
-            outline: none;
-            border-color: #80bdff;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-          }
-        }
-      }
-  
-      .complaints-list {
-        .complaint-item {
-          padding: 8px;
-          margin-bottom: 5px;
-          color: #666;
-          cursor: pointer;
-          border-radius: 4px;
-  
-          &:hover {
-            background-color: #f8f9fa;
-            color: #007bff;
-          }
+
+      .btn-save {
+        padding: 6px 12px;
+        background-color: #5cb85c;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #4cae4c;
         }
       }
     }
   }
 
-  .remove-btn, .add-btn{
-    border: none;
-    background: none;
-    cursor: pointer;
-    &:hover{
-      color: #e0e0e0;
+  .main-content {
+    display: flex;
+    height: calc(100vh - 60px);
+  }
+
+  .left-section {
+    flex: 1;
+    padding: 20px;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+
+    .form-group {
+      margin-bottom: 20px;
+
+      label {
+        display: block;
+        color: #666;
+        margin-bottom: 5px;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        margin-bottom: 5px;
+
+        &:focus {
+          outline: none;
+          border-color: #80bdff;
+          box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+        }
+      }
+    }
+
+    .follow-up {
+      display: flex;
+      align-items: center;
+      margin-top: 20px;
+      color: #666;
+      font-size: 14px;
+
+      p-calendar {
+        border: 1px solid #ddd !important;
+        border-radius: 4px;
+        margin-left: 10px;
+        width: 100px;
+      }
+
+      .action-links {
+        display: flex;
+        gap: 10px;
+
+        a {
+          color: #007bff;
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: underline;
+          }
+
+          &.delete-link {
+            color: #dc3545;
+          }
+        }
+      }
+    }
+
+    .noted-by {
+      margin-top: 20px;
+      color: #666;
+      font-size: 14px;
+      display: flex;
+      gap: 10px;
+
+      .doctor-name,
+      p-calendar {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      p-calendar {
+        width: 100px;
+        display: flex;
+      }
     }
   }
-  
-  .input-group{
-    display: flex;
+
+  .right-section {
+    width: 300px;
+    padding: 20px;
+    background-color: #fff;
+    overflow-y: auto;
+
+    .complaints-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+
+      :host ::ng-deep {
+        .custom-dropdown {
+          .p-dropdown {
+            border: none;
+            background: transparent;
+
+            &:not(.p-disabled).p-focus {
+              box-shadow: none;
+              border-color: transparent;
+            }
+
+            .p-dropdown-label {
+              padding: 6px 12px;
+              font-size: 16px;
+              color: #333;
+            }
+
+            .p-dropdown-trigger {
+              width: 2rem;
+
+              .p-dropdown-trigger-icon {
+                color: #666;
+              }
+            }
+          }
+
+          .p-dropdown-panel {
+            .p-dropdown-items {
+              .p-dropdown-item {
+                padding: 8px 16px;
+                color: #333;
+
+                &:hover {
+                  background-color: #f8f9fa;
+                  color: #007bff;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .btn-add-complaint {
+        display: flex;
+        align-items: center;
+        padding: 6px 12px;
+        background-color: transparent;
+        border: none;
+        color: #007bff;
+        cursor: pointer;
+        font-size: 14px;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .search-box {
+      margin-bottom: 20px;
+
+      .search-input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+
+        &:focus {
+          outline: none;
+          border-color: #80bdff;
+          box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+        }
+      }
+    }
+
+    .complaints-list {
+      .complaint-item {
+        padding: 8px;
+        margin-bottom: 5px;
+        color: #666;
+        cursor: pointer;
+        border-radius: 4px;
+
+        &:hover {
+          background-color: #f8f9fa;
+          color: #007bff;
+        }
+      }
+    }
   }
-  .visibility-hidden{
-    visibility: hidden;
-  }
-  .add-btn{
-    visibility: hidden;
-  }
-  .padding-span{
-    padding-top: 12px;
-  }
-  ::ng-deep .no-icon-dropdown .p-dropdown-trigger {
-    display: none !important;
-  }
-  ::ng-deep .p-dropdown {
-    border: none !important;
-    box-shadow: none !important;
 }
+
+.remove-btn,
+.add-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+
+  &:hover {
+    color: #e0e0e0;
+  }
+}
+
+.input-group {
+  display: flex;
+}
+
+.visibility-hidden {
+  visibility: hidden;
+}
+
+.add-btn {
+  visibility: hidden;
+}
+
+.padding-span {
+  padding-top: 12px;
+}
+
+::ng-deep .no-icon-dropdown .p-dropdown-trigger {
+  display: none !important;
+}
+
+::ng-deep .p-dropdown {
+  border: none !important;
+  box-shadow: none !important;
+}
+
 ::ng-deep .p-calendar .p-inputtext {
   border: none !important;
   box-shadow: none !important;

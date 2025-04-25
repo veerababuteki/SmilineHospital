@@ -176,20 +176,20 @@
         </div>
   
         <div class="procedures-list">
-            <div class="procedure-item" 
-               *ngFor="let procedure of plannedTreatmentPlans"
-               (click)="addPlannedTreatment(procedure)">
-            <div>
-                <div>{{procedure.procedure_details.name}}<span class="planned-tag">Planned</span></div>
-                <span style="font-weight: 500; font-size: 12px;">Teeth no. {{procedure.teeth_set}}</span>
-            </div>
-            <span class="price">{{procedure.total_cost}}</span>
-          </div>
           <div class="procedure-item" 
                *ngFor="let procedure of completedTreatmentPlans"
                (click)="addPlannedTreatment(procedure)">
             <div>
                 <div>{{procedure.procedure_details.name}}<span class="planned-tag">Completed</span></div>
+                <span style="font-weight: 500; font-size: 12px;">Teeth no. {{procedure.teeth_set}}</span>
+            </div>
+            <span class="price">{{procedure.total_cost}}</span>
+          </div>
+          <div class="procedure-item" 
+               *ngFor="let procedure of plannedTreatmentPlans"
+               (click)="addPlannedTreatment(procedure)">
+            <div>
+                <div>{{procedure.procedure_details.name}}<span class="planned-tag">Planned</span></div>
                 <span style="font-weight: 500; font-size: 12px;">Teeth no. {{procedure.teeth_set}}</span>
             </div>
             <span class="price">{{procedure.total_cost}}</span>

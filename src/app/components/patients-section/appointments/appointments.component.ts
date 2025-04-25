@@ -6,6 +6,7 @@ import { forkJoin } from 'rxjs';
 import { UserService } from '../../../services/user.service';
 import { AppointmentComponent } from '../../appointment/appointment.component';
 import { AuthService } from '../../../services/auth.service';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-appointments',
@@ -30,7 +31,8 @@ export class AppointmentsComponent implements OnInit {
     private userService: UserService, 
     private authService: AuthService,
     private router: Router, 
-    private appointmentService: AppointmentService
+    private appointmentService: AppointmentService,
+    private messageService: MessageService,
   ) {}
   
   ngOnInit(): void {
@@ -71,7 +73,7 @@ export class AppointmentsComponent implements OnInit {
         });
         
         // Make sure categories is an array with the correct structure for PrimeNG dropdown
-        this.categories = categories.data.map((category: any) => ({
+        this.categories = categories.data.rows.map((category: any) => ({
           ...category,
           label: category.name, // Add this for dropdown display
           value: category.category_id // Add this for dropdown value
@@ -94,6 +96,7 @@ export class AppointmentsComponent implements OnInit {
     this.myButton.showDialog(true);
   }
   loadPatientData(patientId: string) {
+    this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
     this.appointmentService.getAppointmentsByPatientID(patientId).subscribe(res => {
       this.patientAppointments = res.data.rows;
       this.appointments = this.groupByDate(res.data.rows);

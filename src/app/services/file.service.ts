@@ -9,7 +9,7 @@ import { options } from '@fullcalendar/core/preact.js';
   providedIn: 'root',
 })
 export class FileService {
-  private baseUrl = 'https://apis.idental.ai/auth';  // Replace with actual API
+  private baseUrl = 'https://apis.idental.ai/api/v1';  // Replace with actual API
   loggedIn: boolean = false;
 
   constructor(private http: HttpClient, private router: Router, private authService: AuthService) {}
@@ -19,7 +19,7 @@ export class FileService {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-    return this.http.get<any>(`${this.baseUrl}/getAllFileLabel`, {headers}).pipe(
+    return this.http.get<any>(`${this.baseUrl}/admin/master/getAllFileLabel`, {headers}).pipe(
         catchError(this.handleError)
       );
   }
@@ -31,10 +31,11 @@ export class FileService {
     });
 
 
-    return this.http.post<any>(`${this.baseUrl}/addFileLabel`,{name: name}, {headers}).pipe(
+    return this.http.post<any>(`${this.baseUrl}/admin/master/addFileLabel`,{name: name}, {headers}).pipe(
         catchError(this.handleError)
       );
   }
+
   saveFile(formData: FormData){
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({
@@ -43,62 +44,22 @@ export class FileService {
     formData.forEach((value, key) => console.log(key, value));
 
 
-    return this.http.post<any>(`${this.baseUrl}/addFileData`, formData, {headers}).pipe(
+    return this.http.post<any>(`${this.baseUrl}/auth/file/addFileData`, formData, {headers}).pipe(
         catchError(this.handleError)
       );
   }
-  getDoctors(docRoleID: any) {
-    const token = this.authService.getAccessToken();
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
 
-    return this.http.get<any>(`${this.baseUrl}/getExistingUser/${docRoleID}`, {headers}).pipe(
-        catchError(this.handleError)
-      );
-  }
   getPatientFiles(patientId: number){
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
 
-    return this.http.get<any>(`${this.baseUrl}/getAllFiles/${patientId}`, {headers}).pipe(
+    return this.http.get<any>(`${this.baseUrl}/auth/file/getAllFiles/${patientId}`, {headers}).pipe(
         catchError(this.handleError)
       );  
   }
-  getPatient(code: any) {
-    const token = this.authService.getAccessToken();
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-    return this.http.get<any>(`${this.baseUrl}/getProfileForAppointment/${code}`, {headers}).pipe(
-        catchError(this.handleError)
-      );
-  }  
-  getCategories(){
-    const token = this.authService.getAccessToken();
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-    return this.http.get<any>(`${this.baseUrl}/getAllCategories`, { headers});
-  }
-
-  addCategory(name: string){
-    const token = this.authService.getAccessToken();
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-    const body = { name: name };
-
-    return this.http.post<any>(`${this.baseUrl}/addCategory`,{name: name}, {headers}).pipe(
-        catchError(this.handleError)
-      );
-  }
-
+  
   deleteFile(id: any){
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({
@@ -107,7 +68,7 @@ export class FileService {
 
     const body = { name: name };
 
-    return this.http.post<any>(`${this.baseUrl}/deleteFilesData/${id}`, {headers}).pipe(
+    return this.http.post<any>(`${this.baseUrl}/auth/file/deleteFilesData/${id}`, {headers}).pipe(
         catchError(this.handleError)
       );
   }

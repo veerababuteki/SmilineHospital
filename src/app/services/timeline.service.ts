@@ -9,7 +9,7 @@ import { options } from '@fullcalendar/core/preact.js';
   providedIn: 'root',
 })
 export class TimelineService {
-  private baseUrl = 'https://apis.idental.ai/auth';  // Replace with actual API
+  private baseUrl = 'https://apis.idental.ai/api/v1';  // Replace with actual API
   loggedIn: boolean = false;
 
   constructor(private http: HttpClient, private router: Router, private authService: AuthService) {}
@@ -21,7 +21,7 @@ export class TimelineService {
       'Authorization': `Bearer ${token}`
     });
 
-    return this.http.get<any>(`${this.baseUrl}/getPatientTimeline/${patientId}`, {headers}).pipe(
+    return this.http.get<any>(`${this.baseUrl}/auth/report/getPatientTimeline/${patientId}`, {headers}).pipe(
         catchError(this.handleError)
       );  
   }

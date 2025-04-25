@@ -81,7 +81,8 @@
                     border: 1px solid #e0e0e0;
                     color: #666;
                     cursor: pointer;
-                    padding: 4px;
+                    margin-top: 20px;
+                    padding: 5.5px 4px 5.5px 4px;
                     &:hover {
                         color: #333;
                     }
@@ -269,3 +270,43 @@
 .name{
     width: 50%;
 }
+/* Add these styles to your component's SCSS file */
+
+.action-menu {
+    display: inline-block;
+  }
+  
+  /* Override PrimeNG button styles to match your existing button */
+  .action-menu .p-button.edit-btn {
+    background: transparent;
+    border: 1px solid #ddd;
+    color: #333;
+    padding: 0.5rem;
+    height: auto;
+    width: auto;
+  }
+  
+  /* Remove the button focus ring for better appearance */
+  .action-menu .p-button.edit-btn:focus {
+    box-shadow: none;
+  }
+  
+  /* Make sure the menu appears at the correct position */
+  :host ::ng-deep .p-menu {
+    min-width: 120px;
+  }
+  
+  /* Customize menu item styles if needed */
+  :host ::ng-deep .p-menuitem-link {
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Color for pay option */
+  :host ::ng-deep .p-menuitem:first-child .p-menuitem-text {
+    color: #4caf50;
+  }
+  
+  /* Color for cancel option */
+  :host ::ng-deep .p-menuitem:last-child .p-menuitem-text {
+    color: #f44336;
+  }

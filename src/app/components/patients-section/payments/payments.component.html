@@ -3,14 +3,15 @@
     <div class="appointments-header">
         <h2>PAYMENTS</h2>
         <div>
-            <button class="mark-btn-active">Refund</button>
-            <button class="add-btn">+ Add</button>
+            <!-- <button class="mark-btn-active">Refund</button> -->
+            <button class="add-btn" (click)="navigateToAddPayment()">+ Add</button>
         </div>
     </div>
     <div>
-    <!-- <div class="appointment-date">{{ payment.key | date: 'dd MMM, yyyy'}}</div> -->
+    <div *ngFor="let date of getSortedDates()">
+    <div class="appointment-date">{{ date | date: 'dd MMM, yyyy'}}</div>
 
-    <div class="treatment-plan" *ngFor="let payment of payments">
+    <div class="treatment-plan" *ngFor="let payment of payments[date]">
         <table class="completed-procedures">
             <thead>
                 <tr>
@@ -19,7 +20,7 @@
                     <th class="discount-col">INVOICES</th>
                     <th class="total-col">TOWARDS</th>
                     <th class="notes-col">MODE OF PAYMENT</th>
-                    <th class="actions-col"></th>
+                    <!-- <th class="actions-col"></th> -->
                 </tr>
             </thead>
             <tbody>
@@ -29,21 +30,22 @@
                     <td class="cost-col">{{payment.amount_paid}}</td>
                     <td class="discount-col">{{payment.invoice_id}}</td>
                     <td class="total-col"></td>
-                    <td class="notes-col">{{payment.payment_mode}}</td>
-                    <td class="actions-col">
+                    <td class="notes-col">{{payment.payment_method}}</td>
+                    <!-- <td class="actions-col">
                         <button class="edit-btn border-left-radius">
                             <i class="pi pi-print"></i>
                         </button>
                         <button class="edit-btn border-right-radius">
                             <i class="pi pi-chevron-down"></i>
                         </button>
-                    </td>
+                    </td> -->
                 </tr>
                 <!-- <tr class="completed-by">
                     <td colspan="6"><span class="doctor">Notes:</span>&nbsp;Scaling</td>
                 </tr> -->
             </tbody>
         </table>
+    </div>
     </div>
 </div>
 </div>

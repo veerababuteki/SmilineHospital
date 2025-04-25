@@ -22,6 +22,7 @@ import { PatientDirectoryComponent } from './app/components/patients-section/pat
 import { AddProfileComponent } from './app/components/patients-section/edit-profile/add-profile.component';
 import { AddCompletedProceduresComponent } from './app/components/patients-section/completed-procedures/add-completed-procedures.component';
 import { AddInvoiceComponent } from './app/components/patients-section/invoice/add-invoice.component';
+import { AddPaymentComponent } from './app/components/patients-section/payments/add-payment.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -41,17 +42,18 @@ export const routes: Routes = [
               { path: 'profile/:source', component: ProfileComponent },
               { path: 'edit-profile/:source', component: EditProfileComponent },
               { path: 'appointments/:source', component: AppointmentsComponent },
-              { path: 'clinical-notes', component: ClinicalNotesComponent },
-              { path: 'add-clinical-note', component: AddClinicalNotesComponent },
-              { path: 'treatment-plans', component: TreatmentPlansComponent },
-              { path: 'add-treatment-plan', component: AddTreatmentPlansComponent },
-              { path: 'add-completed-procedures', component: AddCompletedProceduresComponent },
-              { path: 'completed-procedures', component: CompletedProceduresComponent },
-              { path: 'files', component: FilesComponent },
-              { path: 'timeline', component: TimelineComponent },
-              { path: 'add-invoice', component: AddInvoiceComponent },
-              { path: 'invoices', component: InvoiceComponent },
-              { path: 'payments', component: PaymentsComponent },
+              { path: 'clinical-notes/:source', component: ClinicalNotesComponent },
+              { path: 'add-clinical-note/:source', component: AddClinicalNotesComponent },
+              { path: 'treatment-plans/:source', component: TreatmentPlansComponent },
+              { path: 'add-treatment-plan/:source', component: AddTreatmentPlansComponent },
+              { path: 'add-completed-procedures/:source', component: AddCompletedProceduresComponent },
+              { path: 'completed-procedures/:source', component: CompletedProceduresComponent },
+              { path: 'files/:source', component: FilesComponent },
+              { path: 'timeline/:source', component: TimelineComponent },
+              { path: 'add-invoice/:source', component: AddInvoiceComponent },
+              { path: 'invoices/:source', component: InvoiceComponent },
+              { path: 'payments/:source', component: PaymentsComponent },
+              { path: 'add-payment/:source', component: AddPaymentComponent },
             ]}
           ] 
         }

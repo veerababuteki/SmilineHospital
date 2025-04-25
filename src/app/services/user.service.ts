@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
-import { catchError, Observable, tap, throwError } from 'rxjs';
+import { catchError, Observable, Subject, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { options } from '@fullcalendar/core/preact.js';
@@ -9,19 +9,30 @@ import { options } from '@fullcalendar/core/preact.js';
   providedIn: 'root',
 })
 export class UserService {
-  private baseUrl = 'https://apis.idental.ai/auth';  // Replace with actual API
+  private baseUrl = 'https://apis.idental.ai/api/v1';  // Replace with actual API
   loggedIn: boolean = false;
+
+  private loadPatients = new Subject<void>();
+  loadPatients$ = this.loadPatients.asObservable();
+  selectedPractice: any;
 
   constructor(private http: HttpClient, private router: Router, private authService: AuthService) {}
 
+  sendLoadPatients(){
+    this.loadPatients.next();
+  }
 
   getDoctors(docRoleID: any) {
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
+    const savedPractice = localStorage.getItem('selectedPractice');
+    if(savedPractice){
+      this.selectedPractice = JSON.parse(savedPractice);
+    }
 
-    return this.http.get<any>(`${this.baseUrl}/getExistingUser/${docRoleID}`, {headers}).pipe(
+    return this.http.get<any>(`${this.baseUrl}/auth/user/usersByBranchAndRole?branch_id=${this.selectedPractice.branch_id}&role_id=${docRoleID}`, {headers}).pipe(
         catchError(this.handleError)
       );
   }
@@ -32,10 +43,22 @@ export class UserService {
       'Authorization': `Bearer ${token}`
     });
 
-    return this.http.get<any>(`${this.baseUrl}/getProfileForAppointment/${code}`, {headers}).pipe(
+    return this.http.get<any>(`${this.baseUrl}/auth/appointment/ProfileForAppointment/${code}`, {headers}).pipe(
         catchError(this.handleError)
       );
   }  
+
+  getPatientByMobileNumber(code: any) {
+    const token = this.authService.getAccessToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get<any>(`${this.baseUrl}/getPersonByMobile/${code}`, {headers}).pipe(
+        catchError(this.handleError)
+      );
+  }  
+
 
   getMedicalHistories(){
     const token = this.authService.getAccessToken();
@@ -43,7 +66,16 @@ export class UserService {
       'Authorization': `Bearer ${token}`
     });
 
-    return this.http.get<any>(`${this.baseUrl}/master/getAllMedicalHistory`, { headers});
+    return this.http.get<any>(`${this.baseUrl}/admin/group/getAllMedicalHistory`, { headers});
+  }
+
+  getBranches(){
+    const token = this.authService.getAccessToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get<any>(`${this.baseUrl}/admin/role/branches`, { headers});
   }
 
   getInsuranceGroups(){
@@ -52,7 +84,7 @@ export class UserService {
       'Authorization': `Bearer ${token}`
     });
 
-    return this.http.get<any>(`${this.baseUrl}/master/getAllGroups`, { headers});
+    return this.http.get<any>(`${this.baseUrl}/admin/group/getAllGroups`, { headers});
   }
 
   getCategories(){
@@ -61,7 +93,7 @@ export class UserService {
       'Authorization': `Bearer ${token}`
     });
 
-    return this.http.get<any>(`${this.baseUrl}/getAllCategories`, { headers});
+    return this.http.get<any>(`${this.baseUrl}/admin/master/getAllCategories`, { headers});
   }
 
   addCategory(name: string){
@@ -72,7 +104,7 @@ export class UserService {
 
     const body = { name: name };
 
-    return this.http.post<any>(`${this.baseUrl}/addCategory`,{name: name}, {headers}).pipe(
+    return this.http.post<any>(`${this.baseUrl}/admin/master/addCategory`,{name: name}, {headers}).pipe(
         catchError(this.handleError)
       );
   }
@@ -82,7 +114,7 @@ export class UserService {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-    return this.http.get<any>(`${this.baseUrl}/getProfile/${code}`, {headers}).pipe(
+    return this.http.get<any>(`${this.baseUrl}/auth/user/getProfile/${code}`, {headers}).pipe(
       catchError(this.handleError)
     );
   }
@@ -93,10 +125,11 @@ export class UserService {
       'Authorization': `Bearer ${token}`
     });
 
-    return this.http.post<any>(`${this.baseUrl}/updateProfile`, {
+    return this.http.post<any>(`${this.baseUrl}/auth/user/updateProfile`, {
       id: patientDetails.id,
         first_name: patientDetails.first_name,
         last_name: patientDetails.last_name,
+        manual_unique_code: patientDetails.manual_unique_code,
         date_of_birth: patientDetails.date_of_birth,
         address: patientDetails.address,
         aadhaar_id: patientDetails.aadhaar_id,
@@ -104,6 +137,8 @@ export class UserService {
         age: patientDetails.age,
         anniversary: null,
         referred_by: patientDetails.referred_by,
+        referred_name: patientDetails.referred_name,
+        referred_mobile: patientDetails.referred_mobile,
         blood_group: patientDetails.blood_group,
         family: null,
         gender: patientDetails.gender,

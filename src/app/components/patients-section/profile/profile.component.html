@@ -24,6 +24,10 @@
                         <span class="label">Patient ID :</span>
                         <span class="value">{{patientDetails.user_details.unique_code}}</span>
                     </div>
+                    <div class="info-row">
+                        <span class="label">Patient Custom ID :</span>
+                        <span class="value">{{patientDetails.user_details.manual_unique_code}}</span>
+                    </div>
                     <div class="info-row" *ngIf="patientDetails.aadhaar_id">
                         <span class="label">Aadhaar ID :</span>
                         <span class="value">{{patientDetails.aadhaar_id}}</span>

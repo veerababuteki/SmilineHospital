@@ -8,53 +8,76 @@
             <button class="add-btn" (click)="navigateToAddPage()">+ Add</button>
         </div>
     </div>
-    <div *ngFor="let date of getSortedDates()">
+    <div id="completed-procedures-container">
+    <div *ngFor="let dateTreatment of formattedData">
 
-    <div class="appointment-date">{{ date | date: 'dd MMM, yyyy'}}</div>
+    <div class="appointment-date">{{ dateTreatment.date | date: 'dd MMM, yyyy'}}</div>
 
-    <div class="treatment-plan" *ngFor="let treatmentkey of getSortedTreatmentIds(treatmentPlans[date]) | keyvalue">
+    <div class="treatment-plan" *ngFor="let treatmentPlan of dateTreatment.treatments">
+        <div *ngFor="let treatmentDoctorGroup of treatmentPlan.doctorTreatments" class="doctor-group">
         <table class="procedures-table">
             <thead>
                 <tr>
                     <th class="checkbox-col"></th>
                     <th class="procedure-col">PROCEDURE</th>
                     <th class="cost-col">COST</th>
+                    <th class="discount-col">QUANTITY</th>
                     <th class="discount-col">DISCOUNT</th>
                     <th class="total-col">TOTAL</th>
                     <th class="notes-col">NOTES</th>
-                    <th class="actions-col"></th>
+                    <th class="actions-col hide-on-print"></th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let treatment of filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)">
+                <tr *ngFor="let treatment of treatmentDoctorGroup.treatments">
                     <td *ngIf="treatment.invoice_status?.toLowerCase() !== 'generated'"><input type="checkbox" class="procedure-checkbox" [(ngModel)]="treatment.isChecked"
                       (change)="onCheckboxChange(treatment, treatment.id, treatment.treatment_unique_id)"></td>
                     <td *ngIf="treatment.invoice_status?.toLowerCase() === 'generated'"><i class="pi pi-dollar"></i></td>
                     <td>{{treatment.procedure_details.name}}</td>
-                    <td class="amount">{{treatment.procedure_details.cost}}</td>
+                    <td class="amount">{{treatment.cost}}</td>
+                    <td class="amount">{{treatment.quantity}}</td>
                     <td class="discount">{{treatment.discount+" "+treatment.discount_formate}}</td>
-                    <td class="amount">{{treatment.total_cost}}</td>
-                    <td>Teeth: <span class="teeth-number">{{treatment.teeth_set}}</span></td>
-                    <!-- <td class="actions">
-                        <button class="edit-btn border-left-radius">
+                    <td class="amount">{{treatment.total_cost | number }}</td>
+                    <td>
+                        <div>Teeth: <span class="teeth-number">{{treatment.teeth_set}}</span></div>
+                        <div>{{treatment.notes}}</div>
+                    </td>
+                    <td class="actions">
+                        <!-- <button class="edit-btn border-left-radius">
                             <i class="pi pi-print"></i>
-                        </button>
-                        <button class="edit-btn border-right-radius">
-                            <i class="pi pi-chevron-down"></i>
-                        </button>
-                    </td> -->
+                        </button> -->
+                        <div class="action-menu">
+                            <button 
+                              #menuButton
+                              type="button" 
+                              pButton 
+                              icon="pi pi-chevron-down" 
+                              class="edit-btn border-right-radius p-button-text"
+                              (click)="invoiceMenu.toggle($event); setCurrentProcedure(treatment)">
+                            </button>
+                            <p-menu #invoiceMenu [popup]="true" [model]="items"></p-menu>
+                        </div>
+                    </td>
                 </tr>
             </tbody>
         </table>
-    
+
         <div class="plan-footer">
             <div class="planned-by">
-                Completed by <span class="doctor-name">{{"Dr. " + filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)[0]?.doctor_details_treat.user_profile_details[0].first_name +" "+ filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)[0].doctor_details_treat.user_profile_details[0].last_name}}</span>
+                Completed by <span class="doctor-name">{{"Dr. " + treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].first_name +" "+ treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].last_name}}</span>
             </div>
             <div class="estimated-amount">
-                Estimated amount: <span class="amount">{{getTotalCost(filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)) }}</span>
+                Estimated amount: <span class="amount">{{getTotalCost(treatmentDoctorGroup.treatments) | number  }}</span>
             </div>
         </div>
+        </div>
+       
     </div>
+    </div>
+    </div>
+    <div class="no-completed-procedure-container" *ngIf="getSortedDates().length <= 0">
+        <img class="icon" src="assets/completed-procedures.png" />
+        <h3>No completed Procedures added</h3>
+        <button class="add-treatment-btn" (click)="navigateToAddPage()">+ Add</button>
     </div>
 </div>

@@ -27,12 +27,21 @@ export class PatientDirectoryComponent implements OnInit {
     allPatients: any[] = [];
     patients: any[] = [];
     displayAddPatientDialog = false;
-
+    loadPaitentsSubscriber:any;
     constructor(private messageService: MessageService, private userService: UserService, private router: Router){
-
+        this.userService.loadPatients$.subscribe(_=>{
+            this.getPatients();
+        })
     }
 
     ngOnInit() {
+        this.getPatients();
+    }
+
+    filteredPatients: any[] = [];
+    searchText: string = '';
+
+    getPatients(){
         this.userService.getDoctors('2ac7787b-77d1-465b-9bc0-eee50933697f').subscribe(res => {
             this.allPatients = res.data; 
             this.allPatients.forEach(patient => {
@@ -43,21 +52,23 @@ export class PatientDirectoryComponent implements OnInit {
                     email: patient.email,
                     phone: patient.phone,
                     image: 'assets/user.webp',
-                    gender: patient.gender
+                    gender: patient.gender,
+                    manual_unique_code: patient.manual_unique_code
+
                 })
                 this.filteredPatients = [...this.patients]
             })
         })
     }
-    filteredPatients: any[] = [];
-    searchText: string = '';
 
     filterPatients() {
         const searchLower = this.searchText.toLowerCase();
         this.filteredPatients = this.patients.filter(patient =>
           patient.name.toLowerCase().includes(searchLower) ||
           patient.id.toLowerCase().includes(searchLower) ||
-          patient.phone.includes(searchLower)
+          patient.email.toLowerCase().includes(searchLower) ||
+          patient.phone.includes(searchLower) ||
+          (patient.manual_unique_code ? patient.manual_unique_code.toString().toLowerCase().includes(searchLower) : false)
         );
       }
 
@@ -87,6 +98,8 @@ export class PatientDirectoryComponent implements OnInit {
                 this.filteredPatients = [...this.patients]
             })
         })
+        this.router.navigate(['patients', event.user_id, 'profile', event.unique_code]);
+
     }
 
     hideAddPatientDialog() {

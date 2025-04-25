@@ -44,18 +44,53 @@ export class EditProfileComponent implements OnInit {
   addGroup: boolean = false;
   addMedicalHistoryText: string = '';
   addNewGroupText: string = '';
+  patientId: string | null | undefined;
+
   ngOnInit(): void {
     
     this.initiateForm()
+    const dateOfBirthControl = this.patientForm.get('dateOfBirth');
+  const ageControl = this.patientForm.get('age');
+  
+  if (dateOfBirthControl && ageControl) {
+    dateOfBirthControl.valueChanges.subscribe(date => {
+      if (date) {
+        const age = this.calculateAge(date);
+        ageControl.setValue(age, { emitEvent: false });
+      } else {
+        ageControl.setValue('', { emitEvent: false });
+      }
+    });
+  }
+  this.route.parent?.paramMap.subscribe(params => {
+    if(this.patientId == null) {
+      this.patientId = params.get('id');
+    }
+    
+  });  
     this.route.paramMap.subscribe(params => {
       if(this.uniqueCode == null) {
         this.uniqueCode = params.get('source');
       }
       if(this.uniqueCode){
         this.loadPatientData(this.uniqueCode)
+        this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
       }
       
     });
+  }
+  
+  calculateAge(dateOfBirth: Date): number {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age;
   }
 
   loadPatientData(patientId: string){
@@ -63,7 +98,7 @@ export class EditProfileComponent implements OnInit {
       this.patientDetails = res.data;
       this.patientForm.patchValue({
         firstName: this.patientDetails.first_name,
-        lastName: this.patientDetails.last_name,
+        customId: this.patientDetails.user_details.manual_unique_code,
         aadhaarId: this.patientDetails.aadhaar_id,
         gender: this.patientDetails.gender,
         dateOfBirth: this.patientDetails.date_of_birth !== '' ? new Date(this.patientDetails.date_of_birth) : '',
@@ -162,7 +197,7 @@ export class EditProfileComponent implements OnInit {
   initiateForm(){
     this.patientForm = this.fb.group({
       firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      customId: [''],
       aadhaarId: [''],
       gender: ['', Validators.required],
       dateOfBirth: [''],
@@ -211,7 +246,7 @@ export class EditProfileComponent implements OnInit {
       this.userService.updateUserProfile({
         id: this.patientDetails.id,
         first_name: patientDetails.firstName,
-        last_name: patientDetails.lastName,
+        manual_unique_code: patientDetails.customId,
         date_of_birth: patientDetails.dateOfBirth,
         address: patientDetails.streetAddress,
         aadhaar_id: patientDetails.aadhaarId,
@@ -219,9 +254,9 @@ export class EditProfileComponent implements OnInit {
         age: patientDetails.age,
         anniversary: null,
         referred_by: patientDetails.referredBy,
-        referred_name: patientDetails.referredByName,
-        referred_mobile: patientDetails.referredByMobile,
-        blood_group: patientDetails.bloodGroup !== null ? patientDetails.bloodGroup.label: '',
+        referred_name: patientDetails.refferedByName,
+        referred_mobile: patientDetails.refferedByMobile,
+        blood_group: patientDetails.bloodGroup !== null && patientDetails.bloodGroup !== undefined ? patientDetails.bloodGroup.label: '',
         family: null,
         gender: patientDetails.gender,
         secondary_mobile: patientDetails.primaryMobile,

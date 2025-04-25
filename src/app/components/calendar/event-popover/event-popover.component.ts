@@ -32,7 +32,7 @@ import { Router } from '@angular/router';
           </div>
         </div>
         <div>
-            <button pButton icon="pi pi-user-edit" class="p-button-text p-button-rounded" (click)="editEvent()"></button>
+            <button pButton  class="p-button-rounded" (click)="editEvent()">Edit Appointment</button>
             <button pButton icon="pi pi-times" class="p-button-text p-button-rounded" (click)="deleteEvent()"></button>
         </div>
       </div>
@@ -56,8 +56,8 @@ import { Router } from '@angular/router';
         <i class="pi pi-calendar"></i>
         <div class="appointment-details">
           <div>In-Clinic Appointment</div>
-          <div class="doctor-info">with Dr.{{ event.extendedProps?.doctor || 'Alla Kranthi' }} at</div>
-          <div class="time-info">{{ event.extendedProps?.appointmentTime }} for {{ event.extendedProps?.duration || '1 hr 30 mins' }}</div>
+          <div class="doctor-info" *ngIf = "event.extendedProps?.doctor">with Dr.{{ event.extendedProps?.doctor}}</div>
+          <div class="time-info">at {{ event.extendedProps?.appointmentTime }} for {{ event.extendedProps?.duration || '1 hr 30 mins' }}</div>
         </div>
         <button pButton label="No Show" class="p-button-outlined"></button>
       </div>
