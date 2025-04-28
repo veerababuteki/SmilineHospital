@@ -19,12 +19,12 @@
           
           <div class="practices-list">
             <div class="practice-item" 
-     *ngFor="let practice of filteredPractices" 
-     (click)="selectPractice(practice); $event.stopPropagation()"
-     [class.selected]="selectedPractice?.branch_id === practice.branch_id">
-  <div class="practice-name">{{ practice.branch_name }}</div>
-  <div class="practice-id">Practice ID: {{ practice.branch_id }}</div>
-</div>
+              *ngFor="let practice of filteredPractices" 
+              (click)="selectPractice(practice)"
+              [class.selected]="selectedPractice?.branch_id === practice.branch_id">
+              <div class="practice-name">{{ practice.branch_name }}</div>
+              <div class="practice-id">Practice ID: {{ practice.branch_id }}</div>
+            </div>
             
             <!-- No results message -->
             <div class="no-results" *ngIf="practiceSearchText && filteredPractices.length === 0">
@@ -35,48 +35,46 @@
       </div>
     </div>
 </div>
+
 <div class="top-bar">
     <div class="left-section">
         <img src="assets/patientpicker.webp" alt="User Icon" class="user-icon" (click)="openPatientDirectory()">
         <img *ngIf="patientDetails" src="assets/user.webp" alt="Profile Photo" class="adjust profile-photo">
         <div class="patient-info" *ngIf="patientDetails">
-            <span class="name">{{patientDetails.first_name +' '+ patientDetails.last_name}}</span>
+            <span class="name">{{patientDetails?.first_name || ''}} {{patientDetails?.last_name || ''}}</span>
             <span class="separator">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <span class="gender">{{patientDetails.gender}}</span>
-            <span class="separator">,</span>
-            <span class="age">{{patientDetails.age}} Years&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <span class="id">(ID : {{patientDetails.user_details.manual_unique_code}})</span>
+            <span class="gender">{{patientDetails?.gender || ''}}</span>
+            <span class="separator" *ngIf="patientDetails?.gender">,</span>
+            <span class="age" *ngIf="patientDetails?.age">{{patientDetails?.age}} Years&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span class="id" *ngIf="patientDetails?.user_details?.manual_unique_code">(ID: {{patientDetails?.user_details?.manual_unique_code}})</span>
         </div>
     </div>
-    <!-- <button class="medical-history-btn">
-        <span>Medical History</span>
-    </button> -->
 </div>
-<div class="app-container">
 
+<div class="app-container">
     <div class="side-nav" [class.collapsed]="isNavCollapsed">
         <button class="collapse-toggle" (click)="toggleNav()">
             <i class="pi" [ngClass]="isNavCollapsed ? 'pi-angle-double-right' : 'pi-angle-double-left'"></i>
         </button>
 
-        <div class="nav-section" *ngIf="userPrivileges.includes('Profile') || userPrivileges.includes('Appointments')">
+        <div class="nav-section" *ngIf="userPrivileges?.includes('Profile') || userPrivileges?.includes('Appointments')">
             <div class="section-header" (click)="toggleSection('patient')">
                 <span class="label">Patient</span>
                 <i class="pi pi-chevron-down" [ngClass]="{'display-none': isNavCollapsed}" [class.rotated]="!patientExpanded"></i>
             </div>
-            <div class="section-content" [class.collapsed]="!patientExpanded">
-                <a class="nav-item" *ngIf="userPrivileges.includes('Profile')" 
-                   [routerLink]="handleNavigation('/profile')" 
+            <div class="section-content" [class.collapsed]="!patientExpanded || isNavCollapsed">
+                <a class="nav-item" *ngIf="userPrivileges?.includes('Profile')" 
+                   (click)="handleNavigation('/profile')" 
                    routerLinkActive="active">
                     <i class="pi pi-user"></i>
-                    <span>Profile</span>
+                    <span [class.hidden]="isNavCollapsed">Profile</span>
                 </a>
-                <div routerLinkActive="active" *ngIf="userPrivileges.includes('Appointments')">
+                <div *ngIf="userPrivileges?.includes('Appointments')">
                     <a class="nav-item" 
-                       [routerLink]="handleNavigation('/appointments')" 
+                       (click)="handleNavigation('/appointments')" 
                        routerLinkActive="active">
                         <i class="pi pi-calendar"></i>
-                        <span>Appointments</span>
+                        <span [class.hidden]="isNavCollapsed">Appointments</span>
                     </a>
                 </div>
             </div>
@@ -84,68 +82,68 @@
 
         <!-- EMR Section -->
         <div class="nav-section" 
-             *ngIf="userPrivileges.includes('Timeline') || userPrivileges.includes('Files') || userPrivileges.includes('CompletedProcedures') || userPrivileges.includes('ClinicalNotes') || userPrivileges.includes('TreatmentPlans')">
+             *ngIf="userPrivileges?.includes('Timeline') || userPrivileges?.includes('Files') || userPrivileges?.includes('CompletedProcedures') || userPrivileges?.includes('ClinicalNotes') || userPrivileges?.includes('TreatmentPlans')">
             <div class="section-header" (click)="toggleSection('emr')">
                 <span class="label">EMR</span>
                 <i class="pi pi-chevron-down" [ngClass]="{'display-none': isNavCollapsed}" [class.rotated]="!emrExpanded"></i>
             </div>
-            <div class="section-content" [class.collapsed]="!emrExpanded">
-                <a *ngIf="userPrivileges.includes('ClinicalNotes')" class="nav-item" 
-                   [routerLink]="handleNavigation('/clinical-notes')" 
+            <div class="section-content" [class.collapsed]="!emrExpanded || isNavCollapsed">
+                <a *ngIf="userPrivileges?.includes('ClinicalNotes')" class="nav-item" 
+                   (click)="handleNavigation('/clinical-notes')" 
                    routerLinkActive="active">
                     <i class="pi pi-file-edit"></i>
-                    <span>Clinical Notes</span>
+                    <span [class.hidden]="isNavCollapsed">Clinical Notes</span>
                 </a>
-                <a *ngIf="userPrivileges.includes('TreatmentPlans')" class="nav-item" 
-                   [routerLink]="handleNavigation('/treatment-plans')" 
+                <a *ngIf="userPrivileges?.includes('TreatmentPlans')" class="nav-item" 
+                   (click)="handleNavigation('/treatment-plans')" 
                    routerLinkActive="active">
                     <i class="pi pi-list"></i>
-                    <span>Treatment Plans</span>
+                    <span [class.hidden]="isNavCollapsed">Treatment Plans</span>
                 </a>
-                <a *ngIf="userPrivileges.includes('CompletedProcedures')" class="nav-item" 
-                   [routerLink]="handleNavigation('/completed-procedures')" 
+                <a *ngIf="userPrivileges?.includes('CompletedProcedures')" class="nav-item" 
+                   (click)="handleNavigation('/completed-procedures')" 
                    routerLinkActive="active">
                     <i class="pi pi-check-circle"></i>
-                    <span>Completed Procedures</span>
+                    <span [class.hidden]="isNavCollapsed">Completed Procedures</span>
                 </a>
-                <a *ngIf="userPrivileges.includes('Files')" class="nav-item" 
-                   [routerLink]="handleNavigation('/files')" 
+                <a *ngIf="userPrivileges?.includes('Files')" class="nav-item" 
+                   (click)="handleNavigation('/files')" 
                    routerLinkActive="active">
                     <i class="pi pi-folder"></i>
-                    <span>Files</span>
+                    <span [class.hidden]="isNavCollapsed">Files</span>
                 </a>
-                <a *ngIf="userPrivileges.includes('Timeline')" class="nav-item" 
-                   [routerLink]="handleNavigation('/timeline')" 
+                <a *ngIf="userPrivileges?.includes('Timeline')" class="nav-item" 
+                   (click)="handleNavigation('/timeline')" 
                    routerLinkActive="active">
                     <i class="pi pi-clock"></i>
-                    <span>Timeline</span>
+                    <span [class.hidden]="isNavCollapsed">Timeline</span>
                 </a>
             </div>
         </div>
 
         <!-- Billing Section -->
-        <div class="nav-section" *ngIf="userPrivileges.includes('Invoices') || userPrivileges.includes('Payments')">
+        <div class="nav-section" *ngIf="userPrivileges?.includes('Invoices') || userPrivileges?.includes('Payments')">
             <div class="section-header" (click)="toggleSection('billing')">
                 <span class="label">Billing</span>
                 <i class="pi pi-chevron-down" [ngClass]="{'display-none': isNavCollapsed}" [class.rotated]="!billingExpanded"></i>
             </div>
-            <div class="section-content" [class.collapsed]="!billingExpanded">
-                <a class="nav-item" *ngIf="userPrivileges.includes('Invoices')" 
-                   [routerLink]="handleNavigation('/invoices')" 
+            <div class="section-content" [class.collapsed]="!billingExpanded || isNavCollapsed">
+                <a class="nav-item" *ngIf="userPrivileges?.includes('Invoices')" 
+                   (click)="handleNavigation('/invoices')" 
                    routerLinkActive="active">
                     <i class="pi pi-dollar"></i>
-                    <span>Invoices</span>
+                    <span [class.hidden]="isNavCollapsed">Invoices</span>
                 </a>
-                <a class="nav-item" *ngIf="userPrivileges.includes('Payments')" 
-                   [routerLink]="handleNavigation('/payments')" 
+                <a class="nav-item" *ngIf="userPrivileges?.includes('Payments')" 
+                   (click)="handleNavigation('/payments')" 
                    routerLinkActive="active">
                     <i class="pi pi-money-bill"></i>
-                    <span>Payments</span>
+                    <span [class.hidden]="isNavCollapsed">Payments</span>
                 </a>
             </div>
         </div>
     </div>
-    <div style="width: 100%; background-color: #f5f5f5;">
+    <div class="content-area" [ngClass]="{'expanded': isNavCollapsed}" style="width: 100%;">
         <router-outlet></router-outlet>
     </div>
 </div>

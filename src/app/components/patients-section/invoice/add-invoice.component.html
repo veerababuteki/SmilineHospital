@@ -3,8 +3,8 @@
       <div class="title">Generate Invoice</div>
       <div class="action-buttons">
         <button class="cancel-btn" (click)="cancel()">Cancel</button>
-        <button class="save-btn" type="submit" (click)="onSubmit()">Save Invoice</button>
-        <button class="save-btn" type="submit" (click)="saveAndMakePayment()">Save & Create Payment</button>
+        <button class="save-btn" type="submit" (click)="onSubmit()" [disabled]="treatments.length === 0">Save Invoice</button>
+        <button class="save-btn" type="submit" (click)="saveAndMakePayment()" [disabled]="treatments.length === 0">Save & Create Payment</button>
       </div>
     </div>
   
@@ -81,7 +81,7 @@
                     <span class="checkbox-label">Multiply Cost</span>
                   </label>
                   <label class="checkbox-container">
-                    <input type="checkbox" formControlName="fullMouth">
+                    <input type="checkbox" formControlName="fullMouth" (change)="onFullMouthChange(i)">
                     <span class="checkbox-label">Full Mouth</span>
                   </label>
                 </div>
@@ -177,7 +177,7 @@
   
         <div class="procedures-list">
           <div class="procedure-item" 
-               *ngFor="let procedure of completedTreatmentPlans"
+               *ngFor="let procedure of sortedCompletedTreatmentPlans"
                (click)="addPlannedTreatment(procedure)">
             <div>
                 <div>{{procedure.procedure_details.name}}<span class="planned-tag">Completed</span></div>
@@ -186,7 +186,7 @@
             <span class="price">{{procedure.total_cost}}</span>
           </div>
           <div class="procedure-item" 
-               *ngFor="let procedure of plannedTreatmentPlans"
+               *ngFor="let procedure of sortedPlannedTreatmentPlans"
                (click)="addPlannedTreatment(procedure)">
             <div>
                 <div>{{procedure.procedure_details.name}}<span class="planned-tag">Planned</span></div>
@@ -195,7 +195,7 @@
             <span class="price">{{procedure.total_cost}}</span>
           </div>
           <div class="procedure-item" 
-               *ngFor="let procedure of filteredProcedures"
+               *ngFor="let procedure of sortedFilteredProcedures"
                (click)="addTreatment(procedure)">
             <span>{{procedure.name}}</span>
             <span class="price">{{procedure.price}}</span>

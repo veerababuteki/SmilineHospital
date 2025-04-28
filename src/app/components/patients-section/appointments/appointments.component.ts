@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild ,Input} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppointmentService } from '../../../services/appointment.service';
@@ -25,15 +25,21 @@ export class AppointmentsComponent implements OnInit {
   editAppointment: boolean = false;
   currentUser: any;
   patientAppointments: any[] = [];
-  
+  minDate: Date = new Date(); // This will set minimum date to today
+
   constructor(
     private route: ActivatedRoute, 
     private userService: UserService, 
+    
     private authService: AuthService,
     private router: Router, 
     private appointmentService: AppointmentService,
     private messageService: MessageService,
   ) {}
+  
+    // Set the minDate to beginning of today (midnight)
+
+
   
   ngOnInit(): void {
     this.route.parent?.paramMap.subscribe(params => {
@@ -41,7 +47,8 @@ export class AppointmentsComponent implements OnInit {
         this.patientId = params.get('id');
       }
     });
-    
+    // Set the minDate to beginning of today (midnight)
+    this.minDate.setHours(0, 0, 0, 0);
     this.route.paramMap.subscribe(params => {
       if(this.uniqueCode == null) {
         this.uniqueCode = params.get('source');

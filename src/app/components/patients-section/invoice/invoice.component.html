@@ -1,4 +1,3 @@
-<!-- HTML -->
 <div class="appointments-container">
     <div class="appointments-header">
         <h2>INVOICES</h2>
@@ -20,11 +19,13 @@
                         <table class="full-table">
                             <thead>
                                 <tr>
-                                    <th class="name">Treatments & Products</th>
-                                    <th class="amount">Cost</th>
-                                    <th class="amount">Discount</th>
-                                    <th class="amount">Tax</th>
-                                    <th class="amount">Total</th>
+                                    <th class="name" style="width: 25%;">Treatments & Products</th>
+                                    <th class="teeth_set" style="width: 10%;">Teeth</th>
+                                    <th class="notes" style="width: 25%;">Notes</th>
+                                    <th class="amount" style="width: 10%;">Cost</th>
+                                    <th class="amount" style="width: 10%;">Discount</th>
+                                    <th class="amount" style="width: 10%;">Tax</th>
+                                    <th class="amount" style="width: 10%;">Total</th>
                                 </tr>
                             </thead>
                         </table>
@@ -53,7 +54,7 @@
                         <label class="invoice-label">
                             <input type="checkbox" *ngIf="invoiceGroup.value[0].payment_status === 'Pending'" [(ngModel)]="invoiceGroup.value[0].isChecked" (change)="onCheckboxChange(invoiceGroup.value, invoiceGroup.key)">
                             <i  *ngIf="invoiceGroup.value[0].payment_status !== 'Pending'" class="pi pi-indian-rupee"></i>
-                            <a href="#" class="invoice-link">{{invoiceGroup.key}}</a>
+                            <a  class="invoice-link">{{invoiceGroup.key}}</a>
                         </label>
                         <table class="invoice-details">
                             <tbody>
@@ -78,27 +79,26 @@
                         </table>
                     </td>
                     <td class="treatments-cell">
-                        <table class="treatments-table">
+                        <table class="treatments-table" style="width: 100%;">
                             <tbody *ngFor="let invc of getInvoiceGroupValues(invoiceGroup)">
                                 <tr>
-                                    <td class="name">
-                                        <a href="#" class="treatment-link">{{invc.treatment_plans.procedure_details.name}}</a>
-                                        <!-- <span class="tooth-number">{{invc.treatment_plans.teeth_set}}</span> -->
+                                    <td class="name" style="width: 25%;">
+                                        <a  class="treatment-link">{{invc.treatment_plans.procedure_details.name}}</a>
                                     </td>
-                                    <td class="amount">{{invc.treatment_plans.cost}}</td>
-                                    <td class="amount">{{invc.treatment_plans.discount + ' ' + invc.treatment_plans.discount_formate}}</td>
-                                    <td class="amount">0.00</td>
-                                    <td class="amount">{{invc.treatment_plans.total_cost}}</td>
+                                    <td class="teeth_set" style="width: 10%;">
+                                        <span class="tooth-number">{{invc.treatment_plans.teeth_set}}</span>
+                                    </td>
+                                    <td class="notes" style="width: 25%;">{{invc.treatment_plans.notes}}</td>
+                                    <td class="amount" style="width: 10%;">{{invc.treatment_plans.cost}}</td>
+                                    <td class="amount" style="width: 10%;">{{invc.treatment_plans.discount + ' ' + invc.treatment_plans.discount_formate}}</td>
+                                    <td class="amount" style="width: 10%;">0.00</td>
+                                    <td class="amount" style="width: 10%;">{{invc.treatment_plans.total_cost}}</td>
                                 </tr>
                                 <tr>
-                                    <td>
+                                    <td colspan="7">
                                         <p class="completed-by">
                                             <span>Completed by</span>
                                             <strong>{{' Dr.' + invc.treatment_plans.doctor_details_treat.user_profile_details[0].first_name +' '+ invc.treatment_plans.doctor_details_treat.user_profile_details[0].last_name}}</strong>
-                                        </p>
-                                    </td>
-                                    <td colspan="4">
-                                        <p class="treatment-notes">
                                         </p>
                                     </td>
                                 </tr>
