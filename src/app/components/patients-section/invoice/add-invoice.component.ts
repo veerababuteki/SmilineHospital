@@ -308,6 +308,19 @@ export class AddInvoiceComponent implements OnInit {
     if(teethType === 'both'){
       treatment.get('showAdultTeeth')?.setValue(false);
       treatment.get('showChildTeeth')?.setValue(false);
+      
+      // When Full Mouth is checked, select all teeth
+      const fullMouth = treatment.get('fullMouth')?.value;
+      if (fullMouth) {
+        // Create array of all teeth numbers (1-32 for adult teeth)
+        const allTeeth = Array.from({length: 32}, (_, i) => i + 1);
+        treatment.get('selectedTeeth')?.setValue(allTeeth);
+      } else {
+        // When unchecking Full Mouth, clear all selections
+        treatment.get('selectedTeeth')?.setValue([]);
+      }
+      
+      this.calculateTotal(treatmentIndex);
     }
     else if (teethType === 'adult') {
       const currentValue = treatment.get('showAdultTeeth')?.value;
@@ -333,6 +346,37 @@ export class AddInvoiceComponent implements OnInit {
       treatment.get('showChildTeeth')?.setValue(!currentValue);
     }
   }
+
+  // Add new method to handle Full Mouth checkbox change
+  onFullMouthChange(treatmentIndex: number): void {
+    if (treatmentIndex === null || treatmentIndex >= this.treatments.length) return;
+    
+    const treatment = this.treatments.at(treatmentIndex);
+    if (!treatment) return;
+    
+    const fullMouth = treatment.get('fullMouth')?.value;
+
+    // All teeth numbers as per the UI
+    const allTeeth = [
+      // Adult upper
+      18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28,
+      // Adult lower
+      48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38,
+      // Child upper
+      55, 54, 53, 52, 51, 61, 62, 63, 64, 65,
+      // Child lower
+      85, 84, 83, 82, 81, 71, 72, 73, 74, 75
+    ];
+
+    if (fullMouth) {
+      treatment.get('selectedTeeth')?.setValue(allTeeth);
+    } else {
+      treatment.get('selectedTeeth')?.setValue([]);
+    }
+    
+    this.calculateTotal(treatmentIndex);
+  }
+
   setCurrentTreatment(index: number | null) {
     this.currentTreatmentIndex = index;
   }
@@ -562,5 +606,29 @@ export class AddInvoiceComponent implements OnInit {
 
   cancel(){
     this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
+  }
+
+  get sortedCompletedTreatmentPlans() {
+    return this.completedTreatmentPlans.slice().sort((a, b) => {
+      const nameA = a.procedure_details.name.toLowerCase();
+      const nameB = b.procedure_details.name.toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  }
+
+  get sortedPlannedTreatmentPlans() {
+    return this.plannedTreatmentPlans.slice().sort((a, b) => {
+      const nameA = a.procedure_details.name.toLowerCase();
+      const nameB = b.procedure_details.name.toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  }
+
+  get sortedFilteredProcedures() {
+    return this.filteredProcedures.slice().sort((a, b) => {
+      const nameA = a.name.toLowerCase();
+      const nameB = b.name.toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
   }
 }

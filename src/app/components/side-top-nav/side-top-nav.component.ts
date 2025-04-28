@@ -78,8 +78,8 @@ export class SideTopNavComponent {
   }
 
   menuItems: MenuItem[] = [
-    { label: 'Profile', icon: 'pi pi-user', command: () => this.viewProfile() },
-    { label: 'Settings', icon: 'pi pi-cog', command: () => this.openSettings() },
+    // { label: 'Profile', icon: 'pi pi-user', command: () => this.viewProfile() },
+    // { label: 'Settings', icon: 'pi pi-cog', command: () => this.openSettings() },
     { separator: true },
     { label: 'Logout', icon: 'pi pi-sign-out', command: () => this.logout() }
   ];

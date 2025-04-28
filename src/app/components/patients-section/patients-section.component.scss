@@ -405,3 +405,12 @@
     font-style: italic;
     font-size: 0.9rem;
   }
+
+::ng-deep .warning-snackbar {
+  background: #ff9800;
+  color: white;
+  
+  .mat-simple-snackbar-action {
+    color: white;
+  }
+}

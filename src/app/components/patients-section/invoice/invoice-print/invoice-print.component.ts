@@ -1,6 +1,7 @@
 import { CommonModule, NgFor } from '@angular/common';
 import { Component, Input } from '@angular/core';
 
+
 @Component({
   selector: 'app-invoice-print',
   imports: [CommonModule],
@@ -10,6 +11,7 @@ import { Component, Input } from '@angular/core';
 export class InvoicePrintComponent {
 
   @Input() invoice: any;
+
   generatedDate: string = '';
 
   constructor(){
@@ -23,6 +25,7 @@ export class InvoicePrintComponent {
   getInvoiceGroupValues(invoiceGroup: any): any[] {
     return invoiceGroup.value;
   }
+
 
 
   print() {

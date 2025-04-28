@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CalendarModule } from 'primeng/calendar';
@@ -20,17 +20,31 @@ import { MessageService } from '../../services/message.service';
 import { AuthService } from '../../services/auth.service';
 import { AppointmentService } from '../../services/appointment.service';
 import { UserService } from '../../services/user.service';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Subscription } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-patients-section',
   templateUrl: './patients-section.component.html',
   styleUrls: ['./patients-section.component.scss'],
   standalone: true,
-  imports: [ CommonModule, 
-    RouterOutlet,RouterModule, FormsModule,
+  imports: [ 
+    CommonModule, 
+    RouterOutlet,
+    RouterModule, 
+    FormsModule,
+    ReactiveFormsModule,
+    CalendarModule,
+    DropdownModule,
+    ButtonModule,
+    RadioButtonModule,
+    InputNumberModule,
+    MatSnackBarModule
   ]
 })
-export class PatientsSectionComponent implements OnInit {
+export class PatientsSectionComponent implements OnInit, OnDestroy {
     patientId: string | null | undefined;
     appointments: any;
     uniqueCode!: string;
@@ -40,40 +54,6 @@ export class PatientsSectionComponent implements OnInit {
     showPracticesDropdown: boolean = false;
     practiceSearchText: string = '';
     filteredPractices: any[] = [];
-    ngOnInit(): void {
-      this.userService.getBranches().subscribe(res=>{
-        this.practices = res.data;
-        const savedPractice = localStorage.getItem('selectedPractice');
-        if (savedPractice) {
-          this.selectedPractice = JSON.parse(savedPractice);
-        } else {
-          this.selectedPractice = this.practices[0];
-          localStorage.setItem('selectedPractice', JSON.stringify(this.selectedPractice));
-        }
-      })
-      this.messageService.message$.subscribe((message) => {
-        this.patientId = message.text;
-        this.uniqueCode = message.code;
-        this.useService.getUserProfile(this.uniqueCode).subscribe(res => {
-          this.patientDetails = res.data;
-        });
-      });
-      this.authService.getUser().subscribe(res => {
-        this.patient = res.data;
-        this.userPrivileges = this.patient.privileges.map((p: any) => p.name)
-      });
-    }
-
-    constructor(private messageService: MessageService,
-        private authService: AuthService, 
-        private router: Router,
-        private elementRef: ElementRef,
-        private useService: UserService,
-        private appointmentService: AppointmentService,
-        private route:ActivatedRoute,
-        private userService: UserService,
-    ) {}
-
     patientExpanded = true;
     emrExpanded = true;
     billingExpanded = true;
@@ -81,7 +61,107 @@ export class PatientsSectionComponent implements OnInit {
     routeLink = '/profile';
     userPrivileges: any[] = [];
     patient: any;
+    
+    // Subscriptions to manage
+    private messageSubscription!: Subscription;
+    private userSubscription!: Subscription;
+    private branchesSubscription!: Subscription;
+
+    constructor(
+        private messageService: MessageService,
+        private authService: AuthService, 
+        private router: Router,
+        private elementRef: ElementRef,
+        private userService: UserService,
+        private appointmentService: AppointmentService,
+        private route: ActivatedRoute,
+        private snackBar: MatSnackBar
+    ) {}
+
+    ngOnInit(): void {
+      this.branchesSubscription = this.userService.getBranches()
+        .pipe(
+          catchError(error => {
+            this.showErrorMessage('Failed to load practices. Please try again.');
+            console.error('Error loading branches:', error);
+            return of({ data: [] });
+          })
+        )
+        .subscribe(res => {
+          this.practices = res.data;
+          this.loadSavedPractice();
+        });
+
+      this.messageSubscription = this.messageService.message$.subscribe((message) => {
+        this.patientId = message.text;
+        this.uniqueCode = message.code;
+        
+        if (this.uniqueCode) {
+          this.loadPatientProfile();
+        }
+      });
+
+      this.userSubscription = this.authService.getUser()
+        .pipe(
+          catchError(error => {
+            this.showErrorMessage('Failed to load user information.');
+            console.error('Error loading user:', error);
+            return of({ data: { privileges: [] } });
+          })
+        )
+        .subscribe(res => {
+          this.patient = res.data;
+          this.userPrivileges = this.patient.privileges.map((p: any) => p.name);
+        });
+    }
+
+    ngOnDestroy(): void {
+      // Clean up subscriptions
+      if (this.messageSubscription) {
+        this.messageSubscription.unsubscribe();
+      }
+      if (this.userSubscription) {
+        this.userSubscription.unsubscribe();
+      }
+      if (this.branchesSubscription) {
+        this.branchesSubscription.unsubscribe();
+      }
+    }
+
+    private loadSavedPractice(): void {
+      try {
+        const savedPractice = localStorage.getItem('selectedPractice');
+        if (savedPractice) {
+          this.selectedPractice = JSON.parse(savedPractice);
+        } else if (this.practices && this.practices.length > 0) {
+          this.selectedPractice = this.practices[0];
+          localStorage.setItem('selectedPractice', JSON.stringify(this.selectedPractice));
+        }
+      } catch (error) {
+        console.error('Error loading saved practice:', error);
+        this.showErrorMessage('Error loading saved practice settings.');
+      }
+    }
+
+    private loadPatientProfile(): void {
+      this.userService.getUserProfile(this.uniqueCode)
+        .pipe(
+          catchError(error => {
+            this.showErrorMessage('Failed to load patient profile.');
+            console.error('Error loading patient profile:', error);
+            return of({ data: null });
+          })
+        )
+        .subscribe(res => {
+          this.patientDetails = res.data;
+        });
+    }
+
     toggleSection(section: 'patient' | 'emr' | 'billing') {
+        if (!this.patientDetails) {
+            this.showPatientSelectionWarning();
+            return;
+        }
         if (!this.isNavCollapsed) {
             switch (section) {
                 case 'patient':
@@ -96,72 +176,90 @@ export class PatientsSectionComponent implements OnInit {
             }
         }
     }
-togglePracticesDropdown() {
-    this.showPracticesDropdown = !this.showPracticesDropdown;
     
-    if (this.showPracticesDropdown) {
-      this.practiceSearchText = '';
-      this.filteredPractices = [...this.practices];
+    togglePracticesDropdown() {
+      this.showPracticesDropdown = !this.showPracticesDropdown;
       
-      // Focus on the search input after a short delay
-      setTimeout(() => {
-        const searchInput = this.elementRef.nativeElement.querySelector('.practice-search');
-        if (searchInput) {
-          searchInput.focus();
-        }
-      }, 100);
-    }
-  }
-  
-  // Select a practice and save to localStorage
-  selectPractice(practice: any) {
-    this.selectedPractice = practice;
-    this.showPracticesDropdown = false;
-    
-    // Save to localStorage
-    localStorage.setItem('selectedPractice', JSON.stringify(practice));
-    window.location.reload();
-  }
-  
-  // Filter practices based on search text
-  filterPractices() {
-    if (!this.practiceSearchText.trim()) {
-      this.filteredPractices = [...this.practices];
-      return;
+      if (this.showPracticesDropdown) {
+        this.practiceSearchText = '';
+        this.filteredPractices = [...this.practices];
+        
+        // Focus on the search input after a short delay
+        setTimeout(() => {
+          const searchInput = this.elementRef.nativeElement.querySelector('.practice-search');
+          if (searchInput) {
+            searchInput.focus();
+          }
+        }, 100);
+      }
     }
     
-    const searchTerm = this.practiceSearchText.toLowerCase().trim();
-    this.filteredPractices = this.practices.filter(practice => 
-      practice.branch_name.toLowerCase().includes(searchTerm) || 
-      practice.branch_id.toString().includes(searchTerm)
-    );
-  }
+    // Select a practice and save to localStorage
+    selectPractice(practice: any) {
+      this.selectedPractice = practice;
+      this.showPracticesDropdown = false;
+      
+      // Save to localStorage
+      localStorage.setItem('selectedPractice', JSON.stringify(practice));
+      window.location.reload();
+    }
+    
+    // Filter practices based on search text
+    filterPractices() {
+      if (!this.practiceSearchText.trim()) {
+        this.filteredPractices = [...this.practices];
+        return;
+      }
+      
+      const searchTerm = this.practiceSearchText.toLowerCase().trim();
+      this.filteredPractices = this.practices.filter(practice => 
+        practice.branch_name.toLowerCase().includes(searchTerm) || 
+        practice.branch_id.toString().includes(searchTerm)
+      );
+    }
 
-  handleNavigation(route: string): (string | null | undefined)[] | null {
-    return ['/patients', this.patientId, route.substring(1), this.uniqueCode];
-  }
+    handleNavigation(route: string) {
+      if (!this.patientDetails) {
+          this.showPatientSelectionWarning();
+          return;
+      }
+      
+      // Navigate to the correct route
+      this.router.navigate(['/patients', this.patientId, route.substring(1), this.uniqueCode]);
+    }
 
-  // Close dropdown when clicking outside
-  @HostListener('document:click', ['$event'])
-  handleDocumentClick(event: MouseEvent) {
-  if (this.showPracticesDropdown && 
-      !this.elementRef.nativeElement.querySelector('.email-dropdown').contains(event.target)) {
-    this.showPracticesDropdown = false;
-  }
-  }
-    // goToChild(page: string) {
-    //     switch (page) {
-    //         case 'appointments':
-    //             this.router.navigate(['/patients/appointments'], { state: { appointments: this.appointments?.rows } });
-    //             break;
-    //     }
-    // }
-    openPatientDirectory(){
+    // Close dropdown when clicking outside
+    @HostListener('document:click', ['$event'])
+    handleDocumentClick(event: MouseEvent) {
+      if (this.showPracticesDropdown && 
+          !this.elementRef.nativeElement.querySelector('.email-dropdown')?.contains(event.target)) {
+        this.showPracticesDropdown = false;
+      }
+    }
+
+    openPatientDirectory() {
         this.router.navigate(['/patients/patient-directory']);
-
     }
 
     toggleNav() {
         this.isNavCollapsed = !this.isNavCollapsed;
+    }
+
+    private showPatientSelectionWarning() {
+        this.snackBar.open('Select the patient for further action.', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            panelClass: ['warning-snackbar']
+        });
+    }
+    
+    private showErrorMessage(message: string) {
+        this.snackBar.open(message, 'Close', {
+            duration: 5000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            panelClass: ['error-snackbar']
+        });
     }
 }
