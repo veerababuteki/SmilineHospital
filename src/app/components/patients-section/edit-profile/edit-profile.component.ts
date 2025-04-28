@@ -184,7 +184,19 @@ export class EditProfileComponent implements OnInit {
     {label: 'Other', value: 'Other'}
   ];
   languages: any[] = [
-    { label: 'English (Practice Default)', value: 'english' }
+    { label: 'English (Practice Default)', value: 'english' },
+    { label: 'English', value: 'english' },
+    { label: 'Hindi', value: 'hindi' },
+    { label: 'Telugu', value: 'telugu' },
+    { label: 'Marathi', value: 'marathi' },
+    { label: 'Gujarati', value: 'gujarati' },
+    { label: 'Tamil', value: 'tamil' },
+    { label: 'Malayalam', value: 'malayalam' },
+    { label: 'Bengali', value: 'bengali' },
+    { label: 'Punjabi', value: 'punjabi' },
+    { label: 'Kannada', value: 'kannada' },
+    { label: 'Assamese', value: 'assamese' },
+    { label: 'Odia', value: 'odia' },
   ];
   getControlName(condition: string): string {
     return condition.toLowerCase().replace(/[^a-z0-9]/g, '');
