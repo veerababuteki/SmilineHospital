@@ -177,14 +177,26 @@ export class EditProfileComponent implements OnInit {
     {label: 'Male', value: 'Male'},
     {label: 'Female', value: 'Female'},
   ];
-  refferedBy: any[] = [
+  referredBy: any[] = [
     {label: 'Friend', value: 'Friend'},
     {label: 'Family', value: 'Family'},
     {label: 'Online', value: 'Online'},
     {label: 'Other', value: 'Other'}
   ];
   languages: any[] = [
-    { label: 'English (Practice Default)', value: 'english' }
+    { label: 'English (Practice Default)', value: 'english' },
+    { label: 'English', value: 'english' },
+    { label: 'Hindi', value: 'hindi' },
+    { label: 'Telugu', value: 'telugu' },
+    { label: 'Marathi', value: 'marathi' },
+    { label: 'Gujarati', value: 'gujarati' },
+    { label: 'Tamil', value: 'tamil' },
+    { label: 'Malayalam', value: 'malayalam' },
+    { label: 'Bengali', value: 'bengali' },
+    { label: 'Punjabi', value: 'punjabi' },
+    { label: 'Kannada', value: 'kannada' },
+    { label: 'Assamese', value: 'assamese' },
+    { label: 'Odia', value: 'odia' },
   ];
   getControlName(condition: string): string {
     return condition.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -203,8 +215,8 @@ export class EditProfileComponent implements OnInit {
       dateOfBirth: [''],
       age: [''],
       referredBy: [''],
-      refferedByName: [''],
-      refferedByMobile: [''],
+      referredByName: [''],
+      referredByMobile: [''],
       bloodGroup: [null],
       primaryMobile: ['', Validators.required],
       secondaryMobile: [''],
@@ -254,12 +266,12 @@ export class EditProfileComponent implements OnInit {
         age: patientDetails.age,
         anniversary: null,
         referred_by: patientDetails.referredBy,
-        referred_name: patientDetails.refferedByName,
-        referred_mobile: patientDetails.refferedByMobile,
+        referred_name: patientDetails.referredByName,
+        referred_mobile: patientDetails.referredByMobile,
         blood_group: patientDetails.bloodGroup !== null && patientDetails.bloodGroup !== undefined ? patientDetails.bloodGroup.label: '',
         family: null,
         gender: patientDetails.gender,
-        secondary_mobile: patientDetails.primaryMobile,
+        secondary_mobile: patientDetails.secondaryMobile,
         langugae: patientDetails.languagePreference.label,
         land_line: patientDetails.landLine,
         street_address: patientDetails.streetAddress,
