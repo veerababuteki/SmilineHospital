@@ -149,7 +149,7 @@ export class AddProfileComponent implements OnInit {
   private createPatientForm(): FormGroup {
     return this.fb.group({
       firstName: ['', Validators.required],
-      customId: [''],
+      customId: ['', Validators.required],
       aadhaarId: [''],
       gender: ['', Validators.required],
       dateOfBirth: [''],
