@@ -18,6 +18,15 @@ import { MessageService } from '../../../services/message.service';
 })
 
 export class CompletedProceduresComponent implements OnInit {
+getFullTeethNumbers(arg0: any): string|import("@angular/core").TemplateRef<HTMLElement>|undefined {
+throw new Error('Method not implemented.');
+}
+getShortTeethNumbers(arg0: any) {
+throw new Error('Method not implemented.');
+}
+hasMoreTeeth(arg0: any): any {
+throw new Error('Method not implemented.');
+}
     currentTreatmentIndex: number | null = null;
     cost: number = 0;
     name: string = '';
@@ -433,4 +442,5 @@ export class CompletedProceduresComponent implements OnInit {
         }
       }
     }
+    
 }

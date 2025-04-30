@@ -194,4 +194,11 @@ export class InvoiceComponent implements OnInit {
     getSortedDates(): string[] {
       return Object.keys(this.invoices).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
     }
+
+    getInitialTeeth(teethSet: string): string {
+      if (!teethSet) return '';
+      const teeth = teethSet.split(',');
+      if (teeth.length <= 2) return teethSet;
+      return `${teeth[0]}, ${teeth[1]}...`;
+    }
 }

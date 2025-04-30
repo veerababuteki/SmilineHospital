@@ -310,3 +310,35 @@
   :host ::ng-deep .p-menuitem:last-child .p-menuitem-text {
     color: #f44336;
   }
+
+.teeth-hover-container {
+  position: relative;
+  cursor: pointer;
+
+  .initial-teeth {
+    display: inline-block;
+  }
+
+  .hover-teeth {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: white;
+    padding: 2px 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1;
+    white-space: nowrap;
+  }
+
+  &:hover {
+    .initial-teeth {
+      display: none;
+    }
+    
+    .hover-teeth {
+      display: inline-block;
+    }
+  }
+}

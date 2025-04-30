@@ -38,7 +38,15 @@
                     </td>
                     <td class="multiply-symbol">x</td>
                     <td>
-                      <input type="number" formControlName="cost" class="cost-input" min="0">
+                      <input type="number" 
+                             class="form-control" 
+                             formControlName="cost" 
+                             min="0" 
+                             (input)="calculateTotal(i)" 
+                             placeholder="Enter Cost">
+                      <div class="invalid-feedback" *ngIf="getCostError(i)">
+                        {{ getCostError(i) }}
+                      </div>
                     </td>
                     <td class="discount-cell">
                       <input type="number" formControlName="discount" class="discount-input" min="0">

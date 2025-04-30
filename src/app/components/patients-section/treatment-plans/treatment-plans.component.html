@@ -45,7 +45,12 @@
                             <td class="discount">{{treatment.discount+" "+treatment.discount_formate}}</td>
                             <td class="amount">{{treatment.total_cost}}</td>
                             <td>
-                                <div>Teeth: <span class="teeth-number">{{treatment.teeth_set}}</span></div>
+                                <div>Teeth: 
+                                    <span class="teeth-number" [pTooltip]="getFullTeethNumbers(treatment.teeth_set)">
+                                        {{getShortTeethNumbers(treatment.teeth_set)}}
+                                        <span *ngIf="hasMoreTeeth(treatment.teeth_set)" class="more-teeth">...</span>
+                                    </span>
+                                </div>
                                 <div>{{treatment.notes}}</div>
                             </td>
                             <td class="actions hide-on-print">

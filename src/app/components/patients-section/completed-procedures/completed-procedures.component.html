@@ -4,76 +4,82 @@
         <h2>Completed Procedures</h2>
         <div>
             <button class="mark-btn" *ngIf="generateInvoiceList.length == 0">Invoice selected Procedure</button>
-            <button class="mark-btn-active" *ngIf="generateInvoiceList.length > 0" (click)="generateInvoice()">Invoice selected Procedure</button>
+            <button class="mark-btn-active" *ngIf="generateInvoiceList.length > 0" (click)="generateInvoice()">Invoice
+                selected Procedure</button>
             <button class="add-btn" (click)="navigateToAddPage()">+ Add</button>
         </div>
     </div>
     <div id="completed-procedures-container">
-    <div *ngFor="let dateTreatment of formattedData">
+        <div *ngFor="let dateTreatment of formattedData">
 
-    <div class="appointment-date">{{ dateTreatment.date | date: 'dd MMM, yyyy'}}</div>
+            <div class="appointment-date">{{ dateTreatment.date | date: 'dd MMM, yyyy'}}</div>
 
-    <div class="treatment-plan" *ngFor="let treatmentPlan of dateTreatment.treatments">
-        <div *ngFor="let treatmentDoctorGroup of treatmentPlan.doctorTreatments" class="doctor-group">
-        <table class="procedures-table">
-            <thead>
-                <tr>
-                    <th class="checkbox-col"></th>
-                    <th class="procedure-col">PROCEDURE</th>
-                    <th class="cost-col">COST</th>
-                    <th class="discount-col">QUANTITY</th>
-                    <th class="discount-col">DISCOUNT</th>
-                    <th class="total-col">TOTAL</th>
-                    <th class="notes-col">NOTES</th>
-                    <th class="actions-col hide-on-print"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let treatment of treatmentDoctorGroup.treatments">
-                    <td *ngIf="treatment.invoice_status?.toLowerCase() !== 'generated'"><input type="checkbox" class="procedure-checkbox" [(ngModel)]="treatment.isChecked"
-                      (change)="onCheckboxChange(treatment, treatment.id, treatment.treatment_unique_id)"></td>
-                    <td *ngIf="treatment.invoice_status?.toLowerCase() === 'generated'"><i class="pi pi-dollar"></i></td>
-                    <td>{{treatment.procedure_details.name}}</td>
-                    <td class="amount">{{treatment.cost}}</td>
-                    <td class="amount">{{treatment.quantity}}</td>
-                    <td class="discount">{{treatment.discount+" "+treatment.discount_formate}}</td>
-                    <td class="amount">{{treatment.total_cost | number }}</td>
-                    <td>
-                        <div>Teeth: <span class="teeth-number">{{treatment.teeth_set}}</span></div>
-                        <div>{{treatment.notes}}</div>
-                    </td>
-                    <td class="actions">
-                        <!-- <button class="edit-btn border-left-radius">
-                            <i class="pi pi-print"></i>
-                        </button> -->
-                        <div class="action-menu">
-                            <button 
-                              #menuButton
-                              type="button" 
-                              pButton 
-                              icon="pi pi-chevron-down" 
-                              class="edit-btn border-right-radius p-button-text"
-                              (click)="invoiceMenu.toggle($event); setCurrentProcedure(treatment)">
-                            </button>
-                            <p-menu #invoiceMenu [popup]="true" [model]="items"></p-menu>
+            <div class="treatment-plan" *ngFor="let treatmentPlan of dateTreatment.treatments">
+                <div *ngFor="let treatmentDoctorGroup of treatmentPlan.doctorTreatments" class="doctor-group">
+                    <div class="table-responsive">
+                        <table class="procedures-table">
+                            <thead>
+                                <tr>
+                                    <th class="checkbox-col"></th>
+                                    <th class="procedure-col  "  style="text-align: right;">PROCEDURE</th>
+                                    <th class="cost-col  "  style="text-align: right;">COST</th>
+                                    <th class="quantity-col  "  style="text-align: right;">QUANTITY</th>
+                                    <th class="discount-col  "  style="text-align: right;">DISCOUNT</th>
+                                    <th class="total-col  "  style="text-align: right;">TOTAL</th>
+                                    <th class="notes-col  " >NOTES</th>
+                                    <th class="actions-col    hide-on-print" style="text-align: right;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let treatment of treatmentDoctorGroup.treatments">
+                                    <td *ngIf="treatment.invoice_status?.toLowerCase() !== 'generated'"><input
+                                            type="checkbox" class="procedure-checkbox" [(ngModel)]="treatment.isChecked"
+                                            (change)="onCheckboxChange(treatment, treatment.id, treatment.treatment_unique_id)">
+                                    </td>
+                                    <td *ngIf="treatment.invoice_status?.toLowerCase() === 'generated'"><i
+                                            class="pi pi-dollar"></i></td>
+                                    <td class="procedure-col">
+                                        <span class="truncate-text" [title]="treatment.procedure_details.name">
+                                            {{treatment.procedure_details.name}}
+                                        </span>
+                                    </td>
+                                    <td class="cost-col  amount">{{treatment.cost}}</td>
+                                    <td class="quantity-col  amount">{{treatment.quantity}}</td>
+                                    <td class="discount-col  discount">{{treatment.discount+" "+treatment.discount_formate}}</td>
+                                    <td class="total-col  amount">{{treatment.total_cost | number }}</td>
+                                    <td class="notes-col ">
+                                        <div>Teeth: <span class="teeth-number">{{treatment.teeth_set}}</span></div>
+                                        <div class="truncate-text notes-text" [title]="treatment.notes">{{treatment.notes}}</div>
+                                    </td>
+                                    <td class="actions ">
+                                        <div class="action-menu">
+                                            <button #menuButton type="button" pButton icon="pi pi-chevron-down"
+                                                class="edit-btn border-right-radius p-button-text"
+                                                (click)="invoiceMenu.toggle($event); setCurrentProcedure(treatment)">
+                                            </button>
+                                            <p-menu #invoiceMenu [popup]="true" [model]="items"></p-menu>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="plan-footer">
+                        <div class="planned-by">
+                            Completed by <span class="doctor-name">{{"Dr. " +
+                                treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].first_name
+                                +" "+
+                                treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].last_name}}</span>
                         </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="plan-footer">
-            <div class="planned-by">
-                Completed by <span class="doctor-name">{{"Dr. " + treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].first_name +" "+ treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].last_name}}</span>
-            </div>
-            <div class="estimated-amount">
-                Estimated amount: <span class="amount">{{getTotalCost(treatmentDoctorGroup.treatments) | number  }}</span>
+                        <div class="estimated-amount">
+                            Estimated amount: <span class="amount">{{getTotalCost(treatmentDoctorGroup.treatments) |
+                                number }}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        </div>
-       
-    </div>
-    </div>
     </div>
     <div class="no-completed-procedure-container" *ngIf="getSortedDates().length <= 0">
         <img class="icon" src="assets/completed-procedures.png" />

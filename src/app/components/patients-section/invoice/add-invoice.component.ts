@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Procedure, TreatmentForm } from '../treatment-plans/treatment.interface';
 import { TreatmentPlansService } from '../../../services/treatment-plans.service';
 import { UserService } from '../../../services/user.service';
@@ -428,7 +428,9 @@ export class AddInvoiceComponent implements OnInit {
     if (!treatment) return;
 
     const values = treatment.value;
-    let total = values.cost * values.quantity;
+    // Convert negative cost to positive
+    const cost = Math.abs(Math.floor(values.cost));
+    let total = cost * values.quantity;
 
     if (values.multiplyCost && values.selectedTeeth.length > 0) {
       total *= values.selectedTeeth.length;
@@ -440,6 +442,11 @@ export class AddInvoiceComponent implements OnInit {
       } else {
         total -= values.discount;
       }
+    }
+
+    // Update the cost value if it was negative
+    if (values.cost < 0) {
+      treatment.patchValue({ cost }, { emitEvent: false });
     }
 
     treatment.patchValue({ total }, { emitEvent: false });
@@ -630,5 +637,30 @@ export class AddInvoiceComponent implements OnInit {
       const nameB = b.name.toLowerCase();
       return nameA.localeCompare(nameB);
     });
+  }
+
+  initTreatmentForm() {
+    return this.fb.group({
+      treatment: ['', Validators.required],
+      quantity: [1, [Validators.required, Validators.min(1)]],
+      cost: [0, [Validators.required, Validators.min(0)]],
+      discount: [0],
+      isFullMouth: [false],
+      selectedTeeth: [[]],
+      isVisible: [true]
+    });
+  }
+
+  getCostError(index: number): string {
+    const costControl = (this.treatments.at(index) as FormGroup).get('cost');
+    if (costControl?.errors) {
+      if (costControl.errors['required']) {
+        return 'Cost is required';
+      }
+      if (costControl.errors['min']) {
+        return 'Cost must be a positive number';
+      }
+    }
+    return '';
   }
 }

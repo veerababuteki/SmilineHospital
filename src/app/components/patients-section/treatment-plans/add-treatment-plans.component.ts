@@ -35,6 +35,16 @@ export class AddTreatmentPlansComponent implements OnInit {
   isEditMode: boolean = false;
   editTreatmentData: any = null;
   uniqueCode: string | null | undefined;
+  allTeethInOrder = [
+    // Adult upper
+    18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28,
+    // Adult lower
+    48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38,
+    // Child upper
+    55, 54, 53, 52, 51, 61, 62, 63, 64, 65,
+    // Child lower
+    85, 84, 83, 82, 81, 71, 72, 73, 74, 75
+  ];
 
   constructor(private fb: FormBuilder, 
     private userService: UserService,    private messageService: MessageService,
@@ -170,16 +180,14 @@ export class AddTreatmentPlansComponent implements OnInit {
 
   getProcedures(){
     this.treatmentPlansService.getProcedures().subscribe(res => {
-      res.data.rows.sort((a:any, b:any) => b.procedure_id - a.procedure_id);
-      res.data.rows.forEach((r: any) => {
-      this.procedures.push({
+      this.procedures = res.data.rows.map((r: any) => ({
         name: r.name,
         id: r.procedure_id,
         price: r.cost
-      });
-      this.filteredProcedures = [...this.procedures]; 
-      })
-    })
+      })).sort((a: Procedure, b: Procedure) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+      
+      this.filteredProcedures = [...this.procedures];
+    });
   }
 
   private initForm() {
@@ -233,21 +241,46 @@ export class AddTreatmentPlansComponent implements OnInit {
     const currentValue = treatment.get('showNotes')?.value;
     treatment.get('showNotes')?.setValue(!currentValue);
   }
+  onFullMouthChange(treatmentIndex: number): void {
+    if (treatmentIndex === null || treatmentIndex >= this.treatments.length) return;
+    
+    const treatment = this.treatments.at(treatmentIndex);
+    if (!treatment) return;
+    
+    const fullMouth = treatment.get('fullMouth')?.value;
+    
+    if (fullMouth) {
+      treatment.get('selectedTeeth')?.setValue(this.allTeethInOrder);
+      // Show adult teeth by default when full mouth is checked
+      treatment.get('showAdultTeeth')?.setValue(true);
+    } else {
+      treatment.get('selectedTeeth')?.setValue([]);
+    }
+    
+    if(treatment.get('multiplyCost')?.value){
+      treatment.get('quantity')?.setValue(treatment.get('selectedTeeth')?.value.length || 0);
+    }
+    
+    this.calculateTotal(treatmentIndex);
+  }
+
   toggleTeethVisibility(treatmentIndex: number, teethType: 'adult' | 'child' | 'both'): void {
     if (treatmentIndex === null || treatmentIndex >= this.treatments.length) return;
     
     const treatment = this.treatments.at(treatmentIndex);
     if (!treatment) return;
+
     if(teethType === 'both'){
       treatment.get('showAdultTeeth')?.setValue(false);
       treatment.get('showChildTeeth')?.setValue(false);
+      treatment.get('fullMouth')?.setValue(false);
+      treatment.get('selectedTeeth')?.setValue([]);
+      this.calculateTotal(treatmentIndex);
     }
     else if (teethType === 'adult') {
       const currentValue = treatment.get('showAdultTeeth')?.value;
       const otherValue = treatment.get('showChildTeeth')?.value;
       
-      // If we're about to hide adult teeth and child teeth are also hidden,
-      // then show child teeth to ensure at least one is visible
       if (currentValue && !otherValue) {
         treatment.get('showChildTeeth')?.setValue(true);
       }
@@ -257,8 +290,6 @@ export class AddTreatmentPlansComponent implements OnInit {
       const currentValue = treatment.get('showChildTeeth')?.value;
       const otherValue = treatment.get('showAdultTeeth')?.value;
       
-      // If we're about to hide child teeth and adult teeth are also hidden,
-      // then show adult teeth to ensure at least one is visible
       if (currentValue && !otherValue) {
         treatment.get('showAdultTeeth')?.setValue(true);
       }
