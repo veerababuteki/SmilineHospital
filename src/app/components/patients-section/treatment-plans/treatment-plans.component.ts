@@ -12,13 +12,24 @@ import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import { TreatmentPlansPrintComponent } from './treatment-plans-print/treatment-plans-print.component';
 import { MessageService } from '../../../services/message.service';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-treatment-plans',
   templateUrl: './treatment-plans.component.html',
   styleUrls: ['./treatment-plans.component.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, DropdownModule, CalendarModule, MenuModule, ButtonModule, TreatmentPlansPrintComponent]
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    FormsModule, 
+    DropdownModule, 
+    CalendarModule, 
+    MenuModule, 
+    ButtonModule, 
+    TreatmentPlansPrintComponent,
+    TooltipModule
+  ]
 })
 export class TreatmentPlansComponent implements OnInit {
   treatmentForm!: FormGroup;
@@ -328,4 +339,21 @@ handleKeyboardEvent(event: KeyboardEvent) {
     // Call your custom print function
   }
 }
+
+  getShortTeethNumbers(teethSet: string): string {
+    if (!teethSet) return '';
+    const teeth = teethSet.split(',').map(t => t.trim());
+    return teeth.slice(0, 2).join(', ');
+  }
+
+  getFullTeethNumbers(teethSet: string): string {
+    if (!teethSet) return '';
+    return teethSet;
+  }
+
+  hasMoreTeeth(teethSet: string): boolean {
+    if (!teethSet) return false;
+    const teeth = teethSet.split(',').map(t => t.trim());
+    return teeth.length > 2;
+  }
 }

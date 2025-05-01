@@ -86,7 +86,10 @@
                                         <a  class="treatment-link">{{invc.treatment_plans.procedure_details.name}}</a>
                                     </td>
                                     <td class="teeth_set" style="width: 10%;">
-                                        <span class="tooth-number">{{invc.treatment_plans.teeth_set}}</span>
+                                        <div class="teeth-hover-container">
+                                            <span class="initial-teeth">{{getInitialTeeth(invc.treatment_plans.teeth_set)}}</span>
+                                            <span class="hover-teeth">{{invc.treatment_plans.teeth_set}}</span>
+                                        </div>
                                     </td>
                                     <td class="notes" style="width: 25%;">{{invc.treatment_plans.notes}}</td>
                                     <td class="amount" style="width: 10%;">{{invc.treatment_plans.cost}}</td>

@@ -10,9 +10,11 @@ import { Component, Input } from '@angular/core';
 export class ClinicalNotesPrintComponent{
   @Input() clinicalNotes: any;
   generatedDate: string = '';
+  savedPractice: any;
 
  constructor() {
     this.generatedDate = new Date().toLocaleDateString();
+    this.savedPractice = localStorage.getItem('selectedPractice');
   }
 
   print() {

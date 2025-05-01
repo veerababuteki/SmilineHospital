@@ -42,12 +42,12 @@
     <div class="login-form" *ngIf="isLogin">
       <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
         <div class="form-group">
-          <label for="mobileNumber">Mobile Number / Email ID</label>
+          <label for="mobileNumber">Mobile Number</label>
           <input 
             type="text"
             id="mobileNumber" 
             formControlName="mobileNumber"
-            placeholder="Mobile Number / Email ID"
+            placeholder="Mobile Number"
             [ngClass]="{'ng-invalid': loginForm.get('mobileNumber')?.errors?.['invalidMobile'] && loginForm.get('mobileNumber')?.touched}"
           />
          </div>

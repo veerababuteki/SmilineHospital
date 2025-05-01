@@ -102,12 +102,25 @@
             }
     
             .teeth-number {
-                display: inline-block;
-                padding: 2px 6px;
                 background-color: #f0f0f0;
-                border-radius: 3px;
-                font-size: 12px;
-                color: #666;
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-size: 0.9em;
+                white-space: nowrap;
+                display: inline-block;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: #e0e0e0;
+                }
+
+                .more-teeth {
+                    color: #666;
+                    font-weight: bold;
+                }
             }
     
             .actions {
@@ -232,3 +245,9 @@ tbody{
       page-break-inside: avoid;
     }
   }
+
+::ng-deep .p-tooltip {
+  max-width: 250px;
+  white-space: normal;
+  word-break: break-word;
+}
