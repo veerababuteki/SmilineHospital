@@ -9,7 +9,6 @@ import { DividerModule } from 'primeng/divider';
 import { TagModule } from 'primeng/tag';
 import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';  // Change this line
 import { DialogModule } from 'primeng/dialog';
-
 import { CalendarOptions, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -31,6 +30,7 @@ import { CancelAppointmentDialogComponent } from './cancel-appointment-dialog';
 import { AddProfileComponent } from '../patients-section/edit-profile/add-profile.component';
 import { AppointmentsPrintComponent } from "./appointments-print/appointments-print.component";
 import { HostListener } from '@angular/core';
+import { DoctorColorService } from '../../services/doctor-color.service';
 
 interface Doctor {
   id: string;
@@ -239,9 +239,14 @@ export class CalendarComponent implements OnInit {
   filteredPractices: any[] = [];
   displayPrintAppointment = false;
   constructor(private dialogService: DialogService, private overlay: Overlay, private datePipe: DatePipe, private elementRef: ElementRef,
-    private authService: AuthService, private messageService: MessageService, private userService: UserService, private appointmentService: AppointmentService) {
+    private authService: AuthService, private messageService: MessageService, private userService: UserService,  private doctorColorService: DoctorColorService, private appointmentService: AppointmentService) {
 
   }
+
+  getDoctorColor(doctorId: string): string {
+    return this.doctorColorService.getColorForDoctor(doctorId);
+  }
+
   togglePracticesDropdown() {
     this.showPracticesDropdown = !this.showPracticesDropdown;
     

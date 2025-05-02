@@ -5,29 +5,23 @@
       <div class="email-dropdown" (click)="togglePracticesDropdown(); $event.stopPropagation()">
         <span>{{ selectedPractice?.branch_name || 'Select Practice' }}</span>
         <i class="pi pi-chevron-down"></i>
-        
+
         <!-- Dropdown panel -->
         <div class="practices-dropdown-panel" *ngIf="showPracticesDropdown" (click)="$event.stopPropagation()">
           <div class="search-container">
             <i class="pi pi-search search-icon"></i>
-            <input 
-              type="text" 
-              placeholder="Search by name" 
-              class="practice-search" 
-              [(ngModel)]="practiceSearchText"
-              (input)="filterPractices()"
-            >
+            <input type="text" placeholder="Search by name" class="practice-search" [(ngModel)]="practiceSearchText"
+              (input)="filterPractices()">
           </div>
-          
+
           <div class="practices-list">
-            <div class="practice-item" 
-     *ngFor="let practice of filteredPractices" 
-     (click)="selectPractice(practice); $event.stopPropagation()"
-     [class.selected]="selectedPractice?.branch_id === practice.branch_id">
-  <div class="practice-name">{{ practice.branch_name }}</div>
-  <div class="practice-id">Practice ID: {{ practice.branch_id }}</div>
-</div>
-            
+            <div class="practice-item" *ngFor="let practice of filteredPractices"
+              (click)="selectPractice(practice); $event.stopPropagation()"
+              [class.selected]="selectedPractice?.branch_id === practice.branch_id">
+              <div class="practice-name">{{ practice.branch_name }}</div>
+              <div class="practice-id">Practice ID: {{ practice.branch_id }}</div>
+            </div>
+
             <!-- No results message -->
             <div class="no-results" *ngIf="practiceSearchText && filteredPractices.length === 0">
               No practices found matching "{{ practiceSearchText }}"
@@ -105,14 +99,23 @@
             <!-- <span class="count">2100</span> -->
           </div>
 
-          <div class="doctors-scroll">
+          <!-- <div class="doctors-scroll">
             <div class="doctor-item" *ngFor="let doctor of filteredDoctors()"
               [ngClass]="{'doctor-active': selectedDoctor === doctor.user_id}" (click)="selectDoctor(doctor)">
               <span class="status-dot green"></span>
               <span class="doctor-name">Dr. {{doctor.first_name}}&nbsp;{{doctor.last_name}}</span>
-              <!-- <span class="count">197</span> -->
+              <span class="count">197</span>
             </div>
 
+          </div> -->
+          <!-- Replace the doctor-item div in the doctors-scroll section with this -->
+          <div class="doctors-scroll">
+            <div class="doctor-item" *ngFor="let doctor of filteredDoctors()"
+              [ngClass]="{'doctor-active': selectedDoctor === doctor.user_id}" (click)="selectDoctor(doctor)">
+              <span class="status-dot" [ngClass]="getDoctorColor(doctor.user_id)"></span>
+              <span class="doctor-name">Dr. {{doctor.first_name}}&nbsp;{{doctor.last_name}}</span>
+              <!-- <span class="count">197</span> -->
+            </div>
           </div>
         </div>
       </div>
