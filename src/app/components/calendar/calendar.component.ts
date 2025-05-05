@@ -107,7 +107,13 @@ export class CalendarComponent implements OnInit {
       this.handleDateClick(info);
     },
     eventClassNames: (arg: any) => {
-      return [`status-${arg.event.extendedProps.status}`];
+      const doctorId = arg.event.extendedProps?.doctorId || arg.event.extendedProps?.doctor_id || arg.event.extendedProps?.doctor;
+      const colorClass = doctorId ? `doctor-bg-${this.getDoctorColor(doctorId)}` : '';
+      let viewClass = '';
+      if (this.currentView === 'dayGridMonth') viewClass = 'month-view';
+      else if (this.currentView === 'timeGridWeek') viewClass = 'week-view';
+      else viewClass = 'day-view';
+      return [`status-${arg.event.extendedProps.status}`, colorClass, viewClass];
     },
     moreLinkContent: (args: any) => {
       return `+${args.num} more`;
@@ -238,6 +244,7 @@ export class CalendarComponent implements OnInit {
   practiceSearchText: string = '';
   filteredPractices: any[] = [];
   displayPrintAppointment = false;
+  doctorColorMap: { [doctorId: string]: string } = {};
   constructor(private dialogService: DialogService, private overlay: Overlay, private datePipe: DatePipe, private elementRef: ElementRef,
     private authService: AuthService, private messageService: MessageService, private userService: UserService,  private doctorColorService: DoctorColorService, private appointmentService: AppointmentService) {
 
@@ -376,6 +383,8 @@ export class CalendarComponent implements OnInit {
       //const patient = this.patients.find(p => p.user_id === a.patient_id)
       const formattedTime = this.convertTo24Hour(a.appointment_time);
       const startDateTime = new Date(`${a.appointment_date}T${formattedTime}`);
+      const doctor = this.doctorsList.find(d => d.user_id === a.doctor_details?.doctor_id);
+      const colorClass = doctor ? doctor.colorClass : this.doctorColorMap[a.doctor_details?.doctor_id];
       events.push({
         title: this.isDoctor || this.isAdmin ? a.patient_details.user_profile_details[0].first_name
           //+ a.patient_details.user_profile_details[0].last_name 
@@ -396,7 +405,11 @@ export class CalendarComponent implements OnInit {
           category: a.category_details.name,
           notes: a.notes,
           appointmentId: a.id
-        }
+        },
+        className: [
+          `doctor-bg-${colorClass}`,
+          this.currentView === 'dayGridMonth' ? 'month-view' : this.currentView === 'timeGridWeek' ? 'week-view' : 'day-view'
+        ]
       })
     });
     this.selectedCategory = null;
@@ -410,6 +423,8 @@ export class CalendarComponent implements OnInit {
       //const patient = this.patients.find(p => p.user_id === a.patient_id)
       const formattedTime = this.convertTo24Hour(a.appointment_time);
       const startDateTime = new Date(`${a.appointment_date}T${formattedTime}`);
+      const doctor = this.doctorsList.find(d => d.user_id === a.doctor_details?.doctor_id);
+      const colorClass = doctor ? doctor.colorClass : this.doctorColorMap[a.doctor_details?.doctor_id];
       events.push({
         title: this.isDoctor || this.isAdmin ? a.patient_details.user_profile_details[0].first_name
           //+ a.patient_details.user_profile_details[0].last_name 
@@ -431,7 +446,11 @@ export class CalendarComponent implements OnInit {
           category: a.category_details.name,
           notes: a.notes,
           appointmentId: a.id
-        }
+        },
+        className: [
+          `doctor-bg-${colorClass}`,
+          this.currentView === 'dayGridMonth' ? 'month-view' : this.currentView === 'timeGridWeek' ? 'week-view' : 'day-view'
+        ]
       })
     });
     this.calendarOptions.events = events;
@@ -477,12 +496,23 @@ export class CalendarComponent implements OnInit {
         var admin = this.admins.find(a => a.user_id === currentUser.data.user_id);
           this.isAdmin = true;
 
-        this.doctorsList = doctors.data;
+        // Sort doctors by user_id for stable color assignment
+        const sortedDoctors = doctors.data.slice().sort((a: any, b: any) => String(a.user_id).localeCompare(String(b.user_id)));
+        const colorClasses = Object.keys(this.doctorColorService['colorDefinitions']);
+        this.doctorsList = sortedDoctors.map((doc: any, idx: number) => {
+          const colorClass = colorClasses[idx % colorClasses.length];
+          this.doctorColorMap[doc.user_id] = colorClass;
+          return {
+            ...doc,
+            colorClass
+          };
+        });
         this.patients = patients.data;
         this.doctorsList.forEach(doc => {
           this.doctors.push({
             name: doc.first_name + " " + doc.last_name,
-            user_id: doc.user_id
+            user_id: doc.user_id,
+            colorClass: doc.colorClass
           });
         });
         if (!this.isAdmin) {
@@ -648,8 +678,8 @@ export class CalendarComponent implements OnInit {
     }
 
     dAppointments.forEach((a: any) => {
-      //const doctor = this.doctors.find(d => d.user_id === a.doctor_id)
-      //const patient = this.patients.find(p => p.user_id === a.patient_id)
+      const doctor = this.doctorsList.find(d => d.user_id === a.doctor_details?.doctor_id);
+      const colorClass = doctor ? doctor.colorClass : this.doctorColorMap[a.doctor_details?.doctor_id];
       const formattedTime = this.convertTo24Hour(a.appointment_time);
       const startDateTime = new Date(`${a.appointment_date}T${formattedTime}`);
       const endDateTime = new Date(startDateTime);
@@ -677,7 +707,11 @@ export class CalendarComponent implements OnInit {
           category: a.category_details?.name,
           notes: a.notes,
           appointmentId: a.id
-        }
+        },
+        className: [
+          `doctor-bg-${colorClass}`,
+          this.currentView === 'dayGridMonth' ? 'month-view' : this.currentView === 'timeGridWeek' ? 'week-view' : 'day-view'
+        ]
       })
     });
     this.calendarOptions.events = events;
