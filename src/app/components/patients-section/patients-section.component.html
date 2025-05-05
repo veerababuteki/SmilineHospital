@@ -4,7 +4,6 @@
       <div class="email-dropdown" (click)="togglePracticesDropdown(); $event.stopPropagation()">
         <span>{{ selectedPractice?.branch_name || 'Select Practice' }}</span>
         <i class="pi pi-chevron-down"></i>
-        <!-- Dropdown panel -->
         <div class="practices-dropdown-panel" *ngIf="showPracticesDropdown" (click)="$event.stopPropagation()">
           <div class="search-container">
             <i class="pi pi-search search-icon"></i>
@@ -36,7 +35,7 @@
     </div>
 </div>
 
-<div class="top-bar">
+<div class="top-bar" *ngIf="patientDetails">
     <div class="left-section">
         <img src="assets/patientpicker.webp" alt="User Icon" class="user-icon" (click)="openPatientDirectory()">
         <img *ngIf="patientDetails" src="assets/user.webp" alt="Profile Photo" class="adjust profile-photo">
@@ -52,11 +51,10 @@
 </div>
 
 <div class="app-container">
-    <div class="side-nav" [class.collapsed]="isNavCollapsed">
+    <div *ngIf="patientDetails" class="side-nav" [class.collapsed]="isNavCollapsed">
         <button class="collapse-toggle" (click)="toggleNav()">
             <i class="pi" [ngClass]="isNavCollapsed ? 'pi-angle-double-right' : 'pi-angle-double-left'"></i>
         </button>
-
         <div class="nav-section" *ngIf="userPrivileges?.includes('Profile') || userPrivileges?.includes('Appointments')">
             <div class="section-header" (click)="toggleSection('patient')">
                 <span class="label">Patient</span>
@@ -74,7 +72,7 @@
                        (click)="handleNavigation('/appointments')" 
                        routerLinkActive="active">
                         <i class="pi pi-calendar"></i>
-                        <span [class.hidden]="isNavCollapsed">Appointments<span class="count">{{appointments.count}}</span></span>
+                        <span [class.hidden]="isNavCollapsed">Appointments<span *ngIf="appointments && appointments.count > 0" class="count">{{appointments.count}}</span></span>
                     </a>
                 </div>
             </div>
@@ -92,25 +90,25 @@
                    (click)="handleNavigation('/clinical-notes')" 
                    routerLinkActive="active">
                     <i class="pi pi-file-edit"></i>
-                    <span [class.hidden]="isNavCollapsed">Clinical Notes<span class="count">{{clinicalNotes.count}}</span></span>
+                    <span [class.hidden]="isNavCollapsed">Clinical Notes<span *ngIf="clinicalNotes && clinicalNotes.count > 0"  class="count">{{clinicalNotes.count}}</span></span>
                 </a>
                 <a *ngIf="userPrivileges?.includes('TreatmentPlans')" class="nav-item" 
                    (click)="handleNavigation('/treatment-plans')" 
                    routerLinkActive="active">
                     <i class="pi pi-list"></i>
-                    <span [class.hidden]="isNavCollapsed">Treatment Plans<span class="count">{{treatmentPlans.count}}</span></span>
+                    <span [class.hidden]="isNavCollapsed">Treatment Plans<span *ngIf="treatmentPlans && treatmentPlans.count > 0" class="count">{{treatmentPlans.count}}</span></span>
                 </a>
                 <a *ngIf="userPrivileges?.includes('CompletedProcedures')" class="nav-item" 
                    (click)="handleNavigation('/completed-procedures')" 
                    routerLinkActive="active">
                     <i class="pi pi-check-circle"></i>
-                    <span [class.hidden]="isNavCollapsed">Completed Procedures<span class="count">{{completedProcedures.count}}</span></span>
+                    <span [class.hidden]="isNavCollapsed">Completed Procedures<span *ngIf="completedProcedures && completedProcedures.count > 0" class="count">{{completedProcedures.count}}</span></span>
                 </a>
                 <a *ngIf="userPrivileges?.includes('Files')" class="nav-item" 
                    (click)="handleNavigation('/files')" 
                    routerLinkActive="active">
                     <i class="pi pi-folder"></i>
-                    <span [class.hidden]="isNavCollapsed">Files<span class="count">{{files.count}}</span></span>
+                    <span [class.hidden]="isNavCollapsed">Files<span *ngIf="files && files.count > 0" class="count">{{files.count}}</span></span>
                 </a>
                 <a *ngIf="userPrivileges?.includes('Timeline')" class="nav-item" 
                    (click)="handleNavigation('/timeline')" 
@@ -132,7 +130,7 @@
                    (click)="handleNavigation('/invoices')" 
                    routerLinkActive="active">
                     <i class="pi pi-dollar"></i>
-                    <span [class.hidden]="isNavCollapsed">Invoices<span class="count">{{invoices.count}}</span></span>
+                    <span [class.hidden]="isNavCollapsed">Invoices<span *ngIf="invoices && invoices.count > 0" class="count">{{invoices.count}}</span></span>
                 </a>
                 <a class="nav-item" *ngIf="userPrivileges?.includes('Payments')" 
                    (click)="handleNavigation('/payments')" 
