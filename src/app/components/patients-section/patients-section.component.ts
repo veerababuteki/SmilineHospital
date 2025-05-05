@@ -21,9 +21,12 @@ import { AuthService } from '../../services/auth.service';
 import { AppointmentService } from '../../services/appointment.service';
 import { UserService } from '../../services/user.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Subscription } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { ClinicalNotesService } from '../../services/clinical-notes.service';
+import { TreatmentPlansService } from '../../services/treatment-plans.service';
+import { FileService } from '../../services/file.service';
 
 @Component({
   selector: 'app-patients-section',
@@ -66,6 +69,11 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
     private messageSubscription!: Subscription;
     private userSubscription!: Subscription;
     private branchesSubscription!: Subscription;
+  clinicalNotes: any;
+  completedProcedures: any;
+  invoices: any;
+  treatmentPlans: any;
+  files: any;
 
     constructor(
         private messageService: MessageService,
@@ -75,7 +83,10 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
         private userService: UserService,
         private appointmentService: AppointmentService,
         private route: ActivatedRoute,
-        private snackBar: MatSnackBar
+        private snackBar: MatSnackBar,
+        private clinicalNotesService: ClinicalNotesService,
+        private treatmentPlansService: TreatmentPlansService,
+        private filesService: FileService
     ) {}
 
     ngOnInit(): void {
@@ -144,17 +155,28 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
     }
 
     private loadPatientProfile(): void {
-      this.userService.getUserProfile(this.uniqueCode)
-        .pipe(
-          catchError(error => {
-            this.showErrorMessage('Failed to load patient profile.');
-            console.error('Error loading patient profile:', error);
-            return of({ data: null });
-          })
-        )
-        .subscribe(res => {
-          this.patientDetails = res.data;
-        });
+      forkJoin({
+        patientDetails: this.userService.getUserProfile(this.uniqueCode),
+        appointments: this.appointmentService.getAppointmentsByPatientID(this.uniqueCode),
+        clinicalNotes: this.clinicalNotesService.getClinicalNotes(Number(this.patientId)),
+        completedProcedures: this.treatmentPlansService.getCompletedTreatmentPlans(Number(this.patientId)),
+        treatmentPlans: this.treatmentPlansService.getTreatmentPlans(Number(this.patientId)),
+        invoices: this.treatmentPlansService.getInvoices(Number(this.patientId)),
+        files: this.filesService.getPatientFiles(Number(this.patientId)),
+      }).subscribe({
+        next: ({ patientDetails, appointments, clinicalNotes, completedProcedures, invoices, treatmentPlans, files }) => {
+          this.patientDetails = patientDetails.data;
+          this.appointments = appointments.data;
+          this.clinicalNotes = clinicalNotes.data;
+          this.completedProcedures = completedProcedures.data;
+          this.invoices = invoices.data;
+          this.treatmentPlans = treatmentPlans.data;
+          this.files = files.data;
+        },
+      error: (err) => {
+        console.error('Error fetching data:', err);
+      }
+      });
     }
 
     toggleSection(section: 'patient' | 'emr' | 'billing') {

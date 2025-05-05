@@ -4,6 +4,7 @@ import { FileService } from '../../../services/file.service';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from '../../../services/message.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-files',
@@ -14,7 +15,7 @@ import { MessageService } from '../../../services/message.service';
 })
 export class FilesComponent implements OnInit {
     labels: any[] = [];
-    selectedFiles: File[] = []; // Changed from single file to array of files
+    selectedFiles: File[] = [];
     selectedLabelId: number | null = null;
     addLabel: boolean = false;
     newLabel: string = '';
@@ -24,8 +25,18 @@ export class FilesComponent implements OnInit {
     selectedFileIds: any[] = [];
     uploadProgress: number = 0;
     uniqueCode: string | null | undefined;
+    previewModalOpen: boolean = false;
+    currentPreviewFile: any = null;
+    safeFileUrl: SafeResourceUrl | null = null;
 
     filesDict: Record<string, any[]> = {};
+    
+    constructor(
+        private fileService: FileService, 
+        private route: ActivatedRoute, 
+        private messageService: MessageService,
+        private sanitizer: DomSanitizer
+    ) {}
     
     ngOnInit(): void {
       this.route.parent?.paramMap.subscribe(params => {
@@ -46,9 +57,6 @@ export class FilesComponent implements OnInit {
       });
     }
     
-    constructor(private fileService: FileService, private route: ActivatedRoute, private messageService:MessageService,){
-    }
-    
     loadPatientData(patientId: string) {
       this.fileService.getFileLabels().subscribe(labels => {
         this.labels = labels.data;
@@ -58,7 +66,78 @@ export class FilesComponent implements OnInit {
         this.filesDict = this.groupByDate(files.data.rows.filter((f: any) => f.status !== 'Deleted'));
       });
     }
+
+    // New method to open different file types
+    openFile(file: any, event: MouseEvent): void {
+      // Don't open the file if the checkbox was clicked
+      const isCheckboxClick = (event.target as HTMLElement).tagName === 'INPUT';
+      if (isCheckboxClick) return;
+
+      // Set current file for preview
+      this.currentPreviewFile = file;
+      
+      // Create a safe URL using the Angular sanitizer
+      this.safeFileUrl = this.sanitizer.bypassSecurityTrustResourceUrl(file.file_path);
+      
+      // Open file based on its type
+      if (this.isPdf(file.file_type)) {
+        this.openPdfFile(file);
+      } else if (this.isImage(file.file_type)) {
+        this.openImageFile(file);
+      } else if (this.isDocx(file.file_type)) {
+        this.openDocxFile(file);
+      } else {
+        // For other file types, just download the file
+        this.downloadFile(file);
+      }
+    }
     
+    // Helper method to check if file is an image
+    isImage(fileType: string): boolean {
+      return !!fileType && fileType.startsWith('image/');
+    }
+    
+    // Helper method to check if file is a docx/word document
+    isDocx(fileType: string): boolean {
+      return fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+             fileType === 'application/msword';
+    }
+    
+    // Open PDF file in a new tab
+    openPdfFile(file: any): void {
+      window.open(file.file_path, '_blank');
+    }
+    
+    // Open image file in a modal or lightbox
+    openImageFile(file: any): void {
+      this.previewModalOpen = true;
+      // You would need to add a modal component to your HTML to show the image
+    }
+    
+    // Open docx file
+    openDocxFile(file: any): void {
+      // For Word documents, it's usually best to just download them
+      // as browsers can't display them natively
+      this.downloadFile(file);
+    }
+    
+    // Download the file
+    downloadFile(file: any): void {
+      const link = document.createElement('a');
+      link.href = file.file_path;
+      link.download = this.getFileName(file.file_path);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    
+    // Close the preview modal
+    closePreviewModal(): void {
+      this.previewModalOpen = false;
+      this.currentPreviewFile = null;
+    }
+    
+    // Existing methods below this line
     saveLabel(){
       if(this.newLabel.trim()){
         this.fileService.saveFileLabel(this.newLabel).subscribe(res => {
@@ -123,10 +202,8 @@ export class FilesComponent implements OnInit {
     }
     
     onFileSelected(event: any) {
-      // Get all selected files as an array
       const files = event.target.files;
       if (files && files.length > 0) {
-        // Convert FileList to array and store in selectedFiles
         this.selectedFiles = Array.from(files);
         this.uploadFiles();
       }
@@ -149,7 +226,6 @@ export class FilesComponent implements OnInit {
       
       const formData = new FormData();
       
-      // Append each file to the FormData with the same key 'images[]'
       this.selectedFiles.forEach((file, index) => {
         formData.append('images', file);
       });
@@ -161,7 +237,6 @@ export class FilesComponent implements OnInit {
       formData.append('file_label_id', this.selectedLabelId.toString());
       formData.append('appointment_id', '10');
       
-      // Optional: Log form data for debugging
       formData.forEach((value, key) => console.log(key, value));
       
       this.fileService.saveFile(formData).subscribe({
@@ -169,7 +244,6 @@ export class FilesComponent implements OnInit {
           if (this.patientId !== null && this.patientId !== undefined) {
             this.loadPatientData(this.patientId);
           }
-          // Reset selected files after successful upload
           this.selectedFiles = [];
         },
         error: (err) => {

@@ -74,7 +74,7 @@
                        (click)="handleNavigation('/appointments')" 
                        routerLinkActive="active">
                         <i class="pi pi-calendar"></i>
-                        <span [class.hidden]="isNavCollapsed">Appointments</span>
+                        <span [class.hidden]="isNavCollapsed">Appointments<span class="count">{{appointments.count}}</span></span>
                     </a>
                 </div>
             </div>
@@ -92,25 +92,25 @@
                    (click)="handleNavigation('/clinical-notes')" 
                    routerLinkActive="active">
                     <i class="pi pi-file-edit"></i>
-                    <span [class.hidden]="isNavCollapsed">Clinical Notes</span>
+                    <span [class.hidden]="isNavCollapsed">Clinical Notes<span class="count">{{clinicalNotes.count}}</span></span>
                 </a>
                 <a *ngIf="userPrivileges?.includes('TreatmentPlans')" class="nav-item" 
                    (click)="handleNavigation('/treatment-plans')" 
                    routerLinkActive="active">
                     <i class="pi pi-list"></i>
-                    <span [class.hidden]="isNavCollapsed">Treatment Plans</span>
+                    <span [class.hidden]="isNavCollapsed">Treatment Plans<span class="count">{{treatmentPlans.count}}</span></span>
                 </a>
                 <a *ngIf="userPrivileges?.includes('CompletedProcedures')" class="nav-item" 
                    (click)="handleNavigation('/completed-procedures')" 
                    routerLinkActive="active">
                     <i class="pi pi-check-circle"></i>
-                    <span [class.hidden]="isNavCollapsed">Completed Procedures</span>
+                    <span [class.hidden]="isNavCollapsed">Completed Procedures<span class="count">{{completedProcedures.count}}</span></span>
                 </a>
                 <a *ngIf="userPrivileges?.includes('Files')" class="nav-item" 
                    (click)="handleNavigation('/files')" 
                    routerLinkActive="active">
                     <i class="pi pi-folder"></i>
-                    <span [class.hidden]="isNavCollapsed">Files</span>
+                    <span [class.hidden]="isNavCollapsed">Files<span class="count">{{files.count}}</span></span>
                 </a>
                 <a *ngIf="userPrivileges?.includes('Timeline')" class="nav-item" 
                    (click)="handleNavigation('/timeline')" 
@@ -132,7 +132,7 @@
                    (click)="handleNavigation('/invoices')" 
                    routerLinkActive="active">
                     <i class="pi pi-dollar"></i>
-                    <span [class.hidden]="isNavCollapsed">Invoices</span>
+                    <span [class.hidden]="isNavCollapsed">Invoices<span class="count">{{invoices.count}}</span></span>
                 </a>
                 <a class="nav-item" *ngIf="userPrivileges?.includes('Payments')" 
                    (click)="handleNavigation('/payments')" 

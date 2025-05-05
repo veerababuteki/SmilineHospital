@@ -5,11 +5,24 @@
 <div id="clinicalNotes{{clinicalNotes.id}}" class="case-sheet-container">
     <!-- Clinic Details -->
     <h2 class="clinic-name">Smiline Dental Hospitals</h2>
-    <p *ngIf="savedPractice.branch_name == ''" class="clinic-address">
-      #8-3-952/10/2&2/1, Smiline House, Srinagar Colony, Panjagutta, Hyderabad-500073
-    </p>
-    <p class="clinic-phone">Phone: 040 4200 0024</p>
-  
+    <div *ngIf="savedPractice.branch_id == 1">
+      <p class="clinic-address">
+        #8-3-952/10/2&2/1, Smiline House, Srinagar Colony, Panjagutta, Hyderabad-500073
+      </p>
+      <p class="clinic-phone">Phone: 040 4200 0024</p>
+    </div>
+    <div *ngIf="savedPractice.branch_id == 2">
+      <p class="clinic-address">
+        Matha Bhuvaneswari society, Matha Bhuvaneswari Society, Plot No. 4, opp. Computer Generated Solutions India Private Limited, Siddhi Vinayak Nagar, Madhapur, Khanammet, Hyderabad, Telangana 500081
+      </p>
+      <p class="clinic-phone">Phone: 040 29804422</p>
+    </div>
+    <div *ngIf="savedPractice.branch_id == 3">
+      <p class="clinic-address">
+        6th Floor, Pavani Encore Survey, 342/P, Narsing Nanakramguda Service Rd, Khajaguda, Hyderabad, Telangana 500075
+      </p>
+      <p class="clinic-phone">Phone: 08889998353</p>
+    </div>
     <hr />
   
     <!-- Patient & Doctor Details -->

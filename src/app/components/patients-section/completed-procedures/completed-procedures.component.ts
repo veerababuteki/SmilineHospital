@@ -43,10 +43,15 @@ throw new Error('Method not implemented.');
     items: MenuItem[] = [];
     currentProcedure: any;
   currentTreatmentPlan: any;
+  savedPractice: any;
+
     constructor(private treatmentPlanService: TreatmentPlansService, 
           private messageService: MessageService,
       private route: ActivatedRoute, private router: Router){
-      
+        const selectedPractice = localStorage.getItem('selectedPractice');
+        if(selectedPractice){
+          this.savedPractice = JSON.parse(selectedPractice);
+        }
     }
     ngOnInit() {
       this.items = [
@@ -327,7 +332,29 @@ throw new Error('Method not implemented.');
           }
         }
       }
-      
+      let clinicAddress = '';
+  let clinicPhone = '';
+  
+  if (this.savedPractice) {
+    // Default address in case no branch matches
+    clinicAddress = "#8-3-952/10/2&2/1, Smiline House, Srinagar Colony, Panjagutta, Hyderabad-500073";
+    clinicPhone = "Phone: 040 4200 0024";
+    
+    switch (this.savedPractice.branch_id) {
+      case 1:
+        clinicAddress = "#8-3-952/10/2&2/1, Smiline House, Srinagar Colony, Panjagutta, Hyderabad-500073";
+        clinicPhone = "Phone: 040 4200 0024";
+        break;
+      case 2:
+        clinicAddress = "Matha Bhuvaneswari society, Matha Bhuvaneswari Society, Plot No. 4, opp. Computer Generated Solutions India Private Limited, Siddhi Vinayak Nagar, Madhapur, Khanammet, Hyderabad, Telangana 500081";
+        clinicPhone = "Phone: 040 29804422";
+        break;
+      case 3:
+        clinicAddress = "6th Floor, Pavani Encore Survey, 342/P, Narsing Nanakramguda Service Rd, Khajaguda, Hyderabad, Telangana 500075";
+        clinicPhone = "Phone: 08889998353";
+        break;
+    }
+  }
       // Create a styled version for printing
       const printContent = `
         <style>
@@ -392,8 +419,8 @@ throw new Error('Method not implemented.');
         <body>
         <div class="print-header">
           <h1>Smiline Dental Hospitals</h1>
-          <p>#8-3-952/10/2&2/1, Smiline House, Srinagar Colony, Panjagutta, Hyderabad-500073</p>
-          <p>Phone: 040 4200 0024</p>
+          <p>${clinicAddress}</p>
+          <p>${clinicPhone}</p>
         </div>
         <div class="patient-info">
           <p><strong>Patient:</strong> ${patientName}</p>
