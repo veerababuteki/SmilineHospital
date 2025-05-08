@@ -151,6 +151,11 @@
     </div>
     <div class="calendar-main">
       <full-calendar #calendar [options]="calendarOptions" class="custom-calendar">
+        <ng-template #eventContent let-arg>
+          <div class="custom-event-content">
+            <span class="event-title" [title]="arg.event.title">{{ arg.event.title }}</span>
+          </div>
+        </ng-template>
       </full-calendar>
     </div>
     <!-- Schedule sidebar -->

@@ -420,10 +420,10 @@
       // Header styles
       .fc-col-header {
         .fc-col-header-cell {
-          padding: 8px;
-          text-align: center;
-          background-color: #fff;
-          border-color: #e0e0e0;
+          padding: 8px 4px !important;
+          font-size: 0.9rem !important;
+          font-weight: 600 !important;
+          color: #1a1a1a !important;
         }
       }
   
@@ -456,10 +456,10 @@
         }
   
         &-daygrid-day-number {
-          font-size: 1rem;
-          padding: 8px;
-          color: #333;
-          font-weight: 500;
+          font-size: 0.85rem !important;
+          font-weight: 500 !important;
+          padding: 4px 8px !important;
+          color: #333 !important;
         }
   
         &-daygrid-day-top {
@@ -470,14 +470,14 @@
   
       // Custom event styles
       .custom-event-content {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.25rem 0.5rem;
-        font-size: 0.8rem;
-        border-radius: 4px;
-        margin: 2px 0;
-  
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        padding: 0px 2px !important;
+        font-size: 0.75rem !important;
+        border-radius: 4px !important;
+        margin: 2px 0 !important;
+        
         .new-indicator {
           background: #2196f3;
           color: white;
@@ -488,10 +488,12 @@
         }
   
         .event-title {
-          flex: 1;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+          font-size: 0.5rem !important;
+          line-height: 1.2 !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          max-width: calc(100% - 5px) !important;
           color: #666 !important;
         }
       }
@@ -509,10 +511,13 @@
   
       // More events indicator
       .fc-more-link {
-        margin: 0 4px;
-        color: #2196f3;
-        font-size: 0.8rem;
-        font-weight: 500;
+        font-size: 0.75rem !important;
+        padding: 2px 6px !important;
+        margin: 2px 4px !important;
+        background-color: #f8f9fa !important;
+        border-radius: 3px !important;
+        color: #666 !important;
+        font-weight: 500 !important;
         
         &:hover {
           text-decoration: underline;
@@ -810,12 +815,19 @@
   ::ng-deep .fc {
     .fc-event {
       border: none !important;
-      padding: 0px 8px !important;
-      margin-bottom: 2px !important;
-      border-radius: 3px !important;
+      // padding: 2px 2px !important;
+      // margin-bottom: 3px !important;
+      border-radius: 4px !important;
       background-color: white !important;
       color: #333 !important;
-      //height: 24px !important;  /* Fixed height for events */
+      min-height: 20px !important;
+      text-align: start;
+      
+      .fc-event-main {
+        padding: 2px 0;
+        font-size: 0.75rem !important;
+        line-height: 1.2 !important;
+      }
     }
 
     .fc-daygrid-day {
@@ -824,52 +836,37 @@
 
     .fc-daygrid-day-frame {
       height: 100px !important;
-      max-height: 120px !important;
+      max-height: 100px !important;
+      padding: 4px !important;
     }
 
     .fc-daygrid-day-events {
-      position: relative !important;
+      padding: 2px 0 !important;
       margin: 0 !important;
-      padding: 0 !important;
-      min-height: unset !important;
-      height: auto !important;
     }
 
-    .fc-event-main {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      width: 100px;
-      //padding: 2px 0;
+    .fc-col-header-cell {
+      padding: 8px 4px !important;
+      font-size: 0.8rem !important;
+      font-weight: 600 !important;
+      color: #1a1a1a !important;
+    }
 
-      .custom-event-content {
-        border-radius: 3px;
-        .event-title {
-          color: #666;
-        }
-      }
+    .fc-daygrid-day-number {
+      font-size: 0.85rem !important;
+      font-weight: 500 !important;
+      padding: 4px 8px !important;
+      color: #333 !important;
     }
 
     .fc-more-link {
-      background-color: #f8f9fa;
-      padding: 2px 5px;
-      border-radius: 3px;
-      color: #666;
-      font-size: 0.9em;
-      margin-top: 2px !important;
-    }
-
-    .status-available {
-      border-left: 3px solid #4CAF50 !important;
-    }
-
-    .status-unavailable {
-      border-left: 3px solid #f44336 !important;
-    }
-
-    .status-na {
-      border-left: 3px solid #9e9e9e !important;
-      background-color: #f5f5f5 !important;
+      font-size: 0.75rem !important;
+      padding: 2px 6px !important;
+      margin: 2px 4px !important;
+      background-color: #f8f9fa !important;
+      border-radius: 3px !important;
+      color: #666 !important;
+      font-weight: 500 !important;
     }
   }
 
@@ -979,45 +976,30 @@
     .fc-col-header {
       .fc-col-header-cell {
         .fc-day-header {
-          // Enhanced header for weekly view
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          padding: 0.5rem 0.25rem;
+          padding: 8px 4px !important;
           
           .day-name {
-            font-size: 0.75rem;
-            color: #666;
-            text-transform: uppercase;
+            font-size: 0.8rem !important;
+            font-weight: 600 !important;
           }
           
           .day-date {
-            font-size: 1.2rem;
-            font-weight: 500;
-            color: #333;
-            margin-top: 0.25rem;
+            font-size: 1rem !important;
+            margin-top: 4px !important;
           }
         }
       }
     }
     
-    // Adjusted event styles for weekly view
     .fc-timegrid-event {
-      margin: 1px 0;
+      margin: 1px 2px !important;
+      min-height: 25px !important;
       
       .custom-event-content {
-        padding: 2px 4px;
-        
-        .event-title {
-          font-size: 0.8rem;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
+        padding: 2px 6px !important;
       }
     }
     
-    // Highlight current day
     .fc-day-today {
       background-color: rgba(240, 240, 245, 0.5) !important;
     }
@@ -1168,9 +1150,9 @@
 }
 
 // Doctor background color classes for appointments
-:root {
-  /* fallback for custom properties if needed */
-}
+// :root {
+//   /* fallback for custom properties if needed */
+// }
 
 ::ng-deep .fc-event[class*='doctor-bg-'] {
   border-left-width: 5px !important;
@@ -1269,3 +1251,152 @@
 ::ng-deep .fc-event.doctor-bg-black { background-color: #f0f0f0 !important; border-left-color: #000000 !important; }
 ::ng-deep .fc-event.doctor-bg-darkorchid { background-color: #f0d6f9 !important; border-left-color: #9932cc !important; }
 ::ng-deep .fc-event.doctor-bg-rebeccapurple { background-color: #ead6ff !important; border-left-color: #663399 !important; }
+
+// Responsive calendar layout
+@media (max-width: 900px) {
+  .calendar-content {
+    flex-direction: column;
+    .calendar-sidebar {
+      width: 100% !important;
+      border-right: none;
+      border-bottom: 1px solid #e0e0e0;
+      height: auto !important;
+      min-height: unset;
+      order: 1;
+    }
+    .calendar-main {
+      width: 100% !important;
+      padding: 0.5rem !important;
+      order: 2;
+    }
+    .schedule-sidebar {
+      width: 100% !important;
+      border-left: none;
+      border-top: 1px solid #e0e0e0;
+      min-height: unset;
+      order: 3;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .calendar-top {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    .left-section, .right-section {
+      width: 100%;
+      gap: 0.5rem;
+    }
+    .view-controls {
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+  }
+  .calendar-content {
+    flex-direction: column;
+    .calendar-sidebar, .schedule-sidebar {
+      width: 100% !important;
+      min-width: 0;
+      padding: 0.5rem 0.25rem;
+      font-size: 0.9rem;
+    }
+    .calendar-main {
+      width: 100% !important;
+      padding: 0.25rem !important;
+      min-width: 0;
+      overflow-x: auto;
+    }
+  }
+  .custom-calendar, .fc {
+    font-size: 0.85rem !important;
+  }
+  .doctors-list, .categories-list {
+    .doctor-item, .category-item {
+      padding: 0.25rem 0.5rem;
+      gap: 0.5rem;
+      .doctor-name, .category-name {
+        font-size: 0.75rem;
+      }
+    }
+  }
+  .appointments-list {
+    padding: 0.25rem 0 !important;
+    .appointment-item {
+      padding: 0.25rem 0.5rem !important;
+      gap: 0.5rem;
+      .appointment-time {
+        font-size: 0.7rem;
+        min-width: 50px;
+      }
+      .appointment-title {
+        font-size: 0.75rem;
+      }
+    }
+  }
+}
+
+// Event content template styles
+::ng-deep .custom-event-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 4px;
+  
+  .event-title {
+    flex: 1 1 0%;
+    min-width: 0;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #333;
+    order: 1;
+  }
+  
+  .event-time {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    color: #666;
+    white-space: nowrap;
+    order: 2;
+    margin-left: 6px;
+  }
+}
+
+// Improve mobile responsiveness
+@media screen and (max-width: 768px) {
+  ::ng-deep .fc {
+    .fc-event {
+      padding: 2px 4px !important;
+      
+      .fc-event-main {
+        font-size: 0.7rem !important;
+      }
+    }
+    
+    .fc-daygrid-day {
+      height: 100px !important;
+    }
+    
+    .fc-daygrid-day-frame {
+      height: 100px !important;
+    }
+  }
+  
+  .custom-event-content {
+    .event-title {
+      font-size: 0.7rem;
+    }
+    
+    .event-time {
+      font-size: 0.65rem;
+    }
+  }
+}
+
+
+
