@@ -2,9 +2,9 @@
     <div class="appointments-header">
         <h2>INVOICES</h2>
         <div>
-            <button class="mark-btn" *ngIf="selectedInvoiceList.length == 0">Pay selected Invoices</button>
-            <button class="mark-btn-active" *ngIf="selectedInvoiceList.length > 0" (click)="makePayment()">Pay selected Invoices</button>
-            <button class="add-btn" (click)="navigateToAddPage()">+ Add</button>
+            <button class="mark-btn" *ngIf="selectedInvoiceList.length == 0" style="font-weight: 600;">Pay Selected Invoices</button>
+            <button class="mark-btn-active" *ngIf="selectedInvoiceList.length > 0" (click)="makePayment()" style="font-weight: 600;">Pay Selected Invoices</button>
+            <button class="add-btn" (click)="navigateToAddPage()" style="font-weight: 600;">+ Add</button>
         </div>
     </div>
     <div *ngFor="let date of getSortedDates()">
