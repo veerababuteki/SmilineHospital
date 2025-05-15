@@ -281,13 +281,79 @@
         flex-shrink: 0;
   
         &.green { background-color: #28a745; }
+        &.gray { background-color: #495057; }
+        &.blue { background-color: #0052cc; }
         &.brown { background-color: #8B4513; }
         &.pink { background-color: #e83e8c; }
         &.purple { background-color: #6f42c1; }
-        &.teal { background-color: #20c997; }
+        &.teal { background-color: #008080; }
         &.magenta { background-color: #d63384; }
         &.red { background-color: #dc3545; }
-        &.gray { background-color: #6c757d; }
+        &.darkgreen { background-color: #006400; }
+        &.darkblue { background-color: #00008b; }
+        &.darkred { background-color: #8b0000; }
+        &.navy { background-color: #000080; }
+        &.crimson { background-color: #dc143c; }
+        &.indigo { background-color: #6610f2; }
+        &.violet { background-color: #7b1fa2; }
+        &.maroon { background-color: #800000; }
+        &.cyan { background-color: #0097a7; }
+        &.darkorange { background-color: #ff8c00; }
+        &.darkpurple { background-color: #48186a; }
+        &.darkbrown { background-color: #5c4033; }
+        &.darkgray { background-color: #3c4043; }
+        &.darkteal { background-color: #004d40; }
+        &.darkcyan { background-color: #008b8b; }
+        &.darkmagenta { background-color: #8b008b; }
+        &.darkindigo { background-color: #3949ab; }
+        &.darkviolet { background-color: #9400d3; }
+        &.darkmaroon { background-color: #640000; }
+        &.darknavy { background-color: #000038; }
+        &.olive { background-color: #808000; }
+        &.forestgreen { background-color: #228b22; }
+        &.royalblue { background-color: #4169e1; }
+        &.mediumblue { background-color: #0000cd; }
+        &.firebrick { background-color: #b22222; }
+        &.chocolate { background-color: #d2691e; }
+        &.saddlebrown { background-color: #8b4513; }
+        &.midnightblue { background-color: #191970; }
+        &.darkslategray { background-color: #2f4f4f; }
+        &.darkslateblue { background-color: #483d8b; }
+        &.darkgoldenrod { background-color: #b8860b; }
+        &.sienna { background-color: #a0522d; }
+        &.rosybrown { background-color: #bc8f8f; }
+        &.steelblue { background-color: #4682b4; }
+        &.dimgray { background-color: #696969; }
+        &.cadetblue { background-color: #5f9ea0; }
+        &.tomato { background-color: #ff6347; }
+        &.orangered { background-color: #ff4500; }
+        &.seagreen { background-color: #2e8b57; }
+        &.darkkhaki { background-color: #bdb76b; }
+        &.slateblue { background-color: #6a5acd; }
+        &.mediumorchid { background-color: #ba55d3; }
+        &.darkturquoise { background-color: #00ced1; }
+        &.mediumseagreen { background-color: #3cb371; }
+        &.goldenrod { background-color: #daa520; }
+        &.dodgerblue { background-color: #1e90ff; }
+        &.coral { background-color: #ff7f50; }
+        &.mediumvioletred { background-color: #c71585; }
+        &.indianred { background-color: #cd5c5c; }
+        &.peru { background-color: #cd853f; }
+        &.deeppink { background-color: #ff1493; }
+        &.darkseagreen { background-color: #8fbc8f; }
+        &.mediumslateblue { background-color: #7b68ee; }
+        &.darkolivegreen { background-color: #556b2f; }
+        &.olivedrab { background-color: #6b8e23; }
+        &.blueviolet { background-color: #8a2be2; }
+        &.slategray { background-color: #708090; }
+        &.mediumturquoise { background-color: #48d1cc; }
+        &.limegreen { background-color: #32cd32; }
+        &.mediumaquamarine { background-color: #66cdaa; }
+        &.deepskyblue { background-color: #00bfff; }
+        &.mediumspringgreen { background-color: #00fa9a; }
+        &.black { background-color: #000000; }
+        &.darkorchid { background-color: #9932cc; }
+        &.rebeccapurple { background-color: #663399; }
       }
   
       .doctor-name, .category-name {
@@ -354,10 +420,10 @@
       // Header styles
       .fc-col-header {
         .fc-col-header-cell {
-          padding: 8px;
-          text-align: center;
-          background-color: #fff;
-          border-color: #e0e0e0;
+          padding: 8px 4px !important;
+          font-size: 0.9rem !important;
+          font-weight: 600 !important;
+          color: #1a1a1a !important;
         }
       }
   
@@ -390,10 +456,10 @@
         }
   
         &-daygrid-day-number {
-          font-size: 1rem;
-          padding: 8px;
-          color: #333;
-          font-weight: 500;
+          font-size: 0.85rem !important;
+          font-weight: 500 !important;
+          padding: 4px 8px !important;
+          color: #333 !important;
         }
   
         &-daygrid-day-top {
@@ -404,14 +470,14 @@
   
       // Custom event styles
       .custom-event-content {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.25rem 0.5rem;
-        font-size: 0.8rem;
-        border-radius: 4px;
-        margin: 2px 0;
-  
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        padding: 0px 2px !important;
+        font-size: 0.75rem !important;
+        border-radius: 4px !important;
+        margin: 2px 0 !important;
+        
         .new-indicator {
           background: #2196f3;
           color: white;
@@ -422,10 +488,12 @@
         }
   
         .event-title {
-          flex: 1;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+          font-size: 0.5rem !important;
+          line-height: 1.2 !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          max-width: calc(100% - 5px) !important;
           color: #666 !important;
         }
       }
@@ -443,10 +511,13 @@
   
       // More events indicator
       .fc-more-link {
-        margin: 0 4px;
-        color: #2196f3;
-        font-size: 0.8rem;
-        font-weight: 500;
+        font-size: 0.75rem !important;
+        padding: 2px 6px !important;
+        margin: 2px 4px !important;
+        background-color: #f8f9fa !important;
+        border-radius: 3px !important;
+        color: #666 !important;
+        font-weight: 500 !important;
         
         &:hover {
           text-decoration: underline;
@@ -744,12 +815,19 @@
   ::ng-deep .fc {
     .fc-event {
       border: none !important;
-      padding: 0px 8px !important;
-      margin-bottom: 2px !important;
-      border-radius: 3px !important;
+      // padding: 2px 2px !important;
+      // margin-bottom: 3px !important;
+      border-radius: 4px !important;
       background-color: white !important;
       color: #333 !important;
-      //height: 24px !important;  /* Fixed height for events */
+      min-height: 20px !important;
+      text-align: start;
+      
+      .fc-event-main {
+        padding: 2px 0;
+        font-size: 0.75rem !important;
+        line-height: 1.2 !important;
+      }
     }
 
     .fc-daygrid-day {
@@ -758,52 +836,37 @@
 
     .fc-daygrid-day-frame {
       height: 100px !important;
-      max-height: 120px !important;
+      max-height: 100px !important;
+      padding: 4px !important;
     }
 
     .fc-daygrid-day-events {
-      position: relative !important;
+      padding: 2px 0 !important;
       margin: 0 !important;
-      padding: 0 !important;
-      min-height: unset !important;
-      height: auto !important;
     }
 
-    .fc-event-main {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      width: 100px;
-      //padding: 2px 0;
+    .fc-col-header-cell {
+      padding: 8px 4px !important;
+      font-size: 0.8rem !important;
+      font-weight: 600 !important;
+      color: #1a1a1a !important;
+    }
 
-      .custom-event-content {
-        border-radius: 3px;
-        .event-title {
-          color: #666;
-        }
-      }
+    .fc-daygrid-day-number {
+      font-size: 0.85rem !important;
+      font-weight: 500 !important;
+      padding: 4px 8px !important;
+      color: #333 !important;
     }
 
     .fc-more-link {
-      background-color: #f8f9fa;
-      padding: 2px 5px;
-      border-radius: 3px;
-      color: #666;
-      font-size: 0.9em;
-      margin-top: 2px !important;
-    }
-
-    .status-available {
-      border-left: 3px solid #4CAF50 !important;
-    }
-
-    .status-unavailable {
-      border-left: 3px solid #f44336 !important;
-    }
-
-    .status-na {
-      border-left: 3px solid #9e9e9e !important;
-      background-color: #f5f5f5 !important;
+      font-size: 0.75rem !important;
+      padding: 2px 6px !important;
+      margin: 2px 4px !important;
+      background-color: #f8f9fa !important;
+      border-radius: 3px !important;
+      color: #666 !important;
+      font-weight: 500 !important;
     }
   }
 
@@ -913,45 +976,30 @@
     .fc-col-header {
       .fc-col-header-cell {
         .fc-day-header {
-          // Enhanced header for weekly view
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          padding: 0.5rem 0.25rem;
+          padding: 8px 4px !important;
           
           .day-name {
-            font-size: 0.75rem;
-            color: #666;
-            text-transform: uppercase;
+            font-size: 0.8rem !important;
+            font-weight: 600 !important;
           }
           
           .day-date {
-            font-size: 1.2rem;
-            font-weight: 500;
-            color: #333;
-            margin-top: 0.25rem;
+            font-size: 1rem !important;
+            margin-top: 4px !important;
           }
         }
       }
     }
     
-    // Adjusted event styles for weekly view
     .fc-timegrid-event {
-      margin: 1px 0;
+      margin: 1px 2px !important;
+      min-height: 25px !important;
       
       .custom-event-content {
-        padding: 2px 4px;
-        
-        .event-title {
-          font-size: 0.8rem;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
+        padding: 2px 6px !important;
       }
     }
     
-    // Highlight current day
     .fc-day-today {
       background-color: rgba(240, 240, 245, 0.5) !important;
     }
@@ -968,6 +1016,7 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
       z-index: 100 !important;
     }
+    
   }
   
   // Add styling for the popover panel
@@ -1099,3 +1148,255 @@
   font-style: italic;
   font-size: 0.9rem;
 }
+
+// Doctor background color classes for appointments
+// :root {
+//   /* fallback for custom properties if needed */
+// }
+
+::ng-deep .fc-event[class*='doctor-bg-'] {
+  border-left-width: 5px !important;
+  border-left-style: solid !important;
+  background-clip: padding-box !important;
+}
+
+// Month view: lighter background, thinner border
+::ng-deep .fc-event.month-view[class*='doctor-bg-'] {
+  border-left-width: 4px !important;
+  opacity: 0.95;
+}
+// Week view: medium background, medium border
+::ng-deep .fc-event.week-view[class*='doctor-bg-'] {
+  border-left-width: 6px !important;
+  opacity: 1;
+}
+// Day view: more prominent background, thicker border
+::ng-deep .fc-event.day-view[class*='doctor-bg-'] {
+  border-left-width: 8px !important;
+  opacity: 1;
+}
+
+// Color classes (generated from DoctorColorService)
+::ng-deep .fc-event.doctor-bg-red { background-color: #f8d7da !important; border-left-color: #dc3545 !important; }
+::ng-deep .fc-event.doctor-bg-green { background-color: #d4edda !important; border-left-color: #28a745 !important; }
+::ng-deep .fc-event.doctor-bg-blue { background-color: #d0e2ff !important; border-left-color: #0052cc !important; }
+::ng-deep .fc-event.doctor-bg-purple { background-color: #e6d8f5 !important; border-left-color: #6f42c1 !important; }
+::ng-deep .fc-event.doctor-bg-pink { background-color: #fce4ec !important; border-left-color: #e83e8c !important; }
+::ng-deep .fc-event.doctor-bg-brown { background-color: #efdfd0 !important; border-left-color: #8B4513 !important; }
+::ng-deep .fc-event.doctor-bg-gray { background-color: #e2e3e5 !important; border-left-color: #495057 !important; }
+::ng-deep .fc-event.doctor-bg-teal { background-color: #d0f0f0 !important; border-left-color: #008080 !important; }
+::ng-deep .fc-event.doctor-bg-cyan { background-color: #d0faff !important; border-left-color: #0097a7 !important; }
+::ng-deep .fc-event.doctor-bg-magenta { background-color: #f8d0e5 !important; border-left-color: #d63384 !important; }
+::ng-deep .fc-event.doctor-bg-indigo { background-color: #e0e0ff !important; border-left-color: #6610f2 !important; }
+::ng-deep .fc-event.doctor-bg-violet { background-color: #f0e6f9 !important; border-left-color: #7b1fa2 !important; }
+::ng-deep .fc-event.doctor-bg-maroon { background-color: #f8d7da !important; border-left-color: #800000 !important; }
+::ng-deep .fc-event.doctor-bg-navy { background-color: #d6e0f5 !important; border-left-color: #000080 !important; }
+::ng-deep .fc-event.doctor-bg-crimson { background-color: #f9d6dc !important; border-left-color: #dc143c !important; }
+::ng-deep .fc-event.doctor-bg-darkgreen { background-color: #d4f5d4 !important; border-left-color: #006400 !important; }
+::ng-deep .fc-event.doctor-bg-darkblue { background-color: #d6e6ff !important; border-left-color: #00008b !important; }
+::ng-deep .fc-event.doctor-bg-darkred { background-color: #f3d6d6 !important; border-left-color: #8b0000 !important; }
+::ng-deep .fc-event.doctor-bg-darkorange { background-color: #ffe5b4 !important; border-left-color: #ff8c00 !important; }
+::ng-deep .fc-event.doctor-bg-darkpurple { background-color: #e6ccf2 !important; border-left-color: #48186a !important; }
+::ng-deep .fc-event.doctor-bg-darkbrown { background-color: #ecdcd3 !important; border-left-color: #5c4033 !important; }
+::ng-deep .fc-event.doctor-bg-darkgray { background-color: #e8e8e8 !important; border-left-color: #3c4043 !important; }
+::ng-deep .fc-event.doctor-bg-darkteal { background-color: #ccf2f2 !important; border-left-color: #004d40 !important; }
+::ng-deep .fc-event.doctor-bg-darkcyan { background-color: #d0fafa !important; border-left-color: #008b8b !important; }
+::ng-deep .fc-event.doctor-bg-darkmagenta { background-color: #f2d6f2 !important; border-left-color: #8b008b !important; }
+::ng-deep .fc-event.doctor-bg-darkindigo { background-color: #e6ecff !important; border-left-color: #3949ab !important; }
+::ng-deep .fc-event.doctor-bg-darkviolet { background-color: #ecd8f7 !important; border-left-color: #9400d3 !important; }
+::ng-deep .fc-event.doctor-bg-darkmaroon { background-color: #f2d6d6 !important; border-left-color: #640000 !important; }
+::ng-deep .fc-event.doctor-bg-darknavy { background-color: #e0e6ff !important; border-left-color: #000038 !important; }
+::ng-deep .fc-event.doctor-bg-olive { background-color: #e6e6cc !important; border-left-color: #808000 !important; }
+::ng-deep .fc-event.doctor-bg-forestgreen { background-color: #d2f5d2 !important; border-left-color: #228b22 !important; }
+::ng-deep .fc-event.doctor-bg-royalblue { background-color: #e0ecff !important; border-left-color: #4169e1 !important; }
+::ng-deep .fc-event.doctor-bg-mediumblue { background-color: #d0e2ff !important; border-left-color: #0000cd !important; }
+::ng-deep .fc-event.doctor-bg-firebrick { background-color: #f6d0d0 !important; border-left-color: #b22222 !important; }
+::ng-deep .fc-event.doctor-bg-chocolate { background-color: #ffe0cc !important; border-left-color: #d2691e !important; }
+::ng-deep .fc-event.doctor-bg-saddlebrown { background-color: #f0e0d0 !important; border-left-color: #8b4513 !important; }
+::ng-deep .fc-event.doctor-bg-midnightblue { background-color: #d8e0f5 !important; border-left-color: #191970 !important; }
+::ng-deep .fc-event.doctor-bg-darkslategray { background-color: #d7e4e4 !important; border-left-color: #2f4f4f !important; }
+::ng-deep .fc-event.doctor-bg-darkslateblue { background-color: #ddd7ff !important; border-left-color: #483d8b !important; }
+::ng-deep .fc-event.doctor-bg-darkgoldenrod { background-color: #ffeab5 !important; border-left-color: #b8860b !important; }
+::ng-deep .fc-event.doctor-bg-sienna { background-color: #f3e0d0 !important; border-left-color: #a0522d !important; }
+::ng-deep .fc-event.doctor-bg-rosybrown { background-color: #f2dada !important; border-left-color: #bc8f8f !important; }
+::ng-deep .fc-event.doctor-bg-steelblue { background-color: #d6eaf8 !important; border-left-color: #4682b4 !important; }
+::ng-deep .fc-event.doctor-bg-dimgray { background-color: #e6e6e6 !important; border-left-color: #696969 !important; }
+::ng-deep .fc-event.doctor-bg-cadetblue { background-color: #daf0f0 !important; border-left-color: #5f9ea0 !important; }
+::ng-deep .fc-event.doctor-bg-tomato { background-color: #ffebe6 !important; border-left-color: #ff6347 !important; }
+::ng-deep .fc-event.doctor-bg-orangered { background-color: #ffd6cc !important; border-left-color: #ff4500 !important; }
+::ng-deep .fc-event.doctor-bg-seagreen { background-color: #d4f0d4 !important; border-left-color: #2e8b57 !important; }
+::ng-deep .fc-event.doctor-bg-darkkhaki { background-color: #f0e6c0 !important; border-left-color: #bdb76b !important; }
+::ng-deep .fc-event.doctor-bg-slateblue { background-color: #e0dfff !important; border-left-color: #6a5acd !important; }
+::ng-deep .fc-event.doctor-bg-mediumorchid { background-color: #f2d6f9 !important; border-left-color: #ba55d3 !important; }
+::ng-deep .fc-event.doctor-bg-darkturquoise { background-color: #d0f9f9 !important; border-left-color: #00ced1 !important; }
+::ng-deep .fc-event.doctor-bg-mediumseagreen { background-color: #d2f8e0 !important; border-left-color: #3cb371 !important; }
+::ng-deep .fc-event.doctor-bg-goldenrod { background-color: #ffefcc !important; border-left-color: #daa520 !important; }
+::ng-deep .fc-event.doctor-bg-dodgerblue { background-color: #d6f0ff !important; border-left-color: #1e90ff !important; }
+::ng-deep .fc-event.doctor-bg-coral { background-color: #ffe3d5 !important; border-left-color: #ff7f50 !important; }
+::ng-deep .fc-event.doctor-bg-mediumvioletred { background-color: #f9d0e6 !important; border-left-color: #c71585 !important; }
+::ng-deep .fc-event.doctor-bg-indianred { background-color: #f9d6d6 !important; border-left-color: #cd5c5c !important; }
+::ng-deep .fc-event.doctor-bg-peru { background-color: #f3e3d3 !important; border-left-color: #cd853f !important; }
+::ng-deep .fc-event.doctor-bg-deeppink { background-color: #ffd1eb !important; border-left-color: #ff1493 !important; }
+::ng-deep .fc-event.doctor-bg-darkseagreen { background-color: #e6f5e6 !important; border-left-color: #8fbc8f !important; }
+::ng-deep .fc-event.doctor-bg-mediumslateblue { background-color: #e0e0ff !important; border-left-color: #7b68ee !important; }
+::ng-deep .fc-event.doctor-bg-darkolivegreen { background-color: #e3ecd3 !important; border-left-color: #556b2f !important; }
+::ng-deep .fc-event.doctor-bg-olivedrab { background-color: #e3f0d0 !important; border-left-color: #6b8e23 !important; }
+::ng-deep .fc-event.doctor-bg-blueviolet { background-color: #e6dcff !important; border-left-color: #8a2be2 !important; }
+::ng-deep .fc-event.doctor-bg-slategray { background-color: #e0e0e0 !important; border-left-color: #708090 !important; }
+::ng-deep .fc-event.doctor-bg-mediumturquoise { background-color: #ccf5f5 !important; border-left-color: #48d1cc !important; }
+::ng-deep .fc-event.doctor-bg-limegreen { background-color: #ddfcd7 !important; border-left-color: #32cd32 !important; }
+::ng-deep .fc-event.doctor-bg-mediumaquamarine { background-color: #d4fdf4 !important; border-left-color: #66cdaa !important; }
+::ng-deep .fc-event.doctor-bg-deepskyblue { background-color: #ccf2ff !important; border-left-color: #00bfff !important; }
+::ng-deep .fc-event.doctor-bg-mediumspringgreen { background-color: #ccffe6 !important; border-left-color: #00fa9a !important; }
+::ng-deep .fc-event.doctor-bg-black { background-color: #f0f0f0 !important; border-left-color: #000000 !important; }
+::ng-deep .fc-event.doctor-bg-darkorchid { background-color: #f0d6f9 !important; border-left-color: #9932cc !important; }
+::ng-deep .fc-event.doctor-bg-rebeccapurple { background-color: #ead6ff !important; border-left-color: #663399 !important; }
+
+// Responsive calendar layout
+@media (max-width: 900px) {
+  .calendar-content {
+    flex-direction: column;
+    .calendar-sidebar {
+      width: 100% !important;
+      border-right: none;
+      border-bottom: 1px solid #e0e0e0;
+      height: auto !important;
+      min-height: unset;
+      order: 1;
+    }
+    .calendar-main {
+      width: 100% !important;
+      padding: 0.5rem !important;
+      order: 2;
+    }
+    .schedule-sidebar {
+      width: 100% !important;
+      border-left: none;
+      border-top: 1px solid #e0e0e0;
+      min-height: unset;
+      order: 3;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .calendar-top {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    .left-section, .right-section {
+      width: 100%;
+      gap: 0.5rem;
+    }
+    .view-controls {
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+  }
+  .calendar-content {
+    flex-direction: column;
+    .calendar-sidebar, .schedule-sidebar {
+      width: 100% !important;
+      min-width: 0;
+      padding: 0.5rem 0.25rem;
+      font-size: 0.9rem;
+    }
+    .calendar-main {
+      width: 100% !important;
+      padding: 0.25rem !important;
+      min-width: 0;
+      overflow-x: auto;
+    }
+  }
+  .custom-calendar, .fc {
+    font-size: 0.85rem !important;
+  }
+  .doctors-list, .categories-list {
+    .doctor-item, .category-item {
+      padding: 0.25rem 0.5rem;
+      gap: 0.5rem;
+      .doctor-name, .category-name {
+        font-size: 0.75rem;
+      }
+    }
+  }
+  .appointments-list {
+    padding: 0.25rem 0 !important;
+    .appointment-item {
+      padding: 0.25rem 0.5rem !important;
+      gap: 0.5rem;
+      .appointment-time {
+        font-size: 0.7rem;
+        min-width: 50px;
+      }
+      .appointment-title {
+        font-size: 0.75rem;
+      }
+    }
+  }
+}
+
+// Event content template styles
+::ng-deep .custom-event-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 4px;
+  
+  .event-title {
+    flex: 1 1 0%;
+    min-width: 0;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #333;
+    order: 1;
+  }
+  
+  .event-time {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    color: #666;
+    white-space: nowrap;
+    order: 2;
+    margin-left: 6px;
+  }
+}
+
+// Improve mobile responsiveness
+@media screen and (max-width: 768px) {
+  ::ng-deep .fc {
+    .fc-event {
+      padding: 2px 4px !important;
+      
+      .fc-event-main {
+        font-size: 0.7rem !important;
+      }
+    }
+    
+    .fc-daygrid-day {
+      height: 100px !important;
+    }
+    
+    .fc-daygrid-day-frame {
+      height: 100px !important;
+    }
+  }
+  
+  .custom-event-content {
+    .event-title {
+      font-size: 0.7rem;
+    }
+    
+    .event-time {
+      font-size: 0.65rem;
+    }
+  }
+}
+
+
+
