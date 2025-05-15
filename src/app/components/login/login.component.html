@@ -27,13 +27,13 @@
   </header>
   <div class="container">
   <div>
-    <nav class="auth-nav">
+    <!-- <nav class="auth-nav">
         <ul class="auth-nav-list">
             <li class="auth-nav-item">
                 <a (click)="loadForm()" class="auth-nav-link" [ngClass]="{ 'active': isLogin }">Login</a>
             </li>
         </ul>
-    </nav>
+    </nav> -->
   </div>
   <div class="login-container">
     <div class="login-image">
@@ -47,19 +47,24 @@
             type="text"
             id="mobileNumber" 
             formControlName="mobileNumber"
-            placeholder="Mobile Number"
+            placeholder=" Enter Mobile Number"
             [ngClass]="{'ng-invalid': loginForm.get('mobileNumber')?.errors?.['invalidMobile'] && loginForm.get('mobileNumber')?.touched}"
           />
          </div>
       
         <div class="form-group">
           <label for="password">Password</label>
-          <input 
-            type="password" 
-            id="password" 
-            formControlName="password" 
-            placeholder="Password" 
-          />
+          <div class="password-input-container">
+            <input 
+              [type]="showPassword ? 'text' : 'password'"
+              id="password" 
+              formControlName="password" 
+              placeholder="Enter Password" 
+            />
+            <span class="password-toggle" (click)="togglePasswordVisibility()">
+              <i class="fas" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+            </span>
+          </div>
         </div>
         <div *ngIf="otpSent" class="form-group">
           <label for="otp">OTP</label>
@@ -89,7 +94,7 @@
         </div>
       
         <button type="submit" class="login-button"
-        [disabled]="loginForm.invalid || (isOtpLogin && !otpSent && loginForm.get('mobileNumber')?.value.includes('@'))">
+        [disabled]="loginForm.invalid || (isOtpLogin && !otpSent && loginForm.get('mobileNumber')?.value.includes('@'))" >
         {{ isOtpLogin ? (otpSent ? 'Verify OTP' : 'Send OTP') : 'Login' }}
        </button>
       </form>
@@ -98,12 +103,12 @@
       <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
           <label for="firstName">First Name</label>
-          <input type="text" id="firstName" formControlName="firstName" placeholder="First Name" />
+          <input type="text" id="firstName" formControlName="firstName" placeholder="Enter First Name" />
         </div>
       
         <div class="form-group">
           <label for="lastName">Last Name</label>
-          <input type="text" id="lastName" formControlName="lastName" placeholder="Last Name" />
+          <input type="text" id="lastName" formControlName="lastName" placeholder="Enter Last Name" />
         </div>
       
         <div class="form-group">
@@ -130,22 +135,22 @@
       
         <div class="form-group">
           <label for="mobileNumber">Mobile Number</label>
-          <input type="text" id="mobileNumber" formControlName="mobileNumber" placeholder="Mobile Number" />
+          <input type="text" id="mobileNumber" formControlName="mobileNumber" placeholder="Enter Mobile Number" />
         </div>
       
         <div class="form-group">
           <label for="email">Email</label>
-          <input type="email" id="email" formControlName="email" placeholder="Email" />
+          <input type="email" id="email" formControlName="email" placeholder="Enter Email" />
         </div>
       
         <div class="form-group">
           <label for="password">Create Password</label>
-          <input type="password" id="password" formControlName="password" placeholder="Password" />
+          <input type="password" id="password" formControlName="password" placeholder="Enter Password" />
         </div>
       
         <div class="form-group">
           <label for="address">Address</label>
-          <input type="text" id="address" formControlName="address" placeholder="Address" />
+          <input type="text" id="address" formControlName="address" placeholder="Enter Address" />
         </div>
         <div class="actions">
           <div class="remember-me">
