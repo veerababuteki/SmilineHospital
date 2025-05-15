@@ -47,7 +47,8 @@ export class AddProfileComponent implements OnInit {
   addGroup: boolean = false;
   addMedicalHistoryText: string = '';
   addNewGroupText: string = '';
-  
+  maxDate: Date;
+
   // Initialize forms early
   patientForm: FormGroup;
   medicalHistoryForm: FormGroup;
@@ -57,7 +58,7 @@ export class AddProfileComponent implements OnInit {
   insuranceGroups: any[] = [];
   filteredMedicalConditions: any[] = [];
   searchText: string = '';
-  
+  formValid: boolean = false;
   bloodGroups: any[] = [
     { label: 'Select Blood Group', value: null },
     { label: 'A+', value: 'A+' },
@@ -105,7 +106,13 @@ export class AddProfileComponent implements OnInit {
   ) {
     // Initialize forms in constructor to ensure they exist before template renders
     this.patientForm = this.createPatientForm();
+    this.patientForm.statusChanges.subscribe(() => {
+      this.checkFormValidity();
+    });
     
+    // Initial validity check
+    this.checkFormValidity();
+    this.maxDate = new Date();
     // Initialize with empty groups for now, will be updated in ngOnInit
     this.medicalHistoryForm = this.fb.group({
       searchHistory: [''],
@@ -117,7 +124,30 @@ export class AddProfileComponent implements OnInit {
       groups: this.fb.group({})
     });
   }
-
+  checkFormValidity(): void {
+    // Check if patient form is valid (which includes all required fields)
+    this.formValid = this.patientForm.valid;
+    
+    // You can add additional custom validation logic here if needed
+    // For example, checking if at least one medical condition is selected
+    
+    // Optional: Display validation errors or messages
+    if (!this.formValid && this.patientForm.touched) {
+      this.highlightInvalidFields();
+    }
+  }
+  
+  // Helper method to identify and highlight invalid fields (optional)
+  highlightInvalidFields(): void {
+    const controls = this.patientForm.controls;
+    
+    for (const name in controls) {
+      if (controls[name].invalid) {
+        // You could use this to show specific error messages or highlight fields
+        // console.log(`Field ${name} is invalid`);
+      }
+    }
+  }
   ngOnInit(): void {
     // Load medical histories
     this.userService.getMedicalHistories().subscribe(res => {
@@ -156,14 +186,16 @@ export class AddProfileComponent implements OnInit {
       age: [''],
       referredBy: [''],
       refferedByName: [''],
-      refferedByMobile: [''],
+      refferedByMobile: ['',
+        Validators.pattern('^[1-9]\\d{9}$')],
       bloodGroup: [null],
       primaryMobile: ['', [
         Validators.required,
         Validators.pattern('^[1-9]\\d{9}$'), // Starts with 6-9 and has 10 digits
       ]],
       email: [''],
-      secondaryMobile: [''],
+      secondaryMobile: ['',
+        Validators.pattern('^[1-9]\\d{9}$')],
       languagePreference: [this.languages[0]],  // Default to first option
       landLine: [''],
       streetAddress: [''],
@@ -282,9 +314,20 @@ export class AddProfileComponent implements OnInit {
         this.userService.sendLoadPatients();
         this.onSave.emit({user_id:res.data.user.user_id,unique_code:res.data.user.unique_code});
       });
+    }else{
+      this.markFormGroupTouched(this.patientForm);
     }
   }
-
+  markFormGroupTouched(formGroup: FormGroup) {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+      
+      // If control is a nested form group, mark its controls too
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
+  }
   addNewMedicalHistory() {
     if (this.addMedicalHistoryText.trim()) {
       this.clinicalNotesService.addMedicalHistory(this.addMedicalHistoryText.trim()).subscribe(res => {

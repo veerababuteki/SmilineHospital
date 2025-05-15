@@ -45,10 +45,19 @@ export class EditProfileComponent implements OnInit {
   addMedicalHistoryText: string = '';
   addNewGroupText: string = '';
   patientId: string | null | undefined;
+  maxDate: Date;
+  formValid: boolean = false;
 
   ngOnInit(): void {
     
     this.initiateForm()
+    this.patientForm.statusChanges.subscribe(() => {
+      this.checkFormValidity();
+    });
+    
+    // Initial validity check
+    this.checkFormValidity();
+    this.maxDate = new Date();
     const dateOfBirthControl = this.patientForm.get('dateOfBirth');
   const ageControl = this.patientForm.get('age');
   
@@ -79,7 +88,30 @@ export class EditProfileComponent implements OnInit {
       
     });
   }
+  checkFormValidity(): void {
+    // Check if patient form is valid (which includes all required fields)
+    this.formValid = this.patientForm.valid;
+    
+    // You can add additional custom validation logic here if needed
+    // For example, checking if at least one medical condition is selected
+    
+    // Optional: Display validation errors or messages
+    if (!this.formValid && this.patientForm.touched) {
+      this.highlightInvalidFields();
+    }
+  }
   
+  // Helper method to identify and highlight invalid fields (optional)
+  highlightInvalidFields(): void {
+    const controls = this.patientForm.controls;
+    
+    for (const name in controls) {
+      if (controls[name].invalid) {
+        // You could use this to show specific error messages or highlight fields
+        // console.log(`Field ${name} is invalid`);
+      }
+    }
+  }
   calculateAge(dateOfBirth: Date): number {
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
@@ -115,7 +147,7 @@ export class EditProfileComponent implements OnInit {
         streetAddress: this.patientDetails.street_address,
         locality: this.patientDetails.locality,
         city: this.patientDetails.city,
-        pincode: this.patientDetails.pin_code
+        pincode: this.patientDetails.pin_code,
       });
       this.userService.getMedicalHistories().subscribe(res =>{
         this.medicalConditions = res.data.rows;
@@ -198,28 +230,33 @@ export class EditProfileComponent implements OnInit {
     { label: 'Assamese', value: 'assamese' },
     { label: 'Odia', value: 'odia' },
   ];
+
   getControlName(condition: string): string {
     return condition.toLowerCase().replace(/[^a-z0-9]/g, '');
   }
+
   constructor(private fb: FormBuilder, private messageService: MessageService, 
     private route: ActivatedRoute, private userService: UserService, private clinicalNotesService: ClinicalNotesService,
     private router: Router
   ) {
+    this.maxDate = new Date();
   }
   initiateForm(){
     this.patientForm = this.fb.group({
       firstName: ['', Validators.required],
-      customId: [''],
+      customId: ['', Validators.required],
       aadhaarId: [''],
       gender: ['', Validators.required],
       dateOfBirth: [''],
       age: [''],
       referredBy: [''],
       referredByName: [''],
-      referredByMobile: [''],
+      referredByMobile: ['',
+        Validators.pattern('^[1-9]\\d{9}$')],
       bloodGroup: [null],
       primaryMobile: ['', Validators.required],
-      secondaryMobile: [''],
+      secondaryMobile: ['',
+        Validators.pattern('^[1-9]\\d{9}$')],
       languagePreference: ['english'],
       landLine: [''],
       email: [''],
@@ -286,7 +323,19 @@ export class EditProfileComponent implements OnInit {
       }).subscribe(res=>{
         this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode])
       })
+    }else{
+      this.markFormGroupTouched(this.patientForm);
     }
+  }
+  markFormGroupTouched(formGroup: FormGroup) {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+      
+      // If control is a nested form group, mark its controls too
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
   }
   addNewMedicalHistory(){
     if(this.addMedicalHistoryText.trim()){

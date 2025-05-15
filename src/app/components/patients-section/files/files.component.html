@@ -42,11 +42,11 @@
                             <div class="checkbox-wrapper">
                                 <input type="checkbox" (change)="onCheckboxChange(file, file.id)" [(ngModel)]="file.isChecked">
                             </div>
-                            <div class="file-preview" [ngClass]="{'pdf': isPdf(file.file_type)}">
+                            <div class="file-preview" [ngClass]="{'pdf': isPdf(file.file_type)}" (click)="openFile(file, $event)">
                                 <img *ngIf="!isPdf(file.file_type)" [src]="file.file_path" [alt]="file.file_type">
                                 <div *ngIf="isPdf(file.file_type)" class="pdf-placeholder">PDF</div>
                             </div>
-                            <div class="file-name">{{ getFileName(file.file_path) }}</div>
+                            <div class="file-name" (click)="openFile(file, $event)">{{ getFileName(file.file_path) }}</div>
                         </div>
                     </div>
                 </div>
@@ -54,3 +54,35 @@
         </div>
     </div>
 </div>
+<!-- Add this after your existing HTML content -->
+<div class="file-preview-modal" *ngIf="previewModalOpen">
+    <div class="modal-overlay" (click)="closePreviewModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>{{ currentPreviewFile ? getFileName(currentPreviewFile.file_path) : 'File Preview' }}</h3>
+        <button class="close-button" (click)="closePreviewModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <!-- Image preview -->
+        <img *ngIf="currentPreviewFile && isImage(currentPreviewFile.file_type)" 
+             [src]="safeFileUrl" 
+             alt="File preview" 
+             class="preview-image">
+             
+        <!-- PDF preview (iframe) -->
+        <iframe *ngIf="currentPreviewFile && isPdf(currentPreviewFile.file_type)"
+                [src]="safeFileUrl"
+                class="preview-pdf"
+                title="PDF Preview"></iframe>
+                
+        <!-- Download button for other file types -->
+        <div *ngIf="currentPreviewFile && !isImage(currentPreviewFile.file_type) && !isPdf(currentPreviewFile.file_type)" 
+             class="download-prompt">
+          <p>This file type cannot be previewed directly.</p>
+          <button class="download-btn" (click)="downloadFile(currentPreviewFile)">
+            Download File
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -243,3 +243,127 @@
   .display-none{
     visibility: hidden;
   }
+  /* Add these styles to your component SCSS file */
+
+/* Styles for the file preview modal */
+.file-preview-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1001;
+  }
+  
+  .modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 1000px;
+    max-height: 90vh;
+    background-color: white;
+    border-radius: 8px;
+    z-index: 1002;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #333;
+      font-weight: 500;
+    }
+    
+    .close-button {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+      
+      &:hover {
+        color: #f44336;
+      }
+    }
+  }
+  
+  .modal-body {
+    flex: 1;
+    overflow: auto;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    .preview-image {
+      max-width: 100%;
+      max-height: calc(90vh - 70px); /* Subtract header height and some padding */
+      object-fit: contain;
+    }
+    
+    .preview-pdf {
+      width: 100%;
+      height: calc(90vh - 70px); /* Subtract header height and some padding */
+      border: none;
+    }
+    
+    .download-prompt {
+      text-align: center;
+      padding: 30px;
+      
+      p {
+        margin-bottom: 20px;
+        color: #666;
+      }
+      
+      .download-btn {
+        background-color: #2196f3;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        
+        &:hover {
+          background-color: #0c87e0;
+        }
+      }
+    }
+  }
+  
+  /* Add these styles to make file items clickable */
+  .file-item {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .checkbox-wrapper {
+      z-index: 2; /* Ensure checkbox is above and clickable */
+    }
+  }

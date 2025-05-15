@@ -14,7 +14,10 @@ export class ClinicalNotesPrintComponent{
 
  constructor() {
     this.generatedDate = new Date().toLocaleDateString();
-    this.savedPractice = localStorage.getItem('selectedPractice');
+    const selectedPractice = localStorage.getItem('selectedPractice');
+    if(selectedPractice){
+      this.savedPractice = JSON.parse(selectedPractice);
+    }
   }
 
   print() {

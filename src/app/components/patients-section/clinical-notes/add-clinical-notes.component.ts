@@ -106,9 +106,7 @@ export class AddClinicalNotesComponent implements OnInit {
     this.initializeCategories();
     this.loadDoctors();
     this.fetchMasterData();
-    if (this.isEditMode) {
-      this.populateFormWithNote(this.editNoteData);
-    }
+    
   }
 
   populateFormWithNote(note: any) {
@@ -117,7 +115,7 @@ export class AddClinicalNotesComponent implements OnInit {
     this.followupDate = note.followup_appointment ? new Date(note.followup_appointment) : new Date();
 
     // Set doctor
-    const doctorId = note.doctor_id;
+    const doctorId = note.doctor_details_clinic.doctor_id;
     
     // Helper to set the doctor when the doctor list is available
     const setDoctor = () => {
@@ -192,7 +190,6 @@ export class AddClinicalNotesComponent implements OnInit {
       { name: 'Diagnoses', code: 'DIAG' },
       { name: 'Observations', code: 'OBS' },
       { name: 'Investigations', code: 'INV' },
-      { name: 'Notes', code: 'NOTE' }
     ];
     this.selectedCategory = this.categories[0];
   }
@@ -204,6 +201,9 @@ export class AddClinicalNotesComponent implements OnInit {
         user_id: doc.user_id
       }));
       this.doctor = this.doctors[0];
+      if (this.isEditMode) {
+        this.populateFormWithNote(this.editNoteData);
+      }
     });
   }
 
@@ -398,6 +398,7 @@ export class AddClinicalNotesComponent implements OnInit {
         return false;
     }
   }
+
   validateNote(): { isValid: boolean; message: string } {
     // Check if all selected entries have values
     const hasEmptyComplaints = this.selectedComplaints.some(complaint => !complaint.value.trim());
@@ -441,6 +442,7 @@ export class AddClinicalNotesComponent implements OnInit {
       message: ''
     };
   }
+
   saveNote() {
     const validation = this.validateNote();
     if (!validation.isValid) {

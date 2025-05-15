@@ -161,8 +161,8 @@ export class AppointmentComponent implements OnInit {
       const doctor = this.doctors.find(d => d.user_id === this.appointment.doctor_details?.doctor_id)
       var formattedTime = this.convertTo24Hour(this.appointment.appointment_time);
       this.appointmentForm = this.fb.group({
-        doctor: [doctor, Validators.required],
-        category: [category, Validators.required],
+        doctor: [doctor],
+        category: [category],
         scheduledDate: [new Date(this.appointment.appointment_date), Validators.required],
         scheduledTime: [new Date(this.appointment.appointment_date +'T'+ formattedTime), Validators.required],
         duration: [this.appointment.duration],
@@ -317,8 +317,8 @@ export class AppointmentComponent implements OnInit {
           booking_type: value.bookingType,
           status: value.status,
           appointment_status: value.appointmentStatus,
-          doctor_id: value.doctor.user_id,
-          category_id: value.category.category_id,
+          doctor_id: value.doctor == null ? null : value.doctor.user_id,
+          category_id: value.category == null ? null : value.category.category_id,
           appointment_date: format(new Date(value.scheduledDate), 'yyyy-MM-dd'),
           appointment_time: format(new Date(value.scheduledTime), 'hh:mm a'),
           duration: value.duration,

@@ -507,3 +507,31 @@
       text-decoration: underline;
     }
   }
+  .ng-invalid.ng-touched:not(form) {
+    border-color: red !important;
+    border-left: 5px solid red !important;
+  }
+  
+  /* Optional: Add a validation error message class */
+  .validation-error {
+    color: red;
+    font-size: 0.8rem;
+    margin-top: 4px;
+  }
+  
+  /* Optional: Style the disabled button */
+  .btn-primary:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  
+  /* Optional: Add a validation summary at the top */
+  .validation-summary {
+    background-color: #ffeeee;
+    border: 1px solid #ffcccc;
+    color: red;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+  }

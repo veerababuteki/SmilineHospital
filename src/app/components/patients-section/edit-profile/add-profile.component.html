@@ -4,7 +4,7 @@
         <div class="actions">
             <!-- <button class="btn-secondary">Delete Patient</button> -->
             <button class="btn-secondary" (click)="cancel()">Cancel</button>
-            <button class="btn-primary" (click)="onSubmit()">Save Patient</button>
+            <button class="btn-primary" [disabled]="!formValid" (click)="onSubmit()">Save Patient</button>
         </div>
     </div>
 
@@ -22,6 +22,9 @@
                     </div>
                     <div class="form-field">
                       <input pInputText type="text" formControlName="firstName">
+                      <div class="validation-error" *ngIf="patientForm.get('firstName')?.invalid && patientForm.get('firstName')?.touched">
+                        Patient name is required
+                      </div>
                     </div>
                   </div>
                   <div class="form-row">
@@ -30,6 +33,9 @@
                     </div>
                     <div class="form-field">
                       <input pInputText type="text" formControlName="customId">
+                      <div class="validation-error" *ngIf="patientForm.get('customId')?.invalid && patientForm.get('customId')?.touched">
+                        Custom ID is required
+                      </div>
                     </div>
                   </div>
               
@@ -59,9 +65,14 @@
                       Date of Birth :
                     </div>
                     <div class="form-field dob-field">
-                      <p-calendar formControlName="dateOfBirth" [showIcon]="true" appendTo="body"></p-calendar>
+                      <p-calendar 
+                        formControlName="dateOfBirth" 
+                        [showIcon]="true"              
+                        [maxDate]="maxDate" 
+                        appendTo="body">
+                      </p-calendar>
                       <span class="or-text"> age :</span>
-                      <input pInputText type="text" class="age-input" formControlName="age">
+                      <input pInputText type="number" class="age-input" formControlName="age" min="0">
                     </div>
                   </div>
               
@@ -97,7 +108,7 @@
                     Mobile Number :
                   </div>
                   <div class="form-field">
-                    <input pInputText type="text" formControlName="refferedByMobile">
+                    <input pInputText type="number" formControlName="refferedByMobile">
                   </div>
                 </div>
                   <div class="form-row">
@@ -125,10 +136,14 @@
                   color: #333;">Contact Details</h3>
                   <div class="form-row">
                     <div class="form-label required">
-                        Primary Mobile No. :
+                      Primary Mobile No. :
                     </div>
                     <div class="form-field">
                       <input pInputText type="number" formControlName="primaryMobile">
+                      <div class="validation-error" *ngIf="patientForm.get('primaryMobile')?.invalid && patientForm.get('primaryMobile')?.touched">
+                        <span *ngIf="patientForm.get('primaryMobile')?.errors?.['required']">Mobile number is required</span>
+                        <span *ngIf="patientForm.get('primaryMobile')?.errors?.['pattern']">Please enter a valid 10-digit mobile number</span>
+                      </div>
                     </div>
                   </div>
                   <div class="form-row">
@@ -136,7 +151,10 @@
                       Secondary Mobile No. :
                     </div>
                     <div class="form-field">
-                      <input pInputText type="text" formControlName="secondaryMobile">
+                      <input pInputText type="number" formControlName="secondaryMobile">
+                      <div class="validation-error" *ngIf="patientForm.get('secondaryMobile')?.invalid && patientForm.get('secondaryMobile')?.touched">
+                        Please enter a valid 10-digit mobile number
+                      </div>
                     </div>
                   </div>
                   <div class="form-row">
@@ -157,11 +175,14 @@
                     </div>
                   </div>
                   <div class="form-row">
-                    <div class="form-label ">
+                    <div class="form-label">
                       Email Address :
                     </div>
                     <div class="form-field">
                       <input pInputText type="email" formControlName="email">
+                      <div class="validation-error" *ngIf="patientForm.get('email')?.invalid && patientForm.get('email')?.touched">
+                        Please enter a valid email address
+                      </div>
                     </div>
                   </div>
                   <div class="form-row">
