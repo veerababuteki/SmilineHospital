@@ -6,7 +6,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { ButtonModule } from 'primeng/button';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { MessageService } from '../../../services/message.service';
+import { MessageService as CustomMessageService } from '../../../services/message.service';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextareaModule } from 'primeng/inputtextarea';
@@ -14,6 +14,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../../../services/user.service';
 import { first } from 'rxjs';
 import { ClinicalNotesService } from '../../../services/clinical-notes.service';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+
 interface ConditionControls {
     [key: string]: boolean[];
   }
@@ -22,7 +25,9 @@ interface ConditionControls {
   templateUrl: './edit-profile.component.html',
   styleUrls: ['./edit-profile.component.scss'],
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule,
+  imports: [ 
+    CommonModule, 
+    ReactiveFormsModule,
     InputTextModule,
     ButtonModule,
     RadioButtonModule,
@@ -30,8 +35,10 @@ interface ConditionControls {
     DropdownModule,
     CheckboxModule,
     InputTextareaModule,
-    FormsModule
-  ]
+    FormsModule,
+    ToastModule
+  ],
+  providers: [MessageService]
 })
 export class EditProfileComponent implements OnInit {
   uniqueCode: string | null | undefined;
@@ -83,7 +90,7 @@ export class EditProfileComponent implements OnInit {
       }
       if(this.uniqueCode){
         this.loadPatientData(this.uniqueCode)
-        this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
+        this.customMessageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
       }
       
     });
@@ -235,8 +242,13 @@ export class EditProfileComponent implements OnInit {
     return condition.toLowerCase().replace(/[^a-z0-9]/g, '');
   }
 
-  constructor(private fb: FormBuilder, private messageService: MessageService, 
-    private route: ActivatedRoute, private userService: UserService, private clinicalNotesService: ClinicalNotesService,
+  constructor(
+    private fb: FormBuilder, 
+    private customMessageService: CustomMessageService, 
+    private messageService: MessageService,
+    private route: ActivatedRoute, 
+    private userService: UserService, 
+    private clinicalNotesService: ClinicalNotesService,
     private router: Router
   ) {
     this.maxDate = new Date();
@@ -321,9 +333,27 @@ export class EditProfileComponent implements OnInit {
         groups_list: selectedGroups,
         other_history: historyDetails.otherHistory,
       }).subscribe(res=>{
-        this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode])
-      })
-    }else{
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Patient profile updated successfully'
+        });
+        setTimeout(() => {
+          this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode]);
+        }, 1000);
+      }, error => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to update patient profile'
+        });
+      });
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'Please fill all required fields'
+      });
       this.markFormGroupTouched(this.patientForm);
     }
   }

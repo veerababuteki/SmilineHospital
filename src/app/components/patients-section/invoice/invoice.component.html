@@ -2,17 +2,17 @@
     <div class="appointments-header">
         <h2>INVOICES</h2>
         <div>
-            <button class="mark-btn" *ngIf="selectedInvoiceList.length == 0">Pay selected Invoices</button>
-            <button class="mark-btn-active" *ngIf="selectedInvoiceList.length > 0" (click)="makePayment()">Pay selected Invoices</button>
-            <button class="add-btn" (click)="navigateToAddPage()">+ Add</button>
+            <button class="mark-btn" *ngIf="selectedInvoiceList.length == 0" style="font-weight: 600;">Pay Selected Invoices</button>
+            <button class="mark-btn-active" *ngIf="selectedInvoiceList.length > 0" (click)="makePayment()" style="font-weight: 600;">Pay Selected Invoices</button>
+            <button class="add-btn" (click)="navigateToAddPage()" style="font-weight: 600;">+ Add</button>
         </div>
     </div>
     <div *ngFor="let date of getSortedDates()">
-    <div class="appointment-date">{{ date | date: 'dd MMM, yyyy'}}</div>
+    <div class="appointment-date" style="font-weight: 500;">{{ date | date: 'dd MMM, yyyy'}}</div>
 
     <div class="treatment-plan" *ngFor="let invoiceGroup of invoices[date] | keyvalue">
         <table class="invoice-table table-condensed">
-            <thead class="border-bottom">
+            <thead class="border-bottom" >
                 <tr>
                     <th>Invoice Number</th>
                     <th width="70%">
@@ -42,7 +42,7 @@
                                   class="edit-btn border-right-radius p-button-text"
                                   (click)="invoiceMenu.toggle($event); setCurrentInvoice(invoiceGroup.key)">
                                 </button>
-                                <p-menu #invoiceMenu [popup]="true" [model]="items"></p-menu>
+                                <p-menu #invoiceMenu [popup]="true" [model]="items" [style]="{'font-weight': '500'}"></p-menu>
                             </div>
                         </div>
                     </th>
