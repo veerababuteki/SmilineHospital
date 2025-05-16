@@ -18,7 +18,7 @@
                   <!-- Patient Name Section -->
                   <div class="form-row">
                     <div class="form-label required">
-                      Patient Name  : 
+                      Patient Name  :
                     </div>
                     <div class="form-field">
                       <input pInputText type="text" formControlName="firstName">
@@ -38,16 +38,19 @@
                       </div>
                     </div>
                   </div>
-              
+
                   <div class="form-row">
                     <div class="form-label">
                       Aadhaar ID :
                     </div>
                     <div class="form-field">
-                      <input pInputText type="text" formControlName="aadhaarId">
+                      <input pInputText type="text" formControlName="aadhaarId" pattern="[0-9]*">
+                      <div class="validation-error" *ngIf="patientForm.get('aadhaarId')?.invalid && patientForm.get('aadhaarId')?.touched">
+                        should be 12-digit numeric only
+                      </div>
                     </div>
                   </div>
-              
+
                   <div class="form-row">
                     <div class="form-label required">
                       Gender :
@@ -56,26 +59,28 @@
                       <div class="radio-group">
                         <p-radioButton name="gender" value="Male" label="Male" formControlName="gender"></p-radioButton>
                         <p-radioButton name="gender" value="Female" label="Female" formControlName="gender"></p-radioButton>
+                        <p-radioButton name="gender" value="Other" label="Other" formControlName="gender"></p-radioButton>
+
                       </div>
                     </div>
                   </div>
-              
+
                   <div class="form-row">
                     <div class="form-label">
                       Date of Birth :
                     </div>
                     <div class="form-field dob-field">
-                      <p-calendar 
-                        formControlName="dateOfBirth" 
-                        [showIcon]="true"              
-                        [maxDate]="maxDate" 
+                      <p-calendar
+                        formControlName="dateOfBirth"
+                        [showIcon]="true"
+                        [maxDate]="maxDate"
                         appendTo="body">
                       </p-calendar>
-                      <span class="or-text"> age :</span>
+                      <span class="or-text"> Age :</span>
                       <input pInputText type="number" class="age-input" formControlName="age" min="0">
                     </div>
                   </div>
-              
+
                   <!-- <div class="form-row">
                     <div class="form-label">
                       Anniversary :
@@ -85,7 +90,7 @@
                       <a class="add-new-link">Remove</a>
                     </div>
                   </div> -->
-              
+
                   <div class="form-row">
                     <div class="form-label">
                       Referred by :
@@ -116,17 +121,17 @@
                       Blood Group :
                     </div>
                     <div class="form-field">
-                      <p-dropdown [options]="bloodGroups" formControlName="bloodGroup" 
+                      <p-dropdown [options]="bloodGroups" formControlName="bloodGroup"
                                  [style]="{'width':'100%'}" optionLabel="label"></p-dropdown>
                     </div>
                   </div>
-              
+
                   <!-- <div class="form-row">
                     <div class="form-label">
                       Family :
                     </div>
                     <div class="form-field family-field">
-                      <p-dropdown [options]="relations" formControlName="family" 
+                      <p-dropdown [options]="relations" formControlName="family"
                                  [style]="{'width':'150px'}" optionLabel="label"></p-dropdown>
                       <input pInputText type="text" class="family-input">
                     </div>
@@ -162,7 +167,7 @@
                       Language Preference :
                     </div>
                     <div class="form-field">
-                      <p-dropdown [options]="languages" formControlName="languagePreference" 
+                      <p-dropdown [options]="languages" formControlName="languagePreference"
                                  [style]="{'width':'100%'}" optionLabel="label"></p-dropdown>
                     </div>
                   </div>
@@ -217,10 +222,10 @@
                       <input pInputText type="text" formControlName="pincode">
                     </div>
                   </div>
-                  
+
                 </form>
               </div>
-            
+
         </div>
 
         <div class="right-sidebar">
@@ -232,47 +237,47 @@
                     <span *ngIf="addMedicalHistory" (click)="addMedicalHistory = false">Done</span>
                   </button>
                 </div>
-              
+
                 <!-- <div class="search-box">
                   <span class="p-input-icon-left w-full">
                     <i class="pi pi-search"></i>
-                    <input type="text" 
-                           pInputText 
-                           class="w-full" 
+                    <input type="text"
+                           pInputText
+                           class="w-full"
                            placeholder="Search History">
                   </span>
                 </div> -->
                 <input (keydown.enter)="addNewMedicalHistory()" type="text" *ngIf="addMedicalHistory"
-                pInputText 
-                class="w-full" 
+                pInputText
+                class="w-full"
                 placeholder="Add Medical History"
                 [(ngModel)]="addMedicalHistoryText">
                 <form [formGroup]="medicalHistoryForm" *ngIf="medicalConditions.length > 0">
                   <div class="search-box" *ngIf="!addMedicalHistory" >
                     <span class="p-input-icon-left w-full">
                       <i class="pi pi-search"></i>
-                      <input type="text" 
-                             pInputText 
-                             class="w-full" 
+                      <input type="text"
+                             pInputText
+                             class="w-full"
                              placeholder="Search History"
                              formControlName="searchHistory">
-                      
+
                     </span>
                   </div>
                     <div class="conditions-list" formGroupName="conditions">
                       <div class="condition-item" *ngFor="let condition of filteredMedicalConditions">
-                        <p-checkbox [formControlName]="condition.id" 
-                                   [label]="condition.name" 
+                        <p-checkbox [formControlName]="condition.id"
+                                   [label]="condition.name"
                                    [binary]="true">
                         </p-checkbox>
                       </div>
                     </div>
-                
+
                     <div class="other-history">
                       <h3>Other History :</h3>
-                      <textarea pInputTextarea 
-                                formControlName="otherHistory" 
-                                [rows]="4" 
+                      <textarea pInputTextarea
+                                formControlName="otherHistory"
+                                [rows]="4"
                                 class="w-full">
                       </textarea>
                     </div>
@@ -286,15 +291,15 @@
                     </button>
                   </div>
                   <input (keydown.enter)="addNewGroup()" type="text" *ngIf="addGroup"
-                         pInputText 
-                         class="w-full" 
+                         pInputText
+                         class="w-full"
                          placeholder="Add Group"
                          [(ngModel)]="addNewGroupText">
                   <form [formGroup]="groupsForm" *ngIf="insuranceGroups.length > 0">
                     <div class="conditions-list" formGroupName="groups">
                       <div class="condition-item" *ngFor="let condition of insuranceGroups">
-                        <p-checkbox [formControlName]="condition.id" 
-                                   [label]="condition.name" 
+                        <p-checkbox [formControlName]="condition.id"
+                                   [label]="condition.name"
                                    [binary]="true">
                         </p-checkbox>
                       </div>
@@ -302,7 +307,7 @@
                   </form>
 
               </div>
-              
+
         </div>
     </div>
 </div>
