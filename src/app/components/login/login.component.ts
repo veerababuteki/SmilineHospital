@@ -44,7 +44,7 @@ registrationForm!: FormGroup;
     this.maxDate.setFullYear(this.maxDate.getFullYear()); // Set minimum age to 18
   }
   loadForm(){
-    this.isLogin = !this.isLogin;
+    // this.isLogin = !this.isLogin;
   }
   initializeLoginForm(){
     
