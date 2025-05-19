@@ -35,7 +35,8 @@ registrationForm!: FormGroup;
   isEmail = false;
   isOtpLogin = false;
   otpSent = false;
-  showPassword: boolean = false;
+  showPassword = false;
+  isLoading = false;
 
   constructor(private formBuilder: FormBuilder,
     private authService: AuthService, 
@@ -86,10 +87,11 @@ registrationForm!: FormGroup;
     });
   }
   onLoginSubmit() {
-    const mobileControl = this.loginForm.get('mobileNumber');
-    var formData = this.loginForm.value;
-
     if (this.loginForm.valid) {
+      this.isLoading = true;
+      const mobileControl = this.loginForm.get('mobileNumber');
+      var formData = this.loginForm.value;
+
       if (this.isOtpLogin && !this.otpSent) {
         
         if (mobileControl?.value.includes('@')) {
@@ -122,8 +124,18 @@ registrationForm!: FormGroup;
           this.router.navigate(['']);
         })
       }
+      setTimeout(() => {
+        this.isLoading = false;
+      }, 1500);
+    } else {
+      Object.keys(this.loginForm.controls).forEach(key => {
+        const control = this.loginForm.get(key);
+        if (control?.invalid) {
+          control.markAsTouched();
+        }
+      });
     }
-   }
+  }
 
   onSubmit() {
     if (this.registrationForm.valid) {

@@ -35,7 +35,7 @@
   }
   
   .invoice-address, .invoice-phone {
-    text-align: center;
+    text-align: center !important;
     font-size: 12px;
     margin: 5px 0;
   }
@@ -83,4 +83,16 @@
       display: none;
     }
   }
+  
+.invoice-container .invoice-address,
+.invoice-container .invoice-phone {
+  text-align: center !important;
+  display: block;
+  width: 100%;
+}
+  
+::ng-deep .invoice-address,
+::ng-deep .invoice-phone {
+  text-align: center !important;
+}
   
