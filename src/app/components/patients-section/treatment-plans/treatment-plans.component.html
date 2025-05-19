@@ -6,9 +6,9 @@
             <!-- <button class="mark-btn-active" *ngIf="generateInvoiceList.length > 0" (click)="generateInvoice()">Invoice
                 selected Procedure</button> -->
             <button [class.mark-btn]="markCompleteList.length == 0"
-                [class.mark-btn-active]="markCompleteList.length > 0" (click)="markAsComplete()" style="font-weight: 600;">Mark As
+                [class.mark-btn-active]="markCompleteList.length > 0" (click)="markAsComplete()" >Mark As
                 Complete</button>
-            <button class="add-treatment-btn" (click)="navigateToAddPage()" style="font-weight: 600;">+ Add</button>
+            <button class="add-treatment-btn" (click)="navigateToAddPage()" >+ Add</button>
         </div>
     </div>
     <div id="treatment-plans-container">
@@ -92,5 +92,5 @@
     <div class="no-treatment-plan-container" *ngIf="getSortedDates().length <= 0">
         <img class="icon" src="assets/no-treatment-plans.png" />
         <h3>No Treatment plans added</h3>
-        <button class="add-treatment-btn" (click)="navigateToAddPage()" style="font-weight: 600;">+ Add</button>
+        <button class="add-treatment-btn" (click)="navigateToAddPage()" >+ Add</button>
     </div>

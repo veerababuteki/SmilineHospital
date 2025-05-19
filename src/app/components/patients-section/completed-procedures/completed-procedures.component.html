@@ -3,10 +3,10 @@
     <div class="appointments-header">
         <h2>Completed Procedures</h2>
         <div>
-            <button class="mark-btn" *ngIf="generateInvoiceList.length == 0" style="font-weight: 600;">Invoice Selected Procedure</button>
-            <button class="mark-btn-active" *ngIf="generateInvoiceList.length > 0" (click)="generateInvoice()" style="font-weight: 600;">Invoice
+            <button class="mark-btn" *ngIf="generateInvoiceList.length == 0" >Invoice Selected Procedure</button>
+            <button class="mark-btn-active" *ngIf="generateInvoiceList.length > 0" (click)="generateInvoice()" >Invoice
                 Selected Procedure</button>
-            <button class="add-btn" (click)="navigateToAddPage()" style="font-weight: 600;">+ Add</button>
+            <button class="add-btn" (click)="navigateToAddPage()" >+ Add</button>
         </div>
     </div>
     <div id="completed-procedures-container">
@@ -84,6 +84,6 @@
     <div class="no-completed-procedure-container" *ngIf="getSortedDates().length <= 0">
         <img class="icon" src="assets/completed-procedures.png" />
         <h3>No completed Procedures added</h3>
-        <button class="add-treatment-btn" (click)="navigateToAddPage()" style="font-weight: 600;">+ Add</button>
+        <button class="add-treatment-btn" (click)="navigateToAddPage()" >+ Add</button>
     </div>
 </div>
