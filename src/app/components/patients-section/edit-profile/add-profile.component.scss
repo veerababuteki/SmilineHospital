@@ -79,7 +79,7 @@
                     padding-right: 8px;
                     color: #666;
                     font-size: 13px;
-                    font-weight: bold;
+                    font-weight: 500;
                     white-space: nowrap;
 
                     &.required::after {
@@ -538,3 +538,4 @@
   margin-bottom: 15px;
   border-radius: 4px;
 }
+

@@ -4,11 +4,12 @@
 
 <div id="{{invoice.key}}" class="invoice-print">
     <div class="invoice-container">
-        <h2 class="invoice-title">Smiline Dental Hospitals</h2>
+        <h2 class="invoice-title">SMILINE DENTAL HOSPITALS</h2>
         <div *ngIf="savedPractice.branch_id == 1">
           <p class="clinic-address">
             #8-3-952/10/2&2/1, Smiline House, Srinagar Colony, Panjagutta, Hyderabad-500073
           </p>
+          
           <p class="clinic-phone">Phone: 040 4200 0024</p>
         </div>
         <div *ngIf="savedPractice.branch_id == 2">
@@ -23,16 +24,16 @@
           </p>
           <p class="clinic-phone">Phone: 08889998353</p>
         </div>
-      
+
         <hr />
-      
+
         <p><strong>Date:</strong> {{ invoice.value[0].created_at | date: 'dd MMM, yyyy' }}</p>
         <p><strong>Billing Incharge:</strong> Kiran</p>
-        <p><strong>Patient:</strong> {{ invoice.value[0].treatment_plans.patient_details_treat?.user_profile_details[0].first_name }} ({{ invoice.value[0].treatment_plans.patient_details_treat?.unique_code }}) 
+        <p><strong>Patient:</strong> {{ invoice.value[0].treatment_plans.patient_details_treat?.user_profile_details[0].first_name }} ({{ invoice.value[0].treatment_plans.patient_details_treat?.unique_code }})
           {{ invoice.value[0].treatment_plans.patient_details_treat?.user_profile_details[0].gender }}</p>
-      
+
         <hr />
-      
+
         <table class="treatments-table">
           <thead>
             <tr>
@@ -49,7 +50,7 @@
               <td>{{ i + 1 }}</td>
               <td>
                 <strong>{{ invc.treatment_plans.procedure_details.name }}</strong> <br />
-                <span class="subtext">By Dr. {{ invc.treatment_plans.doctor_details_treat.user_profile_details[0].first_name }} 
+                <span class="subtext">By Dr. {{ invc.treatment_plans.doctor_details_treat.user_profile_details[0].first_name }}
                   {{ invc.treatment_plans.doctor_details_treat.user_profile_details[0].last_name }}</span> <br />
                 <span class="subtext">Date: {{ invc.treatment_plans.date | date: 'dd MMM, yyyy' }}</span>
               </td>
@@ -60,11 +61,11 @@
             </tr>
           </tbody>
         </table>
-        
-        
-      
+
+
+
         <hr />
-      
+
         <div class="summary-container">
             <div class="summary">
               <p><strong>Total Cost:</strong> {{ getTotalCost(invoice.value) }} INR</p>
@@ -72,10 +73,9 @@
               <p><strong>Amount Received:</strong> {{ invoice.value[0].payment_status === 'Pending' ? '0.00' : getTotalCost(invoice.value) }} INR</p>
             </div>
           </div>
-      
+
         <p class="generated-on">Generated On: {{ generatedDate }}</p>
         <p class="powered-by">Powered by iDental</p>
       </div>
   </div>
-  
-  
+

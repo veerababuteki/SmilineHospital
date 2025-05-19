@@ -47,7 +47,7 @@
             type="text"
             id="mobileNumber"
             formControlName="mobileNumber"
-            placeholder="Mobile Number"
+            placeholder=" Enter Mobile Number"
             [ngClass]="{'ng-invalid': loginForm.get('mobileNumber')?.errors?.['invalidMobile'] && loginForm.get('mobileNumber')?.touched}"
           />
          </div>
@@ -58,7 +58,7 @@
             type="password"
             id="password"
             formControlName="password"
-            placeholder="Password"
+            placeholder="Enter Password"
           />
         </div>
         <div *ngIf="otpSent" class="form-group">

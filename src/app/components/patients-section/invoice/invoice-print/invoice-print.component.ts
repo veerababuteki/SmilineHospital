@@ -59,7 +59,7 @@ export class InvoicePrintComponent {
   margin-bottom: 5px;
 }
 
-.invoice-address, .invoice-phone {
+.clinic-address, .clinic-phone {
   text-align: center;
   font-size: 12px;
   margin: 2px 0;
@@ -180,9 +180,9 @@ hr {
       <body>
         ${printContent}
         <script>
-         window.onload = function() { 
-            window.print(); 
-            window.close(); 
+         window.onload = function() {
+            window.print();
+            window.close();
           };
         </script>
       </body>
