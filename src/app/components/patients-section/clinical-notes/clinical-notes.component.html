@@ -2,7 +2,7 @@
 <div class="appointments-container">
     <div class="appointments-header">
         <h2>CLINICAL NOTES</h2>
-        <button class="add-btn" (click)="navigateToAdd()" style="font-weight: 600;">+ Add</button>
+        <button class="add-btn" (click)="navigateToAdd()">+ Add</button>
     </div>
     <div *ngFor="let note of clinicalNotes">
         <div class="appointment-date">{{note.date | date: 'dd MMM, yyyy' }}</div>
@@ -12,16 +12,16 @@
                 <tbody>
                     <tr></tr>
                     <tr *ngFor="let complaint of formatStringToArray(note.chief_complaints); let i = index">
-                        <td class="engaged-col border-bottom-none" *ngIf="i == 0" style="font-weight: 500;">Complaints</td>
+                        <td class="engaged-col border-bottom-none" *ngIf="i == 0">Complaints</td>
                         <td class="engaged-col" *ngIf="i > 0"></td>
                         <td class="procedure-col">{{complaint}}</td>
                         <td class="actions-col" *ngIf="i == 0">
                             <app-clinical-notes-print [clinicalNotes]="note"></app-clinical-notes-print>
-                            <button 
+                            <button
                               #menuButton
-                              type="button" 
-                              pButton 
-                              icon="pi pi-chevron-down" 
+                              type="button"
+                              pButton
+                              icon="pi pi-chevron-down"
                               class="edit-btn border-right-radius p-button-text"
                               (click)="invoiceMenu.toggle($event); setCurrentClinicalNotes(note)">
                             </button>
@@ -29,22 +29,22 @@
                         </td>
                     </tr>
                     <tr *ngFor="let observation of formatStringToArray(note.observations); let i = index">
-                        <td class="engaged-col border-bottom-none" *ngIf="i == 0" style="font-weight: 500;">Observations</td>
+                        <td class="engaged-col border-bottom-none" *ngIf="i == 0">Observations</td>
                         <td class="engaged-col" *ngIf="i > 0"></td>
                         <td class="procedure-col">{{observation}}</td>
                     </tr>
                     <tr *ngFor="let investigation of formatStringToArray(note.investigations); let i = index">
-                        <td class="engaged-col border-bottom-none" *ngIf="i == 0" style="font-weight: 500;">Investigations</td>
+                        <td class="engaged-col border-bottom-none" *ngIf="i == 0">Investigations</td>
                         <td class="engaged-col" *ngIf="i > 0"></td>
                         <td class="procedure-col">{{investigation}}</td>
                     </tr>
                     <tr *ngFor="let diagnose of formatStringToArray(note.diagnoses); let i = index">
-                        <td class="engaged-col border-bottom-none" *ngIf="i == 0" style="font-weight: 500;">Diagnoses</td>
+                        <td class="engaged-col border-bottom-none" *ngIf="i == 0">Diagnoses</td>
                         <td class="engaged-col" *ngIf="i > 0"></td>
                         <td class="procedure-col">{{diagnose}}</td>
                     </tr>
                     <tr *ngFor="let note of formatStringToArray(note.notes); let i = index">
-                        <td class="engaged-col border-bottom-none" *ngIf="i == 0" style="font-weight: 500;">Notes</td>
+                        <td class="engaged-col border-bottom-none" *ngIf="i == 0" >Notes</td>
                         <td class="engaged-col" *ngIf="i > 0"></td>
                         <td class="procedure-col">{{note}}</td>
                     </tr>
@@ -62,6 +62,6 @@
     <div class="no-clinical-notes-container" *ngIf="clinicalNotes.length <= 0">
         <img class="icon" src="assets/clinical-notes.png" />
         <h3>No clinical notes added</h3>
-        <button class="add-treatment-btn" (click)="navigateToAdd()" style="font-weight: 600;">+ Add</button>
+        <button class="add-treatment-btn" (click)="navigateToAdd()">+ Add</button>
     </div>
 </div>

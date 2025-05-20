@@ -1,7 +1,7 @@
 .appointments-container {
     padding: 0px 20px 20px 20px;
     background-color: #f5f5f5;
-    height: 80vh; 
+    height: 80vh;
     overflow-y: auto;
 
     .appointments-header {
@@ -24,6 +24,7 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 13px;
+            font-weight: 600;
         }
         .mark-btn{
             background-color: #f5f5f5;
@@ -33,6 +34,8 @@
             border: 1px solid #e0e0e0;
             padding: 6px 12px;
             font-size: 13px;
+            font-weight: 500;
+
         }
     }
 
@@ -41,6 +44,7 @@
         color: #666;
         padding: 8px;
         background-color: #f5f5f5;
+        font-weight: 500;
     }
 
     .treatment-plan {
@@ -58,21 +62,21 @@
                 font-weight: 600 ;
                 font-size: 12px;
             }
-        
+
             .full-table {
                 width: 100%;
                 border-collapse: collapse;
-        
+
                 th {
                     border: none;
                     text-align: left;
-        
+
                     &.amount {
                         text-align: left;
                     }
                 }
             }
-        
+
             .actions {
                 display: flex;
                 justify-content: flex-end;
@@ -82,12 +86,12 @@
                     color: #666;
                     cursor: pointer;
                     margin-top: 20px;
-                    
+
                     padding: 5.5px 4px 5.5px 4px;
                     &:hover {
                         color: #333;
                     }
-    
+
                     i {
                         font-size: 16px;
                     }
@@ -98,82 +102,82 @@
                     color: #666;
                     cursor: pointer;
                     padding: 4px 8px;
-        
+
                     &:hover {
                         color: #333;
                     }
                 }
             }
-        
+
             td {
                 padding: 15px;
                 vertical-align: top;
-        
+
                 &.invoice-number-cell {
                     width: 180px;
-        
+
                     .invoice-label {
                         display: flex;
                         align-items: center;
                         gap: 8px;
                         margin-bottom: 15px;
-        
+
                         input[type="checkbox"] {
                             margin: 0;
                         }
-        
+
                         .invoice-link {
                             color: #2196f3;
                             text-decoration: none;
-        
+
                             &:hover {
                                 text-decoration: underline;
                             }
                         }
                     }
                 }
-        
+
                 .invoice-details {
                     width: 100%;
-        
+
                     td {
                         border: none;
                         padding: 4px 0;
-        
+
                         div:first-child {
                             color: #666;
                             margin-bottom: 4px;
                         }
-        
+
                         .amount {
                             font-family: monospace;
                             color: #333;
-        
+
                             &.red {
                                 color: #f44336;
                             }
                         }
                     }
                 }
-        
+
                 .treatments-table {
                     width: 100%;
                     border-collapse: collapse;
-        
+
                     td {
                         border: none;
                         padding: 8px 0;
-        
+
                         &.name {
                             .treatment-link {
                                 color: #2196f3;
                                 text-decoration: none;
-        
+
                                 &:hover {
                                     text-decoration: underline;
                                 }
                             }
-        
+
                             .tooth-number {
                                 display: inline-block;
                                 padding: 2px 6px;
@@ -183,40 +187,40 @@
                                 margin-left: 8px;
                             }
                         }
-        
+
                         &.amount {
                             text-align: center;
                             font-family: monospace;
                         }
-        
+
                         .completed-by {
                             margin: 0;
                             color: #666;
-        
+
                             strong {
                                 color: #2196f3;
                             }
                         }
-        
+
                         .treatment-notes {
                             margin: 0;
                             color: #666;
                             white-space: pre-line;
                         }
                     }
-        
+
                     tr:nth-child(2n) td {
                         padding-bottom: 15px;
                         border-bottom: 1px solid #e0e0e0;
                     }
-        
+
                     tr:nth-child(2n-1) td {
                         padding-top: 15px;
                     }
                 }
             }
         }
-    
+
         .plan-footer {
             display: flex;
             justify-content: space-between;
@@ -229,16 +233,16 @@
             border-left: 3px solid;
             .planned-by {
                 color: #666;
-    
+
                 .doctor-name {
                     color: #333;
                     font-weight: 500;
                 }
             }
-    
+
             .estimated-amount {
                 color: #666;
-    
+
                 .amount {
                     color: #333;
                     font-weight: 500;
@@ -247,7 +251,7 @@
             }
         }
     }
-    
+
 }
 .border-left-radius{
     border-radius: 5px 0px 0px 5px;
@@ -276,7 +280,7 @@
 .action-menu {
     display: inline-block;
   }
-  
+
   /* Override PrimeNG button styles to match your existing button */
   .action-menu .p-button.edit-btn {
     background: transparent;
@@ -286,30 +290,32 @@
     height: auto;
     width: auto;
   }
-  
+
   /* Remove the button focus ring for better appearance */
   .action-menu .p-button.edit-btn:focus {
     box-shadow: none;
   }
-  
+
   /* Make sure the menu appears at the correct position */
   :host ::ng-deep .p-menu {
     min-width: 120px;
   }
-  
+
   /* Customize menu item styles if needed */
   :host ::ng-deep .p-menuitem-link {
     padding: 0.75rem 1rem;
   }
-  
+
   /* Color for pay option */
   :host ::ng-deep .p-menuitem:first-child .p-menuitem-text {
     color: #4caf50;
+    font-weight: 500;
   }
-  
+
   /* Color for cancel option */
   :host ::ng-deep .p-menuitem:last-child .p-menuitem-text {
     color: #f44336;
+    font-weight: 500;
   }
 
 .teeth-hover-container {
@@ -337,7 +343,7 @@
     .initial-teeth {
       display: none;
     }
-    
+
     .hover-teeth {
       display: inline-block;
     }
