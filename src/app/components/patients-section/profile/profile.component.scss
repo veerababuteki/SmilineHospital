@@ -30,12 +30,15 @@
                     background: white;
                     border: 1px solid #e0e0e0;
                     color: #333;
+                    font-weight: 600;
                 }
 
                 &.btn-primary {
                     background: #2196f3;
                     border: none;
                     color: white;
+                    font-weight: 600;
+
                 }
             }
         }
@@ -158,6 +161,7 @@
                     background: none;
                     border: none;
                     cursor: pointer;
+                    font-weight: 600;
                     font-size: 13px;
                     &:hover{
                         text-decoration: underline;
