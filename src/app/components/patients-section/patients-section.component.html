@@ -7,24 +7,24 @@
         <div class="practices-dropdown-panel" *ngIf="showPracticesDropdown" (click)="$event.stopPropagation()">
           <div class="search-container">
             <i class="pi pi-search search-icon"></i>
-            <input 
-              type="text" 
-              placeholder="Search by name" 
-              class="practice-search" 
+            <input
+              type="text"
+              placeholder="Search by name"
+              class="practice-search"
               [(ngModel)]="practiceSearchText"
               (input)="filterPractices()"
             >
           </div>
-          
+
           <div class="practices-list">
-            <div class="practice-item" 
-              *ngFor="let practice of filteredPractices" 
+            <div class="practice-item"
+              *ngFor="let practice of filteredPractices"
               (click)="selectPractice(practice)"
               [class.selected]="selectedPractice?.branch_id === practice.branch_id">
               <div class="practice-name">{{ practice.branch_name }}</div>
               <div class="practice-id">Practice ID: {{ practice.branch_id }}</div>
             </div>
-            
+
             <!-- No results message -->
             <div class="no-results" *ngIf="practiceSearchText && filteredPractices.length === 0">
               No practices found matching "{{ practiceSearchText }}"
@@ -40,7 +40,7 @@
         <img src="assets/patientpicker.webp" alt="User Icon" class="user-icon" (click)="openPatientDirectory()">
         <img *ngIf="patientDetails" src="assets/user.webp" alt="Profile Photo" class="adjust profile-photo">
         <div class="patient-info" *ngIf="patientDetails">
-            <span class="name">{{patientDetails?.first_name || ''}} {{patientDetails?.last_name || ''}}</span>
+            <span class="name">{{patientDetails.gender === 'Male' ? 'Mr. ' : 'Mrs. '}} {{patientDetails?.first_name || ''}} {{patientDetails?.last_name || ''}}</span>
             <span class="separator">&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <span class="gender">{{patientDetails?.gender || ''}}</span>
             <span class="separator" *ngIf="patientDetails?.gender">,</span>
@@ -61,16 +61,16 @@
                 <i class="pi pi-chevron-down" [ngClass]="{'display-none': isNavCollapsed}" [class.rotated]="!patientExpanded"></i>
             </div>
             <div class="section-content" [class.collapsed]="!patientExpanded || isNavCollapsed">
-                <a class="nav-item" *ngIf="userPrivileges?.includes('Profile')" 
-                   (click)="handleNavigation('/profile')" 
+                <a class="nav-item" *ngIf="userPrivileges?.includes('Profile')"
+                   (click)="handleNavigation('/profile')"
                    routerLinkActive="active">
                     <i class="pi pi-user"></i>
                     <span [class.hidden]="isNavCollapsed">Profile</span>
                 </a>
-                <div *ngIf="userPrivileges?.includes('Appointments')">
-                    <a class="nav-item" 
-                       (click)="handleNavigation('/appointments')" 
-                       routerLinkActive="active">
+                <div *ngIf="userPrivileges?.includes('Appointments')" >
+                    <a class="nav-item"
+                       (click)="handleNavigation('/appointments')"
+                       routerLinkActive="active" >
                         <i class="pi pi-calendar"></i>
                         <span [class.hidden]="isNavCollapsed">Appointments<span *ngIf="appointments && appointments.count > 0" class="count">{{appointments.count}}</span></span>
                     </a>
@@ -79,39 +79,39 @@
         </div>
 
         <!-- EMR Section -->
-        <div class="nav-section" 
+        <div class="nav-section"
              *ngIf="userPrivileges?.includes('Timeline') || userPrivileges?.includes('Files') || userPrivileges?.includes('CompletedProcedures') || userPrivileges?.includes('ClinicalNotes') || userPrivileges?.includes('TreatmentPlans')">
             <div class="section-header" (click)="toggleSection('emr')">
                 <span class="label">EMR</span>
                 <i class="pi pi-chevron-down" [ngClass]="{'display-none': isNavCollapsed}" [class.rotated]="!emrExpanded"></i>
             </div>
             <div class="section-content" [class.collapsed]="!emrExpanded || isNavCollapsed">
-                <a *ngIf="userPrivileges?.includes('ClinicalNotes')" class="nav-item" 
-                   (click)="handleNavigation('/clinical-notes')" 
+                <a *ngIf="userPrivileges?.includes('ClinicalNotes')" class="nav-item"
+                   (click)="handleNavigation('/clinical-notes')"
                    routerLinkActive="active">
                     <i class="pi pi-file-edit"></i>
                     <span [class.hidden]="isNavCollapsed">Clinical Notes<span *ngIf="clinicalNotes && clinicalNotes.count > 0"  class="count">{{clinicalNotes.count}}</span></span>
                 </a>
-                <a *ngIf="userPrivileges?.includes('TreatmentPlans')" class="nav-item" 
-                   (click)="handleNavigation('/treatment-plans')" 
+                <a *ngIf="userPrivileges?.includes('TreatmentPlans')" class="nav-item"
+                   (click)="handleNavigation('/treatment-plans')"
                    routerLinkActive="active">
                     <i class="pi pi-list"></i>
                     <span [class.hidden]="isNavCollapsed">Treatment Plans<span *ngIf="treatmentPlans && treatmentPlans.count > 0" class="count">{{treatmentPlans.count}}</span></span>
                 </a>
-                <a *ngIf="userPrivileges?.includes('CompletedProcedures')" class="nav-item" 
-                   (click)="handleNavigation('/completed-procedures')" 
+                <a *ngIf="userPrivileges?.includes('CompletedProcedures')" class="nav-item"
+                   (click)="handleNavigation('/completed-procedures')"
                    routerLinkActive="active">
                     <i class="pi pi-check-circle"></i>
                     <span [class.hidden]="isNavCollapsed">Completed Procedures<span *ngIf="completedProcedures && completedProcedures.count > 0" class="count">{{completedProcedures.count}}</span></span>
                 </a>
-                <a *ngIf="userPrivileges?.includes('Files')" class="nav-item" 
-                   (click)="handleNavigation('/files')" 
+                <a *ngIf="userPrivileges?.includes('Files')" class="nav-item"
+                   (click)="handleNavigation('/files')"
                    routerLinkActive="active">
                     <i class="pi pi-folder"></i>
                     <span [class.hidden]="isNavCollapsed">Files<span *ngIf="files && files.count > 0" class="count">{{files.count}}</span></span>
                 </a>
-                <a *ngIf="userPrivileges?.includes('Timeline')" class="nav-item" 
-                   (click)="handleNavigation('/timeline')" 
+                <a *ngIf="userPrivileges?.includes('Timeline')" class="nav-item"
+                   (click)="handleNavigation('/timeline')"
                    routerLinkActive="active">
                     <i class="pi pi-clock"></i>
                     <span [class.hidden]="isNavCollapsed">Timeline</span>
@@ -126,17 +126,17 @@
                 <i class="pi pi-chevron-down" [ngClass]="{'display-none': isNavCollapsed}" [class.rotated]="!billingExpanded"></i>
             </div>
             <div class="section-content" [class.collapsed]="!billingExpanded || isNavCollapsed">
-                <a class="nav-item" *ngIf="userPrivileges?.includes('Invoices')" 
-                   (click)="handleNavigation('/invoices')" 
+                <a class="nav-item" *ngIf="userPrivileges?.includes('Invoices')"
+                   (click)="handleNavigation('/invoices')"
                    routerLinkActive="active">
                     <i class="pi pi-dollar"></i>
                     <span [class.hidden]="isNavCollapsed">Invoices<span *ngIf="invoices && invoices.count > 0" class="count">{{invoices.count}}</span></span>
                 </a>
-                <a class="nav-item" *ngIf="userPrivileges?.includes('Payments')" 
-                   (click)="handleNavigation('/payments')" 
+                <a class="nav-item" *ngIf="userPrivileges?.includes('Payments')"
+                   (click)="handleNavigation('/payments')"
                    routerLinkActive="active">
                     <i class="pi pi-money-bill"></i>
-                    <span [class.hidden]="isNavCollapsed">Payments</span>
+                    <span [class.hidden]="isNavCollapsed">Payment</span>
                 </a>
             </div>
         </div>

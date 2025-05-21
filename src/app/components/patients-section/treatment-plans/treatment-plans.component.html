@@ -45,7 +45,7 @@
                             <td class="discount">{{treatment.discount+" "+treatment.discount_formate}}</td>
                             <td class="amount">{{treatment.total_cost}}</td>
                             <td>
-                                <div>Teeth: 
+                                <div>Teeth:
                                     <span class="teeth-number" [pTooltip]="getFullTeethNumbers(treatment.teeth_set)">
                                         {{getShortTeethNumbers(treatment.teeth_set)}}
                                         <span *ngIf="hasMoreTeeth(treatment.teeth_set)" class="more-teeth">...</span>
@@ -55,11 +55,11 @@
                             </td>
                             <td class="actions hide-on-print">
                                 <app-treatment-plans-print [treatmentPlan]="treatment"></app-treatment-plans-print>
-                                <button 
+                                <button
                                   #menuButton
-                                  type="button" 
-                                  pButton 
-                                  icon="pi pi-chevron-down" 
+                                  type="button"
+                                  pButton
+                                  icon="pi pi-chevron-down"
                                   class="edit-btn border-right-radius p-button-text"
                                   (click)="invoiceMenu.toggle($event); setCurrentTreatmentPlan(treatmentPlans[date],treatmentkey.value)">
                                 </button>
@@ -92,5 +92,7 @@
     <div class="no-treatment-plan-container" *ngIf="getSortedDates().length <= 0">
         <img class="icon" src="assets/no-treatment-plans.png" />
         <h3>No Treatment plans added</h3>
-        <button class="add-treatment-btn" (click)="navigateToAddPage()" >+ Add</button>
+
+        <button class="add-treatment-btn" (click)="navigateToAddPage()">+ Add</button>
     </div>
+

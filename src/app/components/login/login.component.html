@@ -25,160 +25,168 @@
     </div> -->
   </nav>
 </header>
+
 <div class="container">
-<div>
-  <nav class="auth-nav">
+  <div>
+    <nav class="auth-nav">
       <ul class="auth-nav-list">
-          <li class="auth-nav-item">
-              <a (click)="loadForm()" class="auth-nav-link" [ngClass]="{ 'active': isLogin }">Login</a>
-          </li>
+        <li class="auth-nav-item">
+          <a (click)="loadForm()" class="auth-nav-link" [ngClass]="{ 'active': isLogin }">Login</a>
+        </li>
       </ul>
-  </nav>
-</div>
-<div class="login-container">
-  <div class="login-image">
-    <!-- <img src="assets/illustration.webp" alt="Login Image" class="login-image-content" /> -->
+    </nav>
   </div>
-  <div class="login-form" *ngIf="isLogin">
-    <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
-      <div class="form-group">
-        <label for="mobileNumber">Mobile Number</label>
-        <input 
-          type="text"
-          id="mobileNumber" 
-          formControlName="mobileNumber"
-          placeholder="Mobile Number"
-          [ngClass]="{'ng-invalid': loginForm.get('mobileNumber')?.errors?.['invalidMobile'] && loginForm.get('mobileNumber')?.touched}"
-        />
-        <div class="error-message" *ngIf="loginForm.get('mobileNumber')?.errors?.['required'] && loginForm.get('mobileNumber')?.touched">
-          Mobile number is required
-        </div>
-        <div class="error-message" *ngIf="loginForm.get('mobileNumber')?.errors?.['invalidMobile'] && loginForm.get('mobileNumber')?.touched">
-          Please enter a valid mobile number
-        </div>
-      </div>
-    
-      <div class="form-group">
-        <label for="password">Password</label>
-        <div class="password-field">
+
+  <div class="login-container">
+    <div class="login-image">
+      <!-- <img src="assets/illustration.webp" alt="Login Image" class="login-image-content" /> -->
+    </div>
+
+    <!-- Login Form -->
+    <div class="login-form" *ngIf="isLogin">
+      <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
+        <div class="form-group">
+          <label for="mobileNumber">Mobile Number</label>
           <input 
-            [type]="showPassword ? 'text' : 'password'"
-            id="password" 
-            formControlName="password" 
-            placeholder="Password" 
+            type="text"
+            id="mobileNumber" 
+            formControlName="mobileNumber"
+            placeholder="Mobile Number"
+            [ngClass]="{'ng-invalid': loginForm.get('mobileNumber')?.errors?.['invalidMobile'] && loginForm.get('mobileNumber')?.touched}"
           />
-          <button type="button" class="password-toggle" (click)="togglePasswordVisibility()">
-            <img [src]="showPassword ? '/assets/eye-off.svg' : '/assets/eye.svg'" alt="toggle password" />
-          </button>
+          <div class="error-message" *ngIf="loginForm.get('mobileNumber')?.errors?.['required'] && loginForm.get('mobileNumber')?.touched">
+            Mobile number is required
+          </div>
+          <div class="error-message" *ngIf="loginForm.get('mobileNumber')?.errors?.['invalidMobile'] && loginForm.get('mobileNumber')?.touched">
+            Please enter a valid mobile number
+          </div>
         </div>
-        <div class="error-message" *ngIf="loginForm.get('password')?.errors?.['required'] && loginForm.get('password')?.touched">
-          Password is required
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-field">
+            <input 
+              [type]="showPassword ? 'text' : 'password'"
+              id="password" 
+              formControlName="password" 
+              placeholder="Password" 
+            />
+            <button type="button" class="password-toggle" (click)="togglePasswordVisibility()">
+              <img [src]="showPassword ? '/assets/eye-off.svg' : '/assets/eye.svg'" alt="toggle password" />
+            </button>
+          </div>
+          <div class="error-message" *ngIf="loginForm.get('password')?.errors?.['required'] && loginForm.get('password')?.touched">
+            Password is required
+          </div>
         </div>
-      </div>
-      <div *ngIf="otpSent" class="form-group">
-        <label for="otp">OTP</label>
-        <input 
-          type="number" 
-          id="otp" 
-          formControlName="otp" 
-          placeholder="Enter OTP" 
-        />
-      </div>
-    
-      <div class="actions">
-        <div class="remember-me">
-          <input type="checkbox" id="rememberMe" formControlName="rememberMe" />
-          <label for="rememberMe">Remember me for 30 days</label>
+
+        <div *ngIf="otpSent" class="form-group">
+          <label for="otp">OTP</label>
+          <input 
+            type="number" 
+            id="otp" 
+            formControlName="otp" 
+            placeholder="Enter OTP" 
+          />
         </div>
-        <a href="#" class="forgot-password">
-          {{ otpSent ? 'Resend OTP' : 'Forgot password?' }}
-        </a>
-      </div>
-    
-      <div class="actions" *ngIf="!isEmail">
-        <div class="remember-me">
-          <input type="checkbox" id="loginWithOtp" formControlName="loginWithOtp" />
-          <label for="loginWithOtp">Login with OTP instead of password</label>
+
+        <div class="actions">
+          <div class="remember-me">
+            <input type="checkbox" id="rememberMe" formControlName="rememberMe" />
+            <label for="rememberMe">Remember me for 30 days</label>
+          </div>
+          <a href="#" class="forgot-password">
+            {{ otpSent ? 'Resend OTP' : 'Forgot password?' }}
+          </a>
         </div>
-      </div>
-    
-      <button type="submit" class="login-button"
-      [disabled]="loginForm.invalid || (isOtpLogin && !otpSent && loginForm.get('mobileNumber')?.value.includes('@')) || isLoading">
-        <span *ngIf="!isLoading">{{ isOtpLogin ? (otpSent ? 'Verify OTP' : 'Send OTP') : 'Login' }}</span>
-        <div class="loader" *ngIf="isLoading"></div>
-      </button>
-    </form>
-  </div>
-  <div class="login-form" *ngIf="!isLogin">
-    <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="firstName">First Name</label>
-        <input type="text" id="firstName" formControlName="firstName" placeholder="First Name" />
-      </div>
-    
-      <div class="form-group">
-        <label for="lastName">Last Name</label>
-        <input type="text" id="lastName" formControlName="lastName" placeholder="Last Name" />
-      </div>
-    
-      <div class="form-group">
-        <label for="dob">Date of Birth</label>
-        <p-calendar id="dob" 
-            formControlName="dob" 
+
+        <div class="actions" *ngIf="!isEmail">
+          <div class="remember-me">
+            <input type="checkbox" id="loginWithOtp" formControlName="loginWithOtp" />
+            <label for="loginWithOtp">Login with OTP instead of password</label>
+          </div>
+        </div>
+
+        <button type="submit" class="login-button"
+        [disabled]="loginForm.invalid || (isOtpLogin && !otpSent && loginForm.get('mobileNumber')?.value.includes('@')) || isLoading">
+          <span *ngIf="!isLoading">{{ isOtpLogin ? (otpSent ? 'Verify OTP' : 'Send OTP') : 'Login' }}</span>
+          <div class="loader" *ngIf="isLoading"></div>
+        </button>
+      </form>
+    </div>
+
+    <!-- Registration Form -->
+    <div class="login-form" *ngIf="!isLogin">
+      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" formControlName="firstName" placeholder="First Name" />
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" formControlName="lastName" placeholder="Last Name" />
+        </div>
+
+        <div class="form-group">
+          <label for="dob">Date of Birth</label>
+          <p-calendar id="dob"
+            formControlName="dob"
             [maxDate]="maxDate"
             [showIcon]="true"
             dateFormat="dd/mm/yy"
-            [ngClass]="{'invalid-field': registrationForm.get('dob')?.invalid && registrationForm.get('dob')?.touched}"
-            >
-        </p-calendar>
-      </div>
-    
-      <div class="form-group">
-        <label for="gender">Gender</label>
-        <p-dropdown id="gender" 
-                    formControlName="gender"
-                    [options]="genderOptions" 
-                    placeholder="Select Gender"
-                    [ngClass]="{'invalid-field': registrationForm.get('gender')?.invalid && registrationForm.get('gender')?.touched}">
-        </p-dropdown>
-      </div>
-    
-      <div class="form-group">
-        <label for="mobileNumber">Mobile Number</label>
-        <input type="text" id="mobileNumber" formControlName="mobileNumber" placeholder="Mobile Number" />
-      </div>
-    
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" formControlName="email" placeholder="Email" />
-      </div>
-    
-      <div class="form-group">
-        <label for="password">Create Password</label>
-        <input type="password" id="password" formControlName="password" placeholder="Password" />
-      </div>
-    
-      <div class="form-group">
-        <label for="address">Address</label>
-        <input type="text" id="address" formControlName="address" placeholder="Address" />
-      </div>
-      <div class="actions">
-        <div class="remember-me">
-          <input type="checkbox" id="isDoctor" formControlName="isDoctor" />
-          <label for="isDoctor">Are you a doctor?</label>
+            [ngClass]="{'invalid-field': registrationForm.get('dob')?.invalid && registrationForm.get('dob')?.touched}">
+          </p-calendar>
         </div>
-      </div>
-      <div class="actions">
-        <div class="remember-me">
-          <input type="checkbox" id="terms" formControlName="terms" />
-          <label for="terms">Receive relevant offers and promotional communication from Practo</label>
+
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <p-dropdown id="gender"
+            formControlName="gender"
+            [options]="genderOptions"
+            placeholder="Select Gender"
+            [ngClass]="{'invalid-field': registrationForm.get('gender')?.invalid && registrationForm.get('gender')?.touched}">
+          </p-dropdown>
         </div>
-      </div>
-    
-      <button type="submit" class="login-button" [disabled]="registrationForm.invalid">Register</button>
-    </form>
+
+        <div class="form-group">
+          <label for="mobileNumber">Mobile Number</label>
+          <input type="text" id="mobileNumber" formControlName="mobileNumber" placeholder="Mobile Number" />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" formControlName="email" placeholder="Email" />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Create Password</label>
+          <input type="password" id="password" formControlName="password" placeholder="Password" />
+        </div>
+
+        <div class="form-group">
+          <label for="address">Address</label>
+          <input type="text" id="address" formControlName="address" placeholder="Address" />
+        </div>
+
+        <div class="actions">
+          <div class="remember-me">
+            <input type="checkbox" id="isDoctor" formControlName="isDoctor" />
+            <label for="isDoctor">Are you a doctor?</label>
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="remember-me">
+            <input type="checkbox" id="terms" formControlName="terms" />
+            <label for="terms">Receive relevant offers and promotional communication from Practo</label>
+          </div>
+        </div>
+
+        <button type="submit" class="login-button" [disabled]="registrationForm.invalid">Register</button>
+      </form>
+    </div>
   </div>
-</div>
 </div>
 
 <p-toast position="top-right"></p-toast>

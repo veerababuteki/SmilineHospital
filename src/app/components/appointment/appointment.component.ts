@@ -37,8 +37,11 @@ import { LoaderService } from '../../services/loader.service';
     RadioButtonModule,
     ReactiveFormsModule,
     CommonModule,
-    MessagesModule
-  ]
+
+    MessagesModule,
+    ToastModule
+  ],
+  providers: [MessageService]
 })
 export class AppointmentComponent implements OnInit {
   activeTab: 'appointment' | 'reminder' | 'blockCalendar' = 'appointment';
@@ -54,8 +57,12 @@ export class AppointmentComponent implements OnInit {
     { label: '3 Hrs', value: 180 },
     { label: '4 Hrs', value: 240 },
     { label: '5 Hrs', value: 300 }
+
   ];  
   bookingTypes: string[] = ['offline', 'online'];
+
+  ];
+
   status: string[] = ["Scheduled", "Completed", "Canceled", "Rescheduled"];
   appointmentStatus: string[] = ['None', 'Waiting', 'Engaged', 'Done'];
   showScheduleWarning: boolean = false;
@@ -114,7 +121,7 @@ export class AppointmentComponent implements OnInit {
   validateTimeRange() {
     const startTime = this.blockCalendarForm.get('startTime')?.value;
     const endTime = this.blockCalendarForm.get('endTime')?.value;
-    
+
     if (startTime && endTime) {
       this.showScheduleWarning = startTime >= endTime;
     }
@@ -187,18 +194,18 @@ export class AppointmentComponent implements OnInit {
         appointmentStatus:[{ value: 'None', disabled: !this.editAppointment }],
       });
     }
-    
+
   }
   convertTo24Hour(time12h: string): string {
     const [time, modifier] = time12h.split(' '); // Split time and AM/PM
     let [hours, minutes] = time.split(':').map(Number); // Extract hours and minutes
-  
+
     if (modifier === 'PM' && hours !== 12) {
       hours += 12; // Convert PM hours (except 12 PM)
     } else if (modifier === 'AM' && hours === 12) {
       hours = 0; // Convert 12 AM to 00
     }
-  
+
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
   showDialog(isEdit: boolean = false) {
@@ -255,7 +262,7 @@ export class AppointmentComponent implements OnInit {
   }
   selectPatient(patient: any) {
     this.patient = patient;
-    
+
     // Check which data structure we're dealing with
     if (patient.profile) {
       // First data structure
@@ -272,7 +279,7 @@ export class AppointmentComponent implements OnInit {
         emailId: patient.email
       });
     }
-    
+
     this.showPatientDropdown = false;
   }
   cancelAppointment(){
@@ -346,4 +353,24 @@ export class AppointmentComponent implements OnInit {
     this.display = false;
     this.closeDialog.emit({isOpenPatientDialog:true});
   }
-}
+
+
+
+
+  onReminderSubmit() {
+    if (this.blockCalendarForm.valid) {
+      const value = this.blockCalendarForm.value;
+      // Add your reminder submission logic here
+      this.messageService.add({severity:'success', summary: 'Success', detail: 'Reminder created successfully'});
+      this.display = false;
+    } else {
+      this.messageService.add({severity:'error', summary: 'Validation Error', detail: 'Please fill all required fields'});
+      Object.keys(this.blockCalendarForm.controls).forEach(key => {
+        const control = this.blockCalendarForm.get(key);
+        if (control?.invalid) {
+          control.markAsTouched();
+        }
+      });
+    }
+  }
+

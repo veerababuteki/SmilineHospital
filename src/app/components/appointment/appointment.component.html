@@ -1,12 +1,13 @@
-<p-dialog 
-  [(visible)]="display" 
-  [modal]="true" 
-  [style]="{width: '800px'}" 
-  [draggable]="false" 
+<p-toast position="top-right"></p-toast>
+<p-dialog
+  [(visible)]="display"
+  [modal]="true"
+  [style]="{width: '800px'}"
+  [draggable]="false"
   [resizable]="false"
   styleClass="appointment-dialog"
   >
-  
+
   <div class="appointment-form">
     <!-- Tabs -->
     <div class="tab-container">
@@ -30,9 +31,9 @@
             <li *ngFor="let patient of multiplePatients" class="patient-item" (click)="selectPatient(patient)">
               <div class="patient-info">
                 <span class="patient-name">
-                  {{ patient.profile ? 
-                    (patient.profile.first_name + ' ' + patient.profile.last_name) : 
-                    (patient.user_profile_details[0].first_name + ' ' + patient.user_profile_details[0].last_name) 
+                  {{ patient.profile ?
+                    (patient.profile.first_name + ' ' + patient.profile.last_name) :
+                    (patient.user_profile_details[0].first_name + ' ' + patient.user_profile_details[0].last_name)
                   }}
                 </span>
                 <span class="patient-mobile">{{ patient.phone }}</span>
@@ -47,7 +48,7 @@
           <button type="button" class="add-paitent-btn" pButton (click)="openPatientDialog()">+ Add patient</button>
         </div>
       </div>
-    
+
       <div class="two-column-grid">
         <div class="column">
           <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
@@ -73,12 +74,12 @@
           </div>
           <div class="form-row">
             <label>Doctor</label>
-            <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
+            <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name"
                        [style]="{'width':'100%'}" [placeholder]="'Select Doctor'"
                        [filter]="true" filterBy="name"></p-dropdown>
           </div>
         </div>
-    
+
         <div class="column">
           <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
             <label>Email ID</label>
@@ -92,14 +93,14 @@
           </div>
           <div class="form-row">
             <label>Category</label>
-            <p-dropdown formControlName="category" [options]="categories" optionLabel="name" 
+            <p-dropdown formControlName="category" [options]="categories" optionLabel="name"
                        placeholder="Select Category" [style]="{'width':'100%'}"
                        [filter]="true" filterBy="name" [ngClass]="{'ng-invalid': appointmentForm.get('category')?.invalid && appointmentForm.get('category')?.touched}"></p-dropdown>
             <small class="error-message" *ngIf="appointmentForm.get('category')?.invalid && appointmentForm.get('category')?.touched">Category is required</small>
           </div>
         </div>
       </div>
-    
+
       <div class="form-row schedule-row">
         <label class="required">Scheduled On</label>
         <div class="schedule-inputs">
@@ -149,12 +150,12 @@
 
       <div class="form-row" style="width: 100%;">
         <label class="required-label">Doctor</label>
-        <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
+        <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name"
              [style]="{'width':'100%'}" styleClass="bordered-dropdown"
              placeholder="All Doctors" [filter]="true" filterBy="name"></p-dropdown>
         </div>
       </div>
-      
+
 
       <!-- Block Type -->
       <div class="form-row block-type-row">
@@ -214,13 +215,15 @@
         <div class="form-row" style="width: 100%;">
         <label class="required-label">Reminder Title</label>
         <input type="text" pInputText formControlName="leaveDetails" class="bordered-input">
-      </div>
-
-      <div class="form-row" style="width: 100%;">
-        <label class="required-label">Doctor</label>
-        <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
-             [style]="{'width':'100%'}" styleClass="bordered-dropdown"
-             placeholder="All Doctors" [filter]="true" filterBy="name"></p-dropdown>
+      </div
+        <div class="form-row" style="width: 100%;">
+          <label class="required-label">Doctor</label>
+          <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name"
+               [style]="{'width':'100%'}" styleClass="bordered-dropdown"
+               placeholder="All Doctors" [filter]="true" filterBy="name"></p-dropdown>
+          <small class="error-message" *ngIf="blockCalendarForm.get('doctor')?.invalid && blockCalendarForm.get('doctor')?.touched">
+            Doctor is required
+          </small>
         </div>
       </div>
       
