@@ -36,6 +36,9 @@
             font-size: 13px;
             font-weight: 600;
         }
+        .mark-btn-active{
+          font-weight: 600;
+        }
     }
 
     .appointment-date {
@@ -60,49 +63,49 @@
                 border-bottom: 1px solid #e0e0e0;
                 font-size: 14px;
             }
-    
+
             th {
                 color: #666;
                 font-weight: 500;
                 font-size: 12px;
                 white-space: nowrap;
             }
-    
+
             .checkbox-col {
                 width: 40px;
                 text-align: center;
             }
-    
+
             .procedure-checkbox {
                 width: 16px;
                 height: 16px;
                 cursor: pointer;
             }
-    
+
             .procedure-col {
                 min-width: 150px;
             }
-    
+
             .cost-col, .discount-col, .total-col {
                 min-width: 100px;
                 text-align: center;
             }
-    
+
             .amount {
                 color: #333;
                 font-family: monospace;
                 text-align: center;
             }
-    
+
             .discount {
                 color: #666;
                 text-align: center;
             }
-    
+
             .notes-col {
                 min-width: 120px;
             }
-    
+
             .teeth-number {
                 background-color: #f0f0f0;
                 padding: 2px 6px;
@@ -124,7 +127,7 @@
                     font-weight: bold;
                 }
             }
-    
+
             .actions {
                 text-align: right;
                 .edit-btn {
@@ -137,7 +140,7 @@
                     &:hover {
                         color: #333;
                     }
-    
+
                     i {
                         font-size: 16px;
                     }
@@ -148,18 +151,18 @@
                     color: #666;
                     cursor: pointer;
                     padding: 4px 8px;
-    
+
                     &:hover {
                         color: #333;
                     }
-    
+
                     i {
                         font-size: 12px;
                     }
                 }
             }
         }
-    
+
         .plan-footer {
             display: flex;
             justify-content: space-between;
@@ -171,16 +174,16 @@
             border-left: 3px solid;
             .planned-by {
                 color: #666;
-    
+
                 .doctor-name {
                     color: #333;
                     font-weight: 500;
                 }
             }
-    
+
             .estimated-amount {
                 color: #666;
-    
+
                 .amount {
                     color: #333;
                     font-weight: 500;
@@ -189,7 +192,7 @@
             }
         }
     }
-    
+
 }
 .border-left-radius{
     border-radius: 5px 0px 0px 5px;
@@ -238,12 +241,12 @@ tbody{
     .hide-on-print {
       display: none !important;
     }
-    
+
     /* Add other print-specific styles as needed */
     table {
       width: 100%;
     }
-    
+
     /* Make sure the table still looks good when columns are hidden */
     .procedures-table {
       page-break-inside: avoid;
