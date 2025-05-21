@@ -20,6 +20,8 @@ import { Message } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { LoaderService } from '../../services/loader.service';
 
+
+
 @Component({
   selector: 'app-appointment',
   templateUrl: './appointment.component.html',
@@ -329,9 +331,10 @@ export class AppointmentComponent implements OnInit {
         });
       }
     } else {
+      // Mark all fields as touched to trigger validation messages
       Object.keys(this.appointmentForm.controls).forEach(key => {
         const control = this.appointmentForm.get(key);
-        if (control?.invalid) {
+        if (control) {
           control.markAsTouched();
         }
       });

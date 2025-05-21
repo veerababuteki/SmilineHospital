@@ -23,7 +23,6 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 13px;
-            font-weight: 600;
         }
         .mark-btn{
             background-color: #f5f5f5;
@@ -215,7 +214,11 @@
                                     .doctor-name {
                                         color: #2196f3;
                                         font-weight: 500;
-                                        
+                                        img{
+                                            width: 300px;
+                                            max-width: 100%;
+                                            height: fit-content;
+                                        }
                                     }
         
                                     .invoice-info {

@@ -19,9 +19,10 @@
       <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
         <label class="required">Patient ID or Mobile Number</label>
         <div class="input-with-button">
-          <input type="text" pInputText formControlName="patientId" placeholder="Enter Patient ID or Mobile Number">
+          <input type="text" pInputText formControlName="patientId" placeholder="Enter Patient ID or Mobile Number" [ngClass]="{'ng-invalid': appointmentForm.get('patientId')?.invalid && appointmentForm.get('patientId')?.touched}">
           <button type="button" pButton label="Get Patient Details" (click)="getPatientDetails()"></button>
         </div>
+        <small class="error-message" *ngIf="appointmentForm.get('patientId')?.invalid && appointmentForm.get('patientId')?.touched">Patient ID or Mobile Number is required</small>
         <!-- Multiple patients dropdown -->
         <div class="patient-dropdown-container" *ngIf="showPatientDropdown">
           <p class="multiple-patients-message">Multiple patients found. Please select one:</p>
@@ -51,16 +52,19 @@
         <div class="column">
           <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
             <label class="required">Patient Name</label>
-            <input type="text" pInputText formControlName="patientName" placeholder="Enter Patient Name" readonly>
+            <input type="text" pInputText formControlName="patientName" placeholder="Enter Patient Name" readonly [ngClass]="{'ng-invalid': appointmentForm.get('patientName')?.invalid && appointmentForm.get('patientName')?.touched}">
+            <small class="error-message" *ngIf="appointmentForm.get('patientName')?.invalid && appointmentForm.get('patientName')?.touched">Patient Name is required</small>
           </div>
           <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
             <label class="required">Mobile Number</label>
-            <input type="text" pInputText formControlName="mobileNumber" placeholder="Enter Mobile Number" readonly>
+            <input type="text" pInputText formControlName="mobileNumber" placeholder="Enter Mobile Number" readonly [ngClass]="{'ng-invalid': appointmentForm.get('mobileNumber')?.invalid && appointmentForm.get('mobileNumber')?.touched}">
+            <small class="error-message" *ngIf="appointmentForm.get('mobileNumber')?.invalid && appointmentForm.get('mobileNumber')?.touched">Mobile Number is required</small>
           </div>
           <div class="form-row">
             <label class="required">Booking Type</label>
             <p-dropdown formControlName="bookingType" [options]="bookingTypes"
-            [style]="{'width':'100%'}" [placeholder]="'Select Booking Type'"></p-dropdown>
+            [style]="{'width':'100%'}" [placeholder]="'Select Booking Type'" [ngClass]="{'ng-invalid': appointmentForm.get('bookingType')?.invalid && appointmentForm.get('bookingType')?.touched}"></p-dropdown>
+            <small class="error-message" *ngIf="appointmentForm.get('bookingType')?.invalid && appointmentForm.get('bookingType')?.touched">Booking Type is required</small>
           </div>
           <div class="form-row">
             <label>Appointment Status</label>
@@ -83,13 +87,15 @@
           <div class="form-row">
             <label class="required">Status</label>
             <p-dropdown formControlName="status" [options]="status"
-                       [style]="{'width':'100%'}" [placeholder]="''"></p-dropdown>
+                       [style]="{'width':'100%'}" [placeholder]="''" [ngClass]="{'ng-invalid': appointmentForm.get('status')?.invalid && appointmentForm.get('status')?.touched}"></p-dropdown>
+            <small class="error-message" *ngIf="appointmentForm.get('status')?.invalid && appointmentForm.get('status')?.touched">Status is required</small>
           </div>
           <div class="form-row">
             <label>Category</label>
             <p-dropdown formControlName="category" [options]="categories" optionLabel="name" 
                        placeholder="Select Category" [style]="{'width':'100%'}"
-                       [filter]="true" filterBy="name"></p-dropdown>
+                       [filter]="true" filterBy="name" [ngClass]="{'ng-invalid': appointmentForm.get('category')?.invalid && appointmentForm.get('category')?.touched}"></p-dropdown>
+            <small class="error-message" *ngIf="appointmentForm.get('category')?.invalid && appointmentForm.get('category')?.touched">Category is required</small>
           </div>
         </div>
       </div>
@@ -97,17 +103,20 @@
       <div class="form-row schedule-row">
         <label class="required">Scheduled On</label>
         <div class="schedule-inputs">
-          <p-calendar formControlName="scheduledDate" [showIcon]="true" dateFormat="dd-mm-yy" appendTo="body"></p-calendar>
+          <p-calendar formControlName="scheduledDate" [showIcon]="true" dateFormat="dd-mm-yy" appendTo="body" [ngClass]="{'ng-invalid': appointmentForm.get('scheduledDate')?.invalid && appointmentForm.get('scheduledDate')?.touched}"></p-calendar>
           <span>at</span>
-          <p-calendar formControlName="scheduledTime" [timeOnly]="true" [showIcon]="false" hourFormat="12"></p-calendar>
+          <p-calendar formControlName="scheduledTime" [timeOnly]="true" [showIcon]="false" hourFormat="12" [ngClass]="{'ng-invalid': appointmentForm.get('scheduledTime')?.invalid && appointmentForm.get('scheduledTime')?.touched}"></p-calendar>
           <span>for</span>
           <p-dropdown formControlName="duration"
                       [options]="durations"
                       optionLabel="label"
                       optionValue="value"
-                      [style]="{'width':'120px'}">
+                      [style]="{'width':'120px'}"
+                      [ngClass]="{'ng-invalid': appointmentForm.get('duration')?.invalid && appointmentForm.get('duration')?.touched}">
           </p-dropdown>
         </div>
+        <small class="error-message" *ngIf="appointmentForm.get('scheduledDate')?.invalid && appointmentForm.get('scheduledDate')?.touched">Scheduled Date is required</small>
+        <small class="error-message" *ngIf="appointmentForm.get('scheduledTime')?.invalid && appointmentForm.get('scheduledTime')?.touched">Scheduled Time is required</small>
       </div>
 
       <div class="form-row">
