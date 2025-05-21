@@ -29,14 +29,14 @@
 
       .save-btn {
         padding: 6px 12px;
-        background: #4CAF50;
+        background: #007bff;
         color: white;
         border: none;
         border-radius: 3px;
         cursor: pointer;
-        
+
         &:disabled {
-          background-color: #a5d6a7;
+          background-color: #007bff;
           cursor: not-allowed;
         }
       }
@@ -50,24 +50,24 @@
 
   .payment-form-section {
     flex: 1;
-    
+
     .yellow-section {
       background-color: #FFFDE7;
       padding: 15px;
       border: 1px solid #FFF59D;
       margin-bottom: 15px;
-      
+
       .payment-row {
         display: flex;
         align-items: center;
         margin-bottom: 15px;
-        
+
         .pay-now-label {
           font-weight: bold;
           margin-right: 10px;
           width: 100px;
         }
-        
+
         .amount-input {
           padding: 5px;
           width: 150px;
@@ -75,13 +75,13 @@
           border: 1px solid #ddd;
           border-radius: 3px;
         }
-        
+
         .pay-now-amount {
           font-weight: bold;
           min-width: 150px;
           margin-right: 10px;
         }
-        
+
         .payment-method-select {
           padding: 5px;
           width: 150px;
@@ -89,28 +89,28 @@
           border-radius: 3px;
         }
       }
-      
+
       .bank-number-row {
         display: flex;
         margin-bottom: 15px;
-        
+
         .bank-field, .number-field {
           display: flex;
           flex-direction: column;
           margin-right: 20px;
           width: 150px;
-          
+
           label {
             font-size: 0.9em;
             margin-bottom: 5px;
           }
-          
+
           input {
             padding: 5px;
             border: 1px solid #ddd;
             border-radius: 3px;
           }
-          
+
           .error-message {
             color: #F44336;
             font-size: 0.8em;
@@ -118,17 +118,17 @@
           }
         }
       }
-      
+
       .advance-payment-note {
         color: #F57F17;
         font-size: 0.9em;
       }
     }
-    
+
     /* Selected invoices section */
     .selected-invoices {
       margin-bottom: 15px;
-      
+
       .selected-invoices-header {
         margin-bottom: 15px;
         display: flex;
@@ -140,16 +140,16 @@
           color: #333;
         }
       }
-      
+
       .invoice-summary-table {
         width: 100%;
         margin-bottom: 15px;
         overflow-x: auto;
-        
+
         table {
           width: 100%;
           border-collapse: collapse;
-          
+
           th, td {
             padding: 8px;
             text-align: left;
@@ -157,20 +157,20 @@
             font-size: 14px;
             vertical-align: top;
           }
-          
+
           th {
             background-color: #f8f8f8;
             font-weight: 500;
             color: #666;
           }
-          
+
           .payment-input {
             width: 80px;
             padding: 5px;
             border: 1px solid #ddd;
             border-radius: 3px;
           }
-          
+
           .remove-btn {
             color: #ff4444;
             border: none;
@@ -179,64 +179,64 @@
             cursor: pointer;
             padding: 0 5px;
           }
-          
+
           tr.first-row td {
             border-top: 2px solid #2196F3;
           }
         }
       }
     }
-    
+
     /* Totals Section */
     .totals-section {
       background: #f8f8f8;
       padding: 12px;
       border: 1px solid #ddd;
       margin-bottom: 15px;
-      
+
       .totals-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 5px 0;
-        
+
         .summary-label {
           font-size: 14px;
           color: #333;
         }
-        
+
         .amount {
           font-weight: 500;
-          
+
           &.green {
             color: #4CAF50;
           }
         }
       }
     }
-    
+
     .payment-action {
       margin-bottom: 15px;
-      
+
       .payment-mode-toggle {
         text-align: right;
         margin-top: 10px;
-        
+
         a {
           color: #2196F3;
           text-decoration: none;
-          
+
           &:hover {
             text-decoration: underline;
           }
         }
       }
     }
-    
+
     /* Notes Section */
     .notes-section {
       margin: 15px 0;
-      
+
       .notes-toggle-btn {
         background: none;
         border: none;
@@ -246,10 +246,10 @@
         padding: 0;
         font-size: 14px;
       }
-      
+
       .notes-input-container {
         margin-top: 10px;
-        
+
         .notes-input {
           width: 100%;
           padding: 8px;
@@ -257,15 +257,16 @@
           border-radius: 4px;
           min-height: 80px;
           resize: vertical;
+          font-size: 14px;
         }
       }
     }
-    
+
     /* Info text */
     .info-text-container {
       margin: 15px 0;
       text-align: center;
-      
+
       .info-text {
         background-color: #E8F5E9;
         padding: 10px;
@@ -275,40 +276,40 @@
         border-radius: 4px;
       }
     }
-    
+
     /* Date footer */
     .date-footer {
       margin-top: 15px;
       padding: 10px 0;
       border-top: 1px solid #eee;
       font-size: 14px;
-      
+
       .received-label {
         font-weight: 500;
         margin-right: 5px;
       }
-      
+
       .date-value {
         margin-right: 10px;
       }
-      
+
       .change-link {
         color: #2196F3;
         text-decoration: none;
-        
+
         &:hover {
           text-decoration: underline;
         }
       }
     }
   }
-  
+
   /* Invoice section */
   .invoice-section {
     width: 300px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    
+
     .procedures-header {
       display: flex;
       justify-content: space-between;
@@ -319,28 +320,28 @@
       font-weight: 500;
       color: #333;
     }
-    
+
     .search-container {
       padding: 12px;
       border-bottom: 1px solid #ddd;
-      
+
       .search-input {
         width: 100%;
         padding: 6px 10px;
         border: 1px solid #ddd;
         border-radius: 3px;
         font-size: 14px;
-        
+
         &::placeholder {
           color: #999;
         }
       }
     }
-    
+
     .procedures-list {
       max-height: calc(100vh - 250px);
       overflow-y: auto;
-      
+
       .procedure-item {
         display: flex;
         justify-content: space-between;
@@ -349,46 +350,46 @@
         font-size: 14px;
         color: #333;
         cursor: pointer;
-        
+
         &:hover {
           background: #f5f5f5;
         }
-        
+
         &.selected {
           background-color: #E3F2FD;
           border-left: 3px solid #2196F3;
         }
-        
+
         .invoice-id {
           font-weight: 500;
           color: #2196F3;
         }
-        
+
         .invoice-date {
           display: block;
           font-size: 12px;
           color: #757575;
           margin-top: 3px;
         }
-        
+
         .price {
           color: #666;
           font-weight: 500;
         }
       }
     }
-    
+
     .no-procedures {
       padding: 20px;
       text-align: center;
       color: #757575;
-      
+
       .add-invoice-link {
         display: block;
         margin-top: 10px;
         color: #2196F3;
         text-decoration: none;
-        
+
         &:hover {
           text-decoration: underline;
         }
@@ -413,7 +414,7 @@
   .payment-container {
     .main-content {
       flex-direction: column;
-      
+
       .invoice-section {
         width: 100%;
         margin-top: 15px;
@@ -428,26 +429,26 @@
       .payment-row, .bank-number-row {
         flex-direction: column;
         align-items: flex-start;
-        
+
         .pay-now-label {
           margin-bottom: 5px;
         }
-        
+
         .amount-input, .payment-method-select {
           width: 100%;
           margin-bottom: 10px;
         }
-        
+
         .bank-field, .number-field {
           width: 100%;
           margin-bottom: 10px;
         }
       }
     }
-    
+
     .invoice-summary-table {
       overflow-x: auto;
-      
+
       table {
         min-width: 600px;
       }
@@ -507,11 +508,11 @@
   padding: 16px;
   border-bottom: 1px solid #e1e5eb;
   cursor: pointer;
-  
+
   &:hover {
     background-color: #f8f9fa;
   }
-  
+
   &.selected {
     background-color: #e8f4fe;
     border-left: 3px solid #007bff;
@@ -564,7 +565,7 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 2px;
-  
+
   &.amount-due {
     margin-top: 4px;
     font-weight: 600;
@@ -574,7 +575,7 @@
 .amount-value {
   min-width: 70px;
   text-align: right;
-  
+
   &.due {
     color: #28a745;
   }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { CalendarModule } from 'primeng/calendar';
 import { DropdownModule } from 'primeng/dropdown';
@@ -23,7 +23,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   styleUrl: './login.component.scss',
   providers:[AuthService, MessageService]
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 loginForm!: FormGroup;
 registrationForm!: FormGroup;
   genderOptions = [
@@ -35,6 +35,7 @@ registrationForm!: FormGroup;
   isEmail = false;
   isOtpLogin = false;
   otpSent = false;
+  showPassword: boolean = false;
 
   constructor(private formBuilder: FormBuilder,
     private authService: AuthService, 
@@ -43,7 +44,7 @@ registrationForm!: FormGroup;
     this.maxDate.setFullYear(this.maxDate.getFullYear()); // Set minimum age to 18
   }
   loadForm(){
-    this.isLogin = !this.isLogin;
+    // this.isLogin = !this.isLogin;
   }
   initializeLoginForm(){
     
@@ -185,4 +186,8 @@ registrationForm!: FormGroup;
     const mobileRegex = /^[6-9]\d{9}$/;
     return mobileRegex.test(value) ? null : { invalidMobile: true };
    }
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
 }

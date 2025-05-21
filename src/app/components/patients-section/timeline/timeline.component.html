@@ -14,7 +14,7 @@
             <!-- Left Sidebar -->
             <div class="filter-sidebar">
                 <div class="filter-header">
-                    <h3>Types</h3>
+                    <h3 class="filter-title">Types</h3>
                     <div class="filter-actions">
                         <a class="action-link" (click)="deselectAll()">De-select All</a>
                         <a class="action-link" *ngIf="!areAllSelected()" (click)="selectAll()">| Select All</a>
@@ -51,16 +51,16 @@
                     </label>
                     <label class="filter-option">
                         <input type="checkbox" [(ngModel)]="filterTypes.Payment" (change)="applyFilters()">
-                        <span>Payments</span>
+                        <span>Payment</span>
                     </label>
                 </div>
             </div>
-        
+
             <div class="timeline-area">
                 <div *ngIf="!hasEvents()">
                     No events to display. Try adjusting your filters.
                 </div>
-                
+
                 <div class="events-container" *ngFor="let date of getSortedDates()">
                     <div class="date-header">
                         <div class="date-main">{{ date | date: 'dd' }}</div>
@@ -69,7 +69,7 @@
                             <div class="date-day">{{ date | date: 'EEEE' }}</div>
                         </div>
                     </div>
-        
+
                     <div class="events-list">
                         <!-- Event items -->
                         <div class="event-item" *ngFor="let item of timeline[date]">

@@ -1,13 +1,15 @@
-<p-dialog 
-  [(visible)]="display" 
-  [modal]="true" 
-  [style]="{width: '800px'}" 
-  [draggable]="false" 
+<p-toast position="top-right"></p-toast>
+<p-dialog
+  [(visible)]="display"
+  [modal]="true"
+  [style]="{width: '800px'}"
+  [draggable]="false"
   [resizable]="false"
   styleClass="appointment-dialog"
   >
-  
+
   <div class="appointment-form">
+    <p-messages></p-messages>
     <!-- Tabs -->
     <div class="tab-container">
       <div class="tab" [class.active]="activeTab === 'appointment'" (click)="setActiveTab('appointment')">Appointment</div>
@@ -29,9 +31,9 @@
             <li *ngFor="let patient of multiplePatients" class="patient-item" (click)="selectPatient(patient)">
               <div class="patient-info">
                 <span class="patient-name">
-                  {{ patient.profile ? 
-                    (patient.profile.first_name + ' ' + patient.profile.last_name) : 
-                    (patient.user_profile_details[0].first_name + ' ' + patient.user_profile_details[0].last_name) 
+                  {{ patient.profile ?
+                    (patient.profile.first_name + ' ' + patient.profile.last_name) :
+                    (patient.user_profile_details[0].first_name + ' ' + patient.user_profile_details[0].last_name)
                   }}
                 </span>
                 <span class="patient-mobile">{{ patient.phone }}</span>
@@ -46,7 +48,7 @@
           <button type="button" class="add-paitent-btn" pButton (click)="openPatientDialog()">+ Add patient</button>
         </div>
       </div>
-    
+
       <div class="two-column-grid">
         <div class="column">
           <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
@@ -69,12 +71,12 @@
           </div>
           <div class="form-row">
             <label>Doctor</label>
-            <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
+            <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name"
                        [style]="{'width':'100%'}" [placeholder]="'Select Doctor'"
                        [filter]="true" filterBy="name"></p-dropdown>
           </div>
         </div>
-    
+
         <div class="column">
           <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
             <label>Email ID</label>
@@ -87,13 +89,13 @@
           </div>
           <div class="form-row">
             <label>Category</label>
-            <p-dropdown formControlName="category" [options]="categories" optionLabel="name" 
+            <p-dropdown formControlName="category" [options]="categories" optionLabel="name"
                        placeholder="Select Category" [style]="{'width':'100%'}"
                        [filter]="true" filterBy="name"></p-dropdown>
           </div>
         </div>
       </div>
-    
+
       <div class="form-row schedule-row">
         <label class="required">Scheduled On</label>
         <div class="schedule-inputs">
@@ -140,12 +142,12 @@
 
       <div class="form-row" style="width: 100%;">
         <label class="required-label">Doctor</label>
-        <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
+        <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name"
              [style]="{'width':'100%'}" styleClass="bordered-dropdown"
              placeholder="All Doctors" [filter]="true" filterBy="name"></p-dropdown>
         </div>
       </div>
-      
+
 
       <!-- Block Type -->
       <div class="form-row block-type-row">
@@ -195,7 +197,7 @@
         <button type="submit" pButton label="Save" class="p-button-primary"></button>
       </div>
     </form>
-    <form *ngIf="activeTab === 'reminder'" [formGroup]="blockCalendarForm" (ngSubmit)="onBlockCalendarSubmit()" class="form-content">
+    <form *ngIf="activeTab === 'reminder'" [formGroup]="blockCalendarForm" (ngSubmit)="onReminderSubmit()" class="form-content">
       <!-- Info Message -->
       <div class="info-message">
         <i class="pi pi-info-circle"></i>
@@ -203,18 +205,23 @@
       </div>
       <div style="display: flex; gap: 50px;">
         <div class="form-row" style="width: 100%;">
-        <label class="required-label">Reminder Title</label>
-        <input type="text" pInputText formControlName="leaveDetails" class="bordered-input">
-      </div>
+          <label class="required-label">Reminder Title</label>
+          <input type="text" pInputText formControlName="leaveDetails" class="bordered-input">
+          <small class="error-message" *ngIf="blockCalendarForm.get('leaveDetails')?.invalid && blockCalendarForm.get('leaveDetails')?.touched">
+            Reminder title is required
+          </small>
+        </div>
 
-      <div class="form-row" style="width: 100%;">
-        <label class="required-label">Doctor</label>
-        <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
-             [style]="{'width':'100%'}" styleClass="bordered-dropdown"
-             placeholder="All Doctors" [filter]="true" filterBy="name"></p-dropdown>
+        <div class="form-row" style="width: 100%;">
+          <label class="required-label">Doctor</label>
+          <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name"
+               [style]="{'width':'100%'}" styleClass="bordered-dropdown"
+               placeholder="All Doctors" [filter]="true" filterBy="name"></p-dropdown>
+          <small class="error-message" *ngIf="blockCalendarForm.get('doctor')?.invalid && blockCalendarForm.get('doctor')?.touched">
+            Doctor is required
+          </small>
         </div>
       </div>
-      
 
       <!-- Block Type -->
       <div class="form-row block-type-row">
@@ -226,6 +233,9 @@
           <input type="radio" formControlName="blockType" value="blockSlot" id="blockSlot">
           <label for="blockSlot" class="radio-label">Custom</label>
         </div>
+        <small class="error-message" *ngIf="blockCalendarForm.get('blockType')?.invalid && blockCalendarForm.get('blockType')?.touched">
+          Please select a reminder type
+        </small>
       </div>
 
       <!-- Duration -->
@@ -235,6 +245,12 @@
           <p-calendar formControlName="date" [showIcon]="true" dateFormat="dd-mm-yy"></p-calendar>
           <p-calendar formControlName="startTime" [timeOnly]="true" [showIcon]="false" hourFormat="12"></p-calendar>
         </div>
+        <small class="error-message" *ngIf="blockCalendarForm.get('date')?.invalid && blockCalendarForm.get('date')?.touched">
+          Date is required
+        </small>
+        <small class="error-message" *ngIf="blockCalendarForm.get('startTime')?.invalid && blockCalendarForm.get('startTime')?.touched">
+          Time is required
+        </small>
       </div>
       <div class="button-row">
         <button type="button" pButton label="Cancel" class="p-button-secondary"></button>

@@ -6,7 +6,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { ButtonModule } from 'primeng/button';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { MessageService } from '../../../services/message.service';
+import { MessageService as CustomMessageService } from '../../../services/message.service';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextareaModule } from 'primeng/inputtextarea';
@@ -14,6 +14,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../../../services/user.service';
 import { first } from 'rxjs';
 import { ClinicalNotesService } from '../../../services/clinical-notes.service';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+
 interface ConditionControls {
     [key: string]: boolean[];
   }
@@ -22,7 +25,9 @@ interface ConditionControls {
   templateUrl: './edit-profile.component.html',
   styleUrls: ['./edit-profile.component.scss'],
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
     InputTextModule,
     ButtonModule,
     RadioButtonModule,
@@ -30,8 +35,10 @@ interface ConditionControls {
     DropdownModule,
     CheckboxModule,
     InputTextareaModule,
-    FormsModule
-  ]
+    FormsModule,
+    ToastModule
+  ],
+  providers: [MessageService]
 })
 export class EditProfileComponent implements OnInit {
   uniqueCode: string | null | undefined;
@@ -49,18 +56,18 @@ export class EditProfileComponent implements OnInit {
   formValid: boolean = false;
 
   ngOnInit(): void {
-    
+
     this.initiateForm()
     this.patientForm.statusChanges.subscribe(() => {
       this.checkFormValidity();
     });
-    
+
     // Initial validity check
     this.checkFormValidity();
     this.maxDate = new Date();
     const dateOfBirthControl = this.patientForm.get('dateOfBirth');
   const ageControl = this.patientForm.get('age');
-  
+
   if (dateOfBirthControl && ageControl) {
     dateOfBirthControl.valueChanges.subscribe(date => {
       if (date) {
@@ -75,36 +82,36 @@ export class EditProfileComponent implements OnInit {
     if(this.patientId == null) {
       this.patientId = params.get('id');
     }
-    
-  });  
+
+  });
     this.route.paramMap.subscribe(params => {
       if(this.uniqueCode == null) {
         this.uniqueCode = params.get('source');
       }
       if(this.uniqueCode){
         this.loadPatientData(this.uniqueCode)
-        this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
+        this.customMessageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
       }
-      
+
     });
   }
   checkFormValidity(): void {
     // Check if patient form is valid (which includes all required fields)
     this.formValid = this.patientForm.valid;
-    
+
     // You can add additional custom validation logic here if needed
     // For example, checking if at least one medical condition is selected
-    
+
     // Optional: Display validation errors or messages
     if (!this.formValid && this.patientForm.touched) {
       this.highlightInvalidFields();
     }
   }
-  
+
   // Helper method to identify and highlight invalid fields (optional)
   highlightInvalidFields(): void {
     const controls = this.patientForm.controls;
-    
+
     for (const name in controls) {
       if (controls[name].invalid) {
         // You could use this to show specific error messages or highlight fields
@@ -117,11 +124,11 @@ export class EditProfileComponent implements OnInit {
     const birthDate = new Date(dateOfBirth);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    
+
     return age;
   }
 
@@ -156,7 +163,7 @@ export class EditProfileComponent implements OnInit {
           const his = this.patientDetails.medical_history.find((c: any) => c.id == condition.id);
           conditionControls[condition.id] =  his !== undefined ? [true] : [false];
         });
-    
+
         this.medicalHistoryForm = this.fb.group({
           searchHistory: [''],
           otherHistory: [this.patientDetails.other_history],
@@ -171,12 +178,12 @@ export class EditProfileComponent implements OnInit {
       this.userService.getInsuranceGroups().subscribe(res => {
         this.insuranceGroups = res.data.rows
         let conditionControls: ConditionControls  = {};
-  
+
         this.insuranceGroups.forEach(condition => {
           const his = this.patientDetails.groups.find((c: any) => c.id == condition.id);
           conditionControls[condition.id] = his !== undefined ? [true] : [false];
         });
-  
+
         this.groupsForm  = this.fb.group({
           groups: this.fb.group(conditionControls)
         });
@@ -184,7 +191,7 @@ export class EditProfileComponent implements OnInit {
     })
   }
   patientForm!: FormGroup;
-  
+
   bloodGroups: any[] = [
     { label: 'Select Blood Group', value: null },
     { label: 'A+', value: 'A+' },
@@ -235,8 +242,13 @@ export class EditProfileComponent implements OnInit {
     return condition.toLowerCase().replace(/[^a-z0-9]/g, '');
   }
 
-  constructor(private fb: FormBuilder, private messageService: MessageService, 
-    private route: ActivatedRoute, private userService: UserService, private clinicalNotesService: ClinicalNotesService,
+  constructor(
+    private fb: FormBuilder,
+    private customMessageService: CustomMessageService,
+    private messageService: MessageService,
+    private route: ActivatedRoute,
+    private userService: UserService,
+    private clinicalNotesService: ClinicalNotesService,
     private router: Router
   ) {
     this.maxDate = new Date();
@@ -273,7 +285,7 @@ export class EditProfileComponent implements OnInit {
     if (!this.searchText) {
       this.filteredMedicalConditions = [...this.medicalConditions];
     } else {
-      this.filteredMedicalConditions = this.medicalConditions.filter(condition => 
+      this.filteredMedicalConditions = this.medicalConditions.filter(condition =>
         condition.name.toLowerCase().includes(this.searchText)
       );
     }
@@ -321,16 +333,34 @@ export class EditProfileComponent implements OnInit {
         groups_list: selectedGroups,
         other_history: historyDetails.otherHistory,
       }).subscribe(res=>{
-        this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode])
-      })
-    }else{
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Patient profile updated successfully'
+        });
+        setTimeout(() => {
+          this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode]);
+        }, 1000);
+      }, error => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to update patient profile'
+        });
+      });
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'Please fill all required fields'
+      });
       this.markFormGroupTouched(this.patientForm);
     }
   }
   markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
-      
+
       // If control is a nested form group, mark its controls too
       if (control instanceof FormGroup) {
         this.markFormGroupTouched(control);
@@ -348,13 +378,13 @@ export class EditProfileComponent implements OnInit {
             const his = this.patientDetails.medical_history.find((c: any) => c.id == condition.id);
             conditionControls[condition.id] =  his !== undefined ? [true] : [false];
           });
-      
+
           this.medicalHistoryForm = this.fb.group({
             searchHistory: [''],
             otherHistory: [this.patientDetails.other_history],
             conditions: this.fb.group(conditionControls)
           });
-  
+
           this.filteredMedicalConditions = this.medicalConditions
           this.medicalHistoryForm.get('searchHistory')?.valueChanges.subscribe(value => {
             this.filterMedicalConditions(value);
@@ -369,12 +399,12 @@ export class EditProfileComponent implements OnInit {
         this.addNewGroupText = ''
         this.insuranceGroups = res.data.rows
         let conditionControls: ConditionControls  = {};
-  
+
         this.insuranceGroups.forEach(condition => {
           const his = this.patientDetails.groups.find((c: any) => c.id == condition.id);
           conditionControls[condition.id] = his !== undefined ? [true] : [false];
         });
-  
+
         this.groupsForm  = this.fb.group({
           groups: this.fb.group(conditionControls)
         });

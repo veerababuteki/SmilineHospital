@@ -3,6 +3,7 @@
     height: 100vh;
     overflow-y: auto;
     width: 100%;
+
     .header {
         display: flex;
         justify-content: space-between;
@@ -83,12 +84,14 @@
                         .label {
                             width: 150px;
                             color: #666;
-                            text-align: right;
+                            text-align: left;
                             padding-right: 15px;
+                             font-weight: 500;
                         }
 
                         .value {
                             color: #333;
+                            font-weight: 400;
 
                             .new-badge {
                                 background: #e3f2fd;
@@ -108,8 +111,8 @@
                     }
 
                     .section-title {
-                        color: #4caf50;
-                        font-size: 16px;
+                        color:#2196f3;
+                        font-size: 24px;
                         margin: 20px 0;
                         font-weight: normal;
                     }
@@ -129,7 +132,7 @@
                     color: #4caf50;
                     font-size: 16px;
                     margin-bottom: 10px;
-                    font-weight: normal;
+                    font-weight: 500;
                 }
 
                 .note-input {
@@ -148,7 +151,7 @@
                 margin-bottom: 10px;
 
                 h3 {
-                    color: #4caf50;
+                    color: #2196f3;
                     font-size: 16px;
                     font-weight: normal;
                 }

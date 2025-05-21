@@ -21,10 +21,10 @@
             <option value="card">Card</option>
             <option value="paytm">Paytm</option>
             <option value="online">Online Payment</option>
-            <option value="phonepe">Phone Pe</option>
+            <option value="phonepe">PhonePe</option>
           </select>
         </div>
-        
+
         <div class="bank-number-row">
           <div class="bank-field" *ngIf="paymentMethod !== 'cash' && paymentMethod !== 'online'">
             <label>Bank</label>
@@ -42,13 +42,13 @@
             <div class="error-message" *ngIf="cardDigitsError && formSubmitted">Last 4 digits are required</div>
           </div>
         </div>
-        
+
         <!-- Display available advance -->
         <div class="available-advance">
           <span class="available-advance-label">Available Advance:</span>
           <span class="available-advance-amount">INR {{ availableAdvance.toFixed(2) }}</span>
         </div>
-        
+
         <div class="advance-payment-note">*This will be an advance payment</div>
       </div>
 
@@ -56,14 +56,14 @@
       <div class="selected-invoices" *ngIf="!isAdvancePayment">
         <div class="selected-invoices-header">
           <div class="header-title">Selected Invoices ({{selectedInvoices.length}})</div>
-          
+
           <!-- Display available advance -->
           <div class="available-advance">
             <span class="available-advance-label">Available Advance:</span>
             <span class="available-advance-amount">INR {{ availableAdvance.toFixed(2) }}</span>
           </div>
         </div>
-        
+
         <!-- Invoices Table -->
         <div class="invoice-summary-table">
           <table>
@@ -104,11 +104,11 @@
                   </td>
                 </tr>
               </ng-container>
-              
+
               <!-- Pay per service mode -->
               <ng-container *ngIf="isPayPerService">
                 <ng-container *ngFor="let invoice of selectedInvoices; let i = index">
-                  <tr *ngFor="let item of invoice.items; let j = index" 
+                  <tr *ngFor="let item of invoice.items; let j = index"
                       [class.first-row]="j === 0">
                     <td *ngIf="j === 0" [attr.rowspan]="invoice.items.length">
                       {{ invoice.invoice_id }}
@@ -140,7 +140,7 @@
             </tbody>
           </table>
         </div>
-        
+
         <!-- Payment summary for all selected invoices -->
         <div class="totals-section">
           <div class="totals-row">
@@ -168,14 +168,14 @@
             <span class="amount bold">INR {{ (totalFromAdvance + totalPayNow).toFixed(2) }}</span>
           </div>
         </div>
-        
+
         <!-- Payment method section -->
         <div class="payment-action yellow-section">
           <div class="payment-row">
             <label class="pay-now-label">PAY NOW:</label>
-            <input type="text" [(ngModel)]="totalPayNowInput" 
+            <input type="text" [(ngModel)]="totalPayNowInput"
                    (ngModelChange)="updateTotalPayNow($event)"
-                   class="amount-input" 
+                   class="amount-input"
                    *ngIf="!isPayPerService">
             <span class="pay-now-amount" *ngIf="isPayPerService">INR {{ totalPayNow.toFixed(2) }}</span>
             <select [(ngModel)]="paymentMethod" (change)="onPaymentMethodChange()" class="payment-method-select">
@@ -187,11 +187,11 @@
               <option value="phonepe">Phone Pe</option>
             </select>
           </div>
-          
+
           <!-- Pay from advance section (only visible if available advance > 0) -->
 <div class="payment-row" *ngIf="availableAdvance > 0 && !isPayPerService">
   <label class="pay-advance-label">PAY FROM ADVANCE:</label>
-  <input type="text" [(ngModel)]="totalAdvanceInput" 
+  <input type="text" [(ngModel)]="totalAdvanceInput"
          (ngModelChange)="updateTotalFromAdvance($event)"
          class="advance-input">
 </div>
@@ -201,11 +201,11 @@
   <label class="pay-advance-label">PAY FROM ADVANCE:</label>
   <span class="pay-advance-amount">INR {{ totalFromAdvance.toFixed(2) }}</span>
 </div>
-          
+
           <div class="bank-number-row">
             <!-- Bank and payment details remain unchanged -->
           </div>
-          
+
           <div class="payment-mode-toggle">
             <a href="javascript:void(0)" (click)="togglePaymentMode()">
               {{ isPayPerService ? 'Pay one time' : 'Pay per Service' }}
@@ -213,24 +213,24 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Notes section - Common for all modes -->
       <div class="notes-section">
         <button type="button" class="notes-toggle-btn" (click)="addNotes()">
-          {{ showNotesInput ? 'Hide notes' : '+Add Notes' }}
+          {{ showNotesInput ? 'Hide notes' : 'Add Notes' }}
         </button>
         <div class="notes-input-container" [style.display]="showNotesInput ? 'block' : 'none'">
           <textarea [(ngModel)]="notes" placeholder="Enter notes here..." class="notes-input"></textarea>
         </div>
       </div>
-      
+
       <!-- Info text - Only shown when in advance payment mode -->
       <div class="info-text-container" *ngIf="isAdvancePayment">
         <div class="info-text">
           You can also select pending invoice(s) from the right
         </div>
       </div>
-      
+
       <!-- Footer with date - Common for all modes -->
       <!-- <div class="date-footer">
         <span class="received-label">Received on:</span>
@@ -238,33 +238,33 @@
         <a href="javascript:void(0)" class="change-link" (click)="openDatePicker()">change</a>
       </div> -->
     </div>
-    
+
     <!-- Right section - Invoice list -->
     <div class="invoice-section">
       <div class="procedures-header">
         <span>Select pending Invoice</span>
       </div>
-      
+
       <div class="search-container">
         <input type="text" [(ngModel)]="searchText" (input)="filterInvoices()" placeholder="Search" class="search-input">
       </div>
-      
+
       <div class="procedures-list" *ngIf="invoices.length > 0">
-        <div class="procedure-item" *ngFor="let invoice of filteredInvoices" 
+        <div class="procedure-item" *ngFor="let invoice of filteredInvoices"
              (click)="selectInvoice(invoice)"
              [class.selected]="isInvoiceSelected(invoice)">
           <div class="invoice-header">
             <div class="invoice-id">{{ invoice.invoice_id }}</div>
             <div class="invoice-date">{{ invoice.created_at | date: 'dd MMM yyyy' }}</div>
           </div>
-          
+
           <div class="invoice-details">
             <!-- Display procedure items -->
             <div class="procedure-row" *ngFor="let item of invoice.items">
               <div class="procedure-name">{{ item.name }}</div>
               <div class="procedure-price">{{ item.price.toFixed(2) }}</div>
             </div>
-            
+
             <!-- Display totals -->
             <div class="invoice-totals">
               <div class="total-row">
@@ -283,7 +283,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="no-procedures" *ngIf="invoices.length === 0">
         <p>No pending invoices</p>
         <a href="javascript:void(0)" (click)="navigateToAddInvoice()" class="add-invoice-link">+ Add an invoice</a>
