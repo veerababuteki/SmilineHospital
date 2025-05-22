@@ -3,6 +3,7 @@
   border: 1px solid #e0e0e0;
   color: #666;
   cursor: pointer;
+  font-weight: 600;
   padding: 4px;
 
   &:hover {
@@ -25,6 +26,7 @@
   border: 1px solid #000;
   font-family: Arial, sans-serif;
   font-size: 14px;
+  text-align: left;
 
   .invoice-header {
     text-align: center;
@@ -42,6 +44,12 @@
       margin: 0;
     }
   }
+}
+
+.invoice-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 .invoice-address,
@@ -95,5 +103,17 @@ button:hover {
 @media print {
   button {
     display: none;
+  }
+
+  .invoice-container .invoice-address,
+  .invoice-container .invoice-phone {
+    text-align: center !important;
+    display: block;
+    width: 100%;
+  }
+
+  ::ng-deep .invoice-address,
+  ::ng-deep .invoice-phone {
+    text-align: center !important;
   }
 }

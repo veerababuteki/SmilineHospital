@@ -214,6 +214,11 @@
                                     .doctor-name {
                                         color: #2196f3;
                                         font-weight: 500;
+                                        img{
+                                            width: 300px;
+                                            max-width: 100%;
+                                            height: fit-content;
+                                        }
                                     }
 
                                     .invoice-info {

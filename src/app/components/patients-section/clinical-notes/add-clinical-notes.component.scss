@@ -26,6 +26,7 @@
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 4px;
+        font-weight: 600;
         cursor: pointer;
       }
 
@@ -35,6 +36,7 @@
         color: white;
         border: none;
         border-radius: 4px;
+        font-weight: 600;
         cursor: pointer;
 
         &:hover {
@@ -195,6 +197,7 @@
         border: none;
         color: #007bff;
         cursor: pointer;
+        font-weight: 600;
         font-size: 14px;
 
         &:hover {
@@ -243,6 +246,7 @@
   border: none;
   background: none;
   cursor: pointer;
+  font-weight: 600;
 
   &:hover {
     color: #e0e0e0;

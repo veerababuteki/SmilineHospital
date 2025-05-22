@@ -1,73 +1,92 @@
 <header>
-    <nav>
-      <div class="logo">
-        <a href="#">
-          <img src="https://smiline.com/wp-content/uploads/2024/08/smiline-logo.png" alt="Dental Logo" />
-        </a>
-      </div>
-      <ul class="nav-links">
-        <!-- <li><a href="#">Find Doctors</a></li>
-        <li><a href="#">Video Consult</a></li>
-        <li><a href="#">Medicines</a></li>
-        <li><a href="#">Lab Tests</a></li>
-        <li><a href="#">Surgeries</a></li>
-        <li><a href="#">For Corporates</a></li>
-        <li><a href="#">For Providers</a></li>
-        <li><a href="#">Security & help</a></li> -->
-      </ul>
-      <div class="logo">
-        <img src="assets/dental-logo.svg" alt="Dental Logo" />
-      </div>
-      <!-- <div class="hamburger">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-      </div> -->
-    </nav>
-  </header>
-  <div class="container">
+  <nav>
+    <div class="logo">
+      <a href="#">
+        <img src="https://smiline.com/wp-content/uploads/2024/08/smiline-logo.png" alt="Dental Logo" />
+      </a>
+    </div>
+    <ul class="nav-links">
+      <!-- <li><a href="#">Find Doctors</a></li>
+      <li><a href="#">Video Consult</a></li>
+      <li><a href="#">Medicines</a></li>
+      <li><a href="#">Lab Tests</a></li>
+      <li><a href="#">Surgeries</a></li>
+      <li><a href="#">For Corporates</a></li>
+      <li><a href="#">For Providers</a></li>
+      <li><a href="#">Security & help</a></li> -->
+    </ul>
+    <div class="logo">
+      <img src="assets/dental-logo.svg" alt="Dental Logo" />
+    </div>
+    <!-- <div class="hamburger">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </div> -->
+  </nav>
+</header>
+
+<div class="container">
   <div>
     <nav class="auth-nav">
-        <ul class="auth-nav-list">
-            <li class="auth-nav-item">
-                <a (click)="loadForm()" class="auth-nav-link" [ngClass]="{ 'active': isLogin }">Login</a>
-            </li>
-        </ul>
+      <ul class="auth-nav-list">
+        <li class="auth-nav-item">
+          <a (click)="loadForm()" class="auth-nav-link" [ngClass]="{ 'active': isLogin }">Login</a>
+        </li>
+      </ul>
     </nav>
   </div>
+
   <div class="login-container">
     <div class="login-image">
       <!-- <img src="assets/illustration.webp" alt="Login Image" class="login-image-content" /> -->
     </div>
+
+    <!-- Login Form -->
     <div class="login-form" *ngIf="isLogin">
       <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
         <div class="form-group">
           <label for="mobileNumber">Mobile Number</label>
-          <input
+          <input 
             type="text"
-            id="mobileNumber"
+            id="mobileNumber" 
             formControlName="mobileNumber"
-            placeholder=" Enter Mobile Number"
+            placeholder="Mobile Number"
             [ngClass]="{'ng-invalid': loginForm.get('mobileNumber')?.errors?.['invalidMobile'] && loginForm.get('mobileNumber')?.touched}"
           />
-         </div>
+          <div class="error-message" *ngIf="loginForm.get('mobileNumber')?.errors?.['required'] && loginForm.get('mobileNumber')?.touched">
+            Mobile number is required
+          </div>
+          <div class="error-message" *ngIf="loginForm.get('mobileNumber')?.errors?.['invalidMobile'] && loginForm.get('mobileNumber')?.touched">
+            Please enter a valid mobile number
+          </div>
+        </div>
 
         <div class="form-group">
           <label for="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            formControlName="password"
-            placeholder="Enter Password"
-          />
+          <div class="password-field">
+            <input 
+              [type]="showPassword ? 'text' : 'password'"
+              id="password" 
+              formControlName="password" 
+              placeholder="Password" 
+            />
+            <button type="button" class="password-toggle" (click)="togglePasswordVisibility()">
+              <img [src]="showPassword ? '/assets/eye-off.svg' : '/assets/eye.svg'" alt="toggle password" />
+            </button>
+          </div>
+          <div class="error-message" *ngIf="loginForm.get('password')?.errors?.['required'] && loginForm.get('password')?.touched">
+            Password is required
+          </div>
         </div>
+
         <div *ngIf="otpSent" class="form-group">
           <label for="otp">OTP</label>
-          <input
-            type="number"
-            id="otp"
-            formControlName="otp"
-            placeholder="Enter OTP"
+          <input 
+            type="number" 
+            id="otp" 
+            formControlName="otp" 
+            placeholder="Enter OTP" 
           />
         </div>
 
@@ -89,11 +108,14 @@
         </div>
 
         <button type="submit" class="login-button"
-        [disabled]="loginForm.invalid || (isOtpLogin && !otpSent && loginForm.get('mobileNumber')?.value.includes('@'))">
-        {{ isOtpLogin ? (otpSent ? 'Verify OTP' : 'Send OTP') : 'Login' }}
-       </button>
+        [disabled]="loginForm.invalid || (isOtpLogin && !otpSent && loginForm.get('mobileNumber')?.value.includes('@')) || isLoading">
+          <span *ngIf="!isLoading">{{ isOtpLogin ? (otpSent ? 'Verify OTP' : 'Send OTP') : 'Login' }}</span>
+          <div class="loader" *ngIf="isLoading"></div>
+        </button>
       </form>
     </div>
+
+    <!-- Registration Form -->
     <div class="login-form" *ngIf="!isLogin">
       <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
@@ -109,22 +131,21 @@
         <div class="form-group">
           <label for="dob">Date of Birth</label>
           <p-calendar id="dob"
-              formControlName="dob"
-              [maxDate]="maxDate"
-              [showIcon]="true"
-              dateFormat="dd/mm/yy"
-              [ngClass]="{'invalid-field': registrationForm.get('dob')?.invalid && registrationForm.get('dob')?.touched}"
-              >
+            formControlName="dob"
+            [maxDate]="maxDate"
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            [ngClass]="{'invalid-field': registrationForm.get('dob')?.invalid && registrationForm.get('dob')?.touched}">
           </p-calendar>
         </div>
 
         <div class="form-group">
           <label for="gender">Gender</label>
           <p-dropdown id="gender"
-                      formControlName="gender"
-                      [options]="genderOptions"
-                      placeholder="Select Gender"
-                      [ngClass]="{'invalid-field': registrationForm.get('gender')?.invalid && registrationForm.get('gender')?.touched}">
+            formControlName="gender"
+            [options]="genderOptions"
+            placeholder="Select Gender"
+            [ngClass]="{'invalid-field': registrationForm.get('gender')?.invalid && registrationForm.get('gender')?.touched}">
           </p-dropdown>
         </div>
 
@@ -147,12 +168,14 @@
           <label for="address">Address</label>
           <input type="text" id="address" formControlName="address" placeholder="Address" />
         </div>
+
         <div class="actions">
           <div class="remember-me">
             <input type="checkbox" id="isDoctor" formControlName="isDoctor" />
             <label for="isDoctor">Are you a doctor?</label>
           </div>
         </div>
+
         <div class="actions">
           <div class="remember-me">
             <input type="checkbox" id="terms" formControlName="terms" />
@@ -166,4 +189,4 @@
   </div>
 </div>
 
-  <p-toast position="top-right"></p-toast>
+<p-toast position="top-right"></p-toast>

@@ -44,7 +44,7 @@
                         <td class="procedure-col">{{diagnose}}</td>
                     </tr>
                     <tr *ngFor="let note of formatStringToArray(note.notes); let i = index">
-                        <td class="engaged-col border-bottom-none" *ngIf="i == 0" >Notes</td>
+                        <td class="engaged-col border-bottom-none" *ngIf="i == 0">Notes</td>
                         <td class="engaged-col" *ngIf="i > 0"></td>
                         <td class="procedure-col">{{note}}</td>
                     </tr>
