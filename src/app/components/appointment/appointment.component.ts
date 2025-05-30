@@ -19,6 +19,8 @@ import { Router } from '@angular/router';
 import { Message } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { LoaderService } from '../../services/loader.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 
 
@@ -37,8 +39,10 @@ import { LoaderService } from '../../services/loader.service';
     RadioButtonModule,
     ReactiveFormsModule,
     CommonModule,
-    MessagesModule
-  ]
+    MessagesModule,
+    ToastModule
+  ],
+  providers: [MessageService]
 })
 export class AppointmentComponent implements OnInit {
   activeTab: 'appointment' | 'reminder' | 'blockCalendar' = 'appointment';
@@ -78,7 +82,7 @@ export class AppointmentComponent implements OnInit {
   messages: Message[] =   [
     { severity: 'info', summary: 'Info', detail: 'Message Content' },
 ];
-  constructor(private fb: FormBuilder, private router: Router, private userService: UserService, private appointmentService: AppointmentService, private loaderService: LoaderService) {}
+  constructor(private fb: FormBuilder, private router: Router, private userService: UserService, private appointmentService: AppointmentService, private loaderService: LoaderService, private messageService: MessageService) {}
 
   ngOnInit() {
     this.activeTab = this.data;
@@ -202,6 +206,7 @@ export class AppointmentComponent implements OnInit {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
   showDialog(isEdit: boolean = false) {
+    this.messages = [];
     if(isEdit)
       {this.editAppointment = true;
       }
@@ -212,9 +217,6 @@ export class AppointmentComponent implements OnInit {
       this.getPatientDetails();
     }
     if (this.selectedDate && !isEdit) {
-      // Set the appointment date in your form or model
-      // This will depend on how your appointment component is structured
-      // For example:
       if (this.appointmentForm) {
         this.appointmentForm.get('appointmentDate')?.setValue(this.selectedDate);
       }
@@ -298,14 +300,31 @@ export class AppointmentComponent implements OnInit {
           duration: value.duration,
           planned_procedure: value.plannedProcedures,
           notes: value.notes,
-        }).subscribe(res=>{
-          this.initAppointmentForm();
-          this.display = false;
-          if(this.fromPatientsection){
-            this.router.navigate(['/calendar'])
+        }).subscribe({
+          next: (res) => {
+            this.loaderService.hide();
+            this.initAppointmentForm();
+            this.display = false;
+            if(this.fromPatientsection){
+              this.router.navigate(['/calendar'])
+            }
+            this.closeDialog.emit({isOpenPatientDialog:false});
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Appointment created successfully',
+              life: 3000
+            });
+          },
+          error: (error) => {
+            this.loaderService.hide();
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to create appointment',
+              life: 3000
+            });
           }
-
-          this.closeDialog.emit({isOpenPatientDialog:false});
         });
       }
       else{
@@ -322,12 +341,28 @@ export class AppointmentComponent implements OnInit {
           duration: value.duration,
           planned_procedure: value.plannedProcedures,
           notes: value.notes,
-        }).subscribe(res => {
-          this.display = false;
-          this.editAppointment = false;
-          this.appointment = null;
-          this.initAppointmentForm();
-          window.location.reload();
+        }).subscribe({
+          next: (res) => {
+            this.display = false;
+            this.editAppointment = false;
+            this.appointment = null;
+            this.initAppointmentForm();
+            window.location.reload();
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Appointment updated successfully',
+              life: 3000
+            });
+          },
+          error: (error) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to update appointment',
+              life: 3000
+            });
+          }
         });
       }
     } else {
@@ -339,7 +374,6 @@ export class AppointmentComponent implements OnInit {
         }
       });
     }
-    
   }
 
   openPatientDialog(){

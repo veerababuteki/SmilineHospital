@@ -25,6 +25,7 @@ import { DropdownModule } from 'primeng/dropdown';
       [style]="{width: '500px'}" 
       [draggable]="false" 
       [resizable]="false"
+      [closable]="false"
       styleClass="cancel-appointment-dialog"
     >
       <div class="cancel-form">
