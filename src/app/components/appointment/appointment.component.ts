@@ -54,7 +54,7 @@ export class AppointmentComponent implements OnInit {
     { label: '3 Hrs', value: 180 },
     { label: '4 Hrs', value: 240 },
     { label: '5 Hrs', value: 300 }
-  ];  
+  ];
   bookingTypes: string[] = ['offline', 'online'];
   status: string[] = ["Scheduled", "Completed", "Canceled", "Rescheduled"];
   appointmentStatus: string[] = ['None', 'Waiting', 'Engaged', 'Done'];
@@ -114,7 +114,7 @@ export class AppointmentComponent implements OnInit {
   validateTimeRange() {
     const startTime = this.blockCalendarForm.get('startTime')?.value;
     const endTime = this.blockCalendarForm.get('endTime')?.value;
-    
+
     if (startTime && endTime) {
       this.showScheduleWarning = startTime >= endTime;
     }
@@ -187,18 +187,18 @@ export class AppointmentComponent implements OnInit {
         appointmentStatus:[{ value: 'None', disabled: !this.editAppointment }],
       });
     }
-    
+
   }
   convertTo24Hour(time12h: string): string {
     const [time, modifier] = time12h.split(' '); // Split time and AM/PM
     let [hours, minutes] = time.split(':').map(Number); // Extract hours and minutes
-  
+
     if (modifier === 'PM' && hours !== 12) {
       hours += 12; // Convert PM hours (except 12 PM)
     } else if (modifier === 'AM' && hours === 12) {
       hours = 0; // Convert 12 AM to 00
     }
-  
+
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
   showDialog(isEdit: boolean = false) {
@@ -222,40 +222,117 @@ export class AppointmentComponent implements OnInit {
     this.display = true;
   }
 
-  getPatientDetails() {
-    var code = this.appointmentForm.value.patientId
-    if (code == undefined || code == '') return;
+  // getPatientDetails() {
+  //   var code = this.appointmentForm.value.patientId
+  //   if (code == undefined || code == '') return;
+  //   this.showPatientDropdown = false;
+  //   this.multiplePatients = [];
+
+  //   this.userService.getPatient(code).subscribe(response => {
+  //     if(response.data.length == 1){
+  //       this.patient = response.data[0];
+  //       this.appointmentForm.patchValue({
+  //         patientName: this.patient.profile.first_name + " " + this.patient.profile.last_name,
+  //         mobileNumber: this.patient.phone,
+  //         emailId: this.patient.email
+  //       });
+  //     } else if (response.data.length > 1){
+  //       this.multiplePatients = response.data;
+  //       this.showPatientDropdown = true;
+  //     }
+  //   }, (error) => {
+  //     this.userService.getPatientByMobileNumber(code).subscribe(response => {
+  //       this.patient = response.data;
+  //       this.appointmentForm.patchValue({
+  //         patientName: this.patient.user_profile_details[0].first_name + " " + this.patient.user_profile_details[0].last_name,
+  //         mobileNumber: this.patient.phone,
+  //         emailId: this.patient.email
+  //       });
+  //     }, (error) => {
+  //       this.paitentNotFound = true;
+  //     });
+  //   });
+  // }
+    getPatientDetails() {
+    const patientId = this.appointmentForm.get('patientId')?.value;
+
+    // Reset previous states
+    this.paitentNotFound = false;
     this.showPatientDropdown = false;
     this.multiplePatients = [];
 
-    this.userService.getPatient(code).subscribe(response => {
-      if(response.data.length == 1){
-        this.patient = response.data[0];
-        this.appointmentForm.patchValue({
-          patientName: this.patient.profile.first_name + " " + this.patient.profile.last_name,
-          mobileNumber: this.patient.phone,
-          emailId: this.patient.email
-        });
-      } else if (response.data.length > 1){
-        this.multiplePatients = response.data;
-        this.showPatientDropdown = true;
+    if (!patientId) {
+      this.appointmentForm.get('patientId')?.setErrors({ required: true });
+      return;
+    }
+
+    this.loaderService.show();
+
+    // First try by patient code
+    this.userService.getPatient(patientId).subscribe({
+      next: (response) => {
+        this.loaderService.hide();
+        if (response.data?.length > 0) {
+          this.handlePatientResponse(response.data);
+        } else {
+          // If no results by code, try by mobile number
+          this.searchByMobileNumber(patientId);
+        }
+      },
+      error: (error) => {
+        this.loaderService.hide();
+        this.searchByMobileNumber(patientId);
       }
-    }, (error) => {
-      this.userService.getPatientByMobileNumber(code).subscribe(response => {
-        this.patient = response.data;
-        this.appointmentForm.patchValue({
-          patientName: this.patient.user_profile_details[0].first_name + " " + this.patient.user_profile_details[0].last_name,
-          mobileNumber: this.patient.phone,
-          emailId: this.patient.email
-        });
-      }, (error) => {
-        this.paitentNotFound = true;
-      });
     });
   }
+
+private searchByMobileNumber(mobileNumber: string) {
+  this.userService.getPatientByMobileNumber(mobileNumber).subscribe({
+    next: (response) => {
+      this.loaderService.hide();
+      if (response.data) {
+        this.handlePatientResponse([response.data]); // Wrap in array for consistency
+      } else {
+        this.handleNoPatientFound();
+      }
+    },
+    error: (error) => {
+      this.loaderService.hide();
+      this.handleNoPatientFound();
+    }
+  });
+}
+
+private handlePatientResponse(patients: any[]) {
+  if (patients.length === 1) {
+    this.selectPatient(patients[0]);
+  } else if (patients.length > 1) {
+    this.multiplePatients = patients;
+    this.showPatientDropdown = true;
+  } else {
+    this.handleNoPatientFound();
+  }
+}
+
+private handleNoPatientFound() {
+  this.paitentNotFound = true;
+  this.appointmentForm.get('patientId')?.setErrors({ invalidPatient: true });
+  this.resetPatientFields();
+}
+
+private resetPatientFields() {
+  this.appointmentForm.patchValue({
+    patientName: '',
+    mobileNumber: '',
+    emailId: ''
+  });
+  // Clear validation errors for these fields
+  this.appointmentForm.get('patientName')?.setErrors(null);
+  this.appointmentForm.get('mobileNumber')?.setErrors(null);
+}
   selectPatient(patient: any) {
     this.patient = patient;
-    
+
     // Check which data structure we're dealing with
     if (patient.profile) {
       // First data structure
@@ -272,7 +349,7 @@ export class AppointmentComponent implements OnInit {
         emailId: patient.email
       });
     }
-    
+
     this.showPatientDropdown = false;
   }
   cancelAppointment(){
@@ -280,6 +357,7 @@ export class AppointmentComponent implements OnInit {
     this.editAppointment = false;
     this.appointment = null;
     this.initAppointmentForm();
+    window.close();
   }
   onSubmit() {
     if (this.appointmentForm.valid) {
@@ -339,7 +417,7 @@ export class AppointmentComponent implements OnInit {
         }
       });
     }
-    
+
   }
 
   openPatientDialog(){

@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
     AvatarModule
   ],
   template: `
-    <div class="event-popover"  (mouseenter)="onMouseEnter()" 
+    <div class="event-popover"  (mouseenter)="onMouseEnter()"
          (mouseleave)="onMouseLeave()">
       <div class="event-header">
         <div class="avatar-section">

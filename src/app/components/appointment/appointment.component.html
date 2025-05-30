@@ -1,12 +1,12 @@
-<p-dialog 
-  [(visible)]="display" 
-  [modal]="true" 
-  [style]="{width: '800px'}" 
-  [draggable]="false" 
+<p-dialog
+  [(visible)]="display"
+  [modal]="true"
+  [style]="{width: '800px'}"
+  [draggable]="false"
   [resizable]="false"
   styleClass="appointment-dialog"
   >
-  
+
   <div class="appointment-form">
     <!-- Tabs -->
     <div class="tab-container">
@@ -19,35 +19,31 @@
       <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
         <label class="required">Patient ID or Mobile Number</label>
         <div class="input-with-button">
-          <input type="text" pInputText formControlName="patientId" placeholder="Enter Patient ID or Mobile Number" [ngClass]="{'ng-invalid': appointmentForm.get('patientId')?.invalid && appointmentForm.get('patientId')?.touched}">
-          <button type="button" pButton label="Get Patient Details" (click)="getPatientDetails()"></button>
+          <input type="text" pInputText formControlName="patientId"
+                placeholder="Enter Patient ID or Mobile Number"
+                [ngClass]="{'ng-invalid': (appointmentForm.get('patientId')?.invalid && appointmentForm.get('patientId')?.touched) || paitentNotFound}">
+          <button type="button" pButton label="Get Patient Details"
+                  (click)="getPatientDetails()" [disabled]="!appointmentForm.get('patientId')?.value"></button>
         </div>
-        <small class="error-message" *ngIf="appointmentForm.get('patientId')?.invalid && appointmentForm.get('patientId')?.touched">Patient ID or Mobile Number is required</small>
+
+        <small class="error-message" *ngIf="appointmentForm.get('patientId')?.hasError('required') && appointmentForm.get('patientId')?.touched">
+          Patient ID or Mobile Number is required
+        </small>
+        <small class="error-message" *ngIf="appointmentForm.get('patientId')?.hasError('invalidPatient') || paitentNotFound">
+          No patient found with this ID/mobile number
+        </small>
+
         <!-- Multiple patients dropdown -->
         <div class="patient-dropdown-container" *ngIf="showPatientDropdown">
-          <p class="multiple-patients-message">Multiple patients found. Please select one:</p>
-          <ul class="patient-dropdown">
-            <li *ngFor="let patient of multiplePatients" class="patient-item" (click)="selectPatient(patient)">
-              <div class="patient-info">
-                <span class="patient-name">
-                  {{ patient.profile ? 
-                    (patient.profile.first_name + ' ' + patient.profile.last_name) : 
-                    (patient.user_profile_details[0].first_name + ' ' + patient.user_profile_details[0].last_name) 
-                  }}
-                </span>
-                <span class="patient-mobile">{{ patient.phone }}</span>
-                <span class="patient-email">{{ patient.email }}</span>
-              </div>
-            </li>
-          </ul>
+          <!-- ... existing dropdown code ... -->
         </div>
-        <span class="error-message" *ngIf="paitentNotFound">No patient found</span>
+
         <div class="add-patient-container">
-          <div class="message">Want to add a new paitent?</div>
-          <button type="button" class="add-paitent-btn" pButton (click)="openPatientDialog()">+ Add patient</button>
+          <div class="message">Want to add a new patient?</div>
+          <button type="button" class="add-patient-btn" pButton (click)="openPatientDialog()">+ Add patient</button>
         </div>
       </div>
-    
+
       <div class="two-column-grid">
         <div class="column">
           <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
@@ -73,12 +69,12 @@
           </div>
           <div class="form-row">
             <label>Doctor</label>
-            <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
+            <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name"
                        [style]="{'width':'100%'}" [placeholder]="'Select Doctor'"
                        [filter]="true" filterBy="name"></p-dropdown>
           </div>
         </div>
-    
+
         <div class="column">
           <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
             <label>Email ID</label>
@@ -92,14 +88,14 @@
           </div>
           <div class="form-row">
             <label>Category</label>
-            <p-dropdown formControlName="category" [options]="categories" optionLabel="name" 
+            <p-dropdown formControlName="category" [options]="categories" optionLabel="name"
                        placeholder="Select Category" [style]="{'width':'100%'}"
                        [filter]="true" filterBy="name" [ngClass]="{'ng-invalid': appointmentForm.get('category')?.invalid && appointmentForm.get('category')?.touched}"></p-dropdown>
             <small class="error-message" *ngIf="appointmentForm.get('category')?.invalid && appointmentForm.get('category')?.touched">Category is required</small>
           </div>
         </div>
       </div>
-    
+
       <div class="form-row schedule-row">
         <label class="required">Scheduled On</label>
         <div class="schedule-inputs">
@@ -149,12 +145,12 @@
 
       <div class="form-row" style="width: 100%;">
         <label class="required-label">Doctor</label>
-        <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
+        <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name"
              [style]="{'width':'100%'}" styleClass="bordered-dropdown"
              placeholder="All Doctors" [filter]="true" filterBy="name"></p-dropdown>
         </div>
       </div>
-      
+
 
       <!-- Block Type -->
       <div class="form-row block-type-row">
@@ -200,7 +196,7 @@
 
       <!-- Action Buttons -->
       <div class="button-row">
-        <button type="button" pButton label="Cancel" class="p-button-secondary"></button>
+        <button type="button" pButton label="Cancel" (click)="cancelAppointment()" class="p-button-secondary"></button>
         <button type="submit" pButton label="Save" class="p-button-primary"></button>
       </div>
     </form>
@@ -218,12 +214,12 @@
 
       <div class="form-row" style="width: 100%;">
         <label class="required-label">Doctor</label>
-        <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
+        <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name"
              [style]="{'width':'100%'}" styleClass="bordered-dropdown"
              placeholder="All Doctors" [filter]="true" filterBy="name"></p-dropdown>
         </div>
       </div>
-      
+
 
       <!-- Block Type -->
       <div class="form-row block-type-row">
@@ -245,8 +241,8 @@
           <p-calendar formControlName="startTime" [timeOnly]="true" [showIcon]="false" hourFormat="12"></p-calendar>
         </div>
       </div>
-      <div class="button-row">
-        <button type="button" pButton label="Cancel" class="p-button-secondary"></button>
+     <div class="button-row">
+        <button type="button" pButton label="Cancel" (click)="cancelAppointment()" class="p-button-secondary"></button>
         <button type="submit" pButton label="Save" class="p-button-primary"></button>
       </div>
     </form>

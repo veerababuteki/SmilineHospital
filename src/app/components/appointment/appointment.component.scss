@@ -29,7 +29,7 @@
         color: white;
       }
     }
-    
+
   }
 
   // Form Content
@@ -416,7 +416,7 @@
 
 .ng-invalid {
   border-color: #f44336 !important;
-  
+
   &:focus {
     box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2) !important;
   }
@@ -424,12 +424,12 @@
 
 .form-row {
   margin-bottom: 16px;
-  
+
   label {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    
+
     &.required:after {
       content: " *";
       color: #f44336;

@@ -57,12 +57,15 @@ export class InvoicePrintComponent {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .clinic-address, .clinic-phone {
   text-align: center;
   font-size: 12px;
   margin: 2px 0;
+  color: #555;
 }
 
 /* Separator */

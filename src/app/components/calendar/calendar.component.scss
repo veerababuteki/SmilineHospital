@@ -5,7 +5,7 @@
     height: 100vh;
     overflow: hidden;
     background-color: #fff;
-  
+
     .calendar-content {
       display: flex;
       flex: 1;
@@ -13,7 +13,7 @@
       height: calc(100vh - 60px); // Adjust based on your top header height
     }
   }
-  
+
   // Your existing styles
   .calendar-top {
     display: flex;
@@ -22,30 +22,30 @@
     padding: 0.5rem 1rem;
     background-color: #f0f0f5;
     border-bottom: 1px solid #e0e0e0;
-  
+
     .left-section {
       display: flex;
       align-items: center;
       gap: 1rem;
-  
+
       .title {
         font-size: 1.2rem;
         font-weight: 500;
         color: #333;
       }
-  
+
       .email-dropdown {
         display: flex;
         align-items: center;
         gap: 0.5rem;
         cursor: pointer;
         color: #666;
-  
+
         i {
           font-size: 0.8rem;
         }
       }
-  
+
       .learn-btn {
         display: flex;
         align-items: center;
@@ -55,50 +55,50 @@
         border: 1px solid #dee2e6;
         border-radius: 4px;
         cursor: pointer;
-  
+
         i {
           color: #ffa500;
         }
-  
+
         &:hover {
           background-color: #e9ecef;
         }
       }
     }
-  
+
     .right-section {
       display: flex;
       align-items: center;
       gap: 1.5rem;
-  
+
       .navigation {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-  
+
         .nav-btn {
           padding: 0.25rem 0.5rem;
           background: none;
           border: none;
           cursor: pointer;
           color: #666;
-  
+
           &:hover {
             color: #333;
           }
         }
-  
+
         .current-date {
           font-weight: 500;
           color: #333;
         }
       }
-  
+
       .view-controls {
         display: flex;
         align-items: center;
         gap: 0.25rem;
-  
+
         .view-btn {
           padding: 0.5rem 1rem;
           background: none;
@@ -106,27 +106,27 @@
           border-radius: 4px;
           cursor: pointer;
           color: #666;
-  
+
           &:hover {
             background-color: #f8f9fa;
           }
-  
+
           &.active {
             background-color: #f8f9fa;
             border-color: #dee2e6;
           }
-  
+
           &.selected {
             background-color: #6c757d;
             color: white;
           }
-  
+
           i {
             font-size: 1rem;
           }
         }
       }
-  
+
       .settings {
         .settings-btn {
           display: flex;
@@ -138,11 +138,11 @@
           border-radius: 4px;
           cursor: pointer;
           color: #666;
-  
+
           &:hover {
             background-color: #f8f9fa;
           }
-  
+
           i {
             font-size: 0.8rem;
           }
@@ -150,7 +150,7 @@
       }
     }
   }
-  
+
   // Media queries for responsiveness
   @media screen and (max-width: 1024px) {
     .calendar-top {
@@ -159,26 +159,26 @@
       }
     }
   }
-  
+
   @media screen and (max-width: 768px) {
     .calendar-top {
       flex-direction: column;
       gap: 1rem;
       align-items: flex-start;
-  
+
       .right-section {
         width: 100%;
         justify-content: space-between;
       }
     }
   }
-  
+
   @media screen and (max-width: 576px) {
     .calendar-top {
       .right-section {
         flex-wrap: wrap;
         gap: 0.5rem;
-  
+
         .view-controls {
           order: 3;
           width: 100%;
@@ -187,13 +187,13 @@
       }
     }
   }
-  
+
   .calendar-sidebar {
     width: 280px;
     background-color: #fff;
     border-right: 1px solid #e0e0e0;
     height: calc(100vh - 60px);
-    
+
     .block-calendar {
       display: flex;
       align-items: center;
@@ -211,31 +211,31 @@
         color: #666;
       }
     }
-  
+
     h2 {
       font-size: 0.8rem;
       color: #666;
       padding: 1rem;
       margin: 0;
     }
-  
+
     .search-box {
       position: relative;
       padding: 0 1rem;
       margin-bottom: 1rem;
-  
+
       .search-input {
         width: 100%;
         padding: 0.5rem 2rem 0.5rem 0.75rem;
         border: 1px solid #e0e0e0;
         border-radius: 4px;
         font-size: 0.8rem;
-  
+
         &::placeholder {
           color: #999;
         }
       }
-  
+
       i {
         position: absolute;
         right: 1.5rem;
@@ -245,7 +245,7 @@
         font-size: 0.8rem;
       }
     }
-  
+
     .doctors-list, .categories-list {
       .all-doctors {
         display: flex;
@@ -256,30 +256,30 @@
         border-bottom: 1px solid #e0e0e0;
         font-weight: 500;
       }
-  
+
       .doctors-scroll, .categories-scroll {
         max-height: 300px;
         overflow-y: auto;
       }
     }
-  
+
     .doctor-item, .category-item {
       display: flex;
       align-items: center;
       padding: 0.5rem 1rem;
       gap: 0.75rem;
       cursor: pointer;
-  
+
       &:hover {
         background-color: #f8f9fa;
       }
-  
+
       .status-dot {
         width: 8px;
         height: 8px;
         border-radius: 50%;
         flex-shrink: 0;
-  
+
         &.green { background-color: #28a745; }
         &.gray { background-color: #495057; }
         &.blue { background-color: #0052cc; }
@@ -355,34 +355,34 @@
         &.darkorchid { background-color: #9932cc; }
         &.rebeccapurple { background-color: #663399; }
       }
-  
+
       .doctor-name, .category-name {
         flex-grow: 1;
         font-size: 0.8rem;
         color: #666;
       }
-  
+
       .count {
         color: #999;
         font-size: 0.8rem;
       }
     }
-  
+
     .categories-section {
         border-top: 1px solid #d5d5e1;
         background-color: #f0f0f5;
-  
+
       .categories-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding-right: 1rem;
-  
+
         .edit-link {
           color: #0dcaf0;
           font-size: 0.8rem;
           cursor: pointer;
-          
+
           &:hover {
             text-decoration: underline;
           }
@@ -390,32 +390,32 @@
       }
     }
   }
-  
+
   // Scrollbar styling
   .doctors-scroll, .categories-scroll {
     &::-webkit-scrollbar {
       width: 6px;
     }
-  
+
     &::-webkit-scrollbar-track {
       background: #f1f1f1;
     }
-  
+
     &::-webkit-scrollbar-thumb {
       background: #ccc;
       border-radius: 3px;
     }
-  
+
     &::-webkit-scrollbar-thumb:hover {
       background: #999;
     }
   }
-  
+
   .calendar-main {
     flex: 1;
     padding: 1rem;
     background: #fff;
-    
+
     .custom-calendar {
       // Header styles
       .fc-col-header {
@@ -426,48 +426,48 @@
           color: #1a1a1a !important;
         }
       }
-  
+
       .fc-day-header {
         display: flex;
         flex-direction: column;
         align-items: center;
         padding: 0.5rem;
-        
+
         .day-name {
           font-size: 0.8rem;
           color: #666;
           text-transform: uppercase;
         }
       }
-  
+
       // General calendar styles
       .fc {
         &-header-toolbar {
           display: none; // Using custom header
         }
-  
+
         &-day {
           background: #fff;
           border: 1px solid #e0e0e0;
         }
-  
+
         &-day-today {
           background-color: #f8f9fa !important;
         }
-  
+
         &-daygrid-day-number {
           font-size: 0.85rem !important;
           font-weight: 500 !important;
           padding: 4px 8px !important;
           color: #333 !important;
         }
-  
+
         &-daygrid-day-top {
           justify-content: center;
           padding-top: 5px;
         }
       }
-  
+
       // Custom event styles
       .custom-event-content {
         display: flex !important;
@@ -477,7 +477,7 @@
         font-size: 0.75rem !important;
         border-radius: 4px !important;
         margin: 2px 0 !important;
-        
+
         .new-indicator {
           background: #2196f3;
           color: white;
@@ -486,7 +486,7 @@
           font-size: 0.8rem;
           font-weight: 500;
         }
-  
+
         .event-title {
           font-size: 0.75rem !important;
           line-height: 1.2 !important;
@@ -497,18 +497,18 @@
           color: #666 !important;
         }
       }
-  
+
       // Event type styles
       .available-event {
         margin: 2px 4px;
         border-left: 3px solid;
       }
-  
+
       .not-available-event {
         margin: 2px 4px;
         border-left: 3px solid;
       }
-  
+
       // More events indicator
       .fc-more-link {
         font-size: 0.75rem !important;
@@ -518,47 +518,47 @@
         border-radius: 3px !important;
         color: #666 !important;
         font-weight: 500 !important;
-        
+
         &:hover {
           text-decoration: underline;
         }
       }
     }
   }
-  
+
   // Calendar overrides for proper height
   .fc {
     height: 100% !important;
-    
+
     .fc-view-harness {
       height: calc(100% - 50px) !important;
     }
-  
+
     .fc-scroller {
       height: 100% !important;
     }
-  
+
     .fc-daygrid-body {
       height: 100% !important;
     }
   }
-  
+
   // Responsive adjustments
   @media screen and (max-width: 768px) {
     .calendar-main {
       padding: 0.5rem;
-      
+
       .custom-calendar {
         .fc-day-header {
           .day-name {
             font-size: 0.8rem;
           }
         }
-  
+
         .fc-daygrid-day-number {
           font-size: 0.8rem;
         }
-        
+
         .custom-event-content {
           font-size: 0.8rem;
         }
@@ -572,12 +572,12 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-  
+
     // Header section
     .schedule-header {
       padding: 1rem;
       border-bottom: 1px solid #e0e0e0;
-  
+
       .schedule-title {
         display: flex;
         justify-content: space-between;
@@ -585,25 +585,25 @@
         margin-bottom: 1rem;
         font-weight: 500;
         color: #333;
-  
+
         .navigation-arrows {
           display: flex;
           gap: 0.5rem;
-  
+
           .nav-btn {
             background: none;
             border: none;
             cursor: pointer;
             padding: 0.25rem;
             color: #666;
-  
+
             &:hover {
               color: #333;
             }
           }
         }
       }
-  
+
       .add-appointment-btn {
         width: 100%;
         padding: 0.75rem;
@@ -613,17 +613,17 @@
         color: #ffa500;
         cursor: pointer;
         font-weight: 600;
-  
+
         &:hover {
           background: #fff8e1;
         }
       }
     }
-  
+
     // Status tabs
     .status-tabs {
       border-bottom: 1px solid #e0e0e0;
-  
+
       .tab-buttons {
         display: flex;
         padding: 0.5rem 1rem;
@@ -638,10 +638,10 @@
           cursor: pointer;
           font-weight: 500;
           position: relative;
-  
+
           &.active {
             color: #ffa500;
-  
+
             &:after {
               content: '';
               position: absolute;
@@ -652,33 +652,33 @@
               background: #ffa500;
             }
           }
-  
+
           &:hover:not(.active) {
             color: #333;
           }
         }
       }
-  
+
       .status-counters {
         padding: 0.5rem 1rem;
-  
+
         .counter-group {
           display: flex;
           gap: 1rem;
-  
+
           .date-counter, .status-counter {
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 0.5rem;
             min-width: 60px;
-  
+
             .counter-label {
               font-size: 0.8rem;
               color: #666;
               margin-bottom: 0.25rem;
             }
-  
+
             .counter-value {
               font-size: 1rem;
               font-weight: 500;
@@ -686,25 +686,25 @@
               cursor: pointer;
             }
           }
-  
+
           .date-counter {
             border-radius: 4px;
             color: #666666;
-  
+
             .counter-label, .counter-value {
               color: #666666;
             }
           }
-  
+
           .status-counter {
             &.waiting .counter-value {
               color: #dc3545;
             }
-  
+
             &.engaged .counter-value {
               color: #17a2b8;
             }
-  
+
             &.done .counter-value {
               color: #28a745;
             }
@@ -712,32 +712,32 @@
         }
       }
     }
-  
+
     // Appointments list
     .appointments-list {
       flex: 1;
       overflow-y: auto;
       padding: 1rem 0;
-  
+
       .appointment-item {
         display: flex;
         gap: 1rem;
         padding: 0.75rem 1rem;
         border-bottom: 1px solid #f0f0f0;
-  
+
         &:hover {
           background: #f8f9fa;
         }
-  
+
         .appointment-time {
           color: #666;
           font-size: 0.8rem;
           min-width: 70px;
         }
-  
+
         .appointment-content {
           flex: 1;
-  
+
           .appointment-title {
             display: flex;
             align-items: center;
@@ -755,20 +755,20 @@
               font-weight: 500;
             }
           }
-  
+
           .appointment-details {
             font-size: 0.8rem;
             color: #666;
-  
+
             .visit-reason {
               margin-bottom: 0.25rem;
             }
-  
+
             .confirmation-info {
               color: #999;
               margin-bottom: 0.25rem;
             }
-  
+
             .doctor-name {
               color: #2196f3;
             }
@@ -788,22 +788,22 @@
         }
       }
     }
-  
+
     // Scrollbar styling
     .appointments-list {
       &::-webkit-scrollbar {
         width: 6px;
       }
-  
+
       &::-webkit-scrollbar-track {
         background: #f1f1f1;
       }
-  
+
       &::-webkit-scrollbar-thumb {
         background: #ccc;
         border-radius: 3px;
       }
-  
+
       &::-webkit-scrollbar-thumb:hover {
         background: #999;
       }
@@ -811,6 +811,8 @@
   }
   .doctors-section{
     background-color: #f0f0f5;
+    height: 50vh;
+    overflow: hidden;
   }
   ::ng-deep .fc {
     .fc-event {
@@ -822,7 +824,7 @@
       color: #333 !important;
       min-height: 20px !important;
       text-align: start;
-      
+
       .fc-event-main {
         padding: 2px 0;
         font-size: 0.75rem !important;
@@ -882,7 +884,7 @@
     color: #666;
     font-size: 0.9em;
   }
-  
+
   .counter-active{
     background: #6c757d;
     color:white !important;
@@ -899,37 +901,37 @@
       border: none;
       border-radius: 4px;
       padding: 2px 4px;
-      
+
       .fc-v-event .fc-event-main {
         padding: 2px 4px;
         color: black !important;
       }
     }
-  
+
     .fc-timegrid-slot-label {
       font-size: 0.875rem;
       color: #6b7280;
       font-weight: 500;
     }
-  
+
     .fc-timegrid-axis {
       background-color: #f9fafb;
     }
-  
+
     .fc-timegrid-now-indicator-line {
       border-color: #dc2626;
     }
-  
+
     .fc-timegrid-now-indicator-arrow {
       border-color: #dc2626;
       border-width: 5px;
     }
-  
+
     .custom-event-content {
       .event-title {
         font-weight: 500;
       }
-  
+
       .event-details {
         font-size: 0.75rem;
         margin-top: 2px;
@@ -937,7 +939,7 @@
         .event-time {
         color: black !important;
         }
-        
+
         .event-category {
           color: black !important;
 
@@ -947,19 +949,19 @@
         }
       }
     }
-  
+
     .fc-timegrid-event.status-unavailable {
       background-color: #4f46e5;
     }
-  
+
     .fc-timegrid-event.status-waiting {
       background-color: #eab308;
     }
-  
+
     .fc-timegrid-event.status-engaged {
       background-color: #22c55e;
     }
-  
+
     .fc-timegrid-event.status-done {
       background-color: #64748b;
     }
@@ -977,12 +979,12 @@
       .fc-col-header-cell {
         .fc-day-header {
           padding: 8px 4px !important;
-          
+
           .day-name {
             font-size: 0.8rem !important;
             font-weight: 600 !important;
           }
-          
+
           .day-date {
             font-size: 1rem !important;
             margin-top: 4px !important;
@@ -990,16 +992,16 @@
         }
       }
     }
-    
+
     .fc-timegrid-event {
       margin: 1px 2px !important;
       min-height: 25px !important;
-      
+
       .custom-event-content {
         padding: 2px 6px !important;
       }
     }
-    
+
     .fc-day-today {
       background-color: rgba(240, 240, 245, 0.5) !important;
     }
@@ -1010,19 +1012,19 @@
   .fc-event {
     cursor: pointer;
     transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
-    
+
     &:hover {
       transform: scale(1.02);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
       z-index: 100 !important;
     }
-    
+
   }
-  
+
   // Add styling for the popover panel
   .event-popover-panel {
     z-index: 1000;
-    
+
     .cdk-overlay-pane {
       z-index: 1000;
     }
@@ -1032,7 +1034,7 @@
 // Add a pointer indicator for events
 .custom-event-content {
   position: relative;
-  
+
   &:after {
     content: '';
     position: absolute;
@@ -1046,7 +1048,7 @@
     opacity: 0;
     transition: opacity 0.2s ease;
   }
-  
+
   &:hover:after {
     opacity: 1;
   }
@@ -1059,11 +1061,11 @@
   border-radius: 4px;
   cursor: pointer;
   position: relative;
-  
+
   &:hover {
     background-color: rgba(0, 0, 0, 0.05);
   }
-  
+
   .pi-chevron-down {
     font-size: 0.8rem;
     color: #666;
@@ -1090,7 +1092,7 @@
   padding: 12px 16px;
   border-bottom: 1px solid #e0e0e0;
   position: relative;
-  
+
   .search-icon {
     position: absolute;
     left: 24px;
@@ -1098,14 +1100,14 @@
     transform: translateY(-50%);
     color: #666;
   }
-  
+
   .practice-search {
     width: 100%;
     padding: 8px 16px 8px 36px;
     border: 1px solid #e0e0e0;
     border-radius: 20px;
     font-size: 0.9rem;
-    
+
     &:focus {
       outline: none;
       border-color: #3b82f6;
@@ -1116,24 +1118,24 @@
 .practices-list {
   overflow-y: auto;
   max-height: 250px;
-  
+
   .practice-item {
     padding: 12px 16px;
     cursor: pointer;
-    
+
     &:hover {
       background-color: #f5f5f5;
     }
-    
+
     &.selected {
       background-color: #f0f7ff;
     }
-    
+
     .practice-name {
       font-weight: 500;
       margin-bottom: 2px;
     }
-    
+
     .practice-id {
       font-size: 0.8rem;
       color: #666;
@@ -1344,7 +1346,7 @@
   flex-direction: row;
   justify-content: flex-start;
   gap: 4px;
-  
+
   .event-title {
     flex: 1 1 0%;
     min-width: 0;
@@ -1356,7 +1358,7 @@
     color: #333;
     order: 1;
   }
-  
+
   .event-time {
     flex-shrink: 0;
     font-size: 0.7rem;
@@ -1372,26 +1374,26 @@
   ::ng-deep .fc {
     .fc-event {
       padding: 2px 4px !important;
-      
+
       .fc-event-main {
         font-size: 0.7rem !important;
       }
     }
-    
+
     .fc-daygrid-day {
       height: 100px !important;
     }
-    
+
     .fc-daygrid-day-frame {
       height: 100px !important;
     }
   }
-  
+
   .custom-event-content {
     .event-title {
       font-size: 0.7rem;
     }
-    
+
     .event-time {
       font-size: 0.65rem;
     }
