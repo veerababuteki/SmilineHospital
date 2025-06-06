@@ -530,6 +530,32 @@ export class CalendarComponent implements OnInit {
       }
     });
   }
+
+    goToToday(): void {
+  const today = new Date();
+  this.currentDate = today;
+
+  const calendarApi = this.calendarComponent.getApi();
+  calendarApi.gotoDate(today);
+
+  switch (this.currentView) {
+    case 'dayGridMonth':
+      this.currentMonth = today;
+      this.updateMonthRange(); 
+      break;
+
+    case 'timeGridWeek':
+      this.weeklyViewDate = today;
+      this.updateWeekRange(); 
+      break;
+
+    case 'timeGridDay':
+      this.dailyViewDate = today;
+      this.changeDailyViewDate(0);
+      break;
+  }
+}
+
   changeDate(days: number): void {
     const updatedDate = new Date(this.currentDate);
     updatedDate.setDate(this.currentDate.getDate() + days);

@@ -56,7 +56,7 @@ export class AppointmentComponent implements OnInit {
     { label: '5 Hrs', value: 300 }
   ];
   bookingTypes: string[] = ['offline', 'online'];
-  status: string[] = ["Scheduled", "Completed", "Canceled", "Rescheduled"];
+  status: string[] = ["Scheduled", "Completed", "Cancelled", "Rescheduled"];
   appointmentStatus: string[] = ['None', 'Waiting', 'Engaged', 'Done'];
   showScheduleWarning: boolean = false;
   public selectedDate: any;
@@ -138,55 +138,83 @@ export class AppointmentComponent implements OnInit {
     }
   }
 
-  initForm() {
-    if(this.isDoctor && !this.editAppointment){
-      this.appointmentForm = this.fb.group({
-        patientName: ['', Validators.required],
-        patientId: ['', Validators.required],
-        mobileNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-        emailId: ['', [Validators.email]],
-        doctor: [''],
-        category: [''],
-        scheduledDate: [this.selectedDate == null ? new Date() : new Date(this.selectedDate), Validators.required],
-        scheduledTime: [this.selectedDate == null ? new Date() : new Date(this.selectedDate), Validators.required],
-        duration: ['15'],
-        bookingType: ['offline'],
-        plannedProcedures: [''],
-        notes: [''],
-        status:[{ value: 'Scheduled', disabled: !this.editAppointment }],
-        appointmentStatus:[{ value: 'None', disabled: !this.editAppointment }],
-      });
-    } else if (this.editAppointment){
-      const category = this.categories.find(c => c.category_id == this.appointment.category_details?.category_id)
-      const doctor = this.doctors.find(d => d.user_id === this.appointment.doctor_details?.doctor_id)
-      var formattedTime = this.convertTo24Hour(this.appointment.appointment_time);
-      this.appointmentForm = this.fb.group({
-        doctor: [doctor],
-        category: [category],
-        scheduledDate: [new Date(this.appointment.appointment_date), Validators.required],
-        scheduledTime: [new Date(this.appointment.appointment_date +'T'+ formattedTime), Validators.required],
-        duration: [this.appointment.duration],
-        bookingType: [this.appointment.booking_type],
-        plannedProcedures: [this.appointment.planned_procedure],
-        notes: [this.appointment.notes],
-        status:[{ value: this.appointment.status, disabled: !this.editAppointment }],
-        appointmentStatus:[{ value: this.appointment.appointment_status, disabled: !this.editAppointment }],
-      });
-    }
-    else{
-      this.appointmentForm = this.fb.group({
-        doctor: ['', Validators.required],
-        category: ['', Validators.required],
-        scheduledDate: [new Date(), Validators.required],
-        scheduledTime: [new Date(), Validators.required],
-        duration: ['15'],
-        bookingType: ['offline'],
-        plannedProcedures: [''],
-        notes: [''],
-        status:[{ value: 'Scheduled', disabled: !this.editAppointment }],
-        appointmentStatus:[{ value: 'None', disabled: !this.editAppointment }],
-      });
-    }
+ initForm() {
+  if (this.isDoctor && !this.editAppointment) {
+    const scheduledDate = this.selectedDate == null ? new Date() : new Date(this.selectedDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const formScheduledDate = new Date(scheduledDate);
+    formScheduledDate.setHours(0, 0, 0, 0);
+    const isPast = formScheduledDate < today;
+
+    this.appointmentForm = this.fb.group({
+      patientName: ['', Validators.required],
+      patientId: ['', Validators.required],
+      mobileNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      emailId: ['', [Validators.email]],
+      doctor: [''],
+      category: [''],
+      scheduledDate: [scheduledDate, Validators.required],
+      scheduledTime: [scheduledDate, Validators.required],
+      duration: [15],
+      bookingType: ['offline'],
+      plannedProcedures: [''],
+      notes: [''],
+      status: [{ value: 'Scheduled', disabled: !isPast }],
+      appointmentStatus: [{ value: 'None', disabled: !isPast }],
+    });
+
+    this.appointmentForm.get('scheduledDate')?.valueChanges.subscribe((selectedDate: Date) => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const date = new Date(selectedDate);
+      date.setHours(0, 0, 0, 0);
+
+      const isPast = date < today;
+
+      const statusControl = this.appointmentForm.get('status');
+      const appointmentStatusControl = this.appointmentForm.get('appointmentStatus');
+
+      if (isPast) {
+        statusControl?.enable();
+        appointmentStatusControl?.enable();
+      } else {
+        statusControl?.disable();
+        appointmentStatusControl?.disable();
+      }
+    });
+  }
+  else if (this.editAppointment) {
+    const category = this.categories.find(c => c.category_id == this.appointment.category_details?.category_id)
+    const doctor = this.doctors.find(d => d.user_id === this.appointment.doctor_details?.doctor_id)
+    var formattedTime = this.convertTo24Hour(this.appointment.appointment_time);
+    this.appointmentForm = this.fb.group({
+      doctor: [doctor],
+      category: [category],
+      scheduledDate: [new Date(this.appointment.appointment_date), Validators.required],
+      scheduledTime: [new Date(this.appointment.appointment_date + 'T' + formattedTime), Validators.required],
+      duration: [Number(this.appointment.duration)],
+      bookingType: [this.appointment.booking_type],
+      plannedProcedures: [this.appointment.planned_procedure],
+      notes: [this.appointment.notes],
+      status: [{ value: this.appointment.status, disabled: !this.editAppointment }],
+      appointmentStatus: [{ value: this.appointment.appointment_status, disabled: !this.editAppointment }],
+    });
+  }
+  else {
+    this.appointmentForm = this.fb.group({
+      doctor: ['', Validators.required],
+      category: ['', Validators.required],
+      scheduledDate: [new Date(), Validators.required],
+      scheduledTime: [new Date(), Validators.required],
+      duration: ['15'],
+      bookingType: ['offline'],
+      plannedProcedures: [''],
+      notes: [''],
+      status: [{ value: 'Scheduled', disabled: !this.editAppointment }],
+      appointmentStatus: [{ value: 'None', disabled: !this.editAppointment }],
+    });
+  }
 
   }
   convertTo24Hour(time12h: string): string {
