@@ -1401,4 +1401,195 @@
 }
 
 
+// Add these styles to your calendar.component.scss
 
+// Block Calendar Event Styles
+::ng-deep .fc-event.block-calendar-event {
+  border: none !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+  border-left: 4px solid !important;
+  
+  &.block-all-day {
+    opacity: 0.9;
+    
+    .fc-event-main {
+      padding: 4px 8px !important;
+    }
+  }
+  
+  &.block-slot {
+    opacity: 0.95;
+    
+    .fc-event-main {
+      padding: 2px 6px !important;
+    }
+  }
+  
+  &.doctor-specific {
+    background-color: #ff9800 !important; // Orange for specific doctor
+    border-left-color: #f57c00 !important;
+  }
+  
+  &.all-doctors {
+    background-color: #f44336 !important; // Red for all doctors
+    border-left-color: #d32f2f !important;
+  }
+}
+
+// Custom event content for block events
+.custom-event-content {
+  &.block-event {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 2px 4px !important;
+    font-size: 0.75rem !important;
+    color: white !important;
+    
+    i {
+      font-size: 0.7rem;
+      flex-shrink: 0;
+    }
+    
+    .event-title {
+      font-size: 0.7rem !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      color: white !important;
+      font-weight: 500 !important;
+    }
+    
+    .block-details {
+      display: flex;
+      flex-direction: column;
+      margin-top: 2px;
+      
+      .block-reason {
+        font-size: 0.65rem;
+        opacity: 0.9;
+        color: white !important;
+      }
+    }
+  }
+}
+
+// Month view specific styling
+::ng-deep .fc-event.block-calendar-event.month-view {
+  min-height: 18px !important;
+  margin: 1px 2px !important;
+  
+  .fc-event-main {
+    padding: 1px 4px !important;
+    
+    .custom-event-content.block-event {
+      .event-title {
+        font-size: 0.65rem !important;
+      }
+    }
+  }
+}
+
+// Week view specific styling
+::ng-deep .fc-event.block-calendar-event.week-view {
+  margin: 1px 2px !important;
+  
+  .fc-event-main {
+    padding: 2px 4px !important;
+  }
+}
+
+// Day view specific styling
+::ng-deep .fc-event.block-calendar-event.day-view {
+  margin: 1px 2px !important;
+  
+  .fc-event-main {
+    padding: 4px 6px !important;
+  }
+}
+
+// Hover effects for block events
+::ng-deep .fc-event.block-calendar-event:hover {
+  opacity: 1 !important;
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  z-index: 10 !important;
+}
+
+// Different styling for all-day block events
+::ng-deep .fc-event.block-calendar-event .fc-event-main {
+  border-radius: 3px;
+  
+  .custom-event-content.block-event {
+    justify-content: flex-start;
+    
+    i.pi-ban {
+      margin-right: 2px;
+    }
+  }
+}
+
+// Time grid view adjustments for block events
+::ng-deep .fc-timegrid-event.block-calendar-event {
+  background: linear-gradient(135deg, #f44336, #ff5722) !important;
+  border: none !important;
+  
+  &.doctor-specific {
+    background: linear-gradient(135deg, #ff9800, #ff5722) !important;
+  }
+  
+  .fc-event-main {
+    color: white !important;
+    
+    .custom-event-content.block-event {
+      .event-title {
+        color: white !important;
+        font-weight: 600 !important;
+      }
+    }
+  }
+}
+
+// Legend for block events (you can add this to your sidebar)
+.block-calendar-legend {
+  margin-top: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  
+  .legend-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    font-size: 0.75rem;
+    
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      border: 1px solid rgba(0,0,0,0.1);
+      
+      &.all-doctors {
+        background: #f44336;
+      }
+      
+      &.doctor-specific {
+        background: #ff9800;
+      }
+    }
+    
+    .legend-text {
+      color: #666;
+    }
+  }
+}

@@ -521,3 +521,1298 @@
 .patient-mobile {
   margin-top: 2px;
 }
+
+// Enhanced Block Calendar Form Styles
+
+.appointment-form {
+  // Block Calendar specific styles
+  .block-type-row {
+    margin: 24px 0;
+    
+    .section-label {
+      display: block;
+      color: #333;
+      margin-bottom: 16px;
+      font-size: 14px;
+      font-weight: 500;
+      
+      &::after {
+        content: '*';
+        color: #ff4d4f;
+        margin-left: 2px;
+      }
+    }
+    
+    .radio-options {
+      display: flex;
+      gap: 32px;
+      
+      .radio-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        
+        input[type="radio"] {
+          margin: 0;
+          width: 16px;
+          height: 16px;
+          cursor: pointer;
+          
+          &.ng-invalid {
+            outline: 2px solid #f44336;
+            border-radius: 50%;
+          }
+        }
+        
+        .radio-label {
+          margin: 0;
+          font-size: 14px;
+          color: #333;
+          cursor: pointer;
+          font-weight: 500;
+        }
+        
+        .radio-help {
+          font-size: 12px;
+          color: #666;
+          margin-top: 2px;
+        }
+      }
+    }
+  }
+
+  // Date range inputs for All Day
+  .date-range-inputs {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+    
+    .date-input-group {
+      flex: 1;
+      min-width: 200px;
+      
+      .input-label {
+        display: block;
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 4px;
+        font-weight: 500;
+      }
+    }
+    
+    .date-separator {
+      align-self: flex-end;
+      margin-bottom: 24px;
+      color: #666;
+      font-weight: 500;
+      padding: 0 8px;
+    }
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 12px;
+      
+      .date-separator {
+        align-self: flex-start;
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // Slot inputs for Block Slot
+  .slot-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    
+    .date-input-group {
+      .input-label {
+        display: block;
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 4px;
+        font-weight: 500;
+      }
+    }
+    
+    .time-range-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+      
+      .time-input-group {
+        flex: 1;
+        min-width: 150px;
+        
+        .input-label {
+          display: block;
+          font-size: 12px;
+          color: #666;
+          margin-bottom: 4px;
+          font-weight: 500;
+        }
+      }
+      
+      .time-separator {
+        align-self: flex-end;
+        margin-bottom: 24px;
+        color: #666;
+        font-weight: 500;
+        padding: 0 8px;
+      }
+      
+      @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 12px;
+        
+        .time-separator {
+          align-self: flex-start;
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  // Time warning styling
+  .time-warning {
+    color: #ff4d4f;
+    font-size: 12px;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    
+    i {
+      font-size: 14px;
+    }
+  }
+
+  // Block type selection improvements
+  .block-type-selection {
+    background: #f8f9fa;
+    padding: 16px;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+    
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 8px;
+      
+      .checkbox-item {
+        display: flex;
+        align-items: center;
+        
+        :host ::ng-deep {
+          .p-checkbox {
+            .p-checkbox-box {
+              border: 1px solid #dee2e6;
+              
+              &.p-highlight {
+                background: #2196F3;
+                border-color: #2196F3;
+              }
+              
+              &.ng-invalid {
+                border-color: #f44336;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Help text styling
+  .help-text {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 4px;
+    display: block;
+    font-style: italic;
+  }
+
+  // Enhanced caution message
+  .caution-message {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border: 1px solid #ffc107;
+    border-left: 4px solid #ff9800;
+    padding: 16px;
+    border-radius: 6px;
+    margin: 24px 0;
+    color: #856404;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+    strong {
+      color: #d84315;
+      font-weight: 600;
+    }
+    
+    i {
+      margin-right: 8px;
+      color: #ff9800;
+    }
+  }
+
+  // Form summary
+  .form-summary {
+    background: #e8f5e8;
+    border: 1px solid #4caf50;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    
+    h4 {
+      margin: 0 0 12px 0;
+      color: #2e7d32;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    ul {
+      margin: 0;
+      padding-left: 16px;
+      
+      li {
+        margin-bottom: 6px;
+        font-size: 13px;
+        color: #2e7d32;
+        
+        strong {
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  // Enhanced error messages
+  .error-message {
+    color: #f44336;
+    font-size: 12px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    
+    &::before {
+      content: '⚠';
+      font-size: 10px;
+    }
+  }
+
+  // Input validation styling
+  .ng-invalid {
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2) !important;
+    }
+  }
+
+  // PrimeNG Calendar specific overrides
+  :host ::ng-deep {
+    .p-calendar {
+      &.ng-invalid {
+        .p-inputtext {
+          border-color: #f44336;
+          box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.1);
+        }
+      }
+      
+      .p-datepicker {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border: 1px solid #e0e0e0;
+        
+        .p-datepicker-header {
+          background: #f8f9fa;
+          border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .p-datepicker-calendar {
+          td {
+            &.p-datepicker-today {
+              .p-datepicker-date {
+                background: #e3f2fd;
+                color: #1976d2;
+              }
+            }
+            
+            &.p-datepicker-other-month {
+              .p-datepicker-date {
+                color: #bdbdbd;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    .p-dropdown {
+      &.ng-invalid {
+        .p-dropdown-label {
+          border-color: #f44336;
+          box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.1);
+        }
+      }
+    }
+  }
+
+  // Enhanced button styling
+  .button-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 2px solid #f0f0f0;
+
+    button {
+      min-width: 120px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+
+      &.p-button-secondary {
+        background: #fff;
+        border: 2px solid #dee2e6;
+        color: #6c757d;
+
+        &:hover:not(:disabled) {
+          background: #f8f9fa;
+          border-color: #adb5bd;
+          color: #495057;
+          transform: translateY(-1px);
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+      }
+
+      &.p-button-primary {
+        background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+        border: 2px solid #2196F3;
+        box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+
+        &:hover:not(:disabled) {
+          background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+          border-color: #1976D2;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(33, 150, 243, 0.4);
+        }
+        
+        &:disabled {
+          background: #e0e0e0;
+          border-color: #e0e0e0;
+          color: #9e9e9e;
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
+        }
+      }
+    }
+  }
+
+  // Responsive design improvements
+  @media (max-width: 768px) {
+    .form-content {
+      padding: 0 16px 16px;
+    }
+    
+    .date-range-inputs,
+    .slot-inputs .time-range-group {
+      flex-direction: column;
+      
+      .date-separator,
+      .time-separator {
+        align-self: flex-start;
+        margin: 8px 0;
+      }
+    }
+    
+    .button-row {
+      flex-direction: column-reverse;
+      gap: 12px;
+      
+      button {
+        width: 100%;
+      }
+    }
+    
+    .checkbox-group {
+      gap: 16px;
+    }
+  }
+
+  // Animation for smooth transitions
+  .form-row {
+    transition: all 0.3s ease;
+    
+    &.ng-enter {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    
+    &.ng-enter-active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  // Focus states
+  input:focus,
+  .p-inputtext:focus {
+    outline: none;
+    border-color: #2196F3;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+  }
+}
+
+// Add these styles to your appointment.component.scss
+
+.block-calendar-check-section {
+  margin: 20px 0;
+  
+  .checking-blocks {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    
+    .loading-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #6c757d;
+      font-size: 14px;
+      
+      i {
+        font-size: 16px;
+        color: #2196F3;
+      }
+    }
+  }
+
+  .block-conflicts-warning {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border: 1px solid #ffc107;
+    border-left: 4px solid #ff9800;
+    border-radius: 6px;
+    padding: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    
+    .warning-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      
+      i {
+        color: #ff9800;
+        font-size: 18px;
+      }
+      
+      strong {
+        color: #d84315;
+        font-size: 16px;
+      }
+    }
+    
+    .conflict-details {
+      .conflict-message {
+        margin: 0 0 16px 0;
+        color: #856404;
+        font-size: 14px;
+        line-height: 1.5;
+        white-space: pre-line;
+      }
+      
+      .block-details-list {
+        margin: 16px 0;
+        
+        .block-detail-item {
+          background: rgba(255, 255, 255, 0.7);
+          border: 1px solid #f0c674;
+          border-radius: 4px;
+          padding: 12px;
+          margin-bottom: 8px;
+          
+          &:last-child {
+            margin-bottom: 0;
+          }
+          
+          .block-item-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            
+            i {
+              color: #dc3545;
+              font-size: 16px;
+            }
+            
+            .block-doctor {
+              font-weight: 600;
+              color: #333;
+              flex: 1;
+            }
+            
+            .block-type-badge {
+              font-size: 11px;
+              padding: 2px 6px;
+              border-radius: 10px;
+              font-weight: 500;
+              
+              &.allDay {
+                background: #e3f2fd;
+                color: #1976d2;
+              }
+              
+              &.blockSlot {
+                background: #fff3e0;
+                color: #f57c00;
+              }
+            }
+          }
+          
+          .block-item-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 12px;
+            color: #666;
+            
+            .block-reason {
+              font-style: italic;
+              color: #856404;
+            }
+            
+            .block-time {
+              font-weight: 500;
+              color: #333;
+            }
+            
+            .block-types {
+              color: #495057;
+              
+              span {
+                font-weight: 500;
+              }
+            }
+          }
+        }
+      }
+      
+      .conflict-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        margin-top: 16px;
+        
+        .conflict-action-btn {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          padding: 6px 12px;
+          border: none;
+          border-radius: 4px;
+          font-size: 12px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          
+          &.secondary {
+            background: #6c757d;
+            color: white;
+            
+            &:hover {
+              background: #5a6268;
+            }
+          }
+          
+          &.primary {
+            background: #2196F3;
+            color: white;
+            
+            &:hover {
+              background: #1976D2;
+            }
+          }
+          
+          i {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+
+  .no-conflicts-message {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border: 1px solid #28a745;
+    border-left: 4px solid #28a745;
+    border-radius: 6px;
+    padding: 12px 16px;
+    
+    .success-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #155724;
+      font-size: 14px;
+      font-weight: 500;
+      
+      i {
+        color: #28a745;
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+// Enhanced error message for time conflicts
+.error-message {
+  &.time-blocked {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 3px;
+    padding: 6px 8px;
+    color: #721c24;
+    font-weight: 500;
+    
+    &::before {
+      content: '🚫';
+      margin-right: 4px;
+    }
+  }
+}
+
+// Loading animation
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.pi-spin {
+  animation: spin 1s linear infinite;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .block-calendar-check-section {
+    margin: 16px 0;
+    
+    .block-conflicts-warning {
+      padding: 12px;
+      
+      .warning-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        
+        strong {
+          font-size: 14px;
+        }
+      }
+      
+      .conflict-details {
+        .block-details-list {
+          .block-detail-item {
+            padding: 8px;
+            
+            .block-item-header {
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 4px;
+              
+              .block-type-badge {
+                align-self: flex-start;
+              }
+            }
+          }
+        }
+        
+        .conflict-actions {
+          flex-direction: column;
+          
+          .conflict-action-btn {
+            width: 100%;
+            justify-content: center;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+// Complete CSS styles for doctor availability section in appointment.component.scss
+
+.doctor-availability-section {
+  margin: 20px 0;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  
+  .checking-availability {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: #f8f9fa;
+    
+    .loading-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #6c757d;
+      font-size: 14px;
+      
+      i {
+        font-size: 16px;
+        color: #2196F3;
+      }
+    }
+  }
+
+  .availability-status {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e9ecef;
+    
+    .status-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      
+      i {
+        font-size: 20px;
+      }
+    }
+    
+    &.status-available {
+      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+      border-left: 4px solid #28a745;
+      
+      .status-header {
+        color: #155724;
+        
+        i {
+          color: #28a745;
+        }
+      }
+    }
+    
+    &.status-partial {
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+      border-left: 4px solid #ffc107;
+      
+      .status-header {
+        color: #856404;
+        
+        i {
+          color: #ffc107;
+        }
+      }
+    }
+    
+    &.status-blocked {
+      background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+      border-left: 4px solid #dc3545;
+      
+      .status-header {
+        color: #721c24;
+        
+        i {
+          color: #dc3545;
+        }
+      }
+    }
+  }
+
+  .block-calendar-details {
+    background: #fff;
+    
+    .details-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+      
+      h4 {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        color: #333;
+        font-weight: 600;
+        
+        i {
+          color: #6c757d;
+        }
+      }
+      
+      .block-count {
+        font-size: 12px;
+        color: #6c757d;
+        background: #e9ecef;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-weight: 500;
+      }
+    }
+    
+    .block-section {
+      border-bottom: 1px solid #f0f0f0;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .section-title {
+        margin: 0;
+        padding: 12px 20px;
+        background: #fafbfc;
+        font-size: 14px;
+        font-weight: 600;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-bottom: 1px solid #e9ecef;
+        
+        i {
+          font-size: 16px;
+          color: #6c757d;
+        }
+      }
+      
+      .block-list {
+        padding: 16px 20px;
+        
+        .block-item {
+          background: #fff;
+          border: 1px solid #e9ecef;
+          border-radius: 6px;
+          margin: 12px 0;
+          padding: 12px;
+          transition: all 0.2s ease;
+          
+          &:first-child {
+            margin-top: 0;
+          }
+          
+          &:last-child {
+            margin-bottom: 0;
+          }
+          
+          &:hover {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-color: #dee2e6;
+          }
+          
+          &.doctor-block {
+            border-left: 4px solid #17a2b8;
+          }
+          
+          &.all-doctors-block {
+            border-left: 4px solid #dc3545;
+          }
+          
+          .block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            
+            .block-info {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              flex: 1;
+              
+              .block-type-badge {
+                font-size: 11px;
+                padding: 3px 8px;
+                border-radius: 12px;
+                font-weight: 600;
+                
+                &.allDay {
+                  background: #e3f2fd;
+                  color: #1976d2;
+                }
+                
+                &.blockSlot {
+                  background: #fff3e0;
+                  color: #f57c00;
+                }
+              }
+              
+              .block-time {
+                font-size: 13px;
+                color: #495057;
+                font-weight: 500;
+                background: #f8f9fa;
+                padding: 2px 6px;
+                border-radius: 4px;
+              }
+            }
+            
+            .block-icon {
+              color: #dc3545;
+              font-size: 16px;
+              flex-shrink: 0;
+            }
+          }
+          
+          .block-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            
+            .block-reason {
+              font-size: 13px;
+              color: #333;
+              padding: 8px;
+              background: #f8f9fa;
+              border-radius: 4px;
+              border-left: 3px solid #17a2b8;
+              
+              strong {
+                color: #495057;
+              }
+            }
+            
+            .affected-types {
+              font-size: 12px;
+              color: #6c757d;
+              
+              strong {
+                color: #495057;
+              }
+              
+              .appointment-type {
+                background: #e9ecef;
+                padding: 2px 6px;
+                border-radius: 10px;
+                font-weight: 500;
+                margin: 0 2px;
+                display: inline-block;
+              }
+            }
+            
+            .block-meta {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              font-size: 11px;
+              color: #6c757d;
+              margin-top: 4px;
+              
+              .created-by {
+                font-style: italic;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    .availability-suggestion {
+      padding: 16px 20px;
+      background: #e8f5e8;
+      border-top: 1px solid #c3e6cb;
+      
+      .suggestion-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        color: #155724;
+        font-size: 14px;
+        line-height: 1.5;
+        
+        i {
+          color: #28a745;
+          font-size: 16px;
+          margin-top: 2px;
+          flex-shrink: 0;
+        }
+      }
+    }
+    
+    .booking-blocked-warning {
+      padding: 16px 20px;
+      background: #f8d7da;
+      border-top: 1px solid #f5c6cb;
+      
+      .warning-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        color: #721c24;
+        font-size: 14px;
+        line-height: 1.5;
+        font-weight: 500;
+        
+        i {
+          color: #dc3545;
+          font-size: 16px;
+          margin-top: 2px;
+          flex-shrink: 0;
+        }
+      }
+    }
+  }
+
+  .no-blocks-message {
+    padding: 20px;
+    background: #d4edda;
+    
+    .success-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #155724;
+      font-size: 14px;
+      justify-content: center;
+      font-weight: 500;
+      
+      i {
+        color: #28a745;
+        font-size: 18px;
+      }
+    }
+  }
+
+  .availability-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &.secondary {
+        background: #6c757d;
+        color: white;
+        
+        &:hover {
+          background: #5a6268;
+          transform: translateY(-1px);
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+      }
+      
+      &.primary {
+        background: #2196F3;
+        color: white;
+        
+        &:hover {
+          background: #1976D2;
+          transform: translateY(-1px);
+          box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+        }
+      }
+      
+      i {
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+// Loading animation
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.pi-spin {
+  animation: spin 1s linear infinite;
+}
+
+// Enhanced error message for time conflicts
+.error-message {
+  color: #f44336;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+
+  &.time-blocked {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 3px;
+    padding: 6px 8px;
+    color: #721c24;
+    font-weight: 500;
+    
+    &::before {
+      content: '🚫';
+      margin-right: 4px;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .doctor-availability-section {
+    margin: 16px 0;
+    
+    .availability-status {
+      padding: 12px 16px;
+      
+      .status-header {
+        font-size: 14px;
+        
+        i {
+          font-size: 18px;
+        }
+      }
+    }
+    
+    .block-calendar-details {
+      .details-header {
+        padding: 12px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        
+        h4 {
+          font-size: 14px;
+        }
+        
+        .block-count {
+          align-self: flex-start;
+        }
+      }
+      
+      .block-section {
+        .section-title {
+          padding: 10px 16px;
+          font-size: 13px;
+        }
+        
+        .block-list {
+          padding: 12px 16px;
+          
+          .block-item {
+            padding: 10px;
+            
+            .block-header {
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 8px;
+              
+              .block-info {
+                width: 100%;
+                flex-wrap: wrap;
+              }
+              
+              .block-icon {
+                align-self: flex-end;
+              }
+            }
+            
+            .block-content {
+              gap: 6px;
+              
+              .block-reason,
+              .affected-types,
+              .block-meta {
+                font-size: 12px;
+              }
+            }
+          }
+        }
+      }
+      
+      .availability-suggestion,
+      .booking-blocked-warning {
+        padding: 12px 16px;
+        
+        .suggestion-content,
+        .warning-content {
+          font-size: 13px;
+        }
+      }
+    }
+    
+    .no-blocks-message {
+      padding: 16px;
+      
+      .success-content {
+        font-size: 13px;
+        
+        i {
+          font-size: 16px;
+        }
+      }
+    }
+    
+    .availability-actions {
+      padding: 10px 16px;
+      flex-direction: column;
+      gap: 6px;
+      
+      .action-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 12px;
+      }
+    }
+  }
+}
+
+// Additional animations for smooth transitions
+.block-item {
+  animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Focus states for accessibility
+.action-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
+}
+
+// Print styles (optional)
+@media print {
+  .doctor-availability-section {
+    .availability-actions {
+      display: none;
+    }
+    
+    .block-item {
+      break-inside: avoid;
+    }
+  }
+}

@@ -31,7 +31,8 @@ import { AddProfileComponent } from '../patients-section/edit-profile/add-profil
 import { AppointmentsPrintComponent } from "./appointments-print/appointments-print.component";
 import { HostListener } from '@angular/core';
 import { DoctorColorService } from '../../services/doctor-color.service';
-
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 interface Doctor {
   id: string;
   name: string;
@@ -42,9 +43,10 @@ interface Doctor {
 @Component({
   selector: 'app-calendar',
   standalone: true,
-  providers: [DialogService, DatePipe, MessageService],
+  providers: [DialogService, DatePipe, MessageService, ConfirmationService],
   imports: [
     CommonModule,
+    ConfirmDialogModule,
     DropdownModule,
     FormsModule,
     FullCalendarModule,
@@ -59,7 +61,7 @@ interface Doctor {
     OverlayModule,
     CancelAppointmentDialogComponent,
     AddProfileComponent,
-    AppointmentsPrintComponent
+    AppointmentsPrintComponent,
   ],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
@@ -71,6 +73,7 @@ export class CalendarComponent implements OnInit {
   currentView: 'dayGridMonth' | 'timeGridDay' | 'timeGridWeek' = 'dayGridMonth';
 
   doctorsList: any[] = [];
+  blockCalendarEvents: any[] = []; 
   editAppointment: boolean = false;
   doctors: any[] = [];
   patients: any[] = [];
@@ -125,20 +128,17 @@ export class CalendarComponent implements OnInit {
 
     eventMouseEnter: (info) => {
       // Store the current event to track if mouse moved to another event
-      this.currentHoverEvent = info.event;
-
-      // Clear any existing timer to prevent multiple popovers
-      if (this.hoverTimer) {
-        clearTimeout(this.hoverTimer);
-      }
-
-      // Set a timer to show the popover after delay (1000ms = 1 second)
-      this.hoverTimer = setTimeout(() => {
-        // Only show if we're still hovering the same event
-        if (this.currentHoverEvent === info.event) {
-          this.showEventPopover(info.event, info.el);
+        this.currentHoverEvent = info.event;
+        
+        if (this.hoverTimer) {
+          clearTimeout(this.hoverTimer);
         }
-      }, 300);
+
+        this.hoverTimer = setTimeout(() => {
+          if (this.currentHoverEvent === info.event) {
+            this.showEventPopover(info.event, info.el);
+          }
+        }, 300);
     },
     // Add eventMouseLeave to close the popover when mouse leaves
     eventMouseLeave: (info) => {
@@ -202,6 +202,20 @@ export class CalendarComponent implements OnInit {
       }
     },
     eventContent: (arg) => {
+      if (arg.event.extendedProps['type'] === 'block_calendar') {
+        return {
+          html: `
+            <div class="custom-event-content block-event">
+              <i class="pi pi-ban"></i>
+              <span class="event-title">${arg.event.title}</span>
+              ${this.currentView !== 'dayGridMonth' ? 
+                `<div class="block-details">
+                  <span class="block-reason">${arg.event.extendedProps['leaveDetails']}</span>
+                </div>` : ''}
+            </div>
+          `
+        };
+      }
       let extraClass = '';
       if (arg.event.title.includes('Not Available')) {
         extraClass = 'not-available-event';
@@ -246,7 +260,7 @@ export class CalendarComponent implements OnInit {
   displayPrintAppointment = false;
   doctorColorMap: { [doctorId: string]: string } = {};
   constructor(private dialogService: DialogService, private overlay: Overlay, private datePipe: DatePipe, private elementRef: ElementRef,
-    private authService: AuthService, private messageService: MessageService, private userService: UserService,  private doctorColorService: DoctorColorService, private appointmentService: AppointmentService) {
+    private authService: AuthService, private confirmationService: ConfirmationService, private messageService: MessageService, private userService: UserService,  private doctorColorService: DoctorColorService, private appointmentService: AppointmentService) {
 
   }
 
@@ -489,8 +503,10 @@ export class CalendarComponent implements OnInit {
       currentUser: this.authService.getUser(),
       appointments: this.appointmentService.getAppointments(firstDay, lastDay),
       admins: this.userService.getDoctors('486320ca-8dc7-45bb-a42a-0fc0c3bb3156'),
+      blockCalendarEvents: this.appointmentService.getBlockCalendarByDateRange(this.firstDayOfMonth, this.lastDayOfMonth, this.selectedPractice?.branch_id)
+
     }).subscribe({
-      next: ({ doctors, patients, categories, currentUser, appointments, admins }) => {
+      next: ({ doctors, patients, categories, currentUser, appointments, admins, blockCalendarEvents }) => {
         this.admins = admins.data;
         this.currentUser = currentUser.data;
         var admin = this.admins.find(a => a.user_id === currentUser.data.user_id);
@@ -521,6 +537,7 @@ export class CalendarComponent implements OnInit {
             this.isDoctor = true;
         }
         this.categories = categories.data.rows;
+        this.blockCalendarEvents = blockCalendarEvents.data.rows || [];
         this.addAppointmentsToCalendar(appointments);
         this.changeDate(0);
         this.isDataLoaded = true
@@ -567,8 +584,14 @@ export class CalendarComponent implements OnInit {
     this.dailyViewDate = updatedDate;
     const calendarApi = this.calendarComponent.getApi();
     calendarApi.gotoDate(this.dailyViewDate);
-    const firstDay = this.formatDateToYYYYMMDD(this.dailyViewDate)
-    this.appointmentService.getAppointments(firstDay, firstDay).subscribe(appointments => {
+    
+    const firstDay = this.formatDateToYYYYMMDD(this.dailyViewDate);
+    
+    forkJoin({
+      appointments: this.appointmentService.getAppointments(firstDay, firstDay),
+      blockEvents: this.appointmentService.getBlockCalendarByDateRange(firstDay, firstDay, this.selectedPractice?.branch_id)
+    }).subscribe(({ appointments, blockEvents }) => {
+      this.blockCalendarEvents = blockEvents.data.rows || [];
       this.addAppointmentsToCalendar(appointments);
     });
   }
@@ -589,7 +612,13 @@ export class CalendarComponent implements OnInit {
 
     const lastDay = new Date(year, month + 1, 6);
     this.lastDayOfMonth = this.formatDateToYYYYMMDD(lastDay);
-    this.appointmentService.getAppointments(firstDay, lastDay).subscribe(appointments => {
+    
+    // Fetch both appointments and block calendar events
+    forkJoin({
+      appointments: this.appointmentService.getAppointments(firstDay, lastDay),
+      blockEvents: this.appointmentService.getBlockCalendarByDateRange(this.firstDayOfMonth, this.lastDayOfMonth, this.selectedPractice?.branch_id)
+    }).subscribe(({ appointments, blockEvents }) => {
+      this.blockCalendarEvents = blockEvents.data.rows || [];
       this.addAppointmentsToCalendar(appointments);
     });
   }
@@ -714,7 +743,107 @@ export class CalendarComponent implements OnInit {
         ]
       })
     });
+    
+    this.addBlockCalendarEvents(events);
+
     this.calendarOptions.events = events;
+  }
+
+  // New method to add block calendar events
+  addBlockCalendarEvents(events: any[]) {
+    this.blockCalendarEvents.forEach((block: any) => {
+      if (block.block_type === 'allDay') {
+        // All day block
+        const fromDate = new Date(block.from_date);
+        const toDate = new Date(block.to_date);
+        
+        // Create events for each day in the range
+        const currentDate = new Date(fromDate);
+        while (currentDate <= toDate) {
+          events.push({
+            title: this.getBlockTitle(block),
+            start: new Date(currentDate),
+            allDay: true,
+            extendedProps: {
+              type: 'block_calendar',
+              status: 'blocked',
+              blockType: 'allDay',
+              leaveDetails: block.leave_details,
+              doctorName: block.doctor_details?.user_profile_details?.[0] ? 
+                (block.doctor_details.user_profile_details[0].first_name + ' ' + block.doctor_details.user_profile_details[0].last_name) : 'All Doctors',
+              blockId: block.id,
+              blockVideoAppointments: block.block_video_appointments,
+              blockInClinicAppointments: block.block_in_clinic_appointments,
+              createdBy: block.creator_details?.user_profile_details?.[0] ?
+                (block.creator_details.user_profile_details[0].first_name + ' ' + block.creator_details.user_profile_details[0].last_name) : 'Unknown'
+            },
+            className: [
+              'block-calendar-event',
+              'block-all-day',
+              block.doctor_id ? 'doctor-specific' : 'all-doctors'
+            ],
+            color: block.doctor_id ? '#ff9800' : '#f44336', // Orange for specific doctor, red for all doctors
+            textColor: 'white'
+          });
+          
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      } else if (block.block_type === 'blockSlot') {
+        // Time slot block
+        const blockDate = new Date(block.date);
+        const startTime = this.parseTimeToDate(block.start_time, blockDate);
+        const endTime = this.parseTimeToDate(block.end_time, blockDate);
+
+        events.push({
+          title: this.getBlockTitle(block),
+          start: startTime,
+          end: endTime,
+          allDay: false,
+          extendedProps: {
+            type: 'block_calendar',
+            status: 'blocked',
+            blockType: 'blockSlot',
+            leaveDetails: block.leave_details,
+            doctorName: block.doctor_details?.user_profile_details?.[0] ? 
+              (block.doctor_details.user_profile_details[0].first_name + ' ' + block.doctor_details.user_profile_details[0].last_name) : 'All Doctors',
+            blockId: block.id,
+            blockVideoAppointments: block.block_video_appointments,
+            blockInClinicAppointments: block.block_in_clinic_appointments,
+            createdBy: block.creator_details?.user_profile_details?.[0] ?
+              (block.creator_details.user_profile_details[0].first_name + ' ' + block.creator_details.user_profile_details[0].last_name) : 'Unknown',
+            startTime: block.start_time,
+            endTime: block.end_time
+          },
+          className: [
+            'block-calendar-event',
+            'block-slot',
+            block.doctor_id ? 'doctor-specific' : 'all-doctors'
+          ],
+          color: block.doctor_id ? '#ff9800' : '#f44336',
+          textColor: 'white'
+        });
+      }
+    });
+  }
+
+  // Helper method to get block title
+  getBlockTitle(block: any): string {
+    const doctorName = block.doctor_details?.user_profile_details?.[0] ? 
+      'Dr. ' + block.doctor_details.user_profile_details[0].first_name : 'All Doctors';
+    
+    if (block.block_type === 'allDay') {
+      return `🚫 ${doctorName} - ${block.leave_details}`;
+    } else {
+      return `🚫 ${doctorName} - Blocked (${block.start_time}-${block.end_time})`;
+    }
+  }
+
+  // Helper method to parse time string to Date object
+  parseTimeToDate(timeString: string, baseDate: Date): Date {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    const result = new Date(baseDate);
+    result.setHours(hours, minutes, 0, 0);
+    return result;
   }
 
   convertTo24Hour(time12h: string): string {
@@ -788,6 +917,8 @@ export class CalendarComponent implements OnInit {
     componentRef.instance.close.subscribe(() => this.closePopover());
     componentRef.instance.edit.subscribe((evt) => this.handleEventEdit(evt));
     componentRef.instance.delete.subscribe((evt) => this.handleEventDelete(evt));
+  
+    componentRef.instance.deleteBlock.subscribe((evt) => this.handleBlockDelete(evt));
   }
 
   private closePopover() {
@@ -796,7 +927,79 @@ export class CalendarComponent implements OnInit {
       this.overlayRef = null;
     }
   }
+  
+  private handleBlockDelete(event: any) {
+    console.log('Delete block calendar:', event);
 
+    // Show confirmation dialog
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to delete this block calendar entry?',
+      header: 'Delete Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Delete',
+      rejectLabel: 'Cancel',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text',
+      accept: () => {
+        // User confirmed deletion
+        this.performBlockDelete(event);
+      },
+      reject: () => {
+        // User cancelled deletion
+        console.log('Block calendar deletion cancelled');
+        this.showMessage('info', 'Cancelled', 'Block calendar deletion was cancelled');
+      }
+    });
+  }
+
+  private performBlockDelete(event: any) {
+    const blockId = event.extendedProps.blockId;
+    
+    if (!blockId) {
+      this.showMessage('error', 'Error', 'Block ID not found');
+      return;
+    }
+
+    // Show loading message
+    this.showMessage('info', 'Deleting...', 'Please wait while we delete the block calendar entry');
+
+    // Call your appointment service to delete the block calendar
+    this.appointmentService.deleteBlockCalendar(blockId.toString()).subscribe({
+      next: (response) => {
+        this.showMessage('success', 'Success', 'Block calendar deleted successfully');
+        this.closePopover(); // Close the popover
+        // Refresh the calendar
+        this.updateCurrentViewData();
+      },
+      error: (error) => {
+        console.error('Error deleting block calendar:', error);
+        
+        // Handle different types of errors
+        if (error.status === 0) {
+          this.showMessage('error', 'Connection Error', 
+            'Unable to connect to server. Please check if the server is running.');
+        } else if (error.status === 404) {
+          this.showMessage('error', 'Not Found', 'Block calendar entry not found.');
+        } else if (error.status === 401) {
+          this.showMessage('error', 'Unauthorized', 'You are not authorized to delete this block calendar.');
+        } else if (error.status === 403) {
+          this.showMessage('error', 'Forbidden', 'You do not have permission to delete this block calendar.');
+        } else {
+          this.showMessage('error', 'Error', `Failed to delete block calendar: ${error.message || 'Unknown error'}`);
+        }
+      }
+    });
+  }
+
+  private updateCurrentViewData() {
+    if (this.currentView === 'dayGridMonth') {
+      this.updateMonthRange();
+    } else if (this.currentView === 'timeGridWeek') {
+      this.updateWeekRange();
+    } else if (this.currentView === 'timeGridDay') {
+      this.changeDailyViewDate(0);
+    }
+  }
   private handleEventEdit(event: any) {
     this.myButton.editAppointment = true;
     this.myButton.appointementId = event.extendedProps.appointmentId;
@@ -924,8 +1127,7 @@ export class CalendarComponent implements OnInit {
   }
 
   // Add method to update week range and fetch appointments
-  private updateWeekRange(): void {
-    // Calculate first day (Sunday) and last day (Saturday) of the current week
+   private updateWeekRange(): void {
     const currentDate = new Date(this.weeklyViewDate);
     const day = currentDate.getDay();
 
@@ -938,8 +1140,12 @@ export class CalendarComponent implements OnInit {
     const firstDayFormatted = this.formatDateToYYYYMMDD(firstDay);
     const lastDayFormatted = this.formatDateToYYYYMMDD(lastDay);
 
-    // Fetch appointments for the week
-    this.appointmentService.getAppointments(firstDayFormatted, lastDayFormatted).subscribe(appointments => {
+    // Fetch both appointments and block calendar events
+    forkJoin({
+      appointments: this.appointmentService.getAppointments(firstDayFormatted, lastDayFormatted),
+      blockEvents: this.appointmentService.getBlockCalendarByDateRange(firstDayFormatted, lastDayFormatted, this.selectedPractice?.branch_id)
+    }).subscribe(({ appointments, blockEvents }) => {
+      this.blockCalendarEvents = blockEvents.data.rows || [];
       this.addAppointmentsToCalendar(appointments);
     });
   }
