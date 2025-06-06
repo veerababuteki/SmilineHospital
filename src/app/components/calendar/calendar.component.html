@@ -82,7 +82,7 @@
     <div *ngIf="isAdmin" class="calendar-sidebar">
       <div class="block-calendar">
         <i class="pi pi-calendar"></i>
-        <app-appointment [data]="'blockCalendar'"></app-appointment>
+        <app-appointment [data]="'blockCalendar'" [doctors]="doctors"></app-appointment>
       </div>
 
       <div class="doctors-section">
@@ -248,3 +248,9 @@
 <app-cancel-appointment-dialog [visible]="showCancelDialog" [appointmentData]="selectedEvent"
   (close)="onCancelDialogClose()" (confirm)="onCancelAppointmentConfirm($event)">
 </app-cancel-appointment-dialog>
+<p-confirmDialog 
+  [style]="{width: '450px'}"
+  [baseZIndex]="10000"
+  rejectButtonStyleClass="p-button-text"
+  acceptButtonStyleClass="p-button-danger">
+</p-confirmDialog>
