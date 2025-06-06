@@ -510,7 +510,9 @@ export class CalendarComponent implements OnInit {
         this.admins = admins.data;
         this.currentUser = currentUser.data;
         var admin = this.admins.find(a => a.user_id === currentUser.data.user_id);
+        if(this.currentUser.role_details.role_id === '486320ca-8dc7-45bb-a42a-0fc0c3bb3156') {
           this.isAdmin = true;
+        }
 
         // Sort doctors by user_id for stable color assignment
         const sortedDoctors = doctors.data.slice().sort((a: any, b: any) => String(a.user_id).localeCompare(String(b.user_id)));
