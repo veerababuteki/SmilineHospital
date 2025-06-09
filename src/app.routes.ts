@@ -23,6 +23,7 @@ import { AddProfileComponent } from './app/components/patients-section/edit-prof
 import { AddCompletedProceduresComponent } from './app/components/patients-section/completed-procedures/add-completed-procedures.component';
 import { AddInvoiceComponent } from './app/components/patients-section/invoice/add-invoice.component';
 import { AddPaymentComponent } from './app/components/patients-section/payments/add-payment.component';
+import { ReportsComponent } from './app/components/reports/reports.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -34,6 +35,7 @@ export const routes: Routes = [
         { path: '', redirectTo: 'calendar', pathMatch: 'full' },
         { path: 'calendar', component: CalendarComponent },
         { path: 'appointment', component: AppointmentComponent },
+        { path: 'reports', component: ReportsComponent },
         { path: 'patients', component: PatientsSectionComponent,
           children: [
             { path: '', redirectTo: 'patient-directory', pathMatch: 'full' },

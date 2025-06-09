@@ -209,5 +209,5 @@ checkAppointmentConflict(params: {
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error.message || 'Server error');
   }
-  
+
 }
