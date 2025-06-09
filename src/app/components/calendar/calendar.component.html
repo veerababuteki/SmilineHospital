@@ -53,8 +53,7 @@
         <button class="nav-btn" (click)="changeWeeklyViewDate(1)"><i class="pi pi-chevron-right"></i></button>
       </div>
       <div class="view-controls">
-        <button class="view-btn" [class.selected]="currentDate.toDateString() === (currentDate | date:'shortDate')"
-          (click)="changeDate(0)">Today</button>
+        <button class="view-btn" (click)="goToToday()">Today</button>
         <button class="view-btn" [class.selected]="currentView === 'timeGridDay'"
           (click)="changeView('timeGridDay')">Day</button>
         <button class="view-btn" [class.selected]="currentView === 'timeGridWeek'"
@@ -127,7 +126,7 @@
           <span *ngIf="addCategory" (click)="toggleAddCategory()" class="edit-link">Done</span>
         </div>
 
-        <div class="search-box">
+        <div class="search-box-2">
           <input *ngIf="!addCategory" [(ngModel)]="searchCategory" type="text" placeholder="Search category"
             class="search-input">
           <input *ngIf="addCategory" type="text" placeholder="+Add Category" class="search-input"

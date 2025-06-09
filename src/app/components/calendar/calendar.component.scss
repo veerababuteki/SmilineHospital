@@ -246,6 +246,33 @@
       }
     }
 
+    .search-box-2 {
+      position: relative;
+      padding: 0 1rem;
+      margin-bottom: 0.5rem;
+
+      .search-input {
+        width: 100%;
+        padding: 0.5rem 2rem 0.5rem 0.75rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 0.8rem;
+
+        &::placeholder {
+          color: #999;
+        }
+      }
+
+      i {
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+        font-size: 0.8rem;
+      }
+    }
+
     .doctors-list, .categories-list {
       .all-doctors {
         display: flex;
@@ -257,8 +284,13 @@
         font-weight: 500;
       }
 
-      .doctors-scroll, .categories-scroll {
-        max-height: 300px;
+      .categories-scroll {
+        max-height: 93px;
+        overflow-y: auto;
+      }
+
+      .doctors-scroll {
+        max-height: 148px;
         overflow-y: auto;
       }
     }
