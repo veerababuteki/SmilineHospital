@@ -16,6 +16,7 @@
             <thead>
                 <tr>
                     <th class="procedure-col">RECEIPT NUMBER</th>
+                    <th class="procedure-col">REFERENCE NUMBER</th>
                     <th class="cost-col">AMOUNT PAID</th>
                     <th class="discount-col">INVOICES</th>
                     <th class="total-col">TOWARDS</th>
@@ -27,6 +28,7 @@
                 <!-- First Procedure -->
                 <tr class="procedure-row">
                     <td class="procedure-col">{{payment.receipt_id}}</td>
+                    <td class="reference-col">{{ payment.referenceNumber || 'N/A' }}</td>
                     <td class="cost-col">{{payment.amount_paid}}</td>
                     <td class="discount-col">{{payment.invoice_id}}</td>
                     <td class="total-col"></td>
