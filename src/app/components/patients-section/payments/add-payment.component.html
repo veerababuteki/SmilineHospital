@@ -41,6 +41,10 @@
             <input type="text" [(ngModel)]="cardLastDigits" maxlength="4" [ngClass]="{'error': cardDigitsError && formSubmitted}">
             <div class="error-message" *ngIf="cardDigitsError && formSubmitted">Last 4 digits are required</div>
           </div>
+          <div class="number-field" *ngIf="paymentMethod !== 'cash'">
+            <label>Reference Number</label>
+            <input type="text" [(ngModel)]="referenceNumber" [ngClass]="{formSubmitted}" placeholder="Optional">
+          </div>
         </div>
 
         <!-- Display available advance -->

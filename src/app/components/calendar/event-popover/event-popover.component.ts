@@ -78,8 +78,8 @@ import { Router } from '@angular/router';
               <a (click)="navigateToProfile()"><h3>{{ event.extendedProps?.patientName }}</h3></a>
               <div class="patient-details">
                 <span>{{ event.extendedProps?.patientCode || '111398' }}</span>
-                <span class="dot">•</span>
-                <span>{{ event.extendedProps?.age || '36' }} Years</span>
+                <span class="dot"> </span>
+                <span>{{ event.extendedProps?.age || '' }} </span>
               </div>
               <div class="show-balance">Show Balance</div>
             </div>
