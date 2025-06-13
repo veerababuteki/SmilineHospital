@@ -13,6 +13,7 @@ import { ButtonModule } from 'primeng/button';
 import { TreatmentPlansPrintComponent } from './treatment-plans-print/treatment-plans-print.component';
 import { MessageService } from '../../../services/message.service';
 import { TooltipModule } from 'primeng/tooltip';
+import { PatientDataService } from '../../../services/patient-data.service';
 
 @Component({
   selector: 'app-treatment-plans',
@@ -53,7 +54,9 @@ export class TreatmentPlansComponent implements OnInit {
     private messageService: MessageService,
     private treatmentPlansService: TreatmentPlansService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+      private patientDataService: PatientDataService
+
   ) {
     const selectedPractice = localStorage.getItem('selectedPractice');
         if(selectedPractice){
@@ -65,30 +68,37 @@ export class TreatmentPlansComponent implements OnInit {
   items: MenuItem[] = [];
 
   ngOnInit() {
-    this.route.parent?.paramMap.subscribe(params => {
-      if (this.patientId == null) {
-        this.patientId = params.get('id');
-      }
-      if (this.patientId) {
-        this.loadPatientData(this.patientId);
-      }
-    });
-    this.route.paramMap.subscribe(params => {
-      if(this.uniqueCode == null) {
-        this.uniqueCode = params.get('source');
-        if (this.uniqueCode) {
-          this.messageService.sendMessage(this.patientId ? this.patientId : '', this.uniqueCode ? this.uniqueCode : '');
-        }
-      }
-    });
-    this.items = [
-      {
-        label: 'Edit',
-        icon: 'pi pi-pencil',
-        command: (event) => this.updateTreatmentPlans(event)
-      }
-    ];
+  const routeId = this.route.parent?.snapshot.paramMap.get('id');
+  const source = this.route.snapshot.paramMap.get('source');
+
+  if (routeId && source) {
+    this.patientId = routeId;
+    this.uniqueCode = source;
+  } else {
+    const cached = localStorage.getItem('patientContext');
+    if (cached) {
+      const context = JSON.parse(cached);
+      this.patientId = context.patientId;
+      this.uniqueCode = context.uniqueCode;
+    }
   }
+
+  // Subscribe to shared data
+  this.patientDataService.data$.subscribe((data) => {
+    const treatments = data?.treatmentPlans?.data?.rows || [];
+
+    const activeTreatmentPlans = treatments.filter((_: any) => _.status !== 'Completed');
+    this.treatmentPlans = this.groupByDate(activeTreatmentPlans);
+  });
+
+  this.items = [
+    {
+      label: 'Edit',
+      icon: 'pi pi-pencil',
+      command: (event) => this.updateTreatmentPlans(event)
+    }
+  ];
+}
 
   updateTreatmentPlans(treatmentPlan: any): void {
     this.router.navigate(['patients', this.patientId, 'add-treatment-plan', this.uniqueCode], {
@@ -112,8 +122,14 @@ export class TreatmentPlansComponent implements OnInit {
   loadPatientData(patientId: string) {
     if (this.patientId !== null && this.patientId !== undefined) {
       this.treatmentPlansService.getTreatmentPlans(Number(this.patientId)).subscribe(res => {
-        var activeTreatmentPlans = res.data.rows.filter((_:any) => _.status != "Completed");
-        this.treatmentPlans = this.groupByDate(activeTreatmentPlans);
+        const existingData = this.patientDataService.getSnapshot();
+
+        const updatedData = {
+          ...existingData,
+          treatmentPlans: res
+        };
+
+        this.patientDataService.setData(updatedData);
       });
     }
   }

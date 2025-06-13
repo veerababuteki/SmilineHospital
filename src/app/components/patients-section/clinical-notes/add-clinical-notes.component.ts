@@ -8,6 +8,7 @@ import { ClinicalNotesService } from '../../../services/clinical-notes.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { MessageService } from '../../../services/message.service';
+import { PatientDataService } from '../../../services/patient-data.service';
 
 interface Category {
   name: string;
@@ -76,7 +77,8 @@ export class AddClinicalNotesComponent implements OnInit {
   constructor(private messageService: MessageService, private userService: UserService, 
     private router: Router,
     private clinicalNotesService: ClinicalNotesService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private patientDataService: PatientDataService
   ) {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras.state) {
@@ -99,8 +101,6 @@ export class AddClinicalNotesComponent implements OnInit {
         this.uniqueCode = params.get('source');
       }
       if (this.uniqueCode) {
-        this.messageService.sendMessage(this.patientId ? this.patientId : '', this.uniqueCode ? this.uniqueCode : '');
-
       }
     });
     this.initializeCategories();
@@ -498,7 +498,7 @@ export class AddClinicalNotesComponent implements OnInit {
       
       this.clinicalNotesService.updateClinicalNotes(noteToUpdate).subscribe({
         next: (res) => {
-          this.router.navigate(['/patients', this.patientId, 'clinical-notes', this.uniqueCode]);
+          this.loadPatientData()
         },
         error: (err) => {
           console.error('Error updating clinical note:', err);
@@ -508,7 +508,7 @@ export class AddClinicalNotesComponent implements OnInit {
       // Otherwise, use the existing saveClinicalNotes method
       this.clinicalNotesService.saveClinicalNotes(clinicalNote).subscribe({
         next: (res) => {
-          this.router.navigate(['/patients', this.patientId, 'clinical-notes', this.uniqueCode]);
+          this.loadPatientData()
         },
         error: (err) => {
           console.error('Error saving clinical note:', err);
@@ -519,5 +519,18 @@ export class AddClinicalNotesComponent implements OnInit {
 
   cancel() {
     this.router.navigate(['/patients', this.patientId, 'clinical-notes', this.uniqueCode]);
+  }
+
+  loadPatientData(){
+    this.clinicalNotesService.getClinicalNotes(Number(this.patientId)).subscribe(res => {
+      const existingData = this.patientDataService.getSnapshot();
+
+      const updatedData = {
+        ...existingData,
+        clinicalNotes: res
+      };
+      this.patientDataService.setData(updatedData);
+      this.router.navigate(['/patients', this.patientId, 'clinical-notes', this.uniqueCode]);
+    })
   }
 }

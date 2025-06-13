@@ -33,7 +33,6 @@ export class PaymentsComponent implements OnInit {
           this.uniqueCode = params.get('source');
         }
         if(this.uniqueCode !== null){
-          this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
         }
       });
     }

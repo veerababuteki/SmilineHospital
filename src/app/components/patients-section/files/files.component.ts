@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from '../../../services/message.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { PatientDataService } from '../../../services/patient-data.service';
 
 @Component({
   selector: 'app-files',
@@ -35,25 +36,35 @@ export class FilesComponent implements OnInit {
         private fileService: FileService, 
         private route: ActivatedRoute, 
         private messageService: MessageService,
-        private sanitizer: DomSanitizer
+        private sanitizer: DomSanitizer,
+          private patientDataService: PatientDataService
     ) {}
     
     ngOnInit(): void {
       this.route.parent?.paramMap.subscribe(params => {
-        if(this.patientId == null) {
-          this.patientId = params.get('id');
-        }
-        if (this.patientId) {
-          this.loadPatientData(this.patientId);
-        }
-      });  
+        this.patientId = params.get('id');
+      });
+
       this.route.paramMap.subscribe(params => {
-        if(this.uniqueCode == null) {
-          this.uniqueCode = params.get('source');
-        }
-        if(this.uniqueCode !== null){
-          this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
-        }
+        this.uniqueCode = params.get('source');
+      });
+
+      this.patientDataService.data$.subscribe((data) => {
+      if (data && data.files?.data?.rows) {
+        this.files = data.files.data.rows.filter((f: any) => f.status !== 'Deleted');
+        this.filesDict = this.groupByDate(this.files);
+      }
+      if (data && data.labels?.data) {
+        this.labels = data.labels.data;
+      } else {
+        this.loadFileLabels();
+      }
+    });
+    }
+
+    loadFileLabels() {
+      this.fileService.getFileLabels().subscribe(labels => {
+      this.labels = labels.data;
       });
     }
     
@@ -62,8 +73,14 @@ export class FilesComponent implements OnInit {
         this.labels = labels.data;
       });
       this.fileService.getPatientFiles(Number(patientId)).subscribe(files => {
-        this.files = files.data.rows.filter((f: any) => f.status !== 'Deleted');
-        this.filesDict = this.groupByDate(files.data.rows.filter((f: any) => f.status !== 'Deleted'));
+        const existingData = this.patientDataService.getSnapshot();
+
+        const updatedData = {
+          ...existingData,
+          files: files
+        };
+
+        this.patientDataService.setData(updatedData);
       });
     }
 

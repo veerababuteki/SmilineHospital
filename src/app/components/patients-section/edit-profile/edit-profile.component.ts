@@ -90,7 +90,6 @@ export class EditProfileComponent implements OnInit {
       }
       if(this.uniqueCode){
         this.loadPatientData(this.uniqueCode)
-        this.customMessageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
       }
 
     });

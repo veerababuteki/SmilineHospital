@@ -9,6 +9,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter, forkJoin } from 'rxjs';
 import { MessageService } from '../../../services/message.service';
+import { PatientDataService } from '../../../services/patient-data.service';
 
 @Component({
   selector: 'app-add-invoice',
@@ -44,7 +45,7 @@ export class AddInvoiceComponent implements OnInit {
   constructor(private fb: FormBuilder, 
     private userService: UserService,              
     private messageService: MessageService,
-    
+    private patientDataService: PatientDataService,
     private treatmentPlansService: TreatmentPlansService,
     private router:Router,
     private route: ActivatedRoute
@@ -100,7 +101,6 @@ export class AddInvoiceComponent implements OnInit {
         this.uniqueCode = params.get('source');
       }
       if(this.uniqueCode !== null){
-        this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
       }
     });
     this.getProcedures();
@@ -505,13 +505,13 @@ export class AddInvoiceComponent implements OnInit {
       if(this.isEditMode) {
         this.treatmentPlansService.updateInvoiceWithTreatmentPlan(treatment).subscribe(res => {
           console.log(res)
-          this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
+          this.fetchInvoices();
         });
       }
       else {
         this.treatmentPlansService.addInvoiceWithTreatmentPlan(treatment).subscribe(res => {
           console.log(res)
-          this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
+          this.fetchInvoices();
         });
       }
        
@@ -567,7 +567,7 @@ export class AddInvoiceComponent implements OnInit {
             next: () => {
               // Navigate only once after all payments are processed
               if (this.patientId !== null && this.patientId !== undefined) {
-                this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
+                this.fetchInvoices();
               }
             },
             error: (error) => {
@@ -578,7 +578,7 @@ export class AddInvoiceComponent implements OnInit {
         } else {
           // If no payments were needed, navigate anyway
           if (this.patientId !== null && this.patientId !== undefined) {
-            this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
+            this.fetchInvoices();
           }
         }
       });
@@ -614,6 +614,20 @@ export class AddInvoiceComponent implements OnInit {
   cancel(){
     this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
   }
+
+  fetchInvoices(){
+      this.treatmentPlansService.getInvoices(Number(this.patientId)).subscribe(res => {
+        const existingData = this.patientDataService.getSnapshot();
+
+        const updatedData = {
+          ...existingData,
+          invoices: res
+        };
+        this.patientDataService.setData(updatedData);
+        this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
+
+      })
+    }
 
   get sortedCompletedTreatmentPlans() {
     return this.completedTreatmentPlans.slice().sort((a, b) => {

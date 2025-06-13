@@ -8,6 +8,7 @@ import { MenuItem, MenuItemCommandEvent } from 'primeng/api';
 import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from '../../../services/message.service';
+import { PatientDataService } from '../../../services/patient-data.service';
 
 @Component({
   selector: 'app-clinical-notes',
@@ -26,29 +27,33 @@ export class ClinicalNotesComponent implements OnInit {
 
   constructor(private messageService: MessageService, private clinicalNotesService: ClinicalNotesService, 
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute, private patientDataService: PatientDataService,
+    
   ){
     
   }  
   
   ngOnInit(): void {
-    this.route.parent?.paramMap.subscribe(params => {
-      if(this.patientId == null) {
-        this.patientId = params.get('id');
-      }
-      if (this.patientId) {
-        this.loadPatientData(this.patientId);
-      }
-    });
-    this.route.paramMap.subscribe(params => {
-      if(this.uniqueCode == null) {
-        this.uniqueCode = params.get('source');
-      }
-      if (this.uniqueCode) {
-        this.messageService.sendMessage(this.patientId ? this.patientId : '', this.uniqueCode ? this.uniqueCode : '');
+    const routeId = this.route.parent?.snapshot.paramMap.get('id');
+  const source = this.route.snapshot.paramMap.get('source');
 
-      }
-    });
+  if (routeId && source) {
+    this.patientId = routeId;
+    this.uniqueCode = source;
+  } else {
+    const cached = localStorage.getItem('patientContext');
+    if (cached) {
+      const context = JSON.parse(cached);
+      this.patientId = context.patientId;
+      this.uniqueCode = context.uniqueCode;
+    }
+  }
+
+  // Subscribe to shared data
+  this.patientDataService.data$.subscribe((res) => {
+    const clinicalNotes = res?.clinicalNotes?.data?.rows || [];
+    this.clinicalNotes = clinicalNotes;
+  });
 
     this.items = [
       {

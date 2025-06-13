@@ -45,7 +45,6 @@ export class ProfileComponent implements OnInit {
   }
 
   loadPatientData(patientId: string){
-    this.messageService.sendMessage(this.patientId ? this.patientId : '', this.uniqueCode ? this.uniqueCode : '');
     this.userService.getUserProfile(patientId).subscribe(res =>{
       this.patientDetails = res.data;
     })

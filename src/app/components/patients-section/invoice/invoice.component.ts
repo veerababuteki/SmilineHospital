@@ -8,6 +8,7 @@ import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
 import { MessageService } from '../../../services/message.service';
+import { PatientDataService } from '../../../services/patient-data.service';
 
 @Component({
   selector: 'app-invoice',
@@ -29,7 +30,7 @@ export class InvoiceComponent implements OnInit {
   uniqueCode: string | null | undefined;
   
   constructor(private treatmentPlansService: TreatmentPlansService, 
-              private messageService: MessageService,
+              private patientDataService: PatientDataService,
     private router: Router, private route: ActivatedRoute){}
 
     ngOnInit(): void {
@@ -45,12 +46,15 @@ export class InvoiceComponent implements OnInit {
           command: (event) => this.cancelInvoice(event)
         }
       ];
+      this.patientDataService.data$.subscribe((data) => {
+        const invoices = data?.invoices?.data?.rows || [];
+        this.invoices = this.groupByDate(invoices)
+      });
       this.route.parent?.paramMap.subscribe(params => {
         if(this.patientId == null) {
           this.patientId = params.get('id');
         }
         if (this.patientId) {
-          this.fetchInvoices(this.patientId);
         }
       });
       this.route.paramMap.subscribe(params => {
@@ -58,7 +62,6 @@ export class InvoiceComponent implements OnInit {
           this.uniqueCode = params.get('source');
         }
         if(this.uniqueCode !== null){
-          this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
         }
       });
     }
@@ -115,7 +118,13 @@ export class InvoiceComponent implements OnInit {
 
     fetchInvoices(patientId: string){
       this.treatmentPlansService.getInvoices(Number(patientId)).subscribe(res => {
-        this.invoices = this.groupByDate( res.data.rows)
+        const existingData = this.patientDataService.getSnapshot();
+
+        const updatedData = {
+          ...existingData,
+          invoices: res
+        };
+        this.patientDataService.setData(updatedData);
       })
     }
 
