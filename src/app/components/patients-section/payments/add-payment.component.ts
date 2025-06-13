@@ -24,6 +24,7 @@ export class AddPaymentComponent implements OnInit {
   notes: string = '';
   receivedDate: string = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   showNotesInput: boolean = false;
+  referenceNumber: string = ''
   
   // Form validation
   formSubmitted: boolean = false;
@@ -118,20 +119,24 @@ export class AddPaymentComponent implements OnInit {
     switch(this.paymentMethod) {
       case 'cheque':
         this.cardLastDigits = '';
+        this.referenceNumber = '';
         break;
       case 'card':
         this.bank = '';
         this.chequeNumber = '';
+        this.referenceNumber = '';
         break;
       case 'paytm':
       case 'phonepe':
         this.chequeNumber = '';
         this.cardLastDigits = '';
+        this.referenceNumber = '';
         break;
       default:
         this.bank = '';
         this.chequeNumber = '';
         this.cardLastDigits = '';
+        this.referenceNumber = '';
     }
   }
   
@@ -768,11 +773,14 @@ export class AddPaymentComponent implements OnInit {
       bank_name: this.bank,
       cheque_number: this.chequeNumber,
       card_digits: this.cardLastDigits,
+      reference_number: this.referenceNumber,
       amount_paid: this.totalPayNow.toString(),
       notes: this.notes,
       use_advance_amount: this.totalFromAdvance.toString(),
       invoices_data: []
     };
+
+    console.log('check if reference number is being added', paymentData)
     
     // Add invoice data for selected invoices
     if (this.selectedInvoices.length > 0) {
