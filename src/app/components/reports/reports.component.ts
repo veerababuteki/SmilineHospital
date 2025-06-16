@@ -221,7 +221,9 @@ export class ReportsComponent implements OnInit {
             ];
             this.detailsData = [];
 
-            data.forEach((inv: any, index: number) =>{
+            const sortedData = data.sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+            sortedData.forEach((inv: any, index: number) =>{
                 this.detailsData.push({
                     sNo: index + 1,
                     date: new Date(inv.date).toLocaleDateString('en-GB', {
@@ -266,7 +268,9 @@ export class ReportsComponent implements OnInit {
             if(data == undefined || data.length == 0){
                 this.detailsData = [];
             }
-            data.forEach((pay: any, index: number) => {
+            const sortedData = data.sort((a: any, b: any) => new Date(a.invoice_date).getTime() - new Date(b.invoice_date).getTime());
+
+            sortedData.forEach((pay: any, index: number) => {
                 this.detailsData.push({
                     sNo: index + 1,
                     date: new Date(pay.invoice_date).toLocaleDateString('en-GB', {
@@ -305,7 +309,9 @@ export class ReportsComponent implements OnInit {
             if(data == undefined || data.length == 0){
                 this.detailsData = [];
             }
-            data.forEach((app: any, index: number) => {
+            const sortedData = data.sort((a: any, b: any) => new Date(a.appointment_date).getTime() - new Date(b.appointment_date).getTime());
+
+            sortedData.forEach((app: any, index: number) => {
                 this.detailsData.push({
                     sNo: index + 1,
                     date: new Date(app.appointment_date).toLocaleDateString('en-GB', {
@@ -369,7 +375,11 @@ export class ReportsComponent implements OnInit {
             if(data == undefined || data.length == 0){
                 this.detailsData = [];
             }
-            data.forEach((app: any, index: number) => {
+            const sortedData = data.sort((a: any, b: any) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+            );
+
+            sortedData.forEach((app: any, index: number) => {
                 this.detailsData.push({
                     sNo: index + 1,
                     date: new Date(app.created_at,).toLocaleDateString('en-GB', {
@@ -401,7 +411,11 @@ export class ReportsComponent implements OnInit {
             if(data == undefined || data.length == 0){
                 this.detailsData = [];
             }
-            data.forEach((app: any, index: number) => {
+            const sortedData = data.sort((a: any, b: any) =>
+            new Date(a.performed_on).getTime() - new Date(b.performed_on).getTime()
+            );
+
+            sortedData.forEach((app: any, index: number) => {
                 this.detailsData.push({
                     sNo: index + 1,
                     date: new Date(app.performed_on,).toLocaleDateString('en-GB', {
