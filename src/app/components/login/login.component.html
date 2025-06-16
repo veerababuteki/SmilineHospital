@@ -88,7 +88,7 @@
             Password is required
           </div>
           <div class="error-message" *ngIf="hasFieldError(loginForm, 'password', 'pattern')">
-            Password must be at least 6 characters with at least one uppercase letter, one number, and one special character
+            Password must be at least 8 characters with at least one uppercase letter, one number, and one special character
           </div>
         </div>
 
@@ -258,10 +258,10 @@
               New password is required
             </div>
             <div class="error-message" *ngIf="hasFieldError(forgotPasswordForm, 'newPassword', 'pattern')">
-              Password must be at least 6 characters with at least one uppercase letter, one number, and one special character
+              Password must be at least 8 characters with at least one uppercase letter, one number, and one special character
             </div>
             <div class="error-message" *ngIf="hasFieldError(forgotPasswordForm, 'newPassword', 'minlength')">
-              Password must be at least 6 characters long
+              Password must be at least 8 characters long
             </div>
           </div>
 
@@ -477,13 +477,13 @@
             Password is required
           </div>
           <div class="error-message" *ngIf="hasFieldError(registrationForm, 'password', 'minlength')">
-            Password must be at least 6 characters long
+            Password must be at least 8 characters long
           </div>
           <div class="error-message" *ngIf="hasFieldError(registrationForm, 'password', 'pattern')">
             Password must contain at least one uppercase letter, one number, and one special character
           </div>
           <div class="error-message" *ngIf="hasFieldError(registrationForm, 'password', 'maxlength')">
-            Password cannot exceed 128 characters
+            Password cannot exceed 20 characters
           </div>
         </div>
 

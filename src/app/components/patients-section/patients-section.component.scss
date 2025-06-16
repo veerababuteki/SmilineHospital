@@ -400,6 +400,22 @@
     }
   }
 
+  .available-advance {
+  display: flex;
+  align-items: center;
+  margin-left: 12px;
+}
+
+.available-advance-label {
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.available-advance-amount {
+  color: #28a745;
+  font-weight: 600;
+}
+
   .no-results {
     padding: 24px 16px;
     text-align: center;

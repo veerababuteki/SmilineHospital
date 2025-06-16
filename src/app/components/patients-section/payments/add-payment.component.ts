@@ -59,7 +59,7 @@ export class AddPaymentComponent implements OnInit {
   constructor(
     private treatmentPlansService: TreatmentPlansService,
     private route: ActivatedRoute, private messageService:MessageService,
-    private router: Router,
+    private router: Router
   ) { 
     this.router.events.pipe(
           filter(event => event instanceof NavigationEnd)
@@ -779,8 +779,6 @@ export class AddPaymentComponent implements OnInit {
       use_advance_amount: this.totalFromAdvance.toString(),
       invoices_data: []
     };
-
-    console.log('check if reference number is being added', paymentData)
     
     // Add invoice data for selected invoices
     if (this.selectedInvoices.length > 0) {

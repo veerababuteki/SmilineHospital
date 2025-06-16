@@ -46,6 +46,10 @@
             <span class="separator" *ngIf="patientDetails?.gender">,</span>
             <span class="age" *ngIf="patientDetails?.age">{{patientDetails?.age}} Years&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <span class="id" *ngIf="patientDetails?.user_details?.manual_unique_code">(ID: {{patientDetails?.user_details?.manual_unique_code}})</span>
+            <!-- <div class="available-advance">
+                <span class="available-advance-label">Available Advance:</span>
+                <span class="available-advance-amount">INR {{ availableAdvance.toFixed(2) }}</span>
+            </div> -->
         </div>
     </div>
 </div>

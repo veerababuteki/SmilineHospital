@@ -44,6 +44,7 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
     appointments: any;
     uniqueCode:  string | null | undefined;
     patientDetails: any;
+    availableAdvance: number = 0;
     practices: any[] = [];
     selectedPractice: any;
     showPracticesDropdown: boolean = false;
@@ -79,7 +80,7 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
         private clinicalNotesService: ClinicalNotesService,
         private treatmentPlansService: TreatmentPlansService,
         private filesService: FileService,
-          private patientDataService: PatientDataService,
+        private patientDataService: PatientDataService,
 
     ) {}
 
@@ -184,6 +185,7 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
       treatmentPlans: this.treatmentPlansService.getTreatmentPlans(Number(this.patientId)),
       invoices: this.treatmentPlansService.getInvoices(Number(this.patientId)),
       files: this.filesService.getPatientFiles(Number(this.patientId)),
+      advanceAmount: this.treatmentPlansService.getPatientAdvance(Number(this.patientId))
     }).subscribe({
       next: (res) => {
         this.patientDetails = res.patientDetails.data;
@@ -201,6 +203,9 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
         this.files = res.files.data.rows.filter((f: any) => f.status !== 'Deleted');
 
         this.patientDataService.setData(res);
+
+        this.availableAdvance = res.advanceAmount.data.available_advance;
+
       },
       error: (err) => {
         console.error('Error fetching data:', err);

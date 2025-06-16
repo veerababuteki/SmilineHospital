@@ -125,8 +125,8 @@ export class LoginComponent implements OnInit {
       ]],
       password: ['', [
         Validators.required, 
-        Validators.minLength(6),
-        Validators.maxLength(128),
+        Validators.minLength(8),
+        Validators.maxLength(20),
         Validators.pattern(PASSWORD_REGEX)
       ]],
       address: ['', [
@@ -142,7 +142,7 @@ export class LoginComponent implements OnInit {
     this.forgotPasswordForm = this.formBuilder.group({
       mobileNumber: ['', [Validators.required, this.mobileNumberValidator.bind(this)]],
       otp: ['', [Validators.required, Validators.pattern(/^\d{6}$/), Validators.minLength(6), Validators.maxLength(6)]],
-      newPassword: ['', [Validators.required, Validators.pattern(PASSWORD_REGEX), Validators.minLength(6)]],
+      newPassword: ['', [Validators.required, Validators.pattern(PASSWORD_REGEX), Validators.minLength(8), Validators.maxLength(20)]],
       confirmPassword: ['', [Validators.required]]
     }, {
       validators: this.passwordMatchValidator.bind(this)
