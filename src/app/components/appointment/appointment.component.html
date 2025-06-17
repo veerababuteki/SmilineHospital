@@ -336,6 +336,10 @@
              *ngIf="blockCalendarForm.get('leaveDetails')?.hasError('required') && blockCalendarForm.get('leaveDetails')?.touched">
         Leave details are required
       </small>
+      <small class="error-message" 
+           *ngIf="blockCalendarForm.get('leaveDetails')?.hasError('minlength') && blockCalendarForm.get('leaveDetails')?.touched">
+        Message is too short
+      </small>
     </div>
 
     <div class="form-row" style="width: 100%;">
