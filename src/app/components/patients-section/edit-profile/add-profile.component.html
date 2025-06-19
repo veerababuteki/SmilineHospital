@@ -252,6 +252,9 @@
                 class="w-full"
                 placeholder="Add Medical History"
                 [(ngModel)]="addMedicalHistoryText">
+                <small class="enter-message" *ngIf="addMedicalHistory && addMedicalHistoryText?.trim()">
+                Press 'Enter' to add.
+                </small>
                 <form [formGroup]="medicalHistoryForm" *ngIf="medicalConditions.length > 0">
                   <div class="search-box" *ngIf="!addMedicalHistory" >
                     <span class="p-input-icon-left w-full">
@@ -295,6 +298,9 @@
                          class="w-full"
                          placeholder="Add Group"
                          [(ngModel)]="addNewGroupText">
+                  <small class="enter-message" *ngIf="addGroup && addNewGroupText?.trim()">
+                  Press 'Enter' to add.
+                  </small>
                   <form [formGroup]="groupsForm" *ngIf="insuranceGroups.length > 0">
                     <div class="conditions-list" formGroupName="groups">
                       <div class="condition-item" *ngFor="let condition of insuranceGroups">
