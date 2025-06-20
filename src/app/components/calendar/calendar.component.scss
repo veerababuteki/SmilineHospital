@@ -1507,6 +1507,15 @@
   }
 }
 
+.enter-message {
+  color: #616161;
+  font-size: 11px;
+  margin-right: 15px;
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
 // Month view specific styling
 ::ng-deep .fc-event.block-calendar-event.month-view {
   min-height: 18px !important;

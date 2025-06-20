@@ -449,8 +449,8 @@ export class AppointmentComponent implements OnInit {
   // Enhanced appointment.component.ts - Block Calendar specific methods
   initBlockCalendarForm() {
     this.blockCalendarForm = this.fb.group({
-      leaveDetails: ['', Validators.required],
-      doctor: [null], // null means "All Doctors"
+      leaveDetails: ['', [Validators.required, Validators.minLength(10)]],
+      doctor: [null, Validators.required], // null means "All Doctors"
       blockType: ['allDay', Validators.required],
       fromDate: [new Date(), Validators.required],
       toDate: [new Date(), Validators.required],

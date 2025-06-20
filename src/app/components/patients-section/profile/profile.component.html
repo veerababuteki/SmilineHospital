@@ -20,12 +20,12 @@
                         <span class="label">Patient name :</span>
                         <span class="value">{{patientDetails.gender === 'Male' ? 'Mr. ' : 'Mrs. '}}{{patientDetails.first_name +' '+ patientDetails.last_name}}</span>
                     </div>
-                    <div class="info-row">
+                    <!-- <div class="info-row">
                         <span class="label">Patient ID :</span>
                         <span class="value">{{patientDetails.user_details.unique_code}}</span>
-                    </div>
+                    </div> -->
                     <div class="info-row">
-                        <span class="label">Patient Custom ID :</span>
+                        <span class="label">Patient ID :</span>
                         <span class="value">{{patientDetails.user_details.manual_unique_code}}</span>
                     </div>
                     <div class="info-row" *ngIf="patientDetails.aadhaar_id">

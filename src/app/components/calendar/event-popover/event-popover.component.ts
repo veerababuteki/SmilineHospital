@@ -112,7 +112,7 @@ import { Router } from '@angular/router';
             <div class="doctor-info" *ngIf="event.extendedProps?.doctor">with Dr.{{ event.extendedProps?.doctor}}</div>
             <div class="time-info">at {{ event.extendedProps?.appointmentTime }} for {{ event.extendedProps?.duration || '1 hr 30 mins' }}</div>
           </div>
-          <button pButton label="No Show" class="p-button-outlined"></button>
+          <!--  <button pButton label="No Show" class="p-button-outlined"></button> -->
         </div>
 
         <div class="category-section">
@@ -122,7 +122,7 @@ import { Router } from '@angular/router';
 
         <div class="notes-section">
           <div class="notes-label">Notes</div>
-          <div class="notes-content">{{ event.extendedProps?.notes || 'pt dont want flap surgery dr...' }}</div>
+          <div class="notes-content">{{ event.extendedProps?.notes || 'N/A' }}</div>
         </div>
 
         

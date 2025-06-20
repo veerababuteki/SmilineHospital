@@ -134,7 +134,9 @@
           <i *ngIf="!addCategory" class="pi pi-search"></i>
           <i *ngIf="addCategory" class="pi pi-sign-in"></i>
         </div>
-
+        <small class="enter-message" *ngIf="addCategory && newCategory?.trim()">
+          Press 'Enter' to add.
+        </small>
         <div class="categories-list">
           <div class="categories-scroll">
             <div class="category-item" *ngFor="let category of filteredCategories()"

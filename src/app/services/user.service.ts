@@ -151,7 +151,10 @@ export class UserService {
         city: patientDetails.city,
         pin_code: patientDetails.pin_code,
         profile: null,
-        user_id: patientDetails.user_id
+        user_id: patientDetails.user_id,
+        medical_history: patientDetails.medical_history,
+        groups_list: patientDetails.groups_list,
+        other_history: patientDetails.other_history,
     }, {headers}).pipe(
       catchError(this.handleError)
     );
