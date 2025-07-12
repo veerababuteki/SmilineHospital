@@ -3,7 +3,7 @@ name: Sync GitHub to Azure DevOps
 on:
   push:
     branches:
-      - main  # or change to your main branch name
+      - main
 
 jobs:
   sync:
@@ -13,16 +13,16 @@ jobs:
       - name: Checkout GitHub repo
         uses: actions/checkout@v3
 
-      - name: Set up Git
+      - name: Set up Git config
         run: |
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
 
-      - name: Add Azure DevOps remote
+      - name: Add Azure DevOps remote safely
         run: |
-          git remote add azure "https://${{ secrets.AZURE_DEVOPS_PAT }}@dev.azure.com/IICLDEV/Idental/_git/Idental-UI"
+          git remote get-url azure || git remote add azure "https://${{ secrets.AZURE_DEVOPS_PAT }}@dev.azure.com/IICLDEV/Idental/_git/Idental-UI"
 
-      - name: Push code to Azure DevOps
+      - name: Force push to Azure DevOps
         run: |
-          git push azure --all
-          git push azure --tags
+          git push azure --force --all
+          git push azure --force --tags
