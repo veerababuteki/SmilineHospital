@@ -3,7 +3,7 @@ name: Sync GitHub to Azure DevOps
 on:
   push:
     branches:
-      - main
+      - main  # Or your default branch
 
 jobs:
   sync:
@@ -18,11 +18,16 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
 
+      - name: 🔍 Debug: Check PAT Length
+        run: |
+          echo -n "${{ secrets.AZURE_DEVOPS_PAT }}" | wc -c
+
       - name: Add Azure DevOps remote safely
         run: |
-          git remote get-url azure || git remote add azure "https://${{ secrets.AZURE_DEVOPS_PAT }}@dev.azure.com/IICLDEV/Idental/_git/Idental-UI"
+          git remote remove azure || true
+          git remote add azure "https://${{ secrets.AZURE_DEVOPS_PAT }}@dev.azure.com/IICLDEV/Idental/_git/Idental-UI"
 
-      - name: Force push to Azure DevOps
+      - name: 🚀 Force push to Azure DevOps
         run: |
           git push azure --force --all
           git push azure --force --tags
