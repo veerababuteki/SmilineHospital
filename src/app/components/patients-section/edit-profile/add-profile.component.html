@@ -46,7 +46,7 @@
                     <div class="form-field">
                       <input pInputText type="text" formControlName="aadhaarId" pattern="[0-9]*">
                       <div class="validation-error" *ngIf="patientForm.get('aadhaarId')?.invalid && patientForm.get('aadhaarId')?.touched">
-                        should be 12-digit numeric only
+                        Please enter a valid 12-digit Aadhaar number.
                       </div>
                     </div>
                   </div>
