@@ -5,7 +5,7 @@
             <button class="mark-btn" *ngIf="selectedFileIds.length == 0">Delete</button>
             <button class="mark-btn-active" (click)="deleteFiles()" *ngIf="selectedFileIds.length > 0">Delete</button>
             <button class="mark-btn">Email</button>
-            <input type="file" #fileInput (change)="onFileSelected($event)" multiple accept="image/*">
+            <input type="file" #fileInput (change)="onFileSelected($event)" multiple accept="image/*" style="display: none;">
             <button class="add-btn" (click)="fileInput.click()">+ Add</button>
         </div>
     </div>
@@ -23,6 +23,9 @@
                     <input type="text" placeholder="+Add label" class="search-input"
                     [(ngModel)]="newLabel" 
                     (keyup.enter)="saveLabel()" [class.display-none]="addLabel == false">
+                    <small class="enter-message" *ngIf="newLabel?.trim()">
+                     Press 'Enter' to add.
+                    </small>
                     <div class="file-categories">
                         <div class="category active" [class.active]="selectedLabelId === null" 
                         (click)="filterFiles(0)" (click)="selectedLabelId = null">All files</div>
