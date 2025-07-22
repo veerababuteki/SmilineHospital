@@ -215,6 +215,7 @@ export class FilesComponent implements OnInit {
             this.loadPatientData(this.patientId);
           }
         });
+        window.location.reload();
       });
     }
     
