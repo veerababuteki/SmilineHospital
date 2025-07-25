@@ -20,7 +20,7 @@
             <option value="cheque">Cheque</option>
             <option value="card">Card</option>
             <option value="paytm">Paytm</option>
-            <option value="online">Online Payment</option>
+            <option value="Online Payment">Online Payment</option>
             <option value="phonepe">PhonePe</option>
           </select>
         </div>
@@ -40,6 +40,10 @@
             <label>Enter last 4 digits</label>
             <input type="text" [(ngModel)]="cardLastDigits" maxlength="4" [ngClass]="{'error': cardDigitsError && formSubmitted}">
             <div class="error-message" *ngIf="cardDigitsError && formSubmitted">Last 4 digits are required</div>
+          </div>
+          <div class="number-field" *ngIf="paymentMethod !== 'cash'">
+            <label>Reference Number</label>
+            <input type="text" [(ngModel)]="referenceNumber" [ngClass]="{formSubmitted}" placeholder="Optional">
           </div>
         </div>
 

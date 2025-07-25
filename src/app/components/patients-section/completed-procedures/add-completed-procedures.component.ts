@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import { format } from 'date-fns';
 import { MessageService } from '../../../services/message.service';
+import { PatientDataService } from '../../../services/patient-data.service';
 
 @Component({
   selector: 'app-add-completed-procedures',
@@ -43,7 +44,8 @@ export class AddCompletedProceduresComponent implements OnInit {
     private userService: UserService,
     private treatmentPlansService: TreatmentPlansService,
     private router:Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private patientDataService: PatientDataService,
   ) {
     this.initForm();
     const navigation = this.router.getCurrentNavigation();
@@ -443,17 +445,31 @@ export class AddCompletedProceduresComponent implements OnInit {
       
       if(this.isEditMode){
         this.treatmentPlansService.updateCompletedProcedure(treatment).subscribe(res => {
-          this.router.navigate(['/patients', this.patientId, 'completed-procedures', this.uniqueCode]);
+          this.updateTreatmentPlans()
         }); 
       }
       else{
         this.treatmentPlansService.addCompletedProcedure(treatment).subscribe(res => {
-          this.router.navigate(['/patients', this.patientId, 'completed-procedures', this.uniqueCode]);
+          this.updateTreatmentPlans()
         }); 
       }
     }
   }
+updateTreatmentPlans(){
+    if(this.patientId == null || this.patientId === undefined) return;
+    this.treatmentPlansService.getCompletedTreatmentPlans(Number(this.patientId)).subscribe(res => {
+  const existingData = this.patientDataService.getSnapshot();
 
+  const updatedData = {
+    ...existingData,
+    completedProcedures: res
+  };
+
+  this.patientDataService.setData(updatedData);
+
+  this.router.navigate(['patients', this.patientId, 'completed-procedures', this.uniqueCode]);
+});
+  }
   saveAndGenerateInvoice(){
     if(this.treatmentForm.valid){
       var procedureLists: any[] = [];
@@ -517,7 +533,18 @@ export class AddCompletedProceduresComponent implements OnInit {
         .subscribe(invoiceRes => {
           // Only navigate if we got a successful response
           if (invoiceRes && this.patientId) {
-            this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
+            this.treatmentPlansService.getInvoices(Number(this.patientId)).subscribe(res => {
+  const existingData = this.patientDataService.getSnapshot();
+
+  const updatedData = {
+    ...existingData,
+    invoices: res
+  };
+
+  this.patientDataService.setData(updatedData);
+
+  this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
+});
           }
         });
     } else {

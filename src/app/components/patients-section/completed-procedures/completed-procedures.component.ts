@@ -7,6 +7,7 @@ import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
 import { MessageService } from '../../../services/message.service';
+import { PatientDataService } from '../../../services/patient-data.service';
 
 @Component({
   selector: 'app-completed-procedures',
@@ -45,8 +46,7 @@ throw new Error('Method not implemented.');
   currentTreatmentPlan: any;
   savedPractice: any;
 
-    constructor(private treatmentPlanService: TreatmentPlansService, 
-          private messageService: MessageService,
+    constructor(private treatmentPlanService: TreatmentPlansService, private patientDataService: PatientDataService,
       private route: ActivatedRoute, private router: Router){
         const selectedPractice = localStorage.getItem('selectedPractice');
         if(selectedPractice){
@@ -54,6 +54,12 @@ throw new Error('Method not implemented.');
         }
     }
     ngOnInit() {
+      this.patientDataService.data$.subscribe((data) => {
+    const treatments = data?.completedProcedures?.data?.rows || [];
+
+    this.treatmentPlans = this.groupByDate(treatments);
+      this.formattedData = this.getFormattedData();
+  });
       this.items = [
         {
           label: 'Invoice Procedure',
@@ -66,19 +72,20 @@ throw new Error('Method not implemented.');
           command: (event) => this.updateTreatmentPlans(event)
         }
       ];
-      this.route.paramMap.subscribe(params => {
-        if(this.uniqueCode == null) {
-          this.uniqueCode = params.get('source');
-        }
-      });
-      this.route.parent?.paramMap.subscribe(params => {
-        if(this.patientId == null) {
-          this.patientId = params.get('id');
-        }
-        if (this.patientId) {
-          this.loadPatientData(this.patientId);
-        }
-      });  
+      const routeId = this.route.parent?.snapshot.paramMap.get('id');
+  const source = this.route.snapshot.paramMap.get('source');
+
+  if (routeId && source) {
+    this.patientId = routeId;
+    this.uniqueCode = source;
+  } else {
+    const cached = localStorage.getItem('patientContext');
+    if (cached) {
+      const context = JSON.parse(cached);
+      this.patientId = context.patientId;
+      this.uniqueCode = context.uniqueCode;
+    }
+  } 
     }
 
     updateTreatmentPlans(treatmentPlan: any): void {
@@ -121,7 +128,6 @@ throw new Error('Method not implemented.');
     }
 
   loadPatientData(patientId: string) {
-    this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
     this.treatmentPlanService.getCompletedTreatmentPlans(Number(patientId)).subscribe(res => {
       this.treatmentPlans = this.groupByDate(res.data.rows);
       this.formattedData = this.getFormattedData();
@@ -154,7 +160,7 @@ throw new Error('Method not implemented.');
         // Use IST date as the key
         const dateKey = istDateStr;
         const treatmentKey = row.treatment_unique_id;
-        if (!acc[dateKey]) {
+        if (dateKey !== undefined && !acc[dateKey]) {
           acc[dateKey] = [];
         }
     

@@ -13,6 +13,9 @@ import { ButtonModule } from 'primeng/button';
 import { TreatmentPlansPrintComponent } from './treatment-plans-print/treatment-plans-print.component';
 import { MessageService } from '../../../services/message.service';
 import { TooltipModule } from 'primeng/tooltip';
+import { PatientDataService } from '../../../services/patient-data.service';
+import { ConsentFormComponent } from './consent-form/consent-form.component';
+import { DialogModule } from 'primeng/dialog'; // ✅ Add this import at the top
 
 @Component({
   selector: 'app-treatment-plans',
@@ -28,7 +31,9 @@ import { TooltipModule } from 'primeng/tooltip';
     MenuModule, 
     ButtonModule, 
     TreatmentPlansPrintComponent,
-    TooltipModule
+    TooltipModule,
+    ConsentFormComponent,
+    DialogModule
   ]
 })
 export class TreatmentPlansComponent implements OnInit {
@@ -48,12 +53,29 @@ export class TreatmentPlansComponent implements OnInit {
   currentTreatmentPlan: any;
   uniqueCode: string | null | undefined;
   savedPractice: any;
+  consentFormVisible: boolean = false;
+  selectedConsentTreatment: any;
+
+
+consentform(plan: any): void {
+  this.selectedConsentTreatment = {
+    patientName: plan?.patient_details?.user_profile_details[0]?.first_name + ' ' +
+                 plan?.patient_details?.user_profile_details[0]?.last_name,
+    doctorName: 'Dr. ' + plan?.doctor_details_treat?.user_profile_details[0]?.first_name + ' ' +
+                         plan?.doctor_details_treat?.user_profile_details[0]?.last_name,
+    date: plan?.created_at ? plan.created_at.split('T')[0] : new Date().toISOString().split('T')[0]
+  };
+  this.consentFormVisible = true;
+}
+
 
   constructor(private fb: FormBuilder,
     private messageService: MessageService,
     private treatmentPlansService: TreatmentPlansService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+      private patientDataService: PatientDataService
+
   ) {
     const selectedPractice = localStorage.getItem('selectedPractice');
         if(selectedPractice){
@@ -65,30 +87,42 @@ export class TreatmentPlansComponent implements OnInit {
   items: MenuItem[] = [];
 
   ngOnInit() {
-    this.route.parent?.paramMap.subscribe(params => {
-      if (this.patientId == null) {
-        this.patientId = params.get('id');
-      }
-      if (this.patientId) {
-        this.loadPatientData(this.patientId);
-      }
-    });
-    this.route.paramMap.subscribe(params => {
-      if(this.uniqueCode == null) {
-        this.uniqueCode = params.get('source');
-        if (this.uniqueCode) {
-          this.messageService.sendMessage(this.patientId ? this.patientId : '', this.uniqueCode ? this.uniqueCode : '');
-        }
-      }
-    });
-    this.items = [
-      {
-        label: 'Edit',
-        icon: 'pi pi-pencil',
-        command: (event) => this.updateTreatmentPlans(event)
-      }
-    ];
+  const routeId = this.route.parent?.snapshot.paramMap.get('id');
+  const source = this.route.snapshot.paramMap.get('source');
+
+  if (routeId && source) {
+    this.patientId = routeId;
+    this.uniqueCode = source;
+  } else {
+    const cached = localStorage.getItem('patientContext');
+    if (cached) {
+      const context = JSON.parse(cached);
+      this.patientId = context.patientId;
+      this.uniqueCode = context.uniqueCode;
+    }
   }
+
+  // Subscribe to shared data
+  this.patientDataService.data$.subscribe((data) => {
+    const treatments = data?.treatmentPlans?.data?.rows || [];
+
+    const activeTreatmentPlans = treatments.filter((_: any) => _.status !== 'Completed');
+    this.treatmentPlans = this.groupByDate(activeTreatmentPlans);
+  });
+
+  this.items = [
+    {
+      label: 'Edit',
+      icon: 'pi pi-pencil',
+      command: (event) => this.updateTreatmentPlans(event)
+    },
+    {
+      label: 'Consent Form',
+      icon: 'pi pi-file',
+      command: (event) => this.consentform(event)
+    }
+  ];
+}
 
   updateTreatmentPlans(treatmentPlan: any): void {
     this.router.navigate(['patients', this.patientId, 'add-treatment-plan', this.uniqueCode], {
@@ -105,15 +139,26 @@ export class TreatmentPlansComponent implements OnInit {
         label: 'Edit',
         icon: 'pi pi-pencil',
         command: () => this.updateTreatmentPlans(this.currentTreatmentPlan)
-      }
+      },
+      {
+      label: 'Consent Form',
+      icon: 'pi pi-file',
+        command: () => this.consentform(this.currentTreatmentPlan)
+    }
     ];
   }
 
   loadPatientData(patientId: string) {
     if (this.patientId !== null && this.patientId !== undefined) {
       this.treatmentPlansService.getTreatmentPlans(Number(this.patientId)).subscribe(res => {
-        var activeTreatmentPlans = res.data.rows.filter((_:any) => _.status != "Completed");
-        this.treatmentPlans = this.groupByDate(activeTreatmentPlans);
+        const existingData = this.patientDataService.getSnapshot();
+
+        const updatedData = {
+          ...existingData,
+          treatmentPlans: res
+        };
+
+        this.patientDataService.setData(updatedData);
       });
     }
   }

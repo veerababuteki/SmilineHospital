@@ -4,7 +4,7 @@
       <div class="action-buttons">
         <button class="cancel-btn" (click)="cancel()">Cancel</button>
         <button class="save-btn" type="submit" (click)="onSubmit()" [disabled]="treatments.length === 0">Save Invoice</button>
-        <button class="save-btn" type="submit" (click)="saveAndMakePayment()" [disabled]="treatments.length === 0">Save & Create Payment</button>
+        <button *ngIf="showSaveAndMakePaymentButton" class="save-btn" type="submit" (click)="saveAndMakePayment()" [disabled]="treatments.length === 0">Save & Create Payment</button>
       </div>
     </div>
   

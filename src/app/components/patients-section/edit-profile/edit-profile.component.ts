@@ -90,7 +90,6 @@ export class EditProfileComponent implements OnInit {
       }
       if(this.uniqueCode){
         this.loadPatientData(this.uniqueCode)
-        this.customMessageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
       }
 
     });
@@ -296,11 +295,11 @@ export class EditProfileComponent implements OnInit {
       const historyDetails = this.medicalHistoryForm.value;
       let selectedConditions: string[] = [];
       let selectedGroups: string[] = [];
-      if(this.medicalHistoryForm.valid){
+      if (this.medicalHistoryForm.valid) {
         selectedConditions = Object.keys(this.medicalHistoryForm.value.conditions)
             .filter(id => this.medicalHistoryForm.value.conditions[id]);
       }
-      if(this.groupsForm.valid){
+      if (this.groupsForm.valid) {
         selectedGroups = Object.keys(this.groupsForm.value.groups)
             .filter(id => this.groupsForm.value.groups[id]);
       }
@@ -321,7 +320,6 @@ export class EditProfileComponent implements OnInit {
         family: null,
         gender: patientDetails.gender,
         secondary_mobile: patientDetails.secondaryMobile,
-        langugae: patientDetails.languagePreference.label,
         land_line: patientDetails.landLine,
         street_address: patientDetails.streetAddress,
         locality: patientDetails.locality,

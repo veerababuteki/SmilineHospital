@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { TimelineService } from '../../../services/timeline.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-timeline',
@@ -18,6 +19,7 @@ export class TimelineComponent implements OnInit {
   patientId: string | null | undefined;
   timeline: Record<string, any[]> = {};
   allTimelineData: any[] = []; // Store all data before filtering
+  isDoctor: boolean = false;
   
   // Define filter types
   filterTypes = {
@@ -31,7 +33,7 @@ export class TimelineComponent implements OnInit {
     Payment: true
   };
 
-  constructor(private route: ActivatedRoute, private timelineService: TimelineService) {}
+  constructor(private route: ActivatedRoute, private timelineService: TimelineService, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.route.parent?.paramMap.subscribe(params => {
@@ -42,11 +44,18 @@ export class TimelineComponent implements OnInit {
         this.loadPatientData(this.patientId);
       }
     });
+    // Detect if user is doctor
+    this.authService.getUser().subscribe(user => {
+      if (user && user.data && user.data.role_details && user.data.role_details.role_name) {
+        this.isDoctor = user.data.role_details.role_name.toLowerCase().includes('doctor');
+      }
+    });
   }
 
   loadPatientData(patientId: string) {
     this.timelineService.getPatientTimeline(Number(patientId)).subscribe(res => {
-      this.allTimelineData = res.data; // Store all data
+      // Filter out deleted files
+      this.allTimelineData = res.data.filter((item: any) => !(item.type === 'FileUpload' && item.status === 'Deleted'));
       this.applyFilters(); // Apply initial filters
     });
   }

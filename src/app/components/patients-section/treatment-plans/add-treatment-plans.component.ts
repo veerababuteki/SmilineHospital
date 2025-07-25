@@ -9,6 +9,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { format } from 'date-fns';
 import { MessageService } from '../../../services/message.service';
+import { PatientDataService } from '../../../services/patient-data.service';
 
 @Component({
   selector: 'app-add-treatment-plans',
@@ -48,7 +49,8 @@ export class AddTreatmentPlansComponent implements OnInit {
 
   constructor(private fb: FormBuilder, 
     private userService: UserService,    private messageService: MessageService,
-    
+      private patientDataService: PatientDataService,
+
     private treatmentPlansService: TreatmentPlansService,
     private router:Router,
     private route: ActivatedRoute
@@ -73,9 +75,6 @@ export class AddTreatmentPlansComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       if(this.uniqueCode == null) {
         this.uniqueCode = params.get('source');
-        if (this.uniqueCode) {
-          this.messageService.sendMessage(this.patientId ? this.patientId : '', this.uniqueCode ? this.uniqueCode : '');
-        }
       }
     });
     this.getProcedures();
@@ -421,7 +420,7 @@ export class AddTreatmentPlansComponent implements OnInit {
           procedures_list: procedureLists
         }).subscribe({
           next: (res) => {
-            this.router.navigate(['/patients', this.patientId, 'treatment-plans', this.uniqueCode]);
+            this.updateTreatmentPlans()
           },
           error: (err) => {
             console.error('Error updating treatment plan:', err);
@@ -457,7 +456,7 @@ export class AddTreatmentPlansComponent implements OnInit {
         
         this.treatmentPlansService.addTreatmentPlan(treatment).subscribe({
           next: (res) => {
-            this.router.navigate(['/patients', this.patientId, 'treatment-plans', this.uniqueCode]);
+            this.updateTreatmentPlans();
           },
           error: (err) => {
             console.error('Error adding treatment plan:', err);
@@ -465,6 +464,23 @@ export class AddTreatmentPlansComponent implements OnInit {
         });
       }
     }
+  }
+
+  updateTreatmentPlans(){
+    if(this.patientId == null || this.patientId === undefined) return;
+    this.treatmentPlansService.getTreatmentPlans(Number(this.patientId)).subscribe(res => {
+  const existingData = this.patientDataService.getSnapshot();
+
+  const updatedData = {
+    ...existingData,
+    treatmentPlans: res
+  };
+
+  this.patientDataService.setData(updatedData);
+
+  // Then navigate
+  this.router.navigate(['patients', this.patientId, 'treatment-plans', this.uniqueCode]);
+});
   }
 
   calculateGrandTotal(): number {

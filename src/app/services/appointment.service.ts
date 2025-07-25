@@ -75,6 +75,15 @@ export class AppointmentService {
       );
   }
 
+createBlockCalendar(blockData: any) {
+  const savedPractice = localStorage.getItem('selectedPractice');
+    if(savedPractice){
+      this.selectedPractice = JSON.parse(savedPractice);
+    }
+  blockData.branch_id = this.selectedPractice.branch_id;
+  return this.http.post(`${this.baseUrl}/createBlockCalendar`, blockData);
+}
+
   createAppointment(appointment: any){
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({
@@ -138,6 +147,65 @@ export class AppointmentService {
 
   }
   
+  // Update block calendar entry
+  updateBlockCalendar(blockData: any) {
+    return this.http.put<any>(`${this.baseUrl}/updateBlockCalendar`, blockData);
+  }
+
+  // Delete block calendar entry
+  deleteBlockCalendar(blockId: string) {
+    return this.http.delete<any>(`${this.baseUrl}/deleteBlockCalendar/${blockId}`);
+  }
+
+  
+checkAppointmentConflict(params: {
+    doctor_id?: string;
+    appointment_date: string;
+    appointment_time: string;
+    booking_type: string;
+    branch_id: number;
+  }): Observable<any> {
+    let httpParams = new HttpParams();
+     const savedPractice = localStorage.getItem('selectedPractice');
+    if(savedPractice){
+      this.selectedPractice = JSON.parse(savedPractice);
+    }
+    if (params.doctor_id) {
+      httpParams = httpParams.set('doctor_id', params.doctor_id);
+    }
+    httpParams = httpParams.set('appointment_date', params.appointment_date);
+    httpParams = httpParams.set('appointment_time', params.appointment_time);
+    httpParams = httpParams.set('booking_type', params.booking_type);
+    httpParams = httpParams.set('branch_id', this.selectedPractice.branch_id.toString());
+
+    return this.http.get(`${this.baseUrl}/checkAppointmentConflict`, { params: httpParams });
+  }
+
+  // Method to get block calendar by doctor and date range (alternative approach)
+  getBlockCalendarByDoctor(doctorId: string, fromDate: string, toDate: string): Observable<any> {
+    const params = new HttpParams()
+      .set('doctor_id', doctorId)
+      .set('from_date', fromDate)
+      .set('to_date', toDate);
+
+    return this.http.get(`${this.baseUrl}/getBlockCalendarByDoctor`, { params });
+  }
+
+  // Method to get all block calendars for a date range
+  getBlockCalendarByDateRange(fromDate: string, toDate: string, branchId?: number): Observable<any> {
+    const savedPractice = localStorage.getItem('selectedPractice');
+    if(savedPractice){
+      this.selectedPractice = JSON.parse(savedPractice);
+    }
+    let params = new HttpParams()
+      .set('from_date', fromDate)
+      .set('to_date', toDate);
+    
+      params = params.set('branch_id', this.selectedPractice.branch_id.toString());
+
+    return this.http.get(`${this.baseUrl}/getBlockCalendarByDateRange`, { params });
+  }
+
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error.message || 'Server error');
   }

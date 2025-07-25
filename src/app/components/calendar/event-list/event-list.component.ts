@@ -12,7 +12,8 @@ import { EventPopoverComponent } from '../event-popover/event-popover.component'
       <h3>{{ formatDate(data.date) }}</h3>
       <div class="event-item" *ngFor="let event of data.events" (click)="showEventPopover(event, $event)"
            [ngClass]="'left-border-red'">
-        {{ event.extendedProps?.patientName }}
+        <span *ngIf="isBlockCalendarEvent(event)">{{ getBlockTitle(event) }}</span>
+        <span *ngIf="!isBlockCalendarEvent(event)">{{ event.extendedProps?.patientName }}</span>
       </div>
     </div>
   `,
@@ -70,7 +71,17 @@ export class EventListComponent {
       day: 'numeric'
     });
   }
+ isBlockCalendarEvent(event: any): boolean {
+    return event?.extendedProps?.type === 'block_calendar';
+  }
 
+  getBlockTitle(event: any): string {
+    if (event.extendedProps?.doctorName && event.extendedProps.doctorName !== 'All Doctors') {
+      return `Dr. ${event.extendedProps.doctorName} - Blocked`;
+    }
+    return 'Calendar Blocked';
+  }
+  
   showEventPopover(event: any, mouseEvent: MouseEvent) {
        // Prevent event bubbling
     mouseEvent.stopPropagation();

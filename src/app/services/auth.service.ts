@@ -72,7 +72,7 @@ export class AuthService {
   }
 
   sendOTP(mobileNumber: any){
-    return this.http.post<any>(`${this.baseUrl}/login`, {
+    return this.http.post<any>(`${this.baseUrl}/auth/user/login`, {
         login_type: "otp",
         username: mobileNumber,
         password: ""
@@ -82,7 +82,7 @@ export class AuthService {
   verifyOTP(mobileNumber: any, otp: any){
     return this.http.post<any>(`${this.baseUrl}/auth/user/verifyOtp`, {
         username: mobileNumber,
-        otp: otp
+        otp: otp.toString()
     });
   }
 
@@ -103,6 +103,26 @@ export class AuthService {
       gender: profileData.gender,
       address: profileData.address
     });
+  }
+
+  sendForgotPasswordOTP(phone: string): Observable<any> {
+    const payload = { phone };
+    return this.http.post(`${this.baseUrl}/auth/user/forgot-password/send-otp`, payload);
+  }
+
+  verifyForgotPasswordOTP(phone: string, otp: string): Observable<any> {
+    const payload = { phone, otp };
+    return this.http.post(`${this.baseUrl}/auth/user/forgot-password/verify-otp`, payload);
+  }
+
+  resetPassword(phone: string, newPassword: string, confirmPassword: string): Observable<any> {
+    const payload = { phone, newPassword, confirmPassword };
+    return this.http.post(`${this.baseUrl}/auth/user/forgot-password/reset`, payload);
+  }
+
+  resendForgotPasswordOTP(phone: string): Observable<any> {
+    const payload = { phone };
+    return this.http.post(`${this.baseUrl}/auth/user/forgot-password/resend-otp`, payload);
   }
 
   storeTokens(response: any) {

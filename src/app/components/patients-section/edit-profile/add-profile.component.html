@@ -1,6 +1,6 @@
 <div class="profile-container">
     <div class="header">
-        <h2 class="title">ADD PATIENT</h2>
+        <h2 class="title">NEW PATIENT REGISTRATION</h2>
         <div class="actions">
             <!-- <button class="btn-secondary">Delete Patient</button> -->
             <button class="btn-secondary" (click)="cancel()">Cancel</button>
@@ -29,12 +29,12 @@
                   </div>
                   <div class="form-row">
                     <div class="form-label required">
-                      Patient Custom Id :
+                      Patient ID :
                     </div>
                     <div class="form-field">
                       <input pInputText type="text" formControlName="customId">
                       <div class="validation-error" *ngIf="patientForm.get('customId')?.invalid && patientForm.get('customId')?.touched">
-                        Custom ID is required
+                        Patient ID is required
                       </div>
                     </div>
                   </div>
@@ -46,7 +46,7 @@
                     <div class="form-field">
                       <input pInputText type="text" formControlName="aadhaarId" pattern="[0-9]*">
                       <div class="validation-error" *ngIf="patientForm.get('aadhaarId')?.invalid && patientForm.get('aadhaarId')?.touched">
-                        should be 12-digit numeric only
+                        Please enter a valid 12-digit Aadhaar number.
                       </div>
                     </div>
                   </div>
@@ -101,21 +101,21 @@
                     </div>
                   </div>
                   <div class="form-row">
-                  <div class="form-label">
-                    Name :
+                    <div class="form-label">
+                      Name :
+                    </div>
+                    <div class="form-field">
+                      <input pInputText type="text" formControlName="refferedByName">
+                    </div>
                   </div>
-                  <div class="form-field">
-                    <input pInputText type="text" formControlName="refferedByName">
+                  <div class="form-row">
+                    <div class="form-label">
+                      Mobile Number :
+                    </div>
+                    <div class="form-field">
+                      <input pInputText type="number" formControlName="refferedByMobile">
+                    </div>
                   </div>
-                </div>
-                <div class="form-row">
-                  <div class="form-label">
-                    Mobile Number :
-                  </div>
-                  <div class="form-field">
-                    <input pInputText type="number" formControlName="refferedByMobile">
-                  </div>
-                </div>
                   <div class="form-row">
                     <div class="form-label">
                       Blood Group :
@@ -162,7 +162,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="form-row">
+                  <!-- <div class="form-row">
                     <div class="form-label">
                       Language Preference :
                     </div>
@@ -170,10 +170,10 @@
                       <p-dropdown [options]="languages" formControlName="languagePreference"
                                  [style]="{'width':'100%'}" optionLabel="label"></p-dropdown>
                     </div>
-                  </div>
+                  </div> -->
                   <div class="form-row">
                     <div class="form-label ">
-                      Land Line No. :
+                      Landline No. :
                     </div>
                     <div class="form-field">
                       <input pInputText type="text" formControlName="landLine">
@@ -252,6 +252,9 @@
                 class="w-full"
                 placeholder="Add Medical History"
                 [(ngModel)]="addMedicalHistoryText">
+                <small class="enter-message" *ngIf="addMedicalHistory && addMedicalHistoryText?.trim()">
+                Press 'Enter' to add.
+                </small>
                 <form [formGroup]="medicalHistoryForm" *ngIf="medicalConditions.length > 0">
                   <div class="search-box" *ngIf="!addMedicalHistory" >
                     <span class="p-input-icon-left w-full">
@@ -295,6 +298,9 @@
                          class="w-full"
                          placeholder="Add Group"
                          [(ngModel)]="addNewGroupText">
+                  <small class="enter-message" *ngIf="addGroup && addNewGroupText?.trim()">
+                  Press 'Enter' to add.
+                  </small>
                   <form [formGroup]="groupsForm" *ngIf="insuranceGroups.length > 0">
                     <div class="conditions-list" formGroupName="groups">
                       <div class="condition-item" *ngFor="let condition of insuranceGroups">

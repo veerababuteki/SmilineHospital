@@ -18,6 +18,7 @@ import { of } from 'rxjs';
 import { ClinicalNotesService } from '../../services/clinical-notes.service';
 import { TreatmentPlansService } from '../../services/treatment-plans.service';
 import { FileService } from '../../services/file.service';
+import { PatientDataService } from '../../services/patient-data.service';
 
 @Component({
   selector: 'app-patients-section',
@@ -41,8 +42,9 @@ import { FileService } from '../../services/file.service';
 export class PatientsSectionComponent implements OnInit, OnDestroy {
     patientId: string | null | undefined;
     appointments: any;
-    uniqueCode!: string;
+    uniqueCode:  string | null | undefined;
     patientDetails: any;
+    availableAdvance: number = 0;
     practices: any[] = [];
     selectedPractice: any;
     showPracticesDropdown: boolean = false;
@@ -55,16 +57,17 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
     routeLink = '/profile';
     userPrivileges: any[] = [];
     patient: any;
+    payments: any[] = [];
     
     // Subscriptions to manage
     private messageSubscription!: Subscription;
     private userSubscription!: Subscription;
     private branchesSubscription!: Subscription;
   clinicalNotes: any;
-  completedProcedures: any;
-  invoices: any;
-  treatmentPlans: any;
-  files: any;
+  completedProcedures: any[] = [];
+  invoices: any[] = [];
+  treatmentPlans: any[] = [];
+  files: any[] = [];
 
     constructor(
         private messageService: MessageService,
@@ -77,7 +80,9 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
         private snackBar: MatSnackBar,
         private clinicalNotesService: ClinicalNotesService,
         private treatmentPlansService: TreatmentPlansService,
-        private filesService: FileService
+        private filesService: FileService,
+        private patientDataService: PatientDataService,
+
     ) {}
 
     ngOnInit(): void {
@@ -103,7 +108,33 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
         }
       });
 
-      this.userSubscription = this.authService.getUser()
+    this.route.firstChild?.firstChild?.paramMap.subscribe(params => {
+    this.patientId = this.route.firstChild?.snapshot.paramMap.get('id');
+    this.uniqueCode = params.get('source');
+    if (this.patientId && this.uniqueCode) {
+      localStorage.setItem('patientContext', JSON.stringify({
+        patientId: this.patientId,
+        uniqueCode: this.uniqueCode
+      }));
+
+      if (!this.patientDataService.getSnapshot()) {
+        this.loadPatientProfile();
+      }
+    } else {
+      const cached = localStorage.getItem('patientContext');
+      if (cached) {
+        const { patientId, uniqueCode } = JSON.parse(cached);
+        this.patientId = patientId;
+        this.uniqueCode = uniqueCode;
+
+        if (!this.patientDataService.getSnapshot()) {
+          this.loadPatientProfile();
+        }
+      }
+    }
+  });
+
+  this.userSubscription = this.authService.getUser()
         .pipe(
           catchError(error => {
             this.showErrorMessage('Failed to load user information.');
@@ -115,7 +146,7 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
           this.patient = res.data;
           this.userPrivileges = this.patient.privileges.map((p: any) => p.name);
         });
-    }
+}
 
     ngOnDestroy(): void {
       // Clean up subscriptions
@@ -146,29 +177,42 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
     }
 
     private loadPatientProfile(): void {
-      forkJoin({
-        patientDetails: this.userService.getUserProfile(this.uniqueCode),
-        appointments: this.appointmentService.getAppointmentsByPatientID(this.uniqueCode),
-        clinicalNotes: this.clinicalNotesService.getClinicalNotes(Number(this.patientId)),
-        completedProcedures: this.treatmentPlansService.getCompletedTreatmentPlans(Number(this.patientId)),
-        treatmentPlans: this.treatmentPlansService.getTreatmentPlans(Number(this.patientId)),
-        invoices: this.treatmentPlansService.getInvoices(Number(this.patientId)),
-        files: this.filesService.getPatientFiles(Number(this.patientId)),
-      }).subscribe({
-        next: ({ patientDetails, appointments, clinicalNotes, completedProcedures, invoices, treatmentPlans, files }) => {
-          this.patientDetails = patientDetails.data;
-          this.appointments = appointments.data;
-          this.clinicalNotes = clinicalNotes.data;
-          this.completedProcedures = completedProcedures.data;
-          this.invoices = invoices.data;
-          this.treatmentPlans = treatmentPlans.data;
-          this.files = files.data;
-        },
+      if(this.uniqueCode === null ||this.uniqueCode === undefined) return;
+    forkJoin({
+      patientDetails: this.userService.getUserProfile(this.uniqueCode),
+      appointments: this.appointmentService.getAppointmentsByPatientID(this.uniqueCode),
+      clinicalNotes: this.clinicalNotesService.getClinicalNotes(Number(this.patientId)),
+      completedProcedures: this.treatmentPlansService.getCompletedTreatmentPlans(Number(this.patientId)),
+      treatmentPlans: this.treatmentPlansService.getTreatmentPlans(Number(this.patientId)),
+      invoices: this.treatmentPlansService.getInvoices(Number(this.patientId)),
+      files: this.filesService.getPatientFiles(Number(this.patientId)),
+      advanceAmount: this.treatmentPlansService.getPatientAdvance(Number(this.patientId))
+    }).subscribe({
+      next: (res) => {
+        this.patientDetails = res.patientDetails.data;
+        this.appointments = res.appointments.data;
+        this.clinicalNotes = res.clinicalNotes.data;
+        this.completedProcedures = Array.from(
+          new Map(res.completedProcedures.data.rows.map((cp: { treatment_unique_id: any; }) => [cp.treatment_unique_id, cp])).values()
+        );        
+        this.invoices = Array.from(
+          new Map(res.invoices.data.rows.map((cp: { invoice_id: any; }) => [cp.invoice_id, cp])).values()
+        );    
+        this.treatmentPlans = Array.from(
+          new Map(res.treatmentPlans.data.rows.filter((tp: { status: string; }) => tp.status !== 'Completed').map((cp: { treatment_unique_id: any; }) => [cp.treatment_unique_id, cp])).values()
+        );    
+        this.files = res.files.data.rows.filter((f: any) => f.status !== 'Deleted');
+
+        this.patientDataService.setData(res);
+
+        this.availableAdvance = res.advanceAmount.data.available_advance;
+
+      },
       error: (err) => {
         console.error('Error fetching data:', err);
       }
-      });
-    }
+    });
+  }
 
     toggleSection(section: 'patient' | 'emr' | 'billing') {
         if (!this.patientDetails) {

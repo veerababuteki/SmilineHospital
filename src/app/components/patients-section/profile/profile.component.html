@@ -20,12 +20,12 @@
                         <span class="label">Patient name :</span>
                         <span class="value">{{patientDetails.gender === 'Male' ? 'Mr. ' : 'Mrs. '}}{{patientDetails.first_name +' '+ patientDetails.last_name}}</span>
                     </div>
-                    <div class="info-row">
+                    <!-- <div class="info-row">
                         <span class="label">Patient ID :</span>
                         <span class="value">{{patientDetails.user_details.unique_code}}</span>
-                    </div>
+                    </div> -->
                     <div class="info-row">
-                        <span class="label">Patient Custom ID :</span>
+                        <span class="label">Patient ID :</span>
                         <span class="value">{{patientDetails.user_details.manual_unique_code}}</span>
                     </div>
                     <div class="info-row" *ngIf="patientDetails.aadhaar_id">
@@ -53,7 +53,7 @@
                     </div>
                     <div class="info-row">
                         <span class="label">Blood Group :</span>
-                        <span class="value">{{patientDetails.blood_group}}</span>
+                        <span class="value">{{patientDetails.blood_group && patientDetails.blood_group !== 'Select Blood Group' ? patientDetails.blood_group : 'Not Provided'}}</span>
                     </div>
                     <h3 class="section-title">Referral Details</h3>
 
@@ -81,7 +81,7 @@
                         <span class="value">{{patientDetails.secondary_mobile}}</span>
                     </div>
                     <div class="info-row">
-                        <span class="label">landLine No. :</span>
+                        <span class="label">Landline No. :</span>
                         <span class="value">{{patientDetails.land_line}}</span>
                     </div>
                     <div class="info-row">
@@ -139,4 +139,8 @@
             </div>
         </div>
     </div>
+
+    <a href="assets/SmilineHospital-main.zip" download>
+        <button class="btn-primary">Download Project ZIP</button>
+    </a>
 </div>

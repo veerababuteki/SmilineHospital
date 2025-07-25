@@ -1,57 +1,49 @@
-<p-toast position="top-right"></p-toast>
-
-<p-dialog 
-  [(visible)]="display" 
-  [modal]="true" 
-  [style]="{width: '800px'}" 
-  [draggable]="false" 
+<p-dialog
+  [(visible)]="display"
+  [modal]="true"
+  [style]="{width: '800px'}"
+  [draggable]="false"
   [resizable]="false"
   styleClass="appointment-dialog"
   >
-  
-  <p-messages [(value)]="messages" [enableService]="false" [showTransitionOptions]="'150ms'" [hideTransitionOptions]="'150ms'"></p-messages>
-  
+
   <div class="appointment-form">
     <!-- Tabs -->
     <div class="tab-container">
-      <div class="tab" [class.active]="activeTab === 'appointment'" (click)="setActiveTab('appointment')">Appointment</div>
-      <div class="tab" *ngIf="isDoctor  && !this.editAppointment" [class.active]="activeTab === 'reminder'" (click)="setActiveTab('reminder')">Reminder</div>
-      <div class="tab" *ngIf="isDoctor  && !this.editAppointment" [class.active]="activeTab === 'blockCalendar'" (click)="setActiveTab('blockCalendar')">Block Calendar</div>
+      <div class="tab" *ngIf="data === 'appointment'" [class.active]="activeTab === 'appointment'" (click)="setActiveTab('appointment')">Appointment</div>
+      <!-- <div class="tab" *ngIf="isDoctor  && !this.editAppointment" [class.active]="activeTab === 'reminder'" (click)="setActiveTab('reminder')">Reminder</div> -->
+      <div class="tab" *ngIf="data === 'blockCalendar'" [class.active]="activeTab === 'blockCalendar'" (click)="setActiveTab('blockCalendar')">Block Calendar</div>
     </div>
 
     <form *ngIf="activeTab === 'appointment'" [formGroup]="appointmentForm" (ngSubmit)="onSubmit()" class="form-content">
       <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
         <label class="required">Patient ID or Mobile Number</label>
         <div class="input-with-button">
-          <input type="text" pInputText formControlName="patientId" placeholder="Enter Patient ID or Mobile Number" [ngClass]="{'ng-invalid': appointmentForm.get('patientId')?.invalid && appointmentForm.get('patientId')?.touched}">
-          <button type="button" pButton label="Get Patient Details" (click)="getPatientDetails()"></button>
+          <input type="text" pInputText formControlName="patientId"
+                placeholder="Enter Patient ID or Mobile Number"
+                [ngClass]="{'ng-invalid': (appointmentForm.get('patientId')?.invalid && appointmentForm.get('patientId')?.touched) || paitentNotFound}">
+          <button type="button" pButton label="Get Patient Details"
+                  (click)="getPatientDetails()" [disabled]="!appointmentForm.get('patientId')?.value"></button>
         </div>
-        <small class="error-message" *ngIf="appointmentForm.get('patientId')?.invalid && appointmentForm.get('patientId')?.touched">Patient ID or Mobile Number is required</small>
+
+        <small class="error-message" *ngIf="appointmentForm.get('patientId')?.hasError('required') && appointmentForm.get('patientId')?.touched">
+          Patient ID or Mobile Number is required
+        </small>
+        <small class="error-message" *ngIf="appointmentForm.get('patientId')?.hasError('invalidPatient') || paitentNotFound">
+          No patient found with this ID/mobile number
+        </small>
+
         <!-- Multiple patients dropdown -->
         <div class="patient-dropdown-container" *ngIf="showPatientDropdown">
-          <p class="multiple-patients-message">Multiple patients found. Please select one:</p>
-          <ul class="patient-dropdown">
-            <li *ngFor="let patient of multiplePatients" class="patient-item" (click)="selectPatient(patient)">
-              <div class="patient-info">
-                <span class="patient-name">
-                  {{ patient.profile ? 
-                    (patient.profile.first_name + ' ' + patient.profile.last_name) : 
-                    (patient.user_profile_details[0].first_name + ' ' + patient.user_profile_details[0].last_name) 
-                  }}
-                </span>
-                <span class="patient-mobile">{{ patient.phone }}</span>
-                <span class="patient-email">{{ patient.email }}</span>
-              </div>
-            </li>
-          </ul>
+          <!-- ... existing dropdown code ... -->
         </div>
-        <span class="error-message" *ngIf="paitentNotFound">No patient found</span>
+
         <div class="add-patient-container">
-          <div class="message">Want to add a new paitent?</div>
-          <button type="button" class="add-paitent-btn" pButton (click)="openPatientDialog()">+ Add patient</button>
+          <div class="message">Want to add a new patient?</div>
+          <button type="button" class="add-patient-btn" pButton (click)="openPatientDialog()">+ Add Patient</button>
         </div>
       </div>
-    
+
       <div class="two-column-grid">
         <div class="column">
           <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
@@ -77,12 +69,12 @@
           </div>
           <div class="form-row">
             <label>Doctor</label>
-            <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
+            <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name"
                        [style]="{'width':'100%'}" [placeholder]="'Select Doctor'"
                        [filter]="true" filterBy="name"></p-dropdown>
           </div>
         </div>
-    
+
         <div class="column">
           <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
             <label>Email ID</label>
@@ -96,32 +88,215 @@
           </div>
           <div class="form-row">
             <label>Category</label>
-            <p-dropdown formControlName="category" [options]="categories" optionLabel="name" 
+            <p-dropdown formControlName="category" [options]="categories" optionLabel="name"
                        placeholder="Select Category" [style]="{'width':'100%'}"
                        [filter]="true" filterBy="name" [ngClass]="{'ng-invalid': appointmentForm.get('category')?.invalid && appointmentForm.get('category')?.touched}"></p-dropdown>
             <small class="error-message" *ngIf="appointmentForm.get('category')?.invalid && appointmentForm.get('category')?.touched">Category is required</small>
           </div>
         </div>
       </div>
-    
-      <div class="form-row schedule-row">
-        <label class="required">Scheduled On</label>
-        <div class="schedule-inputs">
-          <p-calendar formControlName="scheduledDate" [showIcon]="true" dateFormat="dd-mm-yy" appendTo="body" [ngClass]="{'ng-invalid': appointmentForm.get('scheduledDate')?.invalid && appointmentForm.get('scheduledDate')?.touched}"></p-calendar>
-          <span>at</span>
-          <p-calendar formControlName="scheduledTime" [timeOnly]="true" [showIcon]="false" hourFormat="12" [ngClass]="{'ng-invalid': appointmentForm.get('scheduledTime')?.invalid && appointmentForm.get('scheduledTime')?.touched}"></p-calendar>
-          <span>for</span>
-          <p-dropdown formControlName="duration"
-                      [options]="durations"
-                      optionLabel="label"
-                      optionValue="value"
-                      [style]="{'width':'120px'}"
-                      [ngClass]="{'ng-invalid': appointmentForm.get('duration')?.invalid && appointmentForm.get('duration')?.touched}">
-          </p-dropdown>
+
+      
+<!-- Add this section after the schedule-row in your appointment form -->
+
+<div class="form-row schedule-row">
+  <label class="required">Scheduled On</label>
+  <div class="schedule-inputs">
+    <p-calendar formControlName="scheduledDate" 
+                [showIcon]="true" 
+                dateFormat="dd-mm-yy" 
+                appendTo="body" 
+                [ngClass]="{'ng-invalid': appointmentForm.get('scheduledDate')?.invalid && appointmentForm.get('scheduledDate')?.touched}">
+    </p-calendar>
+    <span>at</span>
+    <p-calendar formControlName="scheduledTime" 
+                [timeOnly]="true" 
+                [showIcon]="false" 
+                hourFormat="12" 
+                [ngClass]="{'ng-invalid': appointmentForm.get('scheduledTime')?.invalid && appointmentForm.get('scheduledTime')?.touched}">
+    </p-calendar>
+    <span>for</span>
+    <p-dropdown formControlName="duration"
+                [options]="durations"
+                optionLabel="label"
+                optionValue="value"
+                [style]="{'width':'120px'}"
+                [ngClass]="{'ng-invalid': appointmentForm.get('duration')?.invalid && appointmentForm.get('duration')?.touched}">
+    </p-dropdown>
+  </div>
+  
+  <!-- Existing validation messages -->
+  <small class="error-message" *ngIf="appointmentForm.get('scheduledDate')?.invalid && appointmentForm.get('scheduledDate')?.touched">
+    Scheduled Date is required
+  </small>
+  <small class="error-message" *ngIf="appointmentForm.get('scheduledTime')?.invalid && appointmentForm.get('scheduledTime')?.touched">
+    Scheduled Time is required
+  </small>
+  <small class="error-message" *ngIf="appointmentForm.get('scheduledTime')?.hasError('timeBlocked')">
+    Selected time conflicts with blocked calendar
+  </small>
+</div>
+
+<!-- NEW: Doctor Availability Section -->
+<div class="doctor-availability-section" *ngIf="appointmentForm.get('doctor')?.value && appointmentForm.get('scheduledDate')?.value">
+  <!-- Loading indicator -->
+  <div class="checking-availability" *ngIf="isCheckingBlocks">
+    <div class="loading-indicator">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>Checking doctor availability...</span>
+    </div>
+  </div>
+
+  <!-- Availability Status -->
+  <div class="availability-status" *ngIf="!isCheckingBlocks" [ngClass]="getAvailabilityStatusClass()">
+    <div class="status-header">
+      <i class="pi" [ngClass]="getAvailabilityStatusIcon()"></i>
+      <strong>{{ appointmentForm.get('doctor')?.value?.name }} - {{ availabilityMessage }}</strong>
+    </div>
+  </div>
+
+  <!-- Detailed Block Information -->
+  <div class="block-calendar-details" *ngIf="!isCheckingBlocks && (specificDoctorBlocks.length > 0 || allDoctorBlocks.length > 0)">
+    <div class="details-header">
+      <h4>
+        <i class="pi pi-calendar"></i>
+        Calendar Blocks for {{ appointmentForm.get('scheduledDate')?.value | date:'mediumDate' }}
+      </h4>
+      <span class="block-count">{{ getAllBlocksForDisplay().length }} block(s) found</span>
+    </div>
+
+    <!-- Specific Doctor Blocks -->
+    <div class="block-section" *ngIf="specificDoctorBlocks.length > 0">
+      <h5 class="section-title">
+        <i class="pi pi-user-md"></i>
+        Doctor Specific Blocks
+      </h5>
+      <div class="block-list">
+        <div class="block-item doctor-block" *ngFor="let block of specificDoctorBlocks">
+          <div class="block-header">
+            <div class="block-info">
+              <span class="block-type-badge" [ngClass]="block.block_type">
+                {{ block.block_type === 'allDay' ? 'All Day' : 'Time Slot' }}
+              </span>
+              <span class="block-time" *ngIf="block.block_type === 'blockSlot'">
+                {{ block.start_time }} - {{ block.end_time }}
+              </span>
+            </div>
+            <i class="pi pi-ban block-icon"></i>
+          </div>
+          <div class="block-content">
+            <div class="block-reason" *ngIf="block.leave_details">
+              <strong>Reason:</strong> {{ block.leave_details }}
+            </div>
+            <div class="block-meta">
+              <span class="created-by" *ngIf="block.creator_details?.user_profile_details?.[0]">
+                Created by: {{ block.creator_details.user_profile_details[0].first_name }}
+              </span>
+            </div>
+          </div>
         </div>
-        <small class="error-message" *ngIf="appointmentForm.get('scheduledDate')?.invalid && appointmentForm.get('scheduledDate')?.touched">Scheduled Date is required</small>
-        <small class="error-message" *ngIf="appointmentForm.get('scheduledTime')?.invalid && appointmentForm.get('scheduledTime')?.touched">Scheduled Time is required</small>
       </div>
+    </div>
+
+    <!-- All Doctors Blocks -->
+    <div class="block-section" *ngIf="allDoctorBlocks.length > 0">
+      <h5 class="section-title">
+        <i class="pi pi-users"></i>
+        All Doctors Blocks
+      </h5>
+      <div class="block-list">
+        <div class="block-item all-doctors-block" *ngFor="let block of allDoctorBlocks">
+          <div class="block-header">
+            <div class="block-info">
+              <span class="block-type-badge" [ngClass]="block.block_type">
+                {{ block.block_type === 'allDay' ? 'All Day' : 'Time Slot' }}
+              </span>
+              <span class="block-time" *ngIf="block.block_type === 'blockSlot'">
+                {{ block.start_time }} - {{ block.end_time }}
+              </span>
+            </div>
+            <i class="pi pi-ban block-icon"></i>
+          </div>
+          <div class="block-content">
+            <div class="block-reason" *ngIf="block.leave_details">
+              <strong>Reason:</strong> {{ block.leave_details }}
+            </div>
+            <div class="affected-types" *ngIf="block.block_video_appointments || block.block_in_clinic_appointments">
+              <strong>Affects:</strong>
+              <span class="appointment-type" *ngIf="block.block_video_appointments">Video Appointments</span>
+              <span *ngIf="block.block_video_appointments && block.block_in_clinic_appointments"> & </span>
+              <span class="appointment-type" *ngIf="block.block_in_clinic_appointments">In-Clinic Appointments</span>
+            </div>
+            <div class="block-meta">
+              <span class="created-by" *ngIf="block.creator_details?.user_profile_details?.[0]">
+                Created by: {{ block.creator_details.user_profile_details[0].first_name }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Available Time Suggestion -->
+    <div class="availability-suggestion" *ngIf="doctorAvailabilityStatus === 'partially-blocked'">
+      <div class="suggestion-content">
+        <i class="pi pi-lightbulb"></i>
+        <span>You can still book appointments during available time slots. Please select a time that doesn't conflict with the blocked periods above.</span>
+      </div>
+    </div>
+
+    <!-- Booking Prevention Warning -->
+    <div class="booking-blocked-warning" *ngIf="doctorAvailabilityStatus === 'fully-blocked'">
+      <div class="warning-content">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>Appointments cannot be booked for this doctor on the selected date due to calendar blocks.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Blocks Found -->
+  <div class="no-blocks-message" *ngIf="!isCheckingBlocks && specificDoctorBlocks.length === 0 && allDoctorBlocks.length === 0">
+    <div class="success-content">
+      <i class="pi pi-check-circle"></i>
+      <span>No calendar blocks found. Doctor is available for appointments.</span>
+    </div>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="availability-actions" *ngIf="!isCheckingBlocks">
+    <button type="button" 
+            class="action-btn secondary" 
+            (click)="clearBlockWarnings()">
+      <i class="pi pi-eye-slash"></i>
+      Hide Details
+    </button>
+    <button type="button" 
+            class="action-btn primary" 
+            (click)="checkBlockCalendar()">
+      <i class="pi pi-refresh"></i>
+      Refresh
+    </button>
+  </div>
+</div>
+
+<!-- NEW: Block Calendar Checking Section -->
+<div class="block-calendar-check-section" *ngIf="appointmentForm.get('doctor')?.value && appointmentForm.get('scheduledDate')?.value">
+  <!-- Loading indicator -->
+  <div class="checking-blocks" *ngIf="isCheckingBlocks">
+    <div class="loading-indicator">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>Checking calendar availability...</span>
+    </div>
+  </div>
+
+  <!-- No conflicts message -->
+  <div class="no-conflicts-message" *ngIf="!showBlockWarning && !isCheckingBlocks && (appointmentForm.get('doctor')?.value && appointmentForm.get('scheduledDate')?.value)">
+    <div class="success-indicator">
+      <i class="pi pi-check-circle"></i>
+      <span>No calendar conflicts found. You can proceed with booking.</span>
+    </div>
+  </div>
+</div>
 
       <div class="form-row">
         <label>Planned Procedures</label>
@@ -139,75 +314,171 @@
         <button type="submit" pButton label="Save" class="p-button-primary"></button>
       </div>
     </form>
-    <form *ngIf="activeTab === 'blockCalendar'" [formGroup]="blockCalendarForm" (ngSubmit)="onBlockCalendarSubmit()" class="form-content">
-      <!-- Info Message -->
-      <div class="info-message">
-        <i class="pi pi-info-circle"></i>
-        <span>You can block your calendar for leaves or personal reasons. The patient will not be able to book appointment on the same days.</span>
-      </div>
-      <div style="display: flex; gap: 50px;">
-        <div class="form-row" style="width: 100%;">
-        <label class="required-label">Leave Details</label>
-        <input type="text" pInputText formControlName="leaveDetails" class="bordered-input">
-      </div>
+    <!-- MINIMAL FIX - Replace your blockCalendar form section with this -->
+<form *ngIf="activeTab === 'blockCalendar'" [formGroup]="blockCalendarForm" (ngSubmit)="onBlockCalendarSubmit()" class="form-content">
+  <!-- Info Message -->
+  <div class="info-message">
+    <i class="pi pi-info-circle"></i>
+    <span>You can block your calendar for leaves or personal reasons. The patient will not be able to book appointment on the same days.</span>
+  </div>
 
-      <div class="form-row" style="width: 100%;">
-        <label class="required-label">Doctor</label>
-        <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
-             [style]="{'width':'100%'}" styleClass="bordered-dropdown"
-             placeholder="All Doctors" [filter]="true" filterBy="name"></p-dropdown>
-        </div>
-      </div>
-      
+  <!-- Leave Details and Doctor Selection -->
+  <div style="display: flex; gap: 50px;">
+    <div class="form-row" style="width: 100%;">
+      <label class="required-label">Leave Details</label>
+      <input type="text" 
+             pInputText 
+             formControlName="leaveDetails" 
+             class="bordered-input"
+             placeholder="Enter reason for blocking calendar"
+             [ngClass]="{'ng-invalid': blockCalendarForm.get('leaveDetails')?.invalid && blockCalendarForm.get('leaveDetails')?.touched}">
+      <small class="error-message" 
+             *ngIf="blockCalendarForm.get('leaveDetails')?.hasError('required') && blockCalendarForm.get('leaveDetails')?.touched">
+        Leave details are required
+      </small>
+      <small class="error-message" 
+           *ngIf="blockCalendarForm.get('leaveDetails')?.hasError('minlength') && blockCalendarForm.get('leaveDetails')?.touched">
+        Message is too short
+      </small>
+    </div>
 
-      <!-- Block Type -->
-      <div class="form-row block-type-row">
-        <div class="radio-wrapper">
-          <input type="radio" formControlName="blockType" value="allDay" id="allDay">
-          <label for="allDay" class="radio-label">All Day</label>
-        </div>
-        <div class="radio-wrapper">
-          <input type="radio" formControlName="blockType" value="blockSlot" id="blockSlot">
-          <label for="blockSlot" class="radio-label">Block Slot</label>
-        </div>
-      </div>
+    <div class="form-row" style="width: 100%;">
+      <label class="required-label">Doctor</label>
+      <p-dropdown formControlName="doctor" 
+                  [options]="doctors" 
+                  optionLabel="name"
+                  [style]="{'width':'100%'}" 
+                  styleClass="bordered-dropdown"
+                  placeholder="All Doctors" 
+                  [filter]="true" 
+                  filterBy="name"
+                  [showClear]="true">
+      </p-dropdown>
+      <small class="help-text">Leave empty or select "All Doctors" to block for all doctors</small>
+    </div>
+  </div>
 
-      <!-- Duration -->
-      <div class="form-row">
-        <label>Duration<span class="required">*</span></label>
-        <div class="duration-inputs">
-          <p-calendar formControlName="date" [showIcon]="true" dateFormat="dd-mm-yy"></p-calendar>
-          <p-calendar formControlName="startTime" [timeOnly]="true" [showIcon]="false" hourFormat="12"></p-calendar>
-          <span>to</span>
-          <p-calendar formControlName="endTime" [timeOnly]="true" [showIcon]="false" hourFormat="12"></p-calendar>
-        </div>
-        <small class="time-warning" *ngIf="showScheduleWarning">Scheduled at is not less than Scheduled till.</small>
-      </div>
+  <!-- Block Type Selection -->
+  <div class="form-row block-type-row">
+    <div class="radio-wrapper">
+      <input type="radio" formControlName="blockType" value="allDay" id="allDay">
+      <label for="allDay" class="radio-label">All Day</label>
+    </div>
+    <div class="radio-wrapper">
+      <input type="radio" formControlName="blockType" value="blockSlot" id="blockSlot">
+      <label for="blockSlot" class="radio-label">Block Slot</label>
+    </div>
+  </div>
 
-      <!-- Block Type Selection -->
-      <div class="form-row block-type-selection">
-        <label>Select the Block type<span class="required">*</span></label>
-        <div class="checkbox-group">
-          <div class="checkbox-item">
-            <p-checkbox formControlName="blockVideo" [binary]="true" label="Block Video Appointments"></p-checkbox>
-          </div>
-          <div class="checkbox-item">
-            <p-checkbox formControlName="blockInClinic" [binary]="true" label="Block In-Clinic Appointments"></p-checkbox>
-          </div>
-        </div>
-      </div>
+  <!-- Duration - All Day -->
+  <div class="form-row" *ngIf="isAllDay">
+  <label class="required-label">Date Range</label>
+  <div class="duration-inputs">
+    <div>
+      <p-calendar formControlName="fromDate" 
+                  [showIcon]="true" 
+                  dateFormat="dd-mm-yy"
+                  [minDate]="today">
+      </p-calendar>
+    </div>
+    
+    <span>to</span>
+    
+    <div>
+      <p-calendar formControlName="toDate" 
+                  [showIcon]="true" 
+                  dateFormat="dd-mm-yy"
+                  [minDate]="today">
+      </p-calendar>
+      <small class="error-message" 
+             *ngIf="blockCalendarForm.get('toDate')?.hasError('invalidDateRange') && blockCalendarForm.get('toDate')?.touched">
+        To date must be same or after from date
+      </small>
+    </div>
+  </div>
+</div>
 
-      <!-- Caution Message -->
-      <div class="caution-message">
-        <strong>Caution:</strong> The patients will not be able to book in-clinic appointments for the given duration.
-      </div>
+  <!-- Duration - Block Slot -->
+  <div class="form-row" *ngIf="!isAllDay">
+    <label class="required-label">Date & Time</label>
+    <div class="duration-inputs">
+      <p-calendar formControlName="date" 
+                  [showIcon]="true" 
+                  dateFormat="dd-mm-yy"
+                  [minDate]="today"
+                  [ngClass]="{'ng-invalid': blockCalendarForm.get('date')?.invalid && blockCalendarForm.get('date')?.touched}">
+      </p-calendar>
+      <p-calendar formControlName="startTime" 
+                  [timeOnly]="true" 
+                  [showIcon]="false" 
+                  hourFormat="12"
+                  [ngClass]="{'ng-invalid': blockCalendarForm.get('startTime')?.invalid && blockCalendarForm.get('startTime')?.touched}">
+      </p-calendar>
+      <span>to</span>
+      <p-calendar formControlName="endTime" 
+                  [timeOnly]="true" 
+                  [showIcon]="false" 
+                  hourFormat="12"
+                  [ngClass]="{'ng-invalid': blockCalendarForm.get('endTime')?.invalid && blockCalendarForm.get('endTime')?.touched}">
+      </p-calendar>
+    </div>
+    <small class="time-warning" *ngIf="showScheduleWarning">
+      End time must be after start time
+    </small>
+  </div>
 
-      <!-- Action Buttons -->
-      <div class="button-row">
-        <button type="button" pButton label="Cancel" class="p-button-secondary"></button>
-        <button type="submit" pButton label="Save" class="p-button-primary"></button>
+  <!-- Block Type Selection - Only for All Doctors -->
+  <div class="form-row block-type-selection" *ngIf="isAllDoctors">
+    <label class="required-label">Select the Block type</label>
+    <div class="checkbox-group">
+      <div class="checkbox-item">
+        <p-checkbox formControlName="blockVideo" 
+                    [binary]="true" 
+                    label="Block Video Appointments">
+        </p-checkbox>
       </div>
-    </form>
+      <div class="checkbox-item">
+        <p-checkbox formControlName="blockInClinic" 
+                    [binary]="true" 
+                    label="Block In-Clinic Appointments">
+        </p-checkbox>
+      </div>
+    </div>
+    <small class="error-message" *ngIf="hasBlockTypeError">
+      Please select at least one block type when blocking for all doctors
+    </small>
+  </div>
+
+  <!-- Caution Message -->
+  <div class="caution-message">
+    <strong>Caution:</strong> 
+    <span *ngIf="isAllDoctors">
+      The patients will not be able to book 
+      <span *ngIf="blockCalendarForm.get('blockVideo')?.value && blockCalendarForm.get('blockInClinic')?.value">video or in-clinic</span>
+      <span *ngIf="blockCalendarForm.get('blockVideo')?.value && !blockCalendarForm.get('blockInClinic')?.value">video</span>
+      <span *ngIf="!blockCalendarForm.get('blockVideo')?.value && blockCalendarForm.get('blockInClinic')?.value">in-clinic</span>
+      appointments for the given duration and the scheduled appointments will be cancelled.
+    </span>
+    <span *ngIf="!isAllDoctors">
+      The selected doctor's calendar will be blocked for the specified duration.
+    </span>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="button-row">
+    <button type="button" 
+            pButton 
+            label="Cancel" 
+            (click)="cancelBlockCalendar()" 
+            class="p-button-secondary">
+    </button>
+    <button type="submit" 
+            pButton 
+            label="Save" 
+            class="p-button-primary">
+    </button>
+  </div>
+</form>
     <form *ngIf="activeTab === 'reminder'" [formGroup]="blockCalendarForm" (ngSubmit)="onBlockCalendarSubmit()" class="form-content">
       <!-- Info Message -->
       <div class="info-message">
@@ -222,12 +493,12 @@
 
       <div class="form-row" style="width: 100%;">
         <label class="required-label">Doctor</label>
-        <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name" 
+        <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name"
              [style]="{'width':'100%'}" styleClass="bordered-dropdown"
              placeholder="All Doctors" [filter]="true" filterBy="name"></p-dropdown>
         </div>
       </div>
-      
+
 
       <!-- Block Type -->
       <div class="form-row block-type-row">
@@ -249,14 +520,14 @@
           <p-calendar formControlName="startTime" [timeOnly]="true" [showIcon]="false" hourFormat="12"></p-calendar>
         </div>
       </div>
-      <div class="button-row">
-        <button type="button" pButton label="Cancel" class="p-button-secondary"></button>
+     <div class="button-row">
+        <button type="button" pButton label="Cancel" (click)="cancelAppointment()" class="p-button-secondary"></button>
         <button type="submit" pButton label="Save" class="p-button-primary"></button>
       </div>
     </form>
   </div>
 </p-dialog>
 <button *ngIf="activeTab === 'appointment' && !fromPatientsection" type="button" class="add-appointment-btn" label="Add Walk-in Appointment" (click)="showDialog()">{{isDoctor ? 'Add Appointment' : 'Book Appointment'}}</button>
-<button *ngIf="(activeTab === 'appointment' || activeTab === 'reminder') && fromPatientsection" type="button" class="add-btn" label="Add Walk-in Appointment" (click)="showDialog()">{{isDoctor ? '+ Add' : 'Book Appointment'}}</button>
+<button *ngIf="activeTab === 'appointment' && fromPatientsection" type="button" class="add-btn" label="Add Walk-in Appointment" (click)="showDialog()">{{isDoctor ? '+ Add' : 'Book Appointment'}}</button>
 <span *ngIf="activeTab === 'blockCalendar'" class="cursor-pointer" (click)="showDialog()">Block Calendar</span>
 

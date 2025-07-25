@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FileService } from '../../../services/file.service';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { MessageService } from '../../../services/message.service';
+import { MessageService } from 'primeng/api';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { PatientDataService } from '../../../services/patient-data.service';
 
 @Component({
   selector: 'app-files',
@@ -35,25 +36,26 @@ export class FilesComponent implements OnInit {
         private fileService: FileService, 
         private route: ActivatedRoute, 
         private messageService: MessageService,
-        private sanitizer: DomSanitizer
+        private sanitizer: DomSanitizer,
+        private patientDataService: PatientDataService
     ) {}
     
     ngOnInit(): void {
       this.route.parent?.paramMap.subscribe(params => {
-        if(this.patientId == null) {
-          this.patientId = params.get('id');
-        }
+        this.patientId = params.get('id');
         if (this.patientId) {
           this.loadPatientData(this.patientId);
         }
-      });  
+      });
+
       this.route.paramMap.subscribe(params => {
-        if(this.uniqueCode == null) {
-          this.uniqueCode = params.get('source');
-        }
-        if(this.uniqueCode !== null){
-          this.messageService.sendMessage(this.patientId ?? '', this.uniqueCode ?? '')
-        }
+        this.uniqueCode = params.get('source');
+      });
+    }
+
+    loadFileLabels() {
+      this.fileService.getFileLabels().subscribe(labels => {
+      this.labels = labels.data;
       });
     }
     
@@ -61,9 +63,20 @@ export class FilesComponent implements OnInit {
       this.fileService.getFileLabels().subscribe(labels => {
         this.labels = labels.data;
       });
-      this.fileService.getPatientFiles(Number(patientId)).subscribe(files => {
-        this.files = files.data.rows.filter((f: any) => f.status !== 'Deleted');
-        this.filesDict = this.groupByDate(files.data.rows.filter((f: any) => f.status !== 'Deleted'));
+      this.fileService.getPatientFiles(Number(patientId)).subscribe(res => {
+        console.log('API response for files:', res);
+        let filesArr = [];
+        if (res?.data?.rows) {
+          filesArr = res.data.rows;
+        } else if (Array.isArray(res)) {
+          filesArr = res;
+        } else if (Array.isArray(res?.data)) {
+          filesArr = res.data;
+        }
+        this.files = filesArr.filter((f: any) => f.status !== 'Deleted');
+        console.log('Files after filtering:', this.files);
+        this.filesDict = this.groupByDate(this.files);
+        console.log('FilesDict:', this.filesDict);
       });
     }
 
@@ -175,7 +188,12 @@ export class FilesComponent implements OnInit {
 
     groupByDate(rows: any[]) {
       return rows.reduce((acc, row) => {
-        const dateKey = row.created_at.split('T')[0];
+        let dateKey = 'Unknown Date';
+        if (row.created_at && typeof row.created_at === 'string' && row.created_at.includes('T')) {
+          dateKey = row.created_at.split('T')[0];
+        } else if (row.created_at) {
+          dateKey = row.created_at;
+        }
         if (!acc[dateKey]) {
           acc[dateKey] = [];
         }
@@ -196,6 +214,7 @@ export class FilesComponent implements OnInit {
         this.fileService.deleteFile(id).subscribe(res => {
           if(this.patientId){
             this.loadPatientData(this.patientId);
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'File deleted successfully.' });
           }
         });
       });
@@ -245,9 +264,11 @@ export class FilesComponent implements OnInit {
             this.loadPatientData(this.patientId);
           }
           this.selectedFiles = [];
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Files uploaded successfully.' });
         },
         error: (err) => {
           console.error('Error uploading files:', err);
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'File upload failed.' });
         }
       });
     }

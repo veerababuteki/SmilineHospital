@@ -7,6 +7,7 @@ import { UserService } from '../../../services/user.service';
 import { AppointmentComponent } from '../../appointment/appointment.component';
 import { AuthService } from '../../../services/auth.service';
 import { MessageService } from '../../../services/message.service';
+import { PatientDataService } from '../../../services/patient-data.service';
 
 @Component({
   selector: 'app-appointments',
@@ -30,7 +31,7 @@ export class AppointmentsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute, 
     private userService: UserService, 
-    
+    private patientDataService: PatientDataService,
     private authService: AuthService,
     private router: Router, 
     private appointmentService: AppointmentService,
@@ -42,21 +43,28 @@ export class AppointmentsComponent implements OnInit {
 
   
   ngOnInit(): void {
-    this.route.parent?.paramMap.subscribe(params => {
-      if(this.patientId == null) {
-        this.patientId = params.get('id');
-      }
-    });
-    // Set the minDate to beginning of today (midnight)
-    this.minDate.setHours(0, 0, 0, 0);
-    this.route.paramMap.subscribe(params => {
-      if(this.uniqueCode == null) {
-        this.uniqueCode = params.get('source');
-      }
-      if (this.uniqueCode) {
-        this.loadPatientData(this.uniqueCode);
-      }
-    });
+    const routeId = this.route.parent?.snapshot.paramMap.get('id');
+  const source = this.route.snapshot.paramMap.get('source');
+
+  if (routeId && source) {
+    this.patientId = routeId;
+    this.uniqueCode = source;
+  } else {
+    const cached = localStorage.getItem('patientContext');
+    if (cached) {
+      const context = JSON.parse(cached);
+      this.patientId = context.patientId;
+      this.uniqueCode = context.uniqueCode;
+    }
+  }
+
+  // Subscribe to shared data
+  this.patientDataService.data$.subscribe((res) => {
+    const appointments = res?.appointments?.data?.rows || [];
+
+    this.patientAppointments = appointments;
+      this.appointments = this.groupByDate(appointments);
+  });
     
     forkJoin({
       doctors: this.userService.getDoctors('bce9f008-d447-4fe2-a29e-d58d579534f0'),

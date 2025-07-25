@@ -188,7 +188,7 @@ export class AddProfileComponent implements OnInit {
       refferedByName: [''],
       refferedByMobile: ['',
         Validators.pattern('^[1-9]\\d{9}$')],
-      bloodGroup: [null],
+      bloodGroup: [this.bloodGroups[0]],
       primaryMobile: ['', [
         Validators.required,
         Validators.pattern('^[1-9]\\d{9}$'), // Starts with 6-9 and has 10 digits
