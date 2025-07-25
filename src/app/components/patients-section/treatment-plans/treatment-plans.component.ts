@@ -14,6 +14,8 @@ import { TreatmentPlansPrintComponent } from './treatment-plans-print/treatment-
 import { MessageService } from '../../../services/message.service';
 import { TooltipModule } from 'primeng/tooltip';
 import { PatientDataService } from '../../../services/patient-data.service';
+import { ConsentFormComponent } from './consent-form/consent-form.component';
+import { DialogModule } from 'primeng/dialog'; // ✅ Add this import at the top
 
 @Component({
   selector: 'app-treatment-plans',
@@ -29,7 +31,9 @@ import { PatientDataService } from '../../../services/patient-data.service';
     MenuModule, 
     ButtonModule, 
     TreatmentPlansPrintComponent,
-    TooltipModule
+    TooltipModule,
+    ConsentFormComponent,
+    DialogModule
   ]
 })
 export class TreatmentPlansComponent implements OnInit {
@@ -49,6 +53,21 @@ export class TreatmentPlansComponent implements OnInit {
   currentTreatmentPlan: any;
   uniqueCode: string | null | undefined;
   savedPractice: any;
+  consentFormVisible: boolean = false;
+  selectedConsentTreatment: any;
+
+
+consentform(plan: any): void {
+  this.selectedConsentTreatment = {
+    patientName: plan?.patient_details?.user_profile_details[0]?.first_name + ' ' +
+                 plan?.patient_details?.user_profile_details[0]?.last_name,
+    doctorName: 'Dr. ' + plan?.doctor_details_treat?.user_profile_details[0]?.first_name + ' ' +
+                         plan?.doctor_details_treat?.user_profile_details[0]?.last_name,
+    date: plan?.created_at ? plan.created_at.split('T')[0] : new Date().toISOString().split('T')[0]
+  };
+  this.consentFormVisible = true;
+}
+
 
   constructor(private fb: FormBuilder,
     private messageService: MessageService,
@@ -96,6 +115,11 @@ export class TreatmentPlansComponent implements OnInit {
       label: 'Edit',
       icon: 'pi pi-pencil',
       command: (event) => this.updateTreatmentPlans(event)
+    },
+    {
+      label: 'Consent Form',
+      icon: 'pi pi-file',
+      command: (event) => this.consentform(event)
     }
   ];
 }
@@ -115,7 +139,12 @@ export class TreatmentPlansComponent implements OnInit {
         label: 'Edit',
         icon: 'pi pi-pencil',
         command: () => this.updateTreatmentPlans(this.currentTreatmentPlan)
-      }
+      },
+      {
+      label: 'Consent Form',
+      icon: 'pi pi-file',
+        command: () => this.consentform(this.currentTreatmentPlan)
+    }
     ];
   }
 

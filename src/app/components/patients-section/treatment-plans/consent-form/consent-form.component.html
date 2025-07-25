@@ -1,0 +1,146 @@
+<!-- consent-form.component.html -->
+<div class="consent-form-container">
+  <!-- Mode Selection -->
+  <div class="mode-selection" *ngIf="!selectedMode">
+    <h2>Select Action</h2>
+    <div class="mode-buttons">
+      <button class="btn btn-primary mode-btn" (click)="selectMode('download')">
+        Download Form
+      </button>
+      <button class="btn btn-secondary mode-btn" (click)="selectMode('upload')">
+        Upload Form
+      </button>
+    </div>
+  </div>
+
+  <!-- Download Mode -->
+  <div *ngIf="selectedMode === 'download'">
+    <div class="mode-header">
+      <h2>INFORMED CONSENT FORM - Download</h2>
+      <button class="btn btn-outline" (click)="goBack()">← Back to Selection</button>
+    </div>
+
+    <!-- Single Form -->
+    <form [formGroup]="consentForm" class="consent-form">
+      <!-- Basic Information -->
+      <div class="basic-info">
+        <div class="info-row">
+          <div class="form-group">
+            <label for="patientName">Patient Name:</label>
+            <input 
+              type="text" 
+              id="patientName" 
+              formControlName="patientName"
+              class="form-control"
+              placeholder="Enter patient name">
+          </div>
+          <div class="form-group">
+            <label for="date">Date:</label>
+            <input 
+              type="date" 
+              id="date" 
+              formControlName="date"
+              class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="doctorName">Doctor's Name:</label>
+          <input 
+            type="text" 
+            id="doctorName" 
+            formControlName="doctorName"
+            class="form-control"
+            placeholder="Enter doctor's name">
+        </div>
+      </div>
+
+      <!-- Consent Sections -->
+      <div class="consent-sections" formGroupName="sections">
+        <h3>Select Applicable Sections:</h3>
+        
+        <div class="sections-grid">
+          <div *ngFor="let sectionKey of getSectionKeys()" class="section-item">
+            <div class="section-checkbox">
+              <input 
+                type="checkbox" 
+                [id]="sectionKey"
+                [formControlName]="sectionKey">
+              <label [for]="sectionKey">
+                {{ sectionDescriptions[sectionKey].title }}
+              </label>
+            </div>
+            
+            <div class="section-content" *ngIf="consentForm.get('sections')?.get(sectionKey)?.value">
+              <p>{{ sectionDescriptions[sectionKey].content }}</p>
+              <div class="signature-row">
+                <span>Patient Signature: ____________________</span>
+                <span>Doctor's Signature: ____________________</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- Download Button -->
+    <div class="action-buttons">
+      <button 
+        class="btn btn-primary"
+        [disabled]="!isFormValid()"
+        (click)="downloadFormAsPDF()">
+        Download Form as PDF
+      </button>
+    </div>
+
+    <!-- Form Status -->
+    <div class="form-status">
+      <div class="status-info">
+        <p><strong>Form Status:</strong> 
+          <span [class]="isFormValid() ? 'valid' : 'invalid'">
+            {{ isFormValid() ? 'Complete' : 'Incomplete' }}
+          </span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Mode -->
+  <div *ngIf="selectedMode === 'upload'">
+    <div class="mode-header">
+      <h2>Upload Completed Forms</h2>
+      <button class="btn btn-outline" (click)="goBack()">← Back to Selection</button>
+    </div>
+
+    <!-- File Upload Section -->
+    <div class="upload-section">
+      <div class="upload-area">
+        <input 
+          type="file" 
+          id="fileInput"
+          accept=".pdf"
+          (change)="onFileSelected($event)"
+          style="display: none;">
+        <label for="fileInput" class="upload-button">
+          Choose PDF File
+        </label>
+        <p class="upload-hint">Select a PDF file to upload</p>
+      </div>
+
+      <!-- Uploaded Files List -->
+      <div class="uploaded-files" *ngIf="uploadedForms.length > 0">
+        <h4>Uploaded Forms:</h4>
+        <div class="file-list">
+          <div *ngFor="let file of uploadedForms; let i = index" class="file-item">
+            <div class="file-info">
+              <span class="file-name">{{ file.name }}</span>
+              <span class="upload-date">{{ file.uploadDate | date:'short' }}</span>
+            </div>
+            <button class="btn btn-danger btn-sm" (click)="removeUploadedForm(i)">
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
