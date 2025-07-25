@@ -10,7 +10,7 @@
       class="sfc-search-bar"
     />
   </div>
-  <button class="sfc-action-btn" (click)="addEntry()">
+  <button type="submit" class="sfc-action-btn" (click)="addEntry()">
     <i class="fa-solid fa-plus mr-1"></i>
     {{ editingIndex !== null ? "Update Members to SFC" : "Add Members to SFC" }}
   </button>
@@ -52,25 +52,26 @@
           <td>
             <input
               [(ngModel)]="newEntry.name"
-              name="nameOpNo"
+              name="name"
               maxlength="150"
               required
-              [class.invalid-field]="isFieldInvalid('nameOpNo')"
+              [class.invalid-field]="isFieldInvalid('name')"
             />
-            <div *ngIf="isFieldInvalid('nameOpNo')" class="error-msg">
+            <div *ngIf="isFieldInvalid('name')" class="error-msg">
              
             </div>
           </td>
           <td>
             <input
               [(ngModel)]="newEntry.patientId"
-              name="OpNo"
-              [class.invalid-field]="isFieldInvalid('OpNo')"
+              name="patientId"
+              [class.invalid-field]="isFieldInvalid('patientId')"
             />
-            <div *ngIf="isFieldInvalid('OpNo')" class="error-msg"></div>
+            <div *ngIf="isFieldInvalid('patientId')" class="error-msg"></div>
           </td>
           <td>
             <input
+              type="number"
               [(ngModel)]="newEntry.ageRelation"
               name="ageRelation"
               required
@@ -143,7 +144,7 @@
           <td></td>
         </tr>
         <!-- Existing entries with search and pagination -->
-        <tr *ngFor="let entry of paginatedEntries(); let i = index">
+        <tr *ngFor="let entry of filteredData; let i = index">
           <td>{{ entry.date }}</td>
           <td>{{ entry.name }}</td>
           <td>{{ entry.patientId }}</td>
