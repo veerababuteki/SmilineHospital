@@ -47,6 +47,9 @@
                     </div>
                     <div class="form-field">
                       <input pInputText type="text" formControlName="aadhaarId">
+                      <div class="validation-error" *ngIf="patientForm.get('aadhaarId')?.invalid && patientForm.get('aadhaarId')?.touched">
+                        Please enter a valid 12-digit Aadhaar number.
+                      </div>
                     </div>
                   </div>
 

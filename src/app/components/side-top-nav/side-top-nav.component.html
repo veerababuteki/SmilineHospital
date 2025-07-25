@@ -1,95 +1,91 @@
 <nav class="sidebar" [class.expanded]="isExpanded" (mouseenter)="isExpanded = true" (mouseleave)="isExpanded = false">
-    <div class="logo-container">
-      <img [src]="isExpanded ? 'assets/dental-logo.svg' : 'assets/_6FE99D01-88B5-48C8-A809-DE2A58E33DBF_-removebg-preview-removebg-preview.png'" alt="Practo Logo" [ngClass]="{ 'expanded-logo': isExpanded, 'logo': !isExpanded }"  class="">
-    </div>
-    <ul class="nav-list">
-      <li *ngFor="let item of navItems" class="nav-item">
-        <a class="nav-link" [routerLink]="item.link" routerLinkActive="active" >
-          <span class="icon-wrapper">
-            <i [class]="item.icon"></i>
-          </span>
-          <span [ngClass]="{ 'expanded-label': isExpanded, 'label': !isExpanded }"> {{ item.label }}</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-  <header class="header">
-    <div class="header-left">
-      <div class="search-wrapper">
-        <i class="pi pi-search search-icon"></i>
-        <input
-          type="text"
-          pInputText
-          [(ngModel)]="searchText"
-          (input)="filterPatients()"
-          (focus)="showSearchResults = true"
-          placeholder="Search Patients"
-          class="search-input" />
+  <div class="logo-container">
+    <img
+      [src]="isExpanded ? 'assets/dental-logo.svg' : 'assets/_6FE99D01-88B5-48C8-A809-DE2A58E33DBF_-removebg-preview-removebg-preview.png'"
+      alt="Practo Logo"
+      [ngClass]="{ 'expanded-logo': isExpanded, 'logo': !isExpanded }"
+      class=""
+    />
+  </div>
 
-        <!-- Search results dropdown -->
-        <div class="search-results-dropdown" *ngIf="showSearchResults && searchText.trim().length > 0">
-          <div class="search-results-list" *ngIf="filteredPatients.length > 0">
-            <div class="search-result-item" *ngFor="let patient of filteredPatients" (click)="selectPatient(patient)">
-              <img [src]="patient.image" alt="Patient" class="patient-thumbnail">
-              <div class="patient-details">
-                <div class="patient-header">
-                  <div class="patient-name">{{patient.name}}</div>
-                  <div class="patient-id">{{patient.manual_unique_code}}</div>
-                  </div>
-                <div class="patient-email">{{patient.phone}}</div>
-                <div class="patient-email">{{patient.email}}</div>
+  <ul class="nav-list">
+    <li *ngFor="let item of navItems" class="nav-item">
+      <a class="nav-link" [routerLink]="item.link" routerLinkActive="active">
+        <span class="icon-wrapper">
+          <i [class]="item.icon"></i>
+        </span>
+        <span [ngClass]="{ 'expanded-label': isExpanded, 'label': !isExpanded }">
+          {{ item.label }}
+        </span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<header class="header">
+  <div class="header-left">
+    <div class="search-wrapper">
+      <i class="pi pi-search search-icon"></i>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="searchText"
+        (input)="filterPatients()"
+        (focus)="showSearchResults = true"
+        placeholder="Search Patients"
+        class="search-input"
+      />
+
+      <!-- Search results dropdown -->
+      <div class="search-results-dropdown" *ngIf="showSearchResults && searchText.trim().length > 0">
+        <div class="search-results-list" *ngIf="filteredPatients.length > 0">
+          <div
+            class="search-result-item"
+            *ngFor="let patient of filteredPatients"
+            (click)="selectPatient(patient)"
+          >
+            <img [src]="patient.image" alt="Patient" class="patient-thumbnail" />
+            <div class="patient-details">
+              <div class="patient-header">
+                <div class="patient-name">{{ patient.name }}</div>
+                <div class="patient-id">{{ patient.manual_unique_code }}</div>
               </div>
+              <div class="patient-email">{{ patient.phone }}</div>
+              <div class="patient-email">{{ patient.email }}</div>
             </div>
           </div>
-          <div class="no-results-found" *ngIf="filteredPatients.length === 0">
-            No patients found matching "{{searchText}}"
-          </div>
+        </div>
+        <div class="no-results-found" *ngIf="filteredPatients.length === 0">
+          No patients found matching "{{ searchText }}"
         </div>
       </div>
-
-      <div class="add-patient-wrapper">
-        <button pButton type="button" (click)="showAddPatientDialog()" class="add-patient-btn">
-          Add Patient
-        </button>
-        <!-- <button pButton type="button" class="dropdown-btn">
-          <i class="pi pi-chevron-down"></i>
-        </button> -->
-      </div>
     </div>
 
-    <div class="header-right">
-      <!-- <button pButton type="button" class="p-button-text p-button-rounded help-button">
-        <i class="pi pi-question-circle"></i>
-      </button> -->
-
-      <!-- <div class="notification-wrapper">
-        <button pButton type="button" class="p-button-text p-button-rounded notification-button">
-          <i class="pi pi-bell"></i>
-        </button>
-        <span class="notification-badge">10</span>
-      </div> -->
-
-      <button pButton type="button" class="p-button-text p-button-rounded user-button" (click)="menu.toggle($event)">
-        <img src="assets/user.webp" alt="User" class="user-image" />
-        <i class="pi pi-chevron-down"></i>
+    <div class="add-patient-wrapper">
+      <button pButton type="button" (click)="showAddPatientDialog()" class="add-patient-btn">
+        Add Patient
       </button>
     </div>
-  </header>
-  <p-tieredMenu #menu [model]="menuItems" [popup]="true"></p-tieredMenu>
-  <p-dialog
-    [(visible)]="displayAddPatientDialog"
-    [style]="{width: '100vw'}"
-    [modal]="true"
-    [draggable]="false"
-    [resizable]="false">
+  </div>
 
-    <app-add-profile (onSave)="savePatient($event)"
-    (onCancel)="hideAddPatientDialog()"></app-add-profile>
+  <div class="header-right">
+    <button pButton type="button" class="p-button-text p-button-rounded user-button" (click)="menu.toggle($event)">
+      <img src="assets/user.webp" alt="User" class="user-image" />
+      <i class="pi pi-chevron-down"></i>
+    </button>
+  </div>
+</header>
 
-    <!-- <ng-template pTemplate="footer">
-      <p-button icon="pi pi-times" label="Cancel" (click)="hideAddPatientDialog()" styleClass="p-button-text"></p-button>
-      <p-button icon="pi pi-check" label="Save" (click)="hideAddPatientDialog()"></p-button>
-    </ng-template> -->
-  </p-dialog>
+<p-tieredMenu #menu [model]="menuItems" [popup]="true"></p-tieredMenu>
 
-  <p-toast position="top-right"></p-toast>
+<p-dialog
+  [(visible)]="displayAddPatientDialog"
+  [style]="{ width: '100vw' }"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <app-add-profile (onSave)="savePatient($event)" (onCancel)="hideAddPatientDialog()"></app-add-profile>
+</p-dialog>
+
+<p-toast position="top-right"></p-toast>

@@ -18,7 +18,8 @@
             </div>
             <div class="input-group" *ngIf="!hasEmptyComplaint()">
               <textarea type="text" [(ngModel)]="newComplaint" class="form-control" placeholder="complaint"></textarea>
-              <button class="add-btn" [class.visibility-hidden]="!newComplaint"><i class="pi pi-plus"></i></button>
+              <button class="add-btn" [class.visibility-hidden]="!newComplaint" (click)="addEmptyItem('complaints')"><i class="pi pi-plus"></i></button>
+              <button class="save-btn" *ngIf="newComplaint" (click)="saveNote()">Save</button>
             </div>
           </div>
         </div>
@@ -32,7 +33,8 @@
             </div>
             <div class="input-group" *ngIf="!hasEmptyObservation()">
               <textarea type="text" [(ngModel)]="newObservation" class="form-control" placeholder="observation"></textarea>
-              <button class="add-btn" [class.visibility-hidden]="!newObservation"><i class="pi pi-plus"></i></button>
+              <button class="add-btn" [class.visibility-hidden]="!newObservation" (click)="addEmptyItem('observations')"><i class="pi pi-plus"></i></button>
+              <button class="save-btn" *ngIf="newObservation" (click)="saveNote()">Save</button>
             </div>
           </div>
         </div>
@@ -46,7 +48,8 @@
             </div>
             <div class="input-group" *ngIf="!hasEmptyInvestigation()">
               <textarea type="text" [(ngModel)]="newInvestigation" class="form-control" placeholder="investigation"></textarea>
-              <button class="add-btn" [class.visibility-hidden]="!newInvestigation"><i class="pi pi-plus"></i></button>
+              <button class="add-btn" [class.visibility-hidden]="!newInvestigation" (click)="addEmptyItem('investigations')"><i class="pi pi-plus"></i></button>
+              <button class="save-btn" *ngIf="newInvestigation" (click)="saveNote()">Save</button>
             </div>
           </div>
         </div>
@@ -60,7 +63,8 @@
             </div>
             <div class="input-group" *ngIf="!hasEmptyDiagnosis()">
               <textarea type="text" [(ngModel)]="newDiagnosis" class="form-control" placeholder="diagnosis"></textarea>
-              <button class="add-btn" [class.visibility-hidden]="!newDiagnosis"><i class="pi pi-plus"></i></button>
+              <button class="add-btn" [class.visibility-hidden]="!newDiagnosis" (click)="addEmptyItem('diagnoses')"><i class="pi pi-plus"></i></button>
+              <button class="save-btn" *ngIf="newDiagnosis" (click)="saveNote()">Save</button>
             </div>
           </div>
         </div>

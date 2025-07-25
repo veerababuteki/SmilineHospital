@@ -136,11 +136,12 @@
                     <i class="pi pi-dollar"></i>
                     <span [class.hidden]="isNavCollapsed">Invoices<span *ngIf="invoices && invoices.length > 0" class="count">{{invoices.length}}</span></span>
                 </a>
-                <a class="nav-item" *ngIf="userPrivileges?.includes('Payments')"
+                <a *ngIf="userPrivileges?.includes('Payments')" class="nav-item"
                    (click)="handleNavigation('/payments')"
                    routerLinkActive="active">
                     <i class="pi pi-money-bill"></i>
                     <span [class.hidden]="isNavCollapsed">Payments</span>
+
                 </a>
             </div>
         </div>

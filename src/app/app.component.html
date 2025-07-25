@@ -1,10 +1,14 @@
-<!-- <ng-container *ngIf="authService.isLoggedIn(); else loginTpl">
-  <app-home></app-home>
+<!-- Loading Spinner Overlay -->
+<div class="loading-overlay" *ngIf="isLoading">
+  <p-progressSpinner strokeWidth="8" fill="transparent" animationDuration=".5s"
+    [style]="{ width: '50px', height: '50px' }" />
+</div>
+
+<!-- Auth-based Routing -->
+<ng-container *ngIf="authService.isLoggedIn(); else loginTpl">
+  <router-outlet></router-outlet>
 </ng-container>
+
 <ng-template #loginTpl>
   <app-login></app-login>
-</ng-template> -->
-<div class="loading-overlay" *ngIf="isLoading">
-  <p-progressSpinner strokeWidth="8" fill="transparent" animationDuration=".5s" [style]="{ width: '50px', height: '50px' }" />
-</div>
-<router-outlet></router-outlet>
+</ng-template>

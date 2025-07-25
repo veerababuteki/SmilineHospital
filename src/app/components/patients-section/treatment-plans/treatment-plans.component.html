@@ -64,6 +64,7 @@
                                   (click)="invoiceMenu.toggle($event); setCurrentTreatmentPlan(treatmentPlans[date],treatmentkey.value)">
                                 </button>
                                 <p-menu #invoiceMenu [popup]="true" [model]="items"></p-menu>
+                                
                             </td>
                         </tr>
                     </tbody>
@@ -96,3 +97,16 @@
         <button class="add-treatment-btn" (click)="navigateToAddPage()">+ Add</button>
     </div>
 
+
+    
+<!-- ✅ Consent Form Dialog at the bottom -->
+<p-dialog 
+  header="Consent Form"
+  [(visible)]="consentFormVisible"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '50vw' }">
+
+  <app-consent-form [treatment]="selectedConsentTreatment"></app-consent-form>
+
+</p-dialog>

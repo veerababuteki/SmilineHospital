@@ -21,6 +21,9 @@ import { Message } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { LoaderService } from '../../services/loader.service';
 
+import { MessageService } from 'primeng/api';
+
+
 @Component({
   selector: 'app-appointment',
   templateUrl: './appointment.component.html',
@@ -37,7 +40,8 @@ import { LoaderService } from '../../services/loader.service';
     ReactiveFormsModule,
     CommonModule,
     MessagesModule
-  ]
+  ],
+  providers: [MessageService]
 })
 export class AppointmentComponent implements OnInit {
   activeTab: 'appointment' | 'reminder' | 'blockCalendar' = 'appointment';
@@ -101,7 +105,9 @@ export class AppointmentComponent implements OnInit {
     private router: Router, 
     private userService: UserService, 
     private appointmentService: AppointmentService, 
+    private messageService: MessageService
     private loaderService: LoaderService
+
   ) {}
 
   ngOnInit() {
@@ -853,8 +859,8 @@ atLeastOneBlockTypeValidator() {
           if(this.fromPatientsection){
             this.router.navigate(['/calendar'])
           }
-
           this.closeDialog.emit({isOpenPatientDialog:false});
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Appointment saved successfully.' });
         });
       }
       else{
@@ -877,6 +883,7 @@ atLeastOneBlockTypeValidator() {
           this.appointment = null;
           this.initAppointmentForm();
           window.location.reload();
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Appointment updated successfully.' });
         });
       }
     } else {
@@ -888,8 +895,6 @@ atLeastOneBlockTypeValidator() {
         }
       });
     }
-
-  }
 
   onBlockCalendarSubmit() {
   if (this.blockCalendarForm.valid) {

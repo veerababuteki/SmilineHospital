@@ -7,6 +7,7 @@
             <button class="mark-btn">Email</button>
             <input type="file" #fileInput (change)="onFileSelected($event)" multiple accept="image/*" style="display: none;">
             <button class="add-btn" (click)="fileInput.click()">+ Add</button>
+            <button pButton type="button" (click)="uploadFiles()" class="save-btn">Save</button>
         </div>
     </div>
 
@@ -37,22 +38,27 @@
         
             <!-- Main Content Area -->
             <div class="files-content">
-                <!-- Date Group -->
-                <div class="date-group" *ngFor="let fileGroup of filesDict | keyvalue">
-                    <div class="date-header">{{ fileGroup.key | date: 'dd MMM, yyyy' }}</div>
-                    <div class="files-grid">
-                        <div class="file-item" *ngFor="let file of (fileGroup.value ?? [])">
-                            <div class="checkbox-wrapper">
-                                <input type="checkbox" (change)="onCheckboxChange(file, file.id)" [(ngModel)]="file.isChecked">
+                <ng-container *ngIf="files && files.length > 0; else noFiles">
+                    <!-- Date Group -->
+                    <div class="date-group" *ngFor="let fileGroup of filesDict | keyvalue">
+                        <div class="date-header">{{ fileGroup.key | date: 'dd MMM, yyyy' }}</div>
+                        <div class="files-grid">
+                            <div class="file-item" *ngFor="let file of (fileGroup.value ?? [])">
+                                <div class="checkbox-wrapper">
+                                    <input type="checkbox" (change)="onCheckboxChange(file, file.id)" [(ngModel)]="file.isChecked">
+                                </div>
+                                <div class="file-preview" [ngClass]="{'pdf': isPdf(file.file_type)}" (click)="openFile(file, $event)">
+                                    <img *ngIf="!isPdf(file.file_type)" [src]="file.file_path" [alt]="file.file_type">
+                                    <div *ngIf="isPdf(file.file_type)" class="pdf-placeholder">PDF</div>
+                                </div>
+                                <div class="file-name" (click)="openFile(file, $event)">{{ getFileName(file.file_path) }}</div>
                             </div>
-                            <div class="file-preview" [ngClass]="{'pdf': isPdf(file.file_type)}" (click)="openFile(file, $event)">
-                                <img *ngIf="!isPdf(file.file_type)" [src]="file.file_path" [alt]="file.file_type">
-                                <div *ngIf="isPdf(file.file_type)" class="pdf-placeholder">PDF</div>
-                            </div>
-                            <div class="file-name" (click)="openFile(file, $event)">{{ getFileName(file.file_path) }}</div>
                         </div>
                     </div>
-                </div>
+                </ng-container>
+                <ng-template #noFiles>
+                    <div class="no-files-message">No files uploaded yet.</div>
+                </ng-template>
             </div>
         </div>
     </div>

@@ -13,7 +13,6 @@ import { InvoiceComponent } from './app/components/patients-section/invoice/invo
 import { AppointmentComponent } from './app/components/appointment/appointment.component';
 import { EditProfileComponent } from './app/components/patients-section/edit-profile/edit-profile.component';
 import { LoginComponent } from './app/components/login/login.component';
-import { AppComponent } from './app/app.component';
 import { AuthGuard } from './app/auth/auth.guard';
 import { HomeComponent } from './app/components/home/home.component';
 import { AddTreatmentPlansComponent } from './app/components/patients-section/treatment-plans/add-treatment-plans.component';
@@ -26,21 +25,32 @@ import { AddPaymentComponent } from './app/components/patients-section/payments/
 import { ReportsComponent } from './app/components/reports/reports.component';
 
 export const routes: Routes = [
-    { path: 'login', component: LoginComponent },
-    {
-      path: '', 
-      component: HomeComponent,
-      canActivate: [AuthGuard],
-      children: [
-        { path: '', redirectTo: 'calendar', pathMatch: 'full' },
-        { path: 'calendar', component: CalendarComponent },
-        { path: 'appointment', component: AppointmentComponent },
-        { path: 'reports', component: ReportsComponent },
-        { path: 'patients', component: PatientsSectionComponent,
-          children: [
-            { path: '', redirectTo: 'patient-directory', pathMatch: 'full' },
-            { path: 'patient-directory', component: PatientDirectoryComponent},
-            { path: ':id', children: [
+  { path: 'login', component: LoginComponent },
+  {
+    path: '',
+    component: HomeComponent,
+    canActivate: [AuthGuard],
+    children: [
+      { path: '', redirectTo: 'calendar', pathMatch: 'full' },
+      { path: 'calendar', component: CalendarComponent },
+      { path: 'appointment', component: AppointmentComponent },
+      { path: 'reports', component: ReportsComponent },
+
+      // Lazy load the SFC module
+      {
+        path: 'sfc',
+        loadChildren: () => import('./app/features/sfc/sfc.module').then(m => m.SfcModule)
+      },
+
+      {
+        path: 'patients',
+        component: PatientsSectionComponent,
+        children: [
+          { path: '', redirectTo: 'patient-directory', pathMatch: 'full' },
+          { path: 'patient-directory', component: PatientDirectoryComponent },
+          {
+            path: ':id',
+            children: [
               { path: 'profile/:source', component: ProfileComponent },
               { path: 'edit-profile/:source', component: EditProfileComponent },
               { path: 'appointments/:source', component: AppointmentsComponent },
@@ -56,10 +66,10 @@ export const routes: Routes = [
               { path: 'invoices/:source', component: InvoiceComponent },
               { path: 'payments/:source', component: PaymentsComponent },
               { path: 'add-payment/:source', component: AddPaymentComponent },
-            ]}
-          ] 
-        }
-      ]
-    },
-    
+            ],
+          },
+        ],
+      },
+    ],
+  },
 ];

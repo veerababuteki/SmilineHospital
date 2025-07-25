@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
-import { catchError, Observable, Subject, tap, throwError } from 'rxjs';
+import { catchError, Observable, Subject, tap, throwError, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { options } from '@fullcalendar/core/preact.js';
@@ -15,6 +15,9 @@ export class UserService {
   private loadPatients = new Subject<void>();
   loadPatients$ = this.loadPatients.asObservable();
   selectedPractice: any;
+
+  private userNameSubject = new BehaviorSubject<string>('');
+  userName$ = this.userNameSubject.asObservable();
 
   constructor(private http: HttpClient, private router: Router, private authService: AuthService) {}
 
@@ -159,6 +162,11 @@ export class UserService {
       catchError(this.handleError)
     );
   }
+
+  setUserName(newName: string) {
+    this.userNameSubject.next(newName);
+  }
+
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error.message || 'Server error');
   }

@@ -1,0 +1,232 @@
+<div class="sfc-header">
+  <h2>Smiline Family Club</h2>
+</div>
+<div class="sfc-action-bar">
+  <div class="sfc-controls">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      placeholder="Search Name / ID/ ..."
+      class="sfc-search-bar"
+    />
+  </div>
+  <button class="sfc-action-btn" (click)="addEntry()">
+    <i class="fa-solid fa-plus mr-1"></i>
+    {{ editingIndex !== null ? "Update Members to SFC" : "Add Members to SFC" }}
+  </button>
+</div>
+
+<form (ngSubmit)="addEntry()">
+  <div
+    style="display: flex; align-items: flex-end; margin-bottom: 0.5rem"
+  ></div>
+  <div class="sfc-table-scroll">
+    <table class="sfc-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Patient Name</th>
+          <th>Patient Id</th>
+          <th>Age</th>
+          <th>Occupation</th>
+          <th>Smiline Patient (Y/N)</th>
+          <th>Doctors & Front Office Comment on Previous Work</th>
+          <th>Doctor Advice for Lead Generation</th>
+          <th>Front Office Remarks</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Row for new entry -->
+        <tr>
+          <td>
+            <div class="date-input-container">
+              <app-custom-calendar
+                [selectedDate]="newEntry.date"
+                [isInvalid]="isFieldInvalid('date')"
+                (dateSelected)="onDateSelected($event)"
+              ></app-custom-calendar>
+            </div>
+            <div *ngIf="isFieldInvalid('date')" class="error-msg"></div>
+          </td>
+          <td>
+            <input
+              [(ngModel)]="newEntry.name"
+              name="nameOpNo"
+              maxlength="150"
+              required
+              [class.invalid-field]="isFieldInvalid('nameOpNo')"
+            />
+            <div *ngIf="isFieldInvalid('nameOpNo')" class="error-msg">
+             
+            </div>
+          </td>
+          <td>
+            <input
+              [(ngModel)]="newEntry.patientId"
+              name="OpNo"
+              [class.invalid-field]="isFieldInvalid('OpNo')"
+            />
+            <div *ngIf="isFieldInvalid('OpNo')" class="error-msg"></div>
+          </td>
+          <td>
+            <input
+              [(ngModel)]="newEntry.ageRelation"
+              name="ageRelation"
+              required
+              [class.invalid-field]="isFieldInvalid('ageRelation')"
+            />
+            <div *ngIf="isFieldInvalid('ageRelation')" class="error-msg">
+              
+            </div>
+          </td>
+          <td>
+            <input
+              [(ngModel)]="newEntry.profileOccupation"
+              name="profileOccupation"
+              required
+              [class.invalid-field]="isFieldInvalid('profileOccupation')"
+            />
+            <div *ngIf="isFieldInvalid('profileOccupation')" class="error-msg">
+              
+            </div>
+          </td>
+          <td>
+            <select
+              [(ngModel)]="newEntry.smilinePatient"
+              name="smilinePatient"
+              required
+              [class.invalid-field]="isFieldInvalid('smilinePatient')"
+            >
+              <option value="Y">Y</option>
+              <option value="N">N</option>
+            </select>
+            <div *ngIf="isFieldInvalid('smilinePatient')" class="error-msg">
+              
+            </div>
+          </td>
+          <td>
+            <input
+              [(ngModel)]="newEntry.doctorFrontOfficeComment"
+              name="doctorFrontOfficeComment"
+              maxlength="150"
+              [class.invalid-field]="isFieldInvalid('doctorFrontOfficeComment')"
+            />
+            <div
+              *ngIf="isFieldInvalid('doctorFrontOfficeComment')"
+              class="error-msg"
+            >
+            
+            </div>
+          </td>
+          <td>
+            <input
+              [(ngModel)]="newEntry.doctorAdvice"
+              name="doctorAdvice"
+              maxlength="150"
+              [class.invalid-field]="isFieldInvalid('doctorAdvice')"
+            />
+            <div *ngIf="isFieldInvalid('doctorAdvice')" class="error-msg">
+              
+            </div>
+          </td>
+          <td>
+            <input
+              [(ngModel)]="newEntry.frontOfficeRemarks"
+              name="newEntry.frontOfficeRemarks"
+              [class.invalid-field]="isFieldInvalid('frontOfficeRemarks')"
+            />
+            <div *ngIf="isFieldInvalid('frontOfficeRemarks')" class="error-msg">
+              
+            </div>
+          </td>
+          <td></td>
+        </tr>
+        <!-- Existing entries with search and pagination -->
+        <tr *ngFor="let entry of paginatedEntries(); let i = index">
+          <td>{{ entry.date }}</td>
+          <td>{{ entry.name }}</td>
+          <td>{{ entry.patientId }}</td>
+          <td>{{ entry.ageRelation }}</td>
+          <td>{{ entry.profileOccupation }}</td>
+          <td>{{ entry.smilinePatient }}</td>
+          <td>{{ entry.doctorFrontOfficeComment }}</td>
+          <td>{{ entry.doctorAdvice }}</td>
+          <td>{{ entry.frontOfficeRemarks }}</td>
+          <td class="action-column">
+            <div class="action-dropdown" (click)="$event.stopPropagation()">
+              <button 
+                class="action-trigger" 
+                (click)="toggleDropdown(i)"
+                type="button"
+              >
+                <i [class]="openDropdownIndex === i ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-up'"></i>
+              </button>
+              <div 
+                class="dropdown-menu" 
+                [class.show]="openDropdownIndex === i"
+              >
+                <button 
+                  class="dropdown-item edit-item" 
+                  (click)="editEntry(entry)"
+                  type="button"
+                >
+                  <i class="fa-solid fa-pen-to-square"></i>
+                  <span>Edit</span>
+                </button>
+                <button 
+                  class="dropdown-item delete-item" 
+                  (click)="removeEntry(entry)"
+                  type="button"
+                >
+                  <i class="fa-solid fa-trash"></i>
+                  <span>Delete</span>
+                </button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</form>
+
+<!-- Add click listener to close dropdown when clicking outside -->
+<div class="dropdown-overlay" 
+     *ngIf="openDropdownIndex !== null" 
+     (click)="closeDropdown()">
+</div>
+
+<div class="sfc-pagination">
+  <span class="pagination-info">
+    Showing {{ startIndex + 1 }} to {{ endIndex }} of
+    {{ filteredEntries().length }} entries
+  </span>
+
+  <ul class="pagination-list">
+    <li [class.disabled]="currentPage === 1" (click)="goToPage(1)">
+      <i class="fa-solid fa-angles-left"></i>
+    </li>
+    <li [class.disabled]="currentPage === 1" (click)="prevPage()">
+      <i class="fa-solid fa-angle-left"></i>
+    </li>
+
+    <li
+      *ngFor="let page of paginationRange()"
+      [class.active]="currentPage === page"
+      (click)="goToPage(page)"
+    >
+      {{ page }}
+    </li>
+
+    <li [class.disabled]="currentPage === totalPages()" (click)="nextPage()">
+      <i class="fa-solid fa-angle-right"></i>
+    </li>
+    <li
+      [class.disabled]="currentPage === totalPages()"
+      (click)="goToPage(totalPages())"
+    >
+      <i class="fa-solid fa-angles-right"></i>
+    </li>
+  </ul>
+</div>

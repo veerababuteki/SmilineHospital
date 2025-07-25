@@ -41,6 +41,7 @@ export class AddInvoiceComponent implements OnInit {
   editInvoiceData: any[] = [];
   editInvoiceKey: string | null = null;
   uniqueCode: string | null | undefined;
+  showSaveAndMakePaymentButton: boolean = true;
 
   constructor(private fb: FormBuilder, 
     private userService: UserService,              

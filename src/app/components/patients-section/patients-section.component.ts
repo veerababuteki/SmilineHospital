@@ -57,6 +57,7 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
     routeLink = '/profile';
     userPrivileges: any[] = [];
     patient: any;
+    payments: any[] = [];
     
     // Subscriptions to manage
     private messageSubscription!: Subscription;
