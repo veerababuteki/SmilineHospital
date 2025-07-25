@@ -17,6 +17,7 @@ import { PatientDataService } from '../../../services/patient-data.service';
 import { ConsentFormComponent } from './consent-form/consent-form.component';
 import { DialogModule } from 'primeng/dialog'; // ✅ Add this import at the top
 
+
 @Component({
   selector: 'app-treatment-plans',
   templateUrl: './treatment-plans.component.html',
@@ -120,6 +121,7 @@ consentform(plan: any): void {
       label: 'Consent Form',
       icon: 'pi pi-file',
       command: (event) => this.consentform(event)
+
     }
   ];
 }

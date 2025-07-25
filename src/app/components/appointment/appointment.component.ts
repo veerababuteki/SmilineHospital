@@ -20,7 +20,9 @@ import { Router } from '@angular/router';
 import { Message } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { LoaderService } from '../../services/loader.service';
+
 import { MessageService } from 'primeng/api';
+
 
 @Component({
   selector: 'app-appointment',
@@ -103,8 +105,9 @@ export class AppointmentComponent implements OnInit {
     private router: Router, 
     private userService: UserService, 
     private appointmentService: AppointmentService, 
-    private loaderService: LoaderService,
     private messageService: MessageService
+    private loaderService: LoaderService
+
   ) {}
 
   ngOnInit() {
@@ -892,7 +895,6 @@ atLeastOneBlockTypeValidator() {
         }
       });
     }
-  }
 
   onBlockCalendarSubmit() {
   if (this.blockCalendarForm.valid) {

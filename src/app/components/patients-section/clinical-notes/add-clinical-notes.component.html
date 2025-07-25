@@ -118,6 +118,9 @@
         <div class="search-box">
           <input type="text" *ngIf="!add" [(ngModel)]="searchText" (input)="filterItems()" placeholder="Search" class="search-input">
           <input type="text" *ngIf="add" (keydown.enter)="addItem()" [(ngModel)]="addText" placeholder="Add" class="search-input">
+          <small class="enter-message" *ngIf="addText?.trim()">
+          Press 'Enter' to add.
+        </small>
         </div>
   
         <div class="complaints-list">

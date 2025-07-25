@@ -19,7 +19,7 @@
                 <form [formGroup]="patientForm">
                   <!-- Patient Name Section -->
                   <div class="form-row">
-                    <div class="form-label">
+                    <div class="form-label required">
                       First Name :
                     </div>
                     <div class="form-field">
@@ -119,7 +119,7 @@
                     </div>
                     <div class="form-field">
                       <p-dropdown [options]="bloodGroups" formControlName="bloodGroup"
-                                 [style]="{'width':'100%'}" optionLabel="label"></p-dropdown>
+                                 [style]="{'width':'100%'}" optionLabel="label" placeholder="Select Blood Group"></p-dropdown>
                     </div>
                   </div>
 

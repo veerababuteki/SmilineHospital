@@ -36,7 +36,7 @@ export const routes: Routes = [
       { path: 'appointment', component: AppointmentComponent },
       { path: 'reports', component: ReportsComponent },
 
-      // ✅ ✅ RECOMMENDED: Lazy load the SFC module
+      // Lazy load the SFC module
       {
         path: 'sfc',
         loadChildren: () => import('./app/features/sfc/sfc.module').then(m => m.SfcModule)

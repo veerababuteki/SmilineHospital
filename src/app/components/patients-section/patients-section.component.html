@@ -139,8 +139,9 @@
                 <a *ngIf="userPrivileges?.includes('Payments')" class="nav-item"
                    (click)="handleNavigation('/payments')"
                    routerLinkActive="active">
-                    <i class="pi pi-credit-card"></i>
-                    <span [class.hidden]="isNavCollapsed">Payments<span *ngIf="payments && payments.length > 0" class="count">{{payments.length}}</span></span>
+                    <i class="pi pi-money-bill"></i>
+                    <span [class.hidden]="isNavCollapsed">Payments</span>
+
                 </a>
             </div>
         </div>
