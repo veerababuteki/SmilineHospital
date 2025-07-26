@@ -1,26 +1,37 @@
 <div class="sfc-header">
-  <h2>Smiline Family Club</h2>
+  <div class="left-section">
+    <span class="title">Smiline Family Club</span>
+  </div>
 </div>
+
 <div class="sfc-action-bar">
   <div class="sfc-controls">
+    <i class="pi pi-search search-icon"></i>
     <input
       type="text"
       [(ngModel)]="searchTerm"
-      placeholder="Search Name / ID/ ..."
+      placeholder="Search Name / ID / ..."
       class="sfc-search-bar"
     />
   </div>
-  <button type="submit" class="sfc-action-btn" (click)="addEntry()">
-    <i class="fa-solid fa-plus mr-1"></i>
-    {{ editingIndex !== null ? "Update Members to SFC" : "Add Members to SFC" }}
+  <div class="sfc-action-buttons">
+  <button type="submit" class="btn-primary" (click)="addEntry()">
+    <i 
+      [ngClass]="editingIndex !== null ? 'fa-solid fa-pen-to-square' : 'fa-solid fa-plus'" 
+      style="margin-right: 6px;">
+    </i>
+    {{ editingIndex !== null ? 'Update Members to SFC' : 'Add Members to SFC' }}
   </button>
 </div>
+</div>
+
 
 <form (ngSubmit)="addEntry()">
   <div
     style="display: flex; align-items: flex-end; margin-bottom: 0.5rem"
   ></div>
   <div class="sfc-table-scroll">
+    <div class="sfc-scrollbar">
     <table class="sfc-table">
       <thead>
         <tr>
@@ -144,7 +155,7 @@
           <td></td>
         </tr>
         <!-- Existing entries with search and pagination -->
-        <tr *ngFor="let entry of filteredData; let i = index">
+        <tr *ngFor="let entry of paginatedEntries(); let i = index">
           <td>{{ entry.date }}</td>
           <td>{{ entry.name }}</td>
           <td>{{ entry.patientId }}</td>
@@ -189,6 +200,7 @@
         </tr>
       </tbody>
     </table>
+    </div>
   </div>
 </form>
 

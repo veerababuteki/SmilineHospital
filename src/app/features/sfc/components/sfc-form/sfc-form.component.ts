@@ -215,7 +215,7 @@ export class SfcFormComponent {
   editingIndex: number | null = null;
   searchTerm: string = '';
   currentPage: number = 1;
-  pageSize: number = 50;
+  pageSize: number = 25;
   selectAll: boolean = false;
   submitted: boolean = false;
 
@@ -299,7 +299,8 @@ export class SfcFormComponent {
     this.openDropdownIndex = null; // Close dropdown after action
   }
 
-  addEntry() {
+  
+addEntry() {
   this.submitted = true;
 
   const requiredFields = [
@@ -321,8 +322,20 @@ export class SfcFormComponent {
       next: (response) => {
         console.log('Entry updated successfully:', response);
 
+        const updatedEntry = { id: this.editId, ...this.newEntry };
+
+        // Update in main entries
         if (this.editingIndex !== null) {
-          this.entries[this.editingIndex] = { id: this.editId, ...this.newEntry };
+          this.entries[this.editingIndex] = updatedEntry;
+        } else {
+          const index = this.entries.findIndex(e => e.id === this.editId);
+          if (index !== -1) this.entries[index] = updatedEntry;
+        }
+
+        // Also update in filteredData (in case it's showing a filtered view)
+        const filteredIndex = this.filteredData.findIndex(e => e.id === this.editId);
+        if (filteredIndex !== -1) {
+          this.filteredData[filteredIndex] = updatedEntry;
         }
 
         this.resetForm();
@@ -338,7 +351,10 @@ export class SfcFormComponent {
     next: (response) => {
       console.log('Entry added successfully:', response);
 
-      this.entries.unshift(response); // Assumes response has new id
+      const newRecord = { id: response.id || Date.now(), ...this.newEntry };
+      this.entries.unshift(newRecord);
+      this.filteredData = [...this.entries]; // Sync filtered data
+
       this.resetForm();
       this.currentPage = 1;
     },
@@ -352,23 +368,26 @@ export class SfcFormComponent {
  removeEntry(entry: any) {
   if (!confirm('Are you sure you want to remove this entry?')) return;
 
-  // Call backend API to delete by ID
   this.sfcService.deleteSfcEntry(entry.id).subscribe({
     next: () => {
-      // Remove entry from local entries list
+      // Remove entry from main list
       this.entries = this.entries.filter(e => e.id !== entry.id);
 
-      // Reset editing index if necessary
+      // Also remove from filteredData
+      this.filteredData = this.filteredData.filter(e => e.id !== entry.id);
+
+      // Reset editing index if needed
       if (this.editingIndex !== null && this.entries[this.editingIndex]?.id === entry.id) {
         this.editingIndex = null;
+        this.editId = null;
       }
 
-      // Adjust pagination if needed
+      // Adjust pagination
       if (this.currentPage > this.totalPages()) {
         this.currentPage = this.totalPages();
       }
 
-      // Close dropdown
+      // Close any open dropdown
       this.openDropdownIndex = null;
     },
     error: (error) => {
@@ -377,6 +396,7 @@ export class SfcFormComponent {
     }
   });
 }
+
 
 
   // New method to toggle dropdown
