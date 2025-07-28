@@ -1,12 +1,14 @@
+<p-toast></p-toast>
 <p-dialog
   [(visible)]="display"
   [modal]="true"
   [style]="{width: '800px'}"
+  (onHide)="cancelBlockCalendar()"
   [draggable]="false"
   [resizable]="false"
   styleClass="appointment-dialog"
   >
-
+ 
   <div class="appointment-form">
     <!-- Tabs -->
     <div class="tab-container">
@@ -530,4 +532,3 @@
 <button *ngIf="activeTab === 'appointment' && !fromPatientsection" type="button" class="add-appointment-btn" label="Add Walk-in Appointment" (click)="showDialog()">{{isDoctor ? 'Add Appointment' : 'Book Appointment'}}</button>
 <button *ngIf="activeTab === 'appointment' && fromPatientsection" type="button" class="add-btn" label="Add Walk-in Appointment" (click)="showDialog()">{{isDoctor ? '+ Add' : 'Book Appointment'}}</button>
 <span *ngIf="activeTab === 'blockCalendar'" class="cursor-pointer" (click)="showDialog()">Block Calendar</span>
-

@@ -5,6 +5,8 @@ import { DialogModule } from 'primeng/dialog';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-cancel-appointment-dialog',
@@ -15,9 +17,12 @@ import { DropdownModule } from 'primeng/dropdown';
     DialogModule,
     CheckboxModule,
     ButtonModule,
-    DropdownModule
+    DropdownModule,
+    ToastModule
   ],
+  providers: [MessageService],
   template: `
+  <p-toast></p-toast>
     <p-dialog 
       [header]="'Cancel Appointment'" 
       [(visible)]="visible" 
@@ -147,6 +152,8 @@ export class CancelAppointmentDialogComponent {
   
   @Output() close = new EventEmitter<void>();
   @Output() confirm = new EventEmitter<any>();
+
+  constructor(private messageService: MessageService){}
   
   reasonOptions = [
     { label: 'Doctor unavailable/busy', value: 'doctor_unavailable' },
@@ -179,7 +186,13 @@ export class CancelAppointmentDialogComponent {
       },
       deletePermanently: this.deletePermanently
     };
-    
+    this.messageService.add({ 
+          severity: 'success', 
+          summary: 'Success', 
+          detail: 'Deleted Event Successfully' 
+        });
+    setTimeout(() => {
     this.confirm.emit(cancelData);
+    }, 1300);
   }
 }

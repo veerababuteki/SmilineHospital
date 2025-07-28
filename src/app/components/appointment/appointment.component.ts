@@ -17,9 +17,10 @@ import { AppointmentService } from '../../services/appointment.service';
 import { format } from 'date-fns';
 import { empty } from 'rxjs';
 import { Router } from '@angular/router';
-import { Message } from 'primeng/api';
+import { Message, MessageService } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { LoaderService } from '../../services/loader.service';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-appointment',
@@ -29,15 +30,17 @@ import { LoaderService } from '../../services/loader.service';
     DialogModule,
     ButtonModule,
     InputTextModule,
-    DropdownModule,
+    DropdownModule, 
     CalendarModule,
     InputTextareaModule,
     CheckboxModule,
     RadioButtonModule,
     ReactiveFormsModule,
     CommonModule,
-    MessagesModule
-  ]
+    MessagesModule,
+    ToastModule
+  ],
+  providers: [MessageService]
 })
 export class AppointmentComponent implements OnInit {
   activeTab: 'appointment' | 'reminder' | 'blockCalendar' = 'appointment';
@@ -101,7 +104,8 @@ export class AppointmentComponent implements OnInit {
     private router: Router, 
     private userService: UserService, 
     private appointmentService: AppointmentService, 
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit() {
@@ -850,6 +854,11 @@ atLeastOneBlockTypeValidator() {
         }).subscribe(res=>{
           this.initAppointmentForm();
           this.display = false;
+           this.messageService.add({ 
+          severity: 'success', 
+          summary: 'Success', 
+          detail: 'Appointment Created Successfully' 
+        });
           if(this.fromPatientsection){
             this.router.navigate(['/calendar'])
           }
@@ -875,8 +884,16 @@ atLeastOneBlockTypeValidator() {
           this.display = false;
           this.editAppointment = false;
           this.appointment = null;
+          this.messageService.add({ 
+          severity: 'success', 
+          summary: 'Success', 
+          detail: 'Appointment Updated Successfully' 
+        });
           this.initAppointmentForm();
+          setTimeout(() => {
           window.location.reload();
+          }, 2500);
+
         });
       }
     } else {
