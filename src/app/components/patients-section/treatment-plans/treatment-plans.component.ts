@@ -58,13 +58,21 @@ export class TreatmentPlansComponent implements OnInit {
 
 
 consentform(plan: any): void {
+  console.log('Consent form plan data:', plan);
+  console.log('Treatment unique ID:', plan?.treatment_unique_id);
+  console.log('Patient details:', plan?.patient_details_treat);
+  console.log('Doctor details:', plan?.doctor_details_treat);
+  
   this.selectedConsentTreatment = {
-    patientName: plan?.patient_details?.user_profile_details[0]?.first_name + ' ' +
-                 plan?.patient_details?.user_profile_details[0]?.last_name,
+    patientName: plan?.patient_details_treat?.user_profile_details[0]?.first_name + ' ' +
+                 plan?.patient_details_treat?.user_profile_details[0]?.last_name,
     doctorName: 'Dr. ' + plan?.doctor_details_treat?.user_profile_details[0]?.first_name + ' ' +
                          plan?.doctor_details_treat?.user_profile_details[0]?.last_name,
-    date: plan?.created_at ? plan.created_at.split('T')[0] : new Date().toISOString().split('T')[0]
+    date: plan?.date ? plan.date.split('T')[0] : new Date().toISOString().split('T')[0],
+    treatmentUniqueId: plan?.treatment_unique_id
   };
+  
+  console.log('Selected consent treatment:', this.selectedConsentTreatment);
   this.consentFormVisible = true;
 }
 
@@ -132,8 +140,13 @@ consentform(plan: any): void {
 
   setCurrentTreatmentPlan(rows: any,
   treatmentKey: any): void {
+    console.log('setCurrentTreatmentPlan called with rows:', rows);
+    console.log('treatmentKey:', treatmentKey);
+    
     // Update menu items with the current invoice key as data
     this.currentTreatmentPlan = rows.filter((row: any) => row.treatment_unique_id === treatmentKey)
+    console.log('Filtered currentTreatmentPlan:', this.currentTreatmentPlan);
+    
     this.items = [
       {
         label: 'Edit',
@@ -143,7 +156,7 @@ consentform(plan: any): void {
       {
       label: 'Consent Form',
       icon: 'pi pi-file',
-        command: () => this.consentform(this.currentTreatmentPlan)
+        command: () => this.consentform(this.currentTreatmentPlan[0]) // Pass the first treatment plan
     }
     ];
   }

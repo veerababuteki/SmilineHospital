@@ -512,3 +512,49 @@
     }
   }
 }
+
+/* File upload styles */
+.file-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.file-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.upload-date {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.file-status {
+  font-size: 0.875rem;
+  color: #28a745;
+  font-weight: 500;
+}
+
+.file-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.upload-actions {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.upload-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.upload-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

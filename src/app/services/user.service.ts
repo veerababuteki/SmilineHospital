@@ -4,6 +4,9 @@ import { catchError, Observable, Subject, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { options } from '@fullcalendar/core/preact.js';
+import { HttpEvent, HttpEventType } from '@angular/common/http';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 @Injectable({
   providedIn: 'root',
@@ -156,6 +159,43 @@ export class UserService {
         groups_list: patientDetails.groups_list,
         other_history: patientDetails.other_history,
     }, {headers}).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  importPatients(file: File, branch_id: string) {
+    const token = this.authService.getAccessToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+      // Don't set Content-Type, let the browser set it with the boundary
+    });
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('branch_id', branch_id);
+
+    return this.http.post<any>(
+      `${this.baseUrl}/auth/user/import/patients`,
+      formData,
+      { headers }
+    ).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  importClinicalNotes(file: File, branch_id: string) {
+    const token = this.authService.getAccessToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('branch_id', branch_id);
+
+    return this.http.post<any>(
+      `${this.baseUrl}/auth/clinical/import/notes`,
+      formData,
+      { headers }
+    ).pipe(
       catchError(this.handleError)
     );
   }

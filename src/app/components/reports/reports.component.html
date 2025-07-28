@@ -2,10 +2,10 @@
 <div class="calendar-top">
     <div class="left-section">
         <span class="title">Reports</span>
-        <div class="email-dropdown" (click)="togglePracticesDropdown(); $event.stopPropagation()">
+        <div class="email-dropdown" #dropdownTrigger (click)="togglePracticesDropdown()">
             <span>{{ selectedPractice?.branch_name || 'Select Practice' }}</span>
             <i class="pi pi-chevron-down"></i>
-            <div class="practices-dropdown-panel" *ngIf="showPracticesDropdown" (click)="$event.stopPropagation()">
+            <div class="practices-dropdown-panel" *ngIf="showPracticesDropdown" #dropdownPanel>
                 <div class="search-container">
                     <i class="pi pi-search search-icon"></i>
                     <input

@@ -1,5 +1,5 @@
 // reports.component.ts
-import { Component, ElementRef, OnInit } from "@angular/core";
+import { Component, ElementRef, OnInit, HostListener, ViewChild } from "@angular/core";
 import { RouterOutlet } from "@angular/router";
 import { SideTopNavComponent } from "../side-top-nav/side-top-nav.component";
 import { LoaderService } from "../../services/loader.service";
@@ -59,6 +59,22 @@ export class ReportsComponent implements OnInit {
     summaryData: any = {};
     detailsData: any[] = [];
     detailsColumns: any[] = [];
+
+    @ViewChild('dropdownTrigger', { read: ElementRef }) dropdownTrigger!: ElementRef;
+    @ViewChild('dropdownPanel', { read: ElementRef }) dropdownPanel!: ElementRef;
+
+    @HostListener('document:click', ['$event'])
+    onDocumentClick(event: MouseEvent) {
+        const trigger = this.dropdownTrigger?.nativeElement;
+        const panel = this.dropdownPanel?.nativeElement;
+        if (
+            this.showPracticesDropdown &&
+            trigger &&
+            (!panel || (!trigger.contains(event.target) && !panel.contains(event.target)))
+        ) {
+            this.showPracticesDropdown = false;
+        }
+    }
 
     constructor(
         private reportsService: ReportsService,

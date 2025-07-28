@@ -1,4 +1,5 @@
 <!-- consent-form.component.html -->
+<p-toast></p-toast>
 <div class="consent-form-container">
   <!-- Mode Selection -->
   <div class="mode-selection" *ngIf="!selectedMode">
@@ -126,18 +127,40 @@
         <p class="upload-hint">Select a PDF file to upload</p>
       </div>
 
+      <!-- Upload Button -->
+      <div class="upload-actions" *ngIf="getNewFilesCount() > 0">
+        <button 
+          class="btn btn-primary upload-btn"
+          [disabled]="isLoading"
+          (click)="uploadConsentForms()">
+          {{ isLoading ? 'Uploading...' : 'Upload Forms' }}
+        </button>
+      </div>
+
       <!-- Uploaded Files List -->
       <div class="uploaded-files" *ngIf="uploadedForms.length > 0">
-        <h4>Uploaded Forms:</h4>
+        <h4>Consent Forms:</h4>
         <div class="file-list">
           <div *ngFor="let file of uploadedForms; let i = index" class="file-item">
             <div class="file-info">
               <span class="file-name">{{ file.name }}</span>
               <span class="upload-date">{{ file.uploadDate | date:'short' }}</span>
+              <span class="file-status" *ngIf="file.isExisting">✓ Uploaded</span>
             </div>
-            <button class="btn btn-danger btn-sm" (click)="removeUploadedForm(i)">
-              Remove
-            </button>
+                              <div class="file-actions">
+                    <button 
+                      class="btn btn-primary btn-sm" 
+                      *ngIf="file.file_path"
+                      (click)="downloadConsentForm(file.file_path, file.name)">
+                      Download
+                    </button>
+                    <button 
+                      class="btn btn-danger btn-sm" 
+                      *ngIf="!file.isExisting"
+                      (click)="removeUploadedForm(i)">
+                      Remove
+                    </button>
+                  </div>
           </div>
         </div>
       </div>

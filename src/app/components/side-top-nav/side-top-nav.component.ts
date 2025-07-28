@@ -75,7 +75,8 @@ export class SideTopNavComponent {
       { icon: 'pi pi-calendar', label: 'Calendar', link: '/calendar', hasAccess: privilegeNames.includes("Calendar") },
       { icon: 'pi pi-users', label: 'Patients', link: '/patients', hasAccess: privilegeNames.includes("Patients") },
       { icon: 'pi pi-heart', label: 'SFC', link: '/sfc', hasAccess: true },
-      { icon: 'pi pi-chart-bar', label: 'Reports', link: '/reports', hasAccess: true }
+      { icon: 'pi pi-chart-bar', label: 'Reports', link: '/reports', hasAccess: true },
+      { icon: 'pi pi-upload', label: 'Import', link: '/import', hasAccess: true },
     ];
   }
 
