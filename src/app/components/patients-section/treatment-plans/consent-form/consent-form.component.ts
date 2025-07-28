@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
 import jsPDF from 'jspdf';
@@ -52,6 +52,10 @@ export class ConsentFormComponent implements OnInit {
     return this._treatment;
   }
   private _treatment: any;
+
+  @Input() viewOnly: boolean = false;
+
+  @Output() closeDialog = new EventEmitter<void>();
 
   consentForm!: FormGroup;
   selectedMode: string | null = null;
@@ -120,6 +124,11 @@ export class ConsentFormComponent implements OnInit {
     // Initialize uploadedForms as empty array
     this.uploadedForms = [];
     this.loadCurrentUser();
+    
+    // If view-only mode, automatically show upload section to display existing forms
+    if (this.viewOnly) {
+      this.selectedMode = 'upload';
+    }
   }
 
   @Input() setTreatmentData(treatment: any): void {
