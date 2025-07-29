@@ -5,16 +5,18 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
 import { MenuItem } from 'primeng/api';
 import { MessageService } from '../../../services/message.service';
 import { PatientDataService } from '../../../services/patient-data.service';
+import { ConsentFormComponent } from '../treatment-plans/consent-form/consent-form.component';
 
 @Component({
   selector: 'app-completed-procedures',
   templateUrl: './completed-procedures.component.html',
   styleUrls: ['./completed-procedures.component.scss'],
   standalone: true,
-  imports: [ CommonModule, FormsModule, MenuModule, ButtonModule
+  imports: [ CommonModule, FormsModule, MenuModule, ButtonModule, DialogModule, ConsentFormComponent
   ]
 })
 
@@ -45,6 +47,8 @@ throw new Error('Method not implemented.');
     currentProcedure: any;
   currentTreatmentPlan: any;
   savedPractice: any;
+  showConsentFormDialog: boolean = false;
+  selectedConsentTreatment: any = null;
 
     constructor(private treatmentPlanService: TreatmentPlansService, private patientDataService: PatientDataService,
       private route: ActivatedRoute, private router: Router){
@@ -70,6 +74,11 @@ throw new Error('Method not implemented.');
           label: 'Edit',
           icon: 'pi pi-pencil',
           command: (event) => this.updateTreatmentPlans(event)
+        },
+        {
+          label: 'Consent Form',
+          icon: 'pi pi-file-pdf',
+          command: (event) => this.openConsentForm(event)
         }
       ];
       const routeId = this.route.parent?.snapshot.paramMap.get('id');
@@ -92,6 +101,18 @@ throw new Error('Method not implemented.');
       this.router.navigate(['patients', this.patientId, 'add-completed-procedures', this.uniqueCode], {
         state: { mode: 'edit', procedureData: treatmentPlan }
       });
+    }
+
+    openConsentForm(procedure: any): void {
+      this.selectedConsentTreatment = {
+        patientName: procedure?.patient_details_treat?.user_profile_details[0]?.first_name + ' ' +
+                     procedure?.patient_details_treat?.user_profile_details[0]?.last_name,
+        doctorName: 'Dr. ' + procedure?.doctor_details_treat?.user_profile_details[0]?.first_name + ' ' +
+                    procedure?.doctor_details_treat?.user_profile_details[0]?.last_name,
+        date: procedure?.date ? procedure.date.split('T')[0] : new Date().toISOString().split('T')[0],
+        treatmentUniqueId: procedure?.treatment_unique_id
+      };
+      this.showConsentFormDialog = true;
     }
 
     generateInvoiceForProcedure(event: any){
@@ -123,6 +144,11 @@ throw new Error('Method not implemented.');
           label: 'Edit',
           icon: 'pi pi-pencil',
           command: () => this.updateTreatmentPlans(this.currentProcedure)
+        },
+        {
+          label: 'Consent Form',
+          icon: 'pi pi-file-pdf',
+          command: () => this.openConsentForm(this.currentProcedure)
         }
       ];
     }

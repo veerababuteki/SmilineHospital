@@ -1,5 +1,5 @@
 // custom-calendar.component.ts
-import { Component, Input, Output, EventEmitter, OnInit, HostListener, ElementRef, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, HostListener, ElementRef, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -62,7 +62,7 @@ import { CommonModule } from '@angular/common';
   `,
   styleUrls: ['./custom-calendar.component.scss']
 })
-export class CustomCalendarComponent implements OnInit, OnDestroy {
+export class CustomCalendarComponent implements OnInit, OnDestroy, OnChanges {
   @Input() selectedDate: string = '';
   @Input() isInvalid: boolean = false;
   @Output() dateSelected = new EventEmitter<string>();
@@ -94,6 +94,13 @@ export class CustomCalendarComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.removeEventListeners();
   }
+
+  ngOnChanges(changes: SimpleChanges) {
+  if (changes['selectedDate'] && !changes['selectedDate'].firstChange) {
+    this.initializeCalendar(); // reinitialize calendar when selectedDate changes
+  }
+}
+
 
   private setupEventListeners() {
     this.resizeListener = () => {

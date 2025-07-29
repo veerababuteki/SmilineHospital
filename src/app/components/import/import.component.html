@@ -1,0 +1,275 @@
+<p-toast></p-toast>
+<div class="calendar-top">
+  <div class="left-section">
+    <span class="title">Import Data</span>
+    <div class="email-dropdown" #dropdownTrigger (click)="togglePracticesDropdown()">
+      <span>{{ selectedPractice?.branch_name || 'Select Practice' }}</span>
+      <i class="pi pi-chevron-down"></i>
+      <div class="practices-dropdown-panel" *ngIf="showPracticesDropdown" #dropdownPanel>
+        <div class="search-container">
+          <i class="pi pi-search search-icon"></i>
+          <input
+            type="text"
+            placeholder="Search by name"
+            class="practice-search"
+            [(ngModel)]="practiceSearchText"
+            (input)="filterPractices()"
+          >
+        </div>
+        <div class="practices-list">
+          <div class="practice-item"
+            *ngFor="let practice of filteredPractices"
+            (click)="selectPractice(practice)"
+            [class.selected]="selectedPractice?.branch_id === practice.branch_id">
+            <div class="practice-name">{{ practice.branch_name }}</div>
+            <div class="practice-id">Practice ID: {{ practice.branch_id }}</div>
+          </div>
+          <div class="no-results" *ngIf="practiceSearchText && filteredPractices.length === 0">
+            No practices found matching "{{ practiceSearchText }}"
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="import-container">
+  <div class="import-header">
+    <div class="import-header-title">Easily import your data</div>
+    <div class="import-header-desc">
+      Select a branch and import clinical notes, invoices, payments, appointments, patients, treatment plans, or procedure catalog using Excel files. Each import is specific to the selected branch unless otherwise noted.
+    </div>
+  </div>
+  <div class="import-types-section">
+    <div class="import-cards">
+      <div *ngFor="let type of importTypes; let i = index" class="import-card modern-card">
+        <div class="import-card-icon-bg">
+          <i [ngClass]="{
+            'pi pi-file-edit': type.value === 'clinical_notes',
+            'pi pi-file': type.value === 'invoices',
+            'pi pi-credit-card': type.value === 'payments',
+            'pi pi-calendar': type.value === 'appointments',
+            'pi pi-user': type.value === 'patients',
+            'pi pi-list': type.value === 'treatment_plans',
+            'pi pi-folder': type.value === 'procedure_catalog'
+          }"></i>
+        </div>
+        <div class="import-card-title">{{ type.label }}</div>
+        <div class="import-card-desc">
+          Import {{ type.label.toLowerCase() }} for the selected branch. Accepted formats: .xlsx, .xls
+        </div>
+        <label class="modern-file-btn">
+          <input type="file" hidden (change)="onFileSelected($event, type.label, i)">
+          <span>Choose File</span>
+        </label>
+        <div class="file-feedback" *ngIf="selectedFiles[i]">
+          <i class="pi pi-check-circle"></i>
+          <span>{{ selectedFiles[i].name }}</span>
+        </div>
+        <button
+          class="modern-import-btn"
+          [disabled]="!selectedFiles[i] || importing"
+          (click)="importFile(i)"
+          [matTooltip]="['patients', 'clinical_notes', 'procedure_catalog'].includes(type.value) ? '' : 'Import functionality coming soon'"
+        >
+          {{ importing && selectedFiles[i] ? 'Importing...' : 'Import' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="import-results" *ngIf="importResults">
+  <div class="results-summary">
+    <h3>Import Results</h3>
+    <div class="summary-stats">
+      <div class="stat-item">
+        <span class="stat-label">Total Records:</span>
+        <span class="stat-value">{{importResults.summary?.total || (importResults.created?.length + (importResults.duplicates?.length || 0) + importResults.errors?.length)}}</span>
+      </div>
+      <div class="stat-item success">
+        <span class="stat-label">Created:</span>
+        <span class="stat-value">{{importResults.created?.length || 0}}</span>
+      </div>
+      <div class="stat-item warning" *ngIf="importResults.skipped?.length">
+        <span class="stat-label">Skipped:</span>
+        <span class="stat-value">{{importResults.skipped?.length || 0}}</span>
+      </div>
+      <div class="stat-item error">
+        <span class="stat-label">Failed:</span>
+        <span class="stat-value">{{importResults.errors?.length || 0}}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Created Records -->
+  <div class="results-section" *ngIf="importResults.created?.length">
+    <h4>Successfully Created Records</h4>
+    <div class="download-buttons">
+      <button mat-button color="primary" (click)="downloadCreatedAsCSV()">
+        <mat-icon>download</mat-icon> Download as CSV
+      </button>
+      <button mat-button color="primary" (click)="downloadCreatedAsExcel()">
+        <mat-icon>download</mat-icon> Download as Excel
+      </button>
+    </div>
+    <div class="records-preview">
+      <mat-accordion>
+        <mat-expansion-panel *ngFor="let item of getPagedData(importResults.created, createdPageIndex, pageSize)">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{item.patientNumber || item.manual_unique_code || item.treatmentName || 'N/A'}}
+            </mat-panel-title>
+            <mat-panel-description>
+              Successfully Created
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <div class="excel-data-grid">
+            <div class="grid-header">Excel Data</div>
+            <div class="grid-content">
+              <div class="grid-row" *ngFor="let field of getOriginalDataFields(item.originalData)">
+                <div class="field-name">{{field.key}}:</div>
+                <div class="field-value">{{field.value || 'Not provided'}}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="created-data-grid" *ngIf="item.details">
+            <div class="grid-header">Created Record Details</div>
+            <div class="grid-content">
+              <div class="grid-row" *ngFor="let detail of getObjectEntries(item.details)">
+                <div class="field-name">{{detail.key}}:</div>
+                <div class="field-value">{{detail.value || 'Not provided'}}</div>
+              </div>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+      <mat-paginator
+        [length]="importResults.created.length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        [pageIndex]="createdPageIndex"
+        (page)="onCreatedPageChange($event)"
+        aria-label="Select page of created records">
+      </mat-paginator>
+    </div>
+  </div>
+
+  <!-- Skipped Records -->
+  <div class="results-section" *ngIf="importResults.skipped?.length">
+    <h4>Skipped Records</h4>
+    <div class="download-buttons">
+      <button mat-button color="warn" (click)="downloadSkippedAsCSV()">
+        <mat-icon>download</mat-icon> Download as CSV
+      </button>
+      <button mat-button color="warn" (click)="downloadSkippedAsExcel()">
+        <mat-icon>download</mat-icon> Download as Excel
+      </button>
+    </div>
+    <div class="records-preview">
+      <mat-accordion>
+        <mat-expansion-panel *ngFor="let item of getPagedData(importResults.skipped, skippedPageIndex, pageSize)">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{item.patientNumber || item.treatmentName || 'N/A'}}
+            </mat-panel-title>
+            <mat-panel-description class="error-text">
+              {{item.reason}}
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <div class="error-details" *ngIf="item.details">
+            <div class="details-header">Details:</div>
+            <div class="details-content">{{item.details}}</div>
+          </div>
+
+          <div class="missing-fields" *ngIf="item.missingFields?.length">
+            <div class="missing-header">Missing Fields:</div>
+            <ul>
+              <li *ngFor="let field of item.missingFields">{{field}}</li>
+            </ul>
+          </div>
+
+          <div class="excel-data-grid">
+            <div class="grid-header">Excel Data</div>
+            <div class="grid-content">
+              <div class="grid-row" *ngFor="let field of getOriginalDataFields(item.originalData)">
+                <div class="field-name" [class.missing-field]="item.missingFields?.includes(field.key)">
+                  {{field.key}}:
+                </div>
+                <div class="field-value" [class.missing-field]="item.missingFields?.includes(field.key)">
+                  {{field.value || 'Not provided'}}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="existing-details" *ngIf="item.existingDetails">
+            <div class="grid-header">Existing Record Details</div>
+            <div class="grid-content">
+              <div class="grid-row" *ngFor="let detail of getObjectEntries(item.existingDetails)">
+                <div class="field-name">{{detail.key}}:</div>
+                <div class="field-value">{{detail.value}}</div>
+              </div>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+      <mat-paginator
+        [length]="importResults.skipped.length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        [pageIndex]="skippedPageIndex"
+        (page)="onSkippedPageChange($event)"
+        aria-label="Select page of skipped records">
+      </mat-paginator>
+    </div>
+  </div>
+
+  <!-- Failed Records -->
+  <div class="results-section" *ngIf="importResults.errors?.length">
+    <h4>Failed Records</h4>
+    <div class="download-buttons">
+      <button mat-button color="warn" (click)="downloadFailedAsCSV()">
+        <mat-icon>download</mat-icon> Download as CSV
+      </button>
+      <button mat-button color="warn" (click)="downloadFailedAsExcel()">
+        <mat-icon>download</mat-icon> Download as Excel
+      </button>
+    </div>
+    <div class="records-preview">
+      <mat-accordion>
+        <mat-expansion-panel *ngFor="let item of getPagedData(importResults.errors, failedPageIndex, pageSize)">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{item.patientNumber || item.manual_unique_code || item.treatmentName || 'N/A'}}
+            </mat-panel-title>
+            <mat-panel-description class="error-text">
+              {{item.error}}
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <div class="excel-data-grid">
+            <div class="grid-header">Excel Data</div>
+            <div class="grid-content">
+              <div class="grid-row" *ngFor="let field of getOriginalDataFields(item.originalData)">
+                <div class="field-name">{{field.key}}:</div>
+                <div class="field-value">{{field.value || 'Not provided'}}</div>
+              </div>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+      <mat-paginator
+        [length]="importResults.errors.length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        [pageIndex]="failedPageIndex"
+        (page)="onFailedPageChange($event)"
+        aria-label="Select page of failed records">
+      </mat-paginator>
+    </div>
+  </div>
+</div> 

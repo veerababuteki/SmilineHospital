@@ -1,7 +1,12 @@
 <!-- consent-form.component.html -->
+<p-toast></p-toast>
 <div class="consent-form-container">
+  <div class="dialog-header">
+    <h2>Consent Forms</h2>
+    <button class="close-btn" (click)="closeDialog.emit()">×</button>
+  </div>
   <!-- Mode Selection -->
-  <div class="mode-selection" *ngIf="!selectedMode">
+  <div class="mode-selection" *ngIf="!selectedMode && !viewOnly">
     <h2>Select Action</h2>
     <div class="mode-buttons">
       <button class="btn btn-primary mode-btn" (click)="selectMode('download')">
@@ -106,14 +111,15 @@
 
   <!-- Upload Mode -->
   <div *ngIf="selectedMode === 'upload'">
-    <div class="mode-header">
+    <div class="mode-header" *ngIf="!viewOnly">
       <h2>Upload Completed Forms</h2>
       <button class="btn btn-outline" (click)="goBack()">← Back to Selection</button>
     </div>
 
     <!-- File Upload Section -->
     <div class="upload-section">
-      <div class="upload-area">
+      <!-- Only show upload area if not in view-only mode -->
+      <div class="upload-area" *ngIf="!viewOnly">
         <input 
           type="file" 
           id="fileInput"
@@ -126,18 +132,40 @@
         <p class="upload-hint">Select a PDF file to upload</p>
       </div>
 
+      <!-- Upload Button -->
+      <div class="upload-actions" *ngIf="getNewFilesCount() > 0 && !viewOnly">
+        <button 
+          class="btn btn-primary upload-btn"
+          [disabled]="isLoading"
+          (click)="uploadConsentForms()">
+          {{ isLoading ? 'Uploading...' : 'Upload Forms' }}
+        </button>
+      </div>
+
       <!-- Uploaded Files List -->
       <div class="uploaded-files" *ngIf="uploadedForms.length > 0">
-        <h4>Uploaded Forms:</h4>
+        <h4 *ngIf="!viewOnly">Consent Forms:</h4>
         <div class="file-list">
           <div *ngFor="let file of uploadedForms; let i = index" class="file-item">
             <div class="file-info">
               <span class="file-name">{{ file.name }}</span>
               <span class="upload-date">{{ file.uploadDate | date:'short' }}</span>
+              <span class="file-status" *ngIf="file.isExisting">✓ Uploaded</span>
             </div>
-            <button class="btn btn-danger btn-sm" (click)="removeUploadedForm(i)">
-              Remove
-            </button>
+                              <div class="file-actions">
+                    <button 
+                      class="btn btn-primary btn-sm" 
+                      *ngIf="file.file_path"
+                      (click)="downloadConsentForm(file.file_path, file.name)">
+                      Download
+                    </button>
+                    <button 
+                      class="btn btn-danger btn-sm" 
+                      *ngIf="!file.isExisting"
+                      (click)="removeUploadedForm(i)">
+                      Remove
+                    </button>
+                  </div>
           </div>
         </div>
       </div>

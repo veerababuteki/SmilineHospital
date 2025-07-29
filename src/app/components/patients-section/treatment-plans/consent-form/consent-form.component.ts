@@ -1,7 +1,12 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
 import jsPDF from 'jspdf';
+import { FileUploadService } from '../../../../services/file-upload.service';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { firstValueFrom } from 'rxjs';
+import { AuthService } from '../../../../services/auth.service';
 
 interface ConsentFormData {
   id: string;
@@ -26,16 +31,38 @@ interface ConsentFormData {
 @Component({
   selector: 'app-consent-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, DatePipe],
+  imports: [CommonModule, ReactiveFormsModule, DatePipe, ToastModule],
+  providers: [MessageService],
   templateUrl: './consent-form.component.html',
   styleUrls: ['./consent-form.component.scss']
 })
 export class ConsentFormComponent implements OnInit {
-  @Input() treatment: any;
+  @Input() set treatment(value: any) {
+    console.log('Treatment input setter called with:', value);
+    this._treatment = value;
+    if (value) {
+      this.patchFormWithTreatmentData(value);
+      // Load existing consent forms after treatment data is set
+      if (this.userId && this.treatmentUniqueId) {
+        this.loadExistingConsentForms();
+      }
+    }
+  }
+  get treatment(): any {
+    return this._treatment;
+  }
+  private _treatment: any;
+
+  @Input() viewOnly: boolean = false;
+
+  @Output() closeDialog = new EventEmitter<void>();
 
   consentForm!: FormGroup;
   selectedMode: string | null = null;
   uploadedForms: any[] = [];
+  treatmentUniqueId: string = '';
+  userId: string = '';
+  isLoading: boolean = false;
 
   sectionDescriptions: { [key: string]: { title: string; content: string } } = {
     examination: {
@@ -84,12 +111,23 @@ export class ConsentFormComponent implements OnInit {
     }
   };
 
-  constructor(private fb: FormBuilder) { }
+  constructor(
+    private fb: FormBuilder,
+    private fileUploadService: FileUploadService,
+    private messageService: MessageService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
+    console.log('Consent form ngOnInit - treatment input:', this.treatment);
     this.createConsentForm();
-    if (this.treatment) {
-      this.patchFormWithTreatmentData(this.treatment);
+    // Initialize uploadedForms as empty array
+    this.uploadedForms = [];
+    this.loadCurrentUser();
+    
+    // If view-only mode, automatically show upload section to display existing forms
+    if (this.viewOnly) {
+      this.selectedMode = 'upload';
     }
   }
 
@@ -98,10 +136,43 @@ export class ConsentFormComponent implements OnInit {
   }
 
   patchFormWithTreatmentData(treatment: any): void {
+    console.log('Patching form with treatment data:', treatment);
+    
     this.consentForm.patchValue({
       patientName: treatment?.patientName || '',
       doctorName: treatment?.doctorName || '',
       date: treatment?.date || new Date().toISOString().split('T')[0]
+    });
+    
+    // Set the treatment unique ID for file uploads
+    this.treatmentUniqueId = treatment?.treatmentUniqueId || '';
+    console.log('Set treatmentUniqueId to:', this.treatmentUniqueId);
+  }
+
+  loadCurrentUser(): void {
+    console.log('Loading current user...');
+    this.authService.getUser().subscribe({
+      next: (response) => {
+        console.log('User response:', response);
+        if (response && response.data && response.data.user_id) {
+          this.userId = response.data.user_id;
+          console.log('Set userId to:', this.userId);
+          // Load existing consent forms if treatment data is already available
+          if (this.treatmentUniqueId) {
+            this.loadExistingConsentForms();
+          }
+        } else {
+          console.error('No user_id found in response:', response);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading current user:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load user information.'
+        });
+      }
     });
   }
 
@@ -190,18 +261,20 @@ export class ConsentFormComponent implements OnInit {
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file && file.type === 'application/pdf') {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.uploadedForms.push({
-          name: file.name,
-          data: e.target?.result,
-          uploadDate: new Date()
-        });
-      };
-      reader.readAsDataURL(file);
+      this.uploadedForms.push({
+        name: file.name,
+        file: file,
+        uploadDate: new Date()
+      });
       
       // Reset the file input
       event.target.value = '';
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Please select a valid PDF file.'
+      });
     }
   }
 
@@ -216,5 +289,154 @@ export class ConsentFormComponent implements OnInit {
   isFormValid(): boolean {
     const formData = this.consentForm.value;
     return formData.patientName && formData.doctorName && formData.date;
+  }
+
+  async uploadConsentForms(): Promise<void> {
+    const newFiles = this.uploadedForms.filter(form => form.file && !form.isExisting);
+    
+    if (newFiles.length === 0) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Please select files to upload.'
+      });
+      return;
+    }
+
+    console.log('Current userId:', this.userId);
+    console.log('Current treatmentUniqueId:', this.treatmentUniqueId);
+    console.log('Current treatment data:', this.treatment);
+
+    if (!this.userId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'User ID not available. Please try again.'
+      });
+      return;
+    }
+
+    if (!this.treatmentUniqueId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Treatment ID not available. Please try again.'
+      });
+      return;
+    }
+
+    console.log('Uploading with userId:', this.userId, 'treatmentUniqueId:', this.treatmentUniqueId);
+
+    this.isLoading = true;
+    try {
+      const files = newFiles.map(form => form.file);
+      
+      if (files.length === 1) {
+        await firstValueFrom(this.fileUploadService.uploadConsentForm(
+          files[0], 
+          this.userId, 
+          this.treatmentUniqueId
+        ));
+      } else if (files.length > 1) {
+        await firstValueFrom(this.fileUploadService.uploadMultipleConsentForms(
+          files, 
+          this.userId, 
+          this.treatmentUniqueId
+        ));
+      }
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Consent forms uploaded successfully!'
+      });
+      // Remove the uploaded files from the list
+      this.uploadedForms = this.uploadedForms.filter(form => form.isExisting);
+      this.loadExistingConsentForms(); // Reload the list
+    } catch (error) {
+      console.error('Upload error:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to upload consent forms. Please try again.'
+      });
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  loadExistingConsentForms(): void {
+    console.log('loadExistingConsentForms called with treatmentUniqueId:', this.treatmentUniqueId);
+    if (!this.treatmentUniqueId) {
+      console.log('No treatmentUniqueId available, skipping load');
+      return;
+    }
+
+    console.log('Calling API to get consent forms for treatment:', this.treatmentUniqueId);
+    this.fileUploadService.getConsentFormsByTreatment(this.treatmentUniqueId)
+      .subscribe({
+        next: (response) => {
+          console.log('API response for consent forms:', response);
+          if (response && response.data && response.data.rows) {
+            const existingFiles = response.data.rows.map((file: any) => ({
+              id: file.id,
+              name: file.file_path ? file.file_path.split('/').pop() || 'Unknown file' : 'Unknown file',
+              file_path: file.file_path,
+              uploadDate: new Date(file.created_at),
+              isExisting: true
+            }));
+            console.log('Mapped existing files:', existingFiles);
+            // Merge with any new files that haven't been uploaded yet
+            const newFiles = this.uploadedForms.filter(f => !f.isExisting);
+            this.uploadedForms = [...existingFiles, ...newFiles];
+            console.log('Final uploadedForms array:', this.uploadedForms);
+          } else {
+            console.log('No existing files found in response');
+            this.uploadedForms = this.uploadedForms.filter(f => !f.isExisting);
+          }
+        },
+        error: (error) => {
+          console.error('Error loading consent forms:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load existing consent forms.'
+          });
+        }
+      });
+  }
+
+  async deleteConsentForm(fileId: string): Promise<void> {
+    try {
+      await firstValueFrom(this.fileUploadService.deleteConsentForm(fileId));
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Consent form deleted successfully!'
+      });
+      this.loadExistingConsentForms(); // Reload the list
+    } catch (error) {
+      console.error('Delete error:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to delete consent form. Please try again.'
+      });
+    }
+  }
+
+  downloadConsentForm(filePath: string, fileName: string): void {
+    // Create a temporary link to download the file
+    const link = document.createElement('a');
+    link.href = filePath;
+    link.download = fileName;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  getNewFilesCount(): number {
+    return this.uploadedForms.filter(f => !f.isExisting).length;
   }
 }

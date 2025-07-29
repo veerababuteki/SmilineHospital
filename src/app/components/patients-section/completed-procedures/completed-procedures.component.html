@@ -90,3 +90,18 @@
         <button class="add-treatment-btn" (click)="navigateToAddPage()">+ Add</button>
     </div>
 </div>
+
+<!-- Consent Form Dialog -->
+<p-dialog 
+    [(visible)]="showConsentFormDialog" 
+    [modal]="true" 
+    [style]="{width: '90vw', maxWidth: '1200px'}" 
+    [draggable]="false" 
+    [resizable]="false"
+    styleClass="consent-form-dialog">
+    <app-consent-form 
+        [treatment]="selectedConsentTreatment"
+        [viewOnly]="true"
+        (closeDialog)="showConsentFormDialog = false">
+    </app-consent-form>
+</p-dialog>

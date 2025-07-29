@@ -165,6 +165,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CustomCalendarComponent } from './custom-calendar/custom-calendar.component';
+import { SfcService } from '../../../../services/sfc.service';
 
 @Component({
   selector: 'app-sfc-form',
@@ -174,7 +175,10 @@ import { CustomCalendarComponent } from './custom-calendar/custom-calendar.compo
   styleUrl: './sfc-form.component.scss'
 })
 export class SfcFormComponent {
+
+  constructor(private sfcService: SfcService) {}
   // Your existing code remains the same...
+  editId: number | null = null;
   newEntry: {
     [key: string]: string;
     date: string;
@@ -211,9 +215,39 @@ export class SfcFormComponent {
   editingIndex: number | null = null;
   searchTerm: string = '';
   currentPage: number = 1;
-  pageSize: number = 50;
+  pageSize: number = 25;
   selectAll: boolean = false;
   submitted: boolean = false;
+
+  ngOnInit() {
+        this.getSfcEntries();
+    }
+
+  filteredData: any[] = [];
+
+   getSfcEntries() {
+  this.sfcService.getAllSfcEntries().subscribe({
+    next: (res) => {
+      const data = res?.data || [];
+      this.entries = data.map((entry: any) => ({
+        id: entry.id,
+        date: entry.date,
+        name: entry.patient_name,
+        patientId: entry.patient_id,
+        ageRelation: entry.age,
+        profileOccupation: entry.occupation,
+        smilinePatient: entry.smiline_patient,
+        doctorFrontOfficeComment: entry.doctor_front_office_comment,
+        doctorAdvice: entry.doctor_advice_for_lead_gen,
+        frontOfficeRemarks: entry.front_office_remarks,
+      }));
+      this.filteredData = [...this.entries];
+    },
+    error: (err) => {
+      console.error("Failed to load SFC data:", err);
+    }
+  });
+}
 
   // All your existing methods stay exactly the same...
   get startIndex(): number {
@@ -239,61 +273,131 @@ export class SfcFormComponent {
     }
   }
 
-  addEntry() {
-    this.submitted = true;
-    const requiredFields = [
-      this.newEntry.date,
-      this.newEntry.name,
-      this.newEntry.patientId,
-      this.newEntry.ageRelation,
-      this.newEntry.profileOccupation,
-      this.newEntry.smilinePatient,
-      this.newEntry.doctorFrontOfficeComment,
-      this.newEntry.doctorAdvice,
-      this.newEntry.frontOfficeRemarks
-    ];
-    const isEmpty = requiredFields.some(field => !field || field.toString().trim() === '');
-    if (isEmpty) return;
+  resetForm() {
+  this.newEntry = {
+    date: '',
+    name: '',
+    patientId: '',
+    ageRelation: '',
+    profileOccupation: '',
+    smilinePatient: 'Y',
+    doctorFrontOfficeComment: '',
+    doctorAdvice: '',
+    frontOfficeRemarks: ''
+  };
+  this.editingIndex = null;
+  this.editId = null;
+  this.submitted = false;
+}
 
-    if (this.editingIndex !== null) {
-      this.entries[this.editingIndex] = { ...this.newEntry };
-      this.editingIndex = null;
-    } else {
-      this.entries.unshift({ ...this.newEntry });
-    }
-
-    this.newEntry = {
-      date: '',
-      name: '',
-      patientId: '',
-      ageRelation: '',
-      profileOccupation: '',
-      smilinePatient: 'Y',
-      doctorFrontOfficeComment: '',
-      doctorAdvice: '',
-      frontOfficeRemarks: ''
-    };
-    this.currentPage = 1;
-    this.submitted = false;
-  }
 
   editEntry(entry: any) {
     this.editingIndex = this.entries.indexOf(entry);
+    this.editId = entry.id;
+    console.log(entry)
     this.newEntry = { ...entry };
     this.openDropdownIndex = null; // Close dropdown after action
   }
 
-  removeEntry(entry: any) {
-    if (!confirm('Are you sure you want to remove this entry?')) return;
-    this.entries = this.entries.filter(e => e !== entry);
-    if (this.editingIndex !== null && this.entries[this.editingIndex] !== entry) {
-      this.editingIndex = null;
-    }
-    if (this.currentPage > this.totalPages()) {
-      this.currentPage = this.totalPages();
-    }
-    this.openDropdownIndex = null; // Close dropdown after action
+  
+addEntry() {
+  this.submitted = true;
+
+  const requiredFields = [
+    this.newEntry.date,
+    this.newEntry.name,
+    this.newEntry.patientId,
+    this.newEntry.ageRelation,
+    this.newEntry.profileOccupation,
+    this.newEntry.smilinePatient,
+    this.newEntry.doctorFrontOfficeComment,
+    this.newEntry.doctorAdvice,
+    this.newEntry.frontOfficeRemarks
+  ];
+  const isEmpty = requiredFields.some(field => !field || field.toString().trim() === '');
+  if (isEmpty) return;
+
+  if (this.editId) {
+    this.sfcService.updateSfcEntry(this.editId, this.newEntry).subscribe({
+      next: (response) => {
+        console.log('Entry updated successfully:', response);
+
+        const updatedEntry = { id: this.editId, ...this.newEntry };
+
+        // Update in main entries
+        if (this.editingIndex !== null) {
+          this.entries[this.editingIndex] = updatedEntry;
+        } else {
+          const index = this.entries.findIndex(e => e.id === this.editId);
+          if (index !== -1) this.entries[index] = updatedEntry;
+        }
+
+        // Also update in filteredData (in case it's showing a filtered view)
+        const filteredIndex = this.filteredData.findIndex(e => e.id === this.editId);
+        if (filteredIndex !== -1) {
+          this.filteredData[filteredIndex] = updatedEntry;
+        }
+
+        this.resetForm();
+      },
+      error: (error) => {
+        console.error('Failed to update entry:', error);
+      }
+    });
+    return;
   }
+
+  this.sfcService.addSfcEntry(this.newEntry).subscribe({
+    next: (response) => {
+      console.log('Entry added successfully:', response);
+
+      const newRecord = { id: response.id || Date.now(), ...this.newEntry };
+      this.entries.unshift(newRecord);
+      this.filteredData = [...this.entries]; // Sync filtered data
+
+      this.resetForm();
+      this.currentPage = 1;
+    },
+    error: (error) => {
+      console.error('Failed to add entry:', error);
+    }
+  });
+}
+
+
+ removeEntry(entry: any) {
+  if (!confirm('Are you sure you want to remove this entry?')) return;
+
+  this.sfcService.deleteSfcEntry(entry.id).subscribe({
+    next: () => {
+      // Remove entry from main list
+      this.entries = this.entries.filter(e => e.id !== entry.id);
+
+      // Also remove from filteredData
+      this.filteredData = this.filteredData.filter(e => e.id !== entry.id);
+
+      // Reset editing index if needed
+      if (this.editingIndex !== null && this.entries[this.editingIndex]?.id === entry.id) {
+        this.editingIndex = null;
+        this.editId = null;
+      }
+
+      // Adjust pagination
+      if (this.currentPage > this.totalPages()) {
+        this.currentPage = this.totalPages();
+      }
+
+      // Close any open dropdown
+      this.openDropdownIndex = null;
+    },
+    error: (error) => {
+      console.error('Failed to delete entry:', error);
+      alert('Failed to delete entry. Please try again.');
+    }
+  });
+}
+
+
 
   // New method to toggle dropdown
   toggleDropdown(index: number) {

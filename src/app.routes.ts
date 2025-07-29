@@ -24,6 +24,7 @@ import { AddCompletedProceduresComponent } from './app/components/patients-secti
 import { AddInvoiceComponent } from './app/components/patients-section/invoice/add-invoice.component';
 import { AddPaymentComponent } from './app/components/patients-section/payments/add-payment.component';
 import { ReportsComponent } from './app/components/reports/reports.component';
+import { ImportComponent } from './app/components/import/import.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -40,6 +41,7 @@ export const routes: Routes = [
           loadChildren: () => import('./app/features/sfc/sfc.module').then(m => m.SfcModule)
         },
         { path: 'reports', component: ReportsComponent },
+        { path: 'import', component: ImportComponent },
         { path: 'patients', component: PatientsSectionComponent,
           children: [
             { path: '', redirectTo: 'patient-directory', pathMatch: 'full' },
