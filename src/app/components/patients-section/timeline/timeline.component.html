@@ -108,17 +108,37 @@
                                 </div>
                             </div>
                             <div class="event-card" *ngIf="item.type === 'FileUpload'">
-                                <div class="event-header">
-                                    <div class="event-type">
-                                        <i class="icon-procedure"></i>
-                                        Invoice
-                                    </div>
-                                </div>
-                                <div class="event-body">
-                                    <div class="doctor-name">{{item.name}}</div>
-                                    <img [src]="item.file_path">
-                                </div>
+                         <div class="event-header">
+                           <div class="event-type">
+                              <i class="pi pi-file"></i>
+                              File Upload
                             </div>
+                          </div>
+
+                          <div class="event-body">
+                            <!-- Deleted File -->
+                            <ng-container *ngIf="item.status === 'Deleted'; else activeFile">
+                              <div class="deleted-file-tag">
+                                <div class="deleted-label">Deleted</div>
+                                <img
+                                      [src]="item.file_path"
+                                      alt="Deleted File"
+                                      class="deleted-image"
+                                   />
+                                   </div>
+                               </ng-container>
+
+                        <!-- Active File -->
+                            <ng-template #activeFile>
+                              <img
+                               [src]="item.file_path"
+                               alt="File Preview"
+                               class="active-image"
+                              />
+                           </ng-template>
+                          </div>
+                        </div>
+
                             <div class="event-card" *ngIf="item.type === 'Invoice'">
                                 <div class="event-header">
                                     <div class="event-type">

@@ -17,10 +17,10 @@ import { AppointmentService } from '../../services/appointment.service';
 import { format } from 'date-fns';
 import { empty } from 'rxjs';
 import { Router } from '@angular/router';
-import { Message } from 'primeng/api';
+import { Message, MessageService } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { LoaderService } from '../../services/loader.service';
-import { AppMessage, MessageService} from '../../services/message.service';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-appointment',
@@ -30,15 +30,17 @@ import { AppMessage, MessageService} from '../../services/message.service';
     DialogModule,
     ButtonModule,
     InputTextModule,
-    DropdownModule,
+    DropdownModule, 
     CalendarModule,
     InputTextareaModule,
     CheckboxModule,
     RadioButtonModule,
     ReactiveFormsModule,
     CommonModule,
-    MessagesModule
-  ]
+    MessagesModule,
+    ToastModule
+  ],
+  providers: [MessageService]
 })
 export class AppointmentComponent implements OnInit {
   activeTab: 'appointment' | 'reminder' | 'blockCalendar' = 'appointment';
@@ -832,130 +834,79 @@ atLeastOneBlockTypeValidator() {
     this.initBlockCalendarForm();
   }
 
-  // onSubmit() {
-  //   if (this.appointmentForm.valid) {
-  //     const value = this.appointmentForm.value;
-  //     if(!this.editAppointment){
-  //       this.loaderService.show();
-  //       this.appointmentService.createAppointment({
-  //         patient_id: this.isDoctor ? this.patient.user_id : this.currentUser.user_id,
-  //         booking_type: value.bookingType,
-  //         status: 'Scheduled',
-  //         appointment_status: 'None',
-  //         doctor_id: value.doctor.user_id,
-  //         category_id: value.category.category_id,
-  //         appointment_date: format(new Date(value.scheduledDate), 'yyyy-MM-dd'),
-  //         appointment_time: format(new Date(value.scheduledTime), 'hh:mm a'),
-  //         duration: value.duration,
-  //         planned_procedure: value.plannedProcedures,
-  //         notes: value.notes,
-  //       }).subscribe(res=>{
-  //         this.initAppointmentForm();
-  //         this.display = false;
-  //         if(this.fromPatientsection){
-  //           this.router.navigate(['/calendar'])
-  //         }
-
-  //         this.closeDialog.emit({isOpenPatientDialog:false});
-  //       });
-  //     }
-  //     else{
-  //       this.appointmentService.updateAppointment({
-  //         id: this.appointment.id,
-  //         patient_id: this.appointment.patient_details.patient_id,
-  //         booking_type: value.bookingType,
-  //         status: value.status,
-  //         appointment_status: value.appointmentStatus,
-  //         doctor_id: value.doctor == null ? null : value.doctor.user_id,
-  //         category_id: value.category == null ? null : value.category.category_id,
-  //         appointment_date: format(new Date(value.scheduledDate), 'yyyy-MM-dd'),
-  //         appointment_time: format(new Date(value.scheduledTime), 'hh:mm a'),
-  //         duration: value.duration,
-  //         planned_procedure: value.plannedProcedures,
-  //         notes: value.notes,
-  //       }).subscribe(res => {
-  //         this.display = false;
-  //         this.editAppointment = false;
-  //         this.appointment = null;
-  //         this.initAppointmentForm();
-  //         window.location.reload();
-  //       });
-  //     }
-  //   } else {
-  //     // Mark all fields as touched to trigger validation messages
-  //     Object.keys(this.appointmentForm.controls).forEach(key => {
-  //       const control = this.appointmentForm.get(key);
-  //       if (control) {
-  //         control.markAsTouched();
-  //       }
-  //     });
-  //   }
-
-  // }
-
   onSubmit() {
-  if (this.appointmentForm.valid) {
-    const value = this.appointmentForm.value;
+    if (this.appointmentForm.valid) {
+      const value = this.appointmentForm.value;
+      if(!this.editAppointment){
+        this.loaderService.show();
+        this.appointmentService.createAppointment({
+          patient_id: this.isDoctor ? this.patient.user_id : this.currentUser.user_id,
+          booking_type: value.bookingType,
+          status: 'Scheduled',
+          appointment_status: 'None',
+          doctor_id: value.doctor.user_id,
+          category_id: value.category.category_id,
+          appointment_date: format(new Date(value.scheduledDate), 'yyyy-MM-dd'),
+          appointment_time: format(new Date(value.scheduledTime), 'hh:mm a'),
+          duration: value.duration,
+          planned_procedure: value.plannedProcedures,
+          notes: value.notes,
+        }).subscribe(res=>{
+          this.initAppointmentForm();
+          this.display = false;
+           this.messageService.add({ 
+          severity: 'success', 
+          summary: 'Success', 
+          detail: 'Appointment Created Successfully' 
+        });
+          if(this.fromPatientsection){
+            this.router.navigate(['/calendar'])
+          }
 
-    if (!this.editAppointment) {
-      this.loaderService.show();
-      this.appointmentService.createAppointment({
-        patient_id: this.isDoctor ? this.patient.user_id : this.currentUser.user_id,
-        booking_type: value.bookingType,
-        status: 'Scheduled',
-        appointment_status: 'None',
-        doctor_id: value.doctor.user_id,
-        category_id: value.category.category_id,
-        appointment_date: format(new Date(value.scheduledDate), 'yyyy-MM-dd'),
-        appointment_time: format(new Date(value.scheduledTime), 'hh:mm a'),
-        duration: value.duration,
-        planned_procedure: value.plannedProcedures,
-        notes: value.notes,
-      }).subscribe(res => {
-        this.loaderService.hide();
-        this.messageService.sendMessage('Appointment created successfully!', '', 'success'); 
-        this.initAppointmentForm();
-        this.display = false;
+          this.closeDialog.emit({isOpenPatientDialog:false});
+        });
+      }
+      else{
+        this.appointmentService.updateAppointment({
+          id: this.appointment.id,
+          patient_id: this.appointment.patient_details.patient_id,
+          booking_type: value.bookingType,
+          status: value.status,
+          appointment_status: value.appointmentStatus,
+          doctor_id: value.doctor == null ? null : value.doctor.user_id,
+          category_id: value.category == null ? null : value.category.category_id,
+          appointment_date: format(new Date(value.scheduledDate), 'yyyy-MM-dd'),
+          appointment_time: format(new Date(value.scheduledTime), 'hh:mm a'),
+          duration: value.duration,
+          planned_procedure: value.plannedProcedures,
+          notes: value.notes,
+        }).subscribe(res => {
+          this.display = false;
+          this.editAppointment = false;
+          this.appointment = null;
+          this.messageService.add({ 
+          severity: 'success', 
+          summary: 'Success', 
+          detail: 'Appointment Updated Successfully' 
+        });
+          this.initAppointmentForm();
+          setTimeout(() => {
+          window.location.reload();
+          }, 2500);
 
-        if (this.fromPatientsection) {
-          this.router.navigate(['/calendar']);
-        }
-
-        this.closeDialog.emit({ isOpenPatientDialog: false });
-      });
+        });
+      }
     } else {
-      this.appointmentService.updateAppointment({
-        id: this.appointment.id,
-        patient_id: this.appointment.patient_details.patient_id,
-        booking_type: value.bookingType,
-        status: value.status,
-        appointment_status: value.appointmentStatus,
-        doctor_id: value.doctor == null ? null : value.doctor.user_id,
-        category_id: value.category == null ? null : value.category.category_id,
-        appointment_date: format(new Date(value.scheduledDate), 'yyyy-MM-dd'),
-        appointment_time: format(new Date(value.scheduledTime), 'hh:mm a'),
-        duration: value.duration,
-        planned_procedure: value.plannedProcedures,
-        notes: value.notes,
-      }).subscribe(res => {
-        this.messageService.sendMessage('Appointment updated successfully!', '', 'success'); 
-        this.display = false;
-        this.editAppointment = false;
-        this.appointment = null;
-        this.initAppointmentForm();
-        window.location.reload();
+      // Mark all fields as touched to trigger validation messages
+      Object.keys(this.appointmentForm.controls).forEach(key => {
+        const control = this.appointmentForm.get(key);
+        if (control) {
+          control.markAsTouched();
+        }
       });
     }
-  } else {
-    Object.keys(this.appointmentForm.controls).forEach(key => {
-      const control = this.appointmentForm.get(key);
-      if (control) {
-        control.markAsTouched();
-      }
-    });
-  }
-}
 
+  }
 
   onBlockCalendarSubmit() {
   if (this.blockCalendarForm.valid) {
