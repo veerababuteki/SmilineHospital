@@ -36,10 +36,9 @@ export const routes: Routes = [
         { path: 'calendar', component: CalendarComponent },
         { path: 'appointment', component: AppointmentComponent },
         {
-        path: 'sfc',
-        loadChildren: () => import('./app/features/sfc/sfc.module').then(m => m.SfcModule)
-      },
-
+          path: 'sfc',
+          loadChildren: () => import('./app/features/sfc/sfc.module').then(m => m.SfcModule)
+        },
         { path: 'reports', component: ReportsComponent },
         { path: 'patients', component: PatientsSectionComponent,
           children: [
