@@ -38,6 +38,7 @@ export interface AppMessage {
 export class MessageService {
   private messageSource = new Subject<AppMessage>();
   message$ = this.messageSource.asObservable();
+  add: any;
 
   sendMessage(text: string, code = '', type: 'success' | 'error' | 'info' = 'success') {
     this.messageSource.next({ text, code, type });
