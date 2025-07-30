@@ -97,7 +97,7 @@ export class ClinicalNotesComponent implements OnInit {
   }
   formatStringToArray(value: string){
     if (typeof value !== "string") {
-      throw new Error("Invalid input: Not a string");
+      return ''
     }
     if(value === '') return
     let formatted = value.trim();
