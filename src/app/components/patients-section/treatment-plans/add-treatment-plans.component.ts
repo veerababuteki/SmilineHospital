@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { format } from 'date-fns';
 import { MessageService } from '../../../services/message.service';
 import { PatientDataService } from '../../../services/patient-data.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-add-treatment-plans',
@@ -48,22 +49,22 @@ export class AddTreatmentPlansComponent implements OnInit {
   ];
 
   constructor(private fb: FormBuilder, 
-    private userService: UserService,    private messageService: MessageService,
-      private patientDataService: PatientDataService,
-
+    private userService: UserService,    
+    private messageService: MessageService,
+    private patientDataService: PatientDataService,
     private treatmentPlansService: TreatmentPlansService,
     private router:Router,
     private route: ActivatedRoute
   ) {
     this.initForm();
     const navigation = this.router.getCurrentNavigation();
-   if (navigation?.extras.state) {
-    const state = navigation.extras.state as { mode: string; treatmentData: any };
-    if (state.mode === 'edit' && state.treatmentData) {
-      this.isEditMode = true;
-      this.editTreatmentData = state.treatmentData;
+    if (navigation?.extras.state) {
+      const state = navigation.extras.state as { mode: string; treatmentData: any };
+      if (state.mode === 'edit' && state.treatmentData) {
+        this.isEditMode = true;
+        this.editTreatmentData = state.treatmentData;
+      }
     }
-  }
   }
 
   ngOnInit() {
@@ -77,18 +78,85 @@ export class AddTreatmentPlansComponent implements OnInit {
         this.uniqueCode = params.get('source');
       }
     });
-    this.getProcedures();
+
+    // Load both procedures and doctors, then populate form if in edit mode
+    this.loadInitialData();
+  }
+
+  private loadInitialData() {
+    // Use forkJoin to load both procedures and doctors simultaneously
+    forkJoin({
+      procedures: this.treatmentPlansService.getProcedures(),
+      doctors: this.userService.getDoctors('bce9f008-d447-4fe2-a29e-d58d579534f0')
+    }).subscribe({
+      next: (results) => {
+        // Process procedures
+        this.procedures = results.procedures.data.rows.map((r: any) => ({
+          name: r.name,
+          id: r.procedure_id,
+          price: r.cost
+        })).sort((a: Procedure, b: Procedure) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+        
+        this.filteredProcedures = [...this.procedures];
+
+        // Process doctors
+        this.doctors = [];
+        results.doctors.data.forEach((doc: { first_name: string; last_name: string; user_id: any; }) => {
+          this.doctors.push({
+            name: doc.first_name + " " + doc.last_name,
+            user_id: doc.user_id
+          });
+        });
+
+        // Set default doctor if available
+        if (this.doctors.length > 0) {
+          this.doctor = this.doctors[0];
+        }
+
+        // Now populate form if in edit mode (after both doctors and procedures are loaded)
+        if (this.isEditMode && this.editTreatmentData) {
+          this.populateFormWithTreatment(this.editTreatmentData);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading initial data:', error);
+        // Fallback to individual loading if forkJoin fails
+        this.getProcedures();
+        this.getDoctors();
+      }
+    });
+  }
+
+  private getDoctors() {
     this.userService.getDoctors('bce9f008-d447-4fe2-a29e-d58d579534f0').subscribe(res => {
+      this.doctors = [];
       res.data.forEach((doc: { first_name: string; last_name: string; user_id: any; }) => {
         this.doctors.push({
-          name: doc.first_name+" "+doc.last_name,
+          name: doc.first_name + " " + doc.last_name,
           user_id: doc.user_id
         });
-        this.doctor = this.doctors[0];
       });
+      
+      if (this.doctors.length > 0) {
+        this.doctor = this.doctors[0];
+      }
+
+      // If we're in edit mode and doctors just loaded, try to set the correct doctor
+      if (this.isEditMode && this.editTreatmentData && this.editTreatmentData.length > 0) {
+        this.setDoctorFromEditData();
+      }
     });
-    if (this.isEditMode && this.editTreatmentData) {
-      this.populateFormWithTreatment(this.editTreatmentData);
+  }
+
+  private setDoctorFromEditData() {
+    if (this.editTreatmentData && this.editTreatmentData.length > 0) {
+      const doctorId = this.editTreatmentData[0].doctor_id;
+      if (doctorId && this.doctors.length > 0) {
+        const foundDoctor = this.doctors.find(doc => doc.user_id.toString() === doctorId.toString());
+        if (foundDoctor) {
+          this.doctor = foundDoctor;
+        }
+      }
     }
   }
 
@@ -98,6 +166,11 @@ export class AddTreatmentPlansComponent implements OnInit {
     // Set the date
     if (treatmentData[0].date) {
       this.date = new Date(treatmentData[0].date);
+    }
+
+    // Set the doctor if doctors are already loaded
+    if (this.doctors.length > 0) {
+      this.setDoctorFromEditData();
     }
     
     // Clear the existing treatments array
@@ -165,6 +238,7 @@ export class AddTreatmentPlansComponent implements OnInit {
       procedure.price.toString().includes(search)
     );
   }
+
   addProcedure(){
     if(this.name.trim()){
       this.treatmentPlansService.addProcedure(this.name, this.cost).subscribe(res => {
@@ -219,10 +293,10 @@ export class AddTreatmentPlansComponent implements OnInit {
     });
 
     // Get the current length as the new index
-  const index = this.treatments.length;
-  
-  // Use push instead of insert(0, ...)
-  this.treatments.push(treatment);
+    const index = this.treatments.length;
+    
+    // Use push instead of insert(0, ...)
+    this.treatments.push(treatment);
     this.setCurrentTreatment(index);
     this.calculateTotal(index);
   }
@@ -240,6 +314,7 @@ export class AddTreatmentPlansComponent implements OnInit {
     const currentValue = treatment.get('showNotes')?.value;
     treatment.get('showNotes')?.setValue(!currentValue);
   }
+
   onFullMouthChange(treatmentIndex: number): void {
     if (treatmentIndex === null || treatmentIndex >= this.treatments.length) return;
     
@@ -365,10 +440,6 @@ export class AddTreatmentPlansComponent implements OnInit {
     const values = treatment.value;
     let total = values.cost * values.quantity;
 
-    // if (values.multiplyCost && values.selectedTeeth.length > 0) {
-    //   total *= values.selectedTeeth.length;
-    // }
-
     if (values.discount > 0) {
       if (values.discountType === '%') {
         total *= (1 - values.discount / 100);
@@ -382,7 +453,7 @@ export class AddTreatmentPlansComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.treatmentForm.valid) {
+    if (this.treatmentForm.valid && this.doctor) {
       const procedureLists: any[] = [];
       
       // Build the treatment plan data
@@ -463,24 +534,29 @@ export class AddTreatmentPlansComponent implements OnInit {
           }
         });
       }
+    } else {
+      if (!this.doctor) {
+        console.error('No doctor selected');
+        // You might want to show a user-friendly error message here
+      }
     }
   }
 
   updateTreatmentPlans(){
     if(this.patientId == null || this.patientId === undefined) return;
     this.treatmentPlansService.getTreatmentPlans(Number(this.patientId)).subscribe(res => {
-  const existingData = this.patientDataService.getSnapshot();
+      const existingData = this.patientDataService.getSnapshot();
 
-  const updatedData = {
-    ...existingData,
-    treatmentPlans: res
-  };
+      const updatedData = {
+        ...existingData,
+        treatmentPlans: res
+      };
 
-  this.patientDataService.setData(updatedData);
+      this.patientDataService.setData(updatedData);
 
-  // Then navigate
-  this.router.navigate(['patients', this.patientId, 'treatment-plans', this.uniqueCode]);
-});
+      // Then navigate
+      this.router.navigate(['patients', this.patientId, 'treatment-plans', this.uniqueCode]);
+    });
   }
 
   calculateGrandTotal(): number {
@@ -490,10 +566,6 @@ export class AddTreatmentPlansComponent implements OnInit {
     this.treatments.controls.forEach(treatment => {
       const values = treatment.value;
       let cost = values.cost * values.quantity;
-      
-      // if (values.multiplyCost && values.selectedTeeth.length > 0) {
-      //   cost *= values.selectedTeeth.length;
-      // }
       
       totalCost += cost;
       
@@ -508,6 +580,7 @@ export class AddTreatmentPlansComponent implements OnInit {
 
     return totalCost - totalDiscount;
   }
+
   cancel(){
     this.router.navigate(['/patients', this.patientId, 'treatment-plans', this.uniqueCode]);
   }

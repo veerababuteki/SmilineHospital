@@ -18,6 +18,7 @@ import { AuthService } from './services/auth.service';
 import { HomeComponent } from './components/home/home.component';
 import { LoaderService } from './services/loader.service';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { MessageComponent } from "./components/shared/message/message.component";
 interface NavItem {
   icon: string;
   label: string;
@@ -28,8 +29,8 @@ interface NavItem {
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports:[ 
-    RouterOutlet, 
+  imports: [
+    RouterOutlet,
     CommonModule,
     FormsModule,
     RouterModule,
@@ -37,8 +38,9 @@ interface NavItem {
     ButtonModule,
     SplitButtonModule,
     ButtonModule,
-    ProgressSpinnerModule
-  ],
+    ProgressSpinnerModule,
+    MessageComponent
+],
 })
 export class AppComponent implements OnInit {
   isLoading: boolean = false;

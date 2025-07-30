@@ -21,6 +21,7 @@ import { Message, MessageService } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { LoaderService } from '../../services/loader.service';
 import { ToastModule } from 'primeng/toast';
+import { AddProfileComponent } from "../patients-section/edit-profile/add-profile.component";
 
 @Component({
   selector: 'app-appointment',
@@ -30,7 +31,7 @@ import { ToastModule } from 'primeng/toast';
     DialogModule,
     ButtonModule,
     InputTextModule,
-    DropdownModule, 
+    DropdownModule,
     CalendarModule,
     InputTextareaModule,
     CheckboxModule,
@@ -38,8 +39,9 @@ import { ToastModule } from 'primeng/toast';
     ReactiveFormsModule,
     CommonModule,
     MessagesModule,
-    ToastModule
-  ],
+    ToastModule,
+    AddProfileComponent
+],
   providers: [MessageService]
 })
 export class AppointmentComponent implements OnInit {
@@ -91,6 +93,7 @@ export class AppointmentComponent implements OnInit {
   hasBlockConflicts: boolean = false;
   blockConflictMessage: string = '';
   showBlockWarning: boolean = false;
+  displayAddPatientDialog: boolean = false;
   doctorAvailabilityStatus: 'available' | 'partially-blocked' | 'fully-blocked' | 'unknown' = 'unknown';
   availabilityMessage: string = '';
 
@@ -952,8 +955,17 @@ get isAllDay(): boolean {
   return this.blockCalendarForm.get('blockType')?.value === 'allDay';
 }
 
-openPatientDialog(){
+// openPatientDialog(){
+//     this.display = false;
+//     this.closeDialog.emit({isOpenPatientDialog:false});
+//   }
+// }
+
+ showAddPatientDialog() {
     this.display = false;
-    this.closeDialog.emit({isOpenPatientDialog:true});
+    this.displayAddPatientDialog = true;
   }
+   hideAddPatientDialog() {
+        this.displayAddPatientDialog = false;
+    }
 }

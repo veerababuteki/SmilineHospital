@@ -10,6 +10,7 @@ import { MenuItem } from 'primeng/api';
 import { MessageService } from '../../../services/message.service';
 import { PatientDataService } from '../../../services/patient-data.service';
 import { ConsentFormComponent } from '../treatment-plans/consent-form/consent-form.component';
+import { AuthService } from '../../../services/auth.service'; // Add this
 
 @Component({
   selector: 'app-completed-procedures',
@@ -21,6 +22,9 @@ import { ConsentFormComponent } from '../treatment-plans/consent-form/consent-fo
 })
 
 export class CompletedProceduresComponent implements OnInit {
+  canAccessInvoicing: boolean = true;
+  currentUserRole: string = '';
+  
 getFullTeethNumbers(arg0: any): string|import("@angular/core").TemplateRef<HTMLElement>|undefined {
 throw new Error('Method not implemented.');
 }
@@ -50,13 +54,50 @@ throw new Error('Method not implemented.');
   showConsentFormDialog: boolean = false;
   selectedConsentTreatment: any = null;
 
-    constructor(private treatmentPlanService: TreatmentPlansService, private patientDataService: PatientDataService,
-      private route: ActivatedRoute, private router: Router){
-        const selectedPractice = localStorage.getItem('selectedPractice');
-        if(selectedPractice){
-          this.savedPractice = JSON.parse(selectedPractice);
-        }
+    constructor(
+  private treatmentPlanService: TreatmentPlansService,
+  private patientDataService: PatientDataService,
+  private route: ActivatedRoute,
+  private router: Router,
+  private authService: AuthService, // Inject here
+  private messageService: MessageService // Inject this too for error alerts
+) {
+  const selectedPractice = localStorage.getItem('selectedPractice');
+  if (selectedPractice) {
+    this.savedPractice = JSON.parse(selectedPractice);
+  }
+
+  // Load user into localStorage and check role
+  this.loadCurrentUserAndRole(); // NEW METHOD
+}
+
+    
+
+
+
+    
+   private loadCurrentUserAndRole(): void {
+  console.log('Loading current user for role check...');
+  this.authService.getUser().subscribe({
+    next: (response) => {
+      console.log('User response:', response);
+      localStorage.setItem('currentUser', JSON.stringify(response));
+      this.currentUserRole = response?.data?.role_details?.name || '';
+      this.canAccessInvoicing = this.currentUserRole !== 'Doctor';
+      console.log('Role from API:', this.currentUserRole);
+    },
+    error: (error) => {
+      console.error('Error loading current user:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to load user information.'
+      });
     }
+  });
+}
+
+    
     ngOnInit() {
       this.patientDataService.data$.subscribe((data) => {
     const treatments = data?.completedProcedures?.data?.rows || [];
@@ -64,23 +105,10 @@ throw new Error('Method not implemented.');
     this.treatmentPlans = this.groupByDate(treatments);
       this.formattedData = this.getFormattedData();
   });
-      this.items = [
-        {
-          label: 'Invoice Procedure',
-          icon: 'pi pi-money-bill',
-          command: (event) => this.generateInvoiceForProcedure(event)
-        },
-        {
-          label: 'Edit',
-          icon: 'pi pi-pencil',
-          command: (event) => this.updateTreatmentPlans(event)
-        },
-        {
-          label: 'Consent Form',
-          icon: 'pi pi-file-pdf',
-          command: (event) => this.openConsentForm(event)
-        }
-      ];
+  
+      // Initialize menu items
+      this.initializeMenuItems();
+    
       const routeId = this.route.parent?.snapshot.paramMap.get('id');
   const source = this.route.snapshot.paramMap.get('source');
 
@@ -95,6 +123,33 @@ throw new Error('Method not implemented.');
       this.uniqueCode = context.uniqueCode;
     }
   } 
+    }
+    
+    private initializeMenuItems(): void {
+      this.items = [];
+      
+      // Only add Invoice Procedure if user is NOT a Doctor
+      if (this.canAccessInvoicing) {
+        this.items.push({
+          label: 'Invoice Procedure',
+          icon: 'pi pi-money-bill',
+          command: (event) => this.generateInvoiceForProcedure(event)
+        });
+      }
+      
+      // Always add Edit and Consent Form
+      this.items.push(
+        {
+          label: 'Edit',
+          icon: 'pi pi-pencil',
+          command: (event) => this.updateTreatmentPlans(event)
+        },
+        {
+          label: 'Consent Form',
+          icon: 'pi pi-file-pdf',
+          command: (event) => this.openConsentForm(event)
+        }
+      );
     }
 
     updateTreatmentPlans(treatmentPlan: any): void {
@@ -116,6 +171,12 @@ throw new Error('Method not implemented.');
     }
 
     generateInvoiceForProcedure(event: any){
+      // Check if user has access to invoicing
+      if (!this.canAccessInvoicing) {
+        console.warn('User does not have access to invoicing functionality');
+        return;
+      }
+      
       this.generateInvoiceList = [];
       const id = event.id;
       const treatment_unique_id = event.treatment_unique_id;
@@ -133,13 +194,19 @@ throw new Error('Method not implemented.');
 
     setCurrentProcedure(event: any): void {
       // Update menu items with the current invoice key as data
-      this.currentProcedure = event
-      this.items = [
-        {
+      this.currentProcedure = event;
+      this.items = [];
+      
+      // Only add Invoice Procedure if user is NOT a Doctor
+      if (this.canAccessInvoicing) {
+        this.items.push({
           label: 'Invoice Procedure',
           icon: 'pi pi-money-bill',
           command: () => this.generateInvoiceForProcedure(this.currentProcedure)
-        },
+        });
+      }
+      
+      this.items.push(
         {
           label: 'Edit',
           icon: 'pi pi-pencil',
@@ -150,7 +217,7 @@ throw new Error('Method not implemented.');
           icon: 'pi pi-file-pdf',
           command: () => this.openConsentForm(this.currentProcedure)
         }
-      ];
+      );
     }
 
   loadPatientData(patientId: string) {
@@ -237,10 +304,16 @@ throw new Error('Method not implemented.');
           doctorId,
           appointments,
       }));
-  }
+    }
   
 
     generateInvoice(){
+      // Check if user has access to invoicing
+      if (!this.canAccessInvoicing) {
+        console.warn('User does not have access to invoicing functionality');
+        return;
+      }
+      
       // this.treatmentPlanService.generateInvoice(this.generateInvoiceList).subscribe(res => {
       //   if(this.patientId !== null && this.patientId !== undefined){
       //     this.loadPatientData(this.patientId)
