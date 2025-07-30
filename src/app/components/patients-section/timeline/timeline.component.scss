@@ -267,3 +267,30 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
+
+.deleted-file-tag {
+  border: 1px dashed red;
+  background: #fff0f0;
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.deleted-label {
+  font-weight: bold;
+  color: #f04734;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+
+.deleted-image {
+  max-width: 100%;
+  opacity: 0.5;
+  filter: grayscale(50%);
+  pointer-events: none;
+}
+
+.active-image {
+  max-width: 100%;
+  border-radius: 4px;
+}
