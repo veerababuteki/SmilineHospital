@@ -95,18 +95,23 @@ export class ClinicalNotesComponent implements OnInit {
   navigateToAdd(){
     this.router.navigate(['/patients', this.patientId, 'add-clinical-note', this.uniqueCode])
   }
-  formatStringToArray(value: string){
-    if (typeof value !== "string") {
-      return ''
+  formatStringToArray(value: string | null | undefined): string[] {
+    try {
+      if (typeof value !== "string" || !value) {
+        return [];
+      }
+      
+      const formatted = value.trim();
+      if (formatted === '') {
+        return [];
+      }
+      
+      const formattedA = formatted.split(',');
+      return formattedA.map(item => item.trim()).filter(item => item.length > 0);
+    } catch (error: any) {
+      console.error("Error parsing string to array:", error);
+      return []; // Return empty array on error
     }
-    if(value === '') return
-    let formatted = value.trim();
-    let formattedA = formatted.split(',');
-
-    return formattedA;
-  } catch (error: any) {
-    console.error("Error parsing string to array:", error);
-    return []; // Return empty array on error
   }
   getSortedDates(): string[] {
     return Object.keys(this.clinicalNotes).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
