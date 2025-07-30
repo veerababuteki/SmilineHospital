@@ -222,6 +222,11 @@
   }
 }
 
+.sfc-header-static {
+  position: sticky;
+  top: 0;
+  z-index: 100000;
+}
 
 .sfc-search-bar {
   padding: 0.5rem 1rem;
@@ -422,96 +427,145 @@ max-height: 350px;
 
 
 
+td.action-column {
+  position: relative;
+}
 
 
+// Solution 2: Enhanced action column with dynamic positioning
 .action-column {
- .action-dropdown {
-   position: relative;
-   display: inline-block;
+  position: relative; // Ensure proper stacking context
+  
+  .action-dropdown {
+    position: relative;
+    display: inline-block;
 
-   .action-trigger {
-     width: 32px;
-     height: 32px;
-     border: 1px solid #ccc;
-     background: none;
-     border-radius: 8%;
-     display: flex;
-     margin-top: 4px;
-     align-items: center;
-     justify-content: center;
-     cursor: pointer;
-     transition: background-color 0.2s;
+    .action-trigger {
+      width: 32px;
+      height: 32px;
+      border: 1px solid #ccc;
+      background: none;
+      border-radius: 8%;
+      display: flex;
+      margin-top: 4px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
 
-     &:hover {
-       background-color: #f3f4f6;
-     }
+      &:hover {
+        background-color: #f3f4f6;
+      }
 
-     i {
-       font-size: 12px;
-       color: #6b7280;
-       transition: transform 0.2s;
-     }
-   }
+      i {
+        font-size: 12px;
+        color: #6b7280;
+        transition: transform 0.2s;
+      }
+    }
 
-   .dropdown-menu {
-     position: absolute;
-     right: 0;
-     top: 100%;
-     margin-top: 8px;
-     width: 160px;
-     background: white;
-     border-radius: 8px;
-     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-     border: 1px solid #e5e7eb;
-     z-index: 1000;
-     opacity: 0;
-     visibility: hidden;
-     transform: scale(0.95);
-     transition: all 0.2s;
+    .dropdown-menu {
+      position: fixed; // Changed from absolute to fixed
+      right: 20px;
+      top: auto;
+      margin-top: 8px;
+      width: 160px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+      z-index: 999999;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.95);
+      transition: all 0.2s;
 
-     &.show {
-       opacity: 1;
-       visibility: visible;
-       transform: scale(1);
-     }
+      &.show {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1);
+      }
 
-     .dropdown-item {
-       width: 100%;
-       padding: 12px 16px;
-       border: none;
-       background: none;
-       text-align: left;
-       display: flex;
-       align-items: center;
-       font-size: 14px;
-       color: #374151;
-       cursor: pointer;
-       transition: all 0.15s;
+      // Dynamic positioning classes
+      // &.dropdown-up {
+      //   bottom: 100%;
+      //   top: auto;
+      //   margin-top: 0;
+      //   margin-bottom: 8px;
+      // }
 
-       &:first-child {
-         border-radius: 8px 8px 0 0;
-       }
+      &.dropdown-left {
+        right: 100%;
+        left: auto;
+        margin-right: 8px;
+      }
 
-       &:last-child {
-         border-radius: 0 0 8px 8px;
-       }
+      .dropdown-item {
+        width: 100%;
+        padding: 12px 16px;
+        border: none;
+        background: none;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: #374151;
+        cursor: pointer;
+        transition: all 0.15s;
 
-       i {
-         margin-right: 12px;
-         width: 16px;
-         font-size: 14px;
-       }
+        &:first-child {
+          border-radius: 8px 8px 0 0;
+        }
 
-       &.edit-item:hover {
-         background-color: #f2f2f3;
-        //  color: #e7ebf3;
-       }
+        &:last-child {
+          border-radius: 0 0 8px 8px;
+        }
 
-       &.delete-item:hover {
-         background-color: #f2f2f3;
-        //  color: #dc2626;
-       }
-     }
-   }
- }
+        i {
+          margin-right: 12px;
+          width: 16px;
+          font-size: 14px;
+        }
+
+        &.edit-item:hover {
+          background-color: #f2f2f3;
+        }
+
+        &.delete-item:hover {
+          background-color: #f2f2f3;
+        }
+      }
+    }
+  }
+}
+
+// Alternative Solution 3: Portal-style dropdown (if using a framework)
+.dropdown-portal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999999;
+  
+  .dropdown-menu {
+    position: absolute;
+    pointer-events: all;
+    width: 160px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.95);
+    transition: all 0.2s;
+
+    &.show {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1);
+    }
+  }
 }

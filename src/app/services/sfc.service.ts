@@ -8,7 +8,7 @@ import { AuthService } from './auth.service';
 })
 
 export class SfcService {
-  private baseUrl = 'https://apis.idental.ai/api/v1/auth/sfc'; // base path for SFC routes
+  private baseUrl = 'http://localhost:7001/api/v1/auth/sfc'; // base path for SFC routes
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 

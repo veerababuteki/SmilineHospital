@@ -1,4 +1,18 @@
 <p-toast></p-toast>
+ <p-dialog 
+    [(visible)]="displayAddPatientDialog" 
+    [style]="{width: '100vw'}" 
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false">
+    
+    <app-add-profile (onSave)="hideAddPatientDialog()"></app-add-profile>
+    
+    <!-- <ng-template pTemplate="footer">
+      <p-button icon="pi pi-times" label="Cancel" (click)="hideAddPatientDialog()" styleClass="p-button-text"></p-button>
+      <p-button icon="pi pi-check" label="Save" (click)="hideAddPatientDialog()"></p-button>
+    </ng-template> -->
+  </p-dialog>
 <p-dialog
   [(visible)]="display"
   [modal]="true"
@@ -42,7 +56,7 @@
 
         <div class="add-patient-container">
           <div class="message">Want to add a new patient?</div>
-          <button type="button" class="add-patient-btn" pButton (click)="openPatientDialog()">+ Add Patient</button>
+          <button type="button" class="add-patient-btn" pButton (click)="showAddPatientDialog()">+ Add Patient</button>
         </div>
       </div>
 
