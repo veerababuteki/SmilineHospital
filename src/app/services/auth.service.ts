@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
+  // private baseUrl = 'http://localhost:7001/api/v1';  // Replace with actual API
   private baseUrl = 'https://apis.idental.ai/api/v1';  // Replace with actual API
   loggedIn: boolean = false;
 
