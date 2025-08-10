@@ -317,6 +317,9 @@ export class AddProfileComponent implements OnInit {
     }else{
       this.markFormGroupTouched(this.patientForm);
     }
+    setTimeout(function() {
+    window.location.reload();
+}, 1500); 
   }
   markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach(control => {
