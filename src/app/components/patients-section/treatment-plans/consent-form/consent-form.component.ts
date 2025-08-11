@@ -63,6 +63,8 @@ export class ConsentFormComponent implements OnInit {
   treatmentUniqueId: string = '';
   userId: string = '';
   isLoading: boolean = false;
+  isLoadingExistingForms: boolean = false; // New property to track loading state
+  hasLoadedExistingForms: boolean = false; // New property to track if we've attempted to load
 
   sectionDescriptions: { [key: string]: { title: string; content: string } } = {
     examination: {
@@ -398,10 +400,12 @@ export class ConsentFormComponent implements OnInit {
     console.log('loadExistingConsentForms called with treatmentUniqueId:', this.treatmentUniqueId);
     if (!this.treatmentUniqueId) {
       console.log('No treatmentUniqueId available, skipping load');
+      this.hasLoadedExistingForms = true; // Mark as attempted even if no ID
       return;
     }
 
     console.log('Calling API to get consent forms for treatment:', this.treatmentUniqueId);
+    this.isLoadingExistingForms = true;
     this.fileUploadService.getConsentFormsByTreatment(this.treatmentUniqueId)
       .subscribe({
         next: (response) => {
@@ -423,6 +427,8 @@ export class ConsentFormComponent implements OnInit {
             console.log('No existing files found in response');
             this.uploadedForms = this.uploadedForms.filter(f => !f.isExisting);
           }
+          this.isLoadingExistingForms = false;
+          this.hasLoadedExistingForms = true;
         },
         error: (error) => {
           console.error('Error loading consent forms:', error);
@@ -431,6 +437,8 @@ export class ConsentFormComponent implements OnInit {
             summary: 'Error',
             detail: 'Failed to load existing consent forms.'
           });
+          this.isLoadingExistingForms = false;
+          this.hasLoadedExistingForms = true;
         }
       });
   }
@@ -467,5 +475,19 @@ export class ConsentFormComponent implements OnInit {
 
   getNewFilesCount(): number {
     return this.uploadedForms.filter(f => !f.isExisting).length;
+  }
+
+  // New method to check if there are existing consent forms
+  hasExistingConsentForms(): boolean {
+    return this.uploadedForms.filter(f => f.isExisting).length > 0;
+  }
+
+  // New method to show the no consent message
+  shouldShowNoConsentMessage(): boolean {
+    return this.viewOnly && 
+           this.selectedMode === 'upload' && 
+           !this.isLoadingExistingForms && 
+           this.hasLoadedExistingForms && 
+           !this.hasExistingConsentForms();
   }
 }
