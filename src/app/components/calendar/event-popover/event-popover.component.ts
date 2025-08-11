@@ -81,7 +81,7 @@ import { Router } from '@angular/router';
                 <span class="dot"> </span>
                 <span>{{ event.extendedProps?.age || '' }} </span>
               </div>
-              <div class="show-balance">Show Balance</div>
+             <!-- <div class="show-balance">Show Balance</div> -->
             </div>
           </div>
           <div>
@@ -117,7 +117,7 @@ import { Router } from '@angular/router';
 
         <div class="category-section">
           <div class="category-label">Category:</div>
-          <div class="category-value">{{ event.extendedProps?.category || 'Flap Surgery' }}</div>
+          <div class="category-value">{{ event.extendedProps?.category || 'N/A' }}</div>
         </div>
 
         <div class="notes-section">

@@ -237,8 +237,10 @@ export class ReportsComponent implements OnInit {
             ];
             this.detailsData = [];
 
-            const sortedData = data.sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
+            const sortedData = data.sort(
+                (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
+                );
+                
             sortedData.forEach((inv: any, index: number) =>{
                 this.detailsData.push({
                     sNo: index + 1,
@@ -284,7 +286,9 @@ export class ReportsComponent implements OnInit {
             if(data == undefined || data.length == 0){
                 this.detailsData = [];
             }
-            const sortedData = data.sort((a: any, b: any) => new Date(a.invoice_date).getTime() - new Date(b.invoice_date).getTime());
+            const sortedData = data.sort(
+                (a: any, b: any) => new Date(b.invoice_date).getTime() - new Date(a.invoice_date).getTime()
+            );
 
             sortedData.forEach((pay: any, index: number) => {
                 this.detailsData.push({
@@ -325,7 +329,9 @@ export class ReportsComponent implements OnInit {
             if(data == undefined || data.length == 0){
                 this.detailsData = [];
             }
-            const sortedData = data.sort((a: any, b: any) => new Date(a.appointment_date).getTime() - new Date(b.appointment_date).getTime());
+            const sortedData = data.sort(
+                (a: any, b: any) => new Date(b.appointment_date).getTime() - new Date(a.appointment_date).getTime()
+            );
 
             sortedData.forEach((app: any, index: number) => {
                 this.detailsData.push({
@@ -391,10 +397,10 @@ export class ReportsComponent implements OnInit {
             if(data == undefined || data.length == 0){
                 this.detailsData = [];
             }
-            const sortedData = data.sort((a: any, b: any) =>
-            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+            const sortedData = data.sort(
+            (a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
             );
-
+            
             sortedData.forEach((app: any, index: number) => {
                 this.detailsData.push({
                     sNo: index + 1,
@@ -427,9 +433,9 @@ export class ReportsComponent implements OnInit {
             if(data == undefined || data.length == 0){
                 this.detailsData = [];
             }
-            const sortedData = data.sort((a: any, b: any) =>
-            new Date(a.performed_on).getTime() - new Date(b.performed_on).getTime()
-            );
+            const sortedData = data.sort(
+                (a: any, b: any) => new Date(b.performed_on).getTime() - new Date(a.performed_on).getTime()
+                );
 
             sortedData.forEach((app: any, index: number) => {
                 this.detailsData.push({
