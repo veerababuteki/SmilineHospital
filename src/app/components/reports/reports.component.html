@@ -1,89 +1,107 @@
 <!-- reports.component.html -->
 <div class="calendar-top">
-    <div class="left-section">
-        <span class="title">Reports</span>
-        <div class="email-dropdown" #dropdownTrigger (click)="togglePracticesDropdown()">
-            <span>{{ selectedPractice?.branch_name || 'Select Practice' }}</span>
-            <i class="pi pi-chevron-down"></i>
-            <div class="practices-dropdown-panel" *ngIf="showPracticesDropdown" #dropdownPanel>
-                <div class="search-container">
-                    <i class="pi pi-search search-icon"></i>
-                    <input
-                        type="text"
-                        placeholder="Search by name"
-                        class="practice-search"
-                        [(ngModel)]="practiceSearchText"
-                        (input)="filterPractices()"
-                    >
-                </div>
-
-                <div class="practices-list">
-                    <div class="practice-item"
-                        *ngFor="let practice of filteredPractices"
-                        (click)="selectPractice(practice)"
-                        [class.selected]="selectedPractice?.branch_id === practice.branch_id">
-                        <div class="practice-name">{{ practice.branch_name }}</div>
-                        <div class="practice-id">Practice ID: {{ practice.branch_id }}</div>
-                    </div>
-
-                    <div class="no-results" *ngIf="practiceSearchText && filteredPractices.length === 0">
-                        No practices found matching "{{ practiceSearchText }}"
-                    </div>
-                </div>
-            </div>
+  <div class="left-section">
+    <span class="title">Reports</span>
+    <div
+      class="email-dropdown"
+      #dropdownTrigger
+      (click)="togglePracticesDropdown()"
+    >
+      <span>{{ selectedPractice?.branch_name || "Select Practice" }}</span>
+      <i class="pi pi-chevron-down"></i>
+      <div
+        class="practices-dropdown-panel"
+        *ngIf="showPracticesDropdown"
+        #dropdownPanel
+      >
+        <div class="search-container">
+          <i class="pi pi-search search-icon"></i>
+          <input
+            type="text"
+            placeholder="Search by name"
+            class="practice-search"
+            [(ngModel)]="practiceSearchText"
+            (input)="filterPractices()"
+          />
         </div>
+
+        <div class="practices-list">
+          <div
+            class="practice-item"
+            *ngFor="let practice of filteredPractices"
+            (click)="selectPractice(practice)"
+            [class.selected]="
+              selectedPractice?.branch_id === practice.branch_id
+            "
+          >
+            <div class="practice-name">{{ practice.branch_name }}</div>
+            <div class="practice-id">Practice ID: {{ practice.branch_id }}</div>
+          </div>
+
+          <div
+            class="no-results"
+            *ngIf="practiceSearchText && filteredPractices.length === 0"
+          >
+            No practices found matching "{{ practiceSearchText }}"
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <div class="report-container">
-    <!-- Report Controls -->
-    <div class="report-controls">
-        <div class="controls-row">
-            <div class="control-group">
-                <label for="reportCategory">Select Report Category</label>
-                <p-dropdown 
-                    id="reportCategory"
-                    [options]="reportCategories" 
-                    [(ngModel)]="selectedReportCategory"
-                    placeholder="Select Report Category"
-                    optionLabel="label"
-                    [showClear]="false"
-                    (onChange)="onReportCategoryChange()"
-                    styleClass="report-dropdown">
-                </p-dropdown>
-            </div>
+  <!-- Report Controls -->
+  <div class="report-controls">
+    <div class="controls-row">
+      <div class="control-group">
+        <label for="reportCategory">Select Report Category</label>
+        <p-dropdown
+          id="reportCategory"
+          [options]="reportCategories"
+          [(ngModel)]="selectedReportCategory"
+          placeholder="Select Report Category"
+          optionLabel="label"
+          [showClear]="false"
+          (onChange)="onReportCategoryChange()"
+          styleClass="report-dropdown"
+        >
+        </p-dropdown>
+      </div>
 
-            <div class="date-controls" *ngIf="showDatePickers()">
-                <div class="control-group">
-                    <label for="fromDate">From</label>
-                    <p-calendar 
-                        id="fromDate"
-                        [(ngModel)]="fromDate"
-                        dateFormat="dd M yy"
-                        [maxDate]="toDate"
-                        [showIcon]="false"
-                        inputId="fromDate"
-                        (onSelect)="onDateChange()"
-                        styleClass="date-picker">
-                    </p-calendar>
-                </div>
+      <div class="date-controls" *ngIf="showDatePickers()">
+        <div class="control-group">
+          <label for="fromDate">From</label>
+          <p-calendar
+            id="fromDate"
+            [(ngModel)]="fromDate"
+            dateFormat="dd M yy"
+            [maxDate]="toDate"
+            [showIcon]="false"
+            inputId="fromDate"
+            (onSelect)="onDateChange()"
+            styleClass="date-picker"
+          >
+          </p-calendar>
+        </div>
 
-                <div class="control-group">
-                    <label for="toDate">To</label>
-                    <p-calendar 
-                        id="toDate"
-                        [(ngModel)]="toDate"
-                        dateFormat="dd M yy"
-                        [minDate]="fromDate"
-                        [showIcon]="false"
-                        inputId="toDate"
-                        (onSelect)="onDateChange()"
-                        styleClass="date-picker">
-                    </p-calendar>
-                </div>
-            </div>
+        <div class="control-group">
+          <label for="toDate">To</label>
+          <p-calendar
+            id="toDate"
+            [(ngModel)]="toDate"
+            dateFormat="dd M yy"
+            [minDate]="fromDate"
+            [showIcon]="false"
+            inputId="toDate"
+            (onSelect)="onDateChange()"
+            styleClass="date-picker"
+          >
+          </p-calendar>
+        </div>
+      </div>
 
-            <!-- <div class="action-buttons">
+      <!-- <div class="action-buttons">
                 <p-button 
                     icon="pi pi-envelope" 
                     label="Mail"
@@ -93,136 +111,194 @@
                 </p-button>
                 
                   </div> -->
-                <p-button 
-                    icon="pi pi-print" 
-                    label="Print"
-                    severity="primary"
-                    (onClick)="printReport()"
-                    styleClass="action-btn print-btn">
-                </p-button>
+      <p-button
+        icon="pi pi-print"
+        label="Print"
+        severity="primary"
+        (onClick)="printReport()"
+        styleClass="action-btn print-btn"
+      >
+      </p-button>
+    </div>
+  </div>
+
+  <!-- Summary Section -->
+  <div class="summary-section">
+    <h3>Summary</h3>
+    <div class="summary-cards">
+      <!-- Invoice Summary -->
+      <div
+        *ngIf="selectedReportCategory?.value === 'invoices'"
+        class="summary-grid"
+      >
+        <div class="summary-item">
+          <span class="summary-label">Cost (INR)</span>
+          <span class="summary-value">{{
+            summaryData.cost | currency : "INR" : "symbol" : "1.2-2"
+          }}</span>
         </div>
-    </div>
-
-    <!-- Summary Section -->
-    <div class="summary-section">
-        <h3>Summary</h3>
-        <div class="summary-cards">
-            <!-- Invoice Summary -->
-            <div *ngIf="selectedReportCategory?.value === 'invoices'" class="summary-grid">
-                <div class="summary-item">
-                    <span class="summary-label">Cost (INR)</span>
-                    <span class="summary-value">{{ summaryData.cost | currency:'INR':'symbol':'1.2-2' }}</span>
-                </div>
-                <div class="summary-item">
-                    <span class="summary-label">Discount (INR)</span>
-                    <span class="summary-value">{{ summaryData.discount | currency:'INR':'symbol':'1.2-2' }}</span>
-                </div>
-                <div class="summary-item">
-                    <span class="summary-label">Income after Discount (INR)</span>
-                    <span class="summary-value">{{ summaryData.incomeAfterDiscount | currency:'INR':'symbol':'1.2-2' }}</span>
-                </div>
-                <div class="summary-item">
-                    <span class="summary-label">Tax (INR)</span>
-                    <span class="summary-value">0.00</span>
-                </div>
-                <div class="summary-item">
-                    <span class="summary-label">Invoice Amount (INR)</span>
-                    <span class="summary-value">{{ summaryData.invoiceAmount | currency:'INR':'symbol':'1.2-2' }}</span>
-                </div>
-            </div>
-
-            <!-- Payments Summary -->
-            <div *ngIf="selectedReportCategory?.value === 'payments'" class="summary-grid">
-                <div class="summary-item">
-                    <span class="summary-label">Total Payments (INR)</span>
-                    <span class="summary-value">{{ summaryData.totalPayments | currency:'INR':'symbol':'1.2-2' }}</span>
-                </div>
-                <div class="summary-item">
-                    <span class="summary-label">Total Advance Payment (INR)</span>
-                    <span class="summary-value">{{ summaryData.totalAdvance | currency:'INR':'symbol':'1.2-2' }}</span>
-                </div>
-            </div>
-
-            <!-- Appointments Summary -->
-            <div *ngIf="selectedReportCategory?.value === 'appointments'" class="summary-grid">
-                <div class="summary-item">
-                    <span class="summary-label">Total Appointments</span>
-                    <span class="summary-value">{{ '  '+summaryData.totalAppointments }}</span>
-                </div>
-            </div>
-
-            <!-- Amount Due Summary -->
-            <div *ngIf="selectedReportCategory?.value === 'amount_due'" class="summary-grid">
-                <div class="summary-item">
-                    <span class="summary-label">Total Amount Due (INR)</span>
-                    <span class="summary-value">{{ summaryData.totalAmountDue | currency:'INR':'symbol':'1.2-2' }}</span>
-                </div>
-            </div>
-
-            <!-- Patients Summary -->
-            <div *ngIf="selectedReportCategory?.value === 'patients'" class="summary-grid">
-                <div class="summary-item">
-                    <span class="summary-label">Total Patients</span>
-                    <span class="summary-value">{{ summaryData.totalPatients }}</span>
-                </div>
-            </div>
-
-            <!-- EMR Summary -->
-            <div *ngIf="selectedReportCategory?.value === 'emr'" class="summary-grid">
-                <div class="summary-item">
-                    <span class="summary-label">Total Treatments</span>
-                    <span class="summary-value">{{ summaryData.totalTreatments }}</span>
-                </div>
-            </div>
+        <div class="summary-item">
+          <span class="summary-label">Discount (INR)</span>
+          <span class="summary-value">{{
+            summaryData.discount | currency : "INR" : "symbol" : "1.2-2"
+          }}</span>
         </div>
-    </div>
+        <div class="summary-item">
+          <span class="summary-label">Income after Discount (INR)</span>
+          <span class="summary-value">{{
+            summaryData.incomeAfterDiscount
+              | currency : "INR" : "symbol" : "1.2-2"
+          }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Tax (INR)</span>
+          <span class="summary-value">0.00</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Invoice Amount (INR)</span>
+          <span class="summary-value">{{
+            summaryData.invoiceAmount | currency : "INR" : "symbol" : "1.2-2"
+          }}</span>
+        </div>
+      </div>
 
-    <!-- Details Section -->
-    <div class="details-section">
-        <h3>Details</h3>
-        <p-table 
-            [value]="detailsData" 
-            [paginator]="true" 
-            [rows]="50"
-            [showCurrentPageReport]="true"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            styleClass="p-datatable-sm details-table"
-            [scrollable]="true"
-            scrollHeight="400px">
-            
-            <ng-template pTemplate="header">
-                <tr>
-                    <th *ngFor="let col of detailsColumns" [style.min-width]="col.field === 'treatments' ? '300px' : '120px'">
-                        {{ col.header }}
-                    </th>
-                </tr>
-            </ng-template>
-            
-            <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
-                <tr>
-                    <td *ngFor="let col of detailsColumns">
-                       <span *ngIf="col.field === 'cost' || col.field === 'discount' || col.field === 'tax' || col.field === 'invoiceAmount' || col.field === 'amountPaid' || col.field === 'amount' || col.field === 'dueAmount'">
-                    <ng-container *ngIf="col.field === 'discount'; else inrFormat">
-                        {{ rowData[col.field] | number:'1.2-2' }}%
-                    </ng-container>
-                    <ng-template #inrFormat>
-                        {{ rowData[col.field] | currency:'INR':'symbol':'1.2-2' }}
-                    </ng-template>
-                    </span>
-                        <span *ngIf="col.field !== 'cost' && col.field !== 'discount' && col.field !== 'tax' && col.field !== 'invoiceAmount' && col.field !== 'amountPaid' && col.field !== 'amount' && col.field !== 'dueAmount'">
-                            {{ rowData[col.field] }}
-                        </span>
-                    </td>
-                </tr>
-            </ng-template>
-            
-            <ng-template pTemplate="emptymessage">
-                <tr>
-                    <td [attr.colspan]="detailsColumns.length" class="text-center">
-                        No data available for the selected report filters.
-                    </td>
-                </tr>
-            </ng-template>
-        </p-table>
+      <!-- Payments Summary -->
+      <div
+        *ngIf="selectedReportCategory?.value === 'payments'"
+        class="summary-grid"
+      >
+        <div class="summary-item">
+          <span class="summary-label">Total Payments (INR)</span>
+          <span class="summary-value">{{
+            summaryData.totalPayments | currency : "INR" : "symbol" : "1.2-2"
+          }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Total Advance Payment (INR)</span>
+          <span class="summary-value">{{
+            summaryData.totalAdvance | currency : "INR" : "symbol" : "1.2-2"
+          }}</span>
+        </div>
+      </div>
+
+      <!-- Appointments Summary -->
+      <div
+        *ngIf="selectedReportCategory?.value === 'appointments'"
+        class="summary-grid"
+      >
+        <div class="summary-item">
+          <span class="summary-label">Total Appointments</span>
+          <span class="summary-value">{{
+            "  " + summaryData.totalAppointments
+          }}</span>
+        </div>
+      </div>
+
+      <!-- Amount Due Summary -->
+      <div
+        *ngIf="selectedReportCategory?.value === 'amount_due'"
+        class="summary-grid"
+      >
+        <div class="summary-item">
+          <span class="summary-label">Total Amount Due (INR)</span>
+          <span class="summary-value">{{
+            summaryData.totalAmountDue | currency : "INR" : "symbol" : "1.2-2"
+          }}</span>
+        </div>
+      </div>
+
+      <!-- Patients Summary -->
+      <div
+        *ngIf="selectedReportCategory?.value === 'patients'"
+        class="summary-grid"
+      >
+        <div class="summary-item">
+          <span class="summary-label">Total Patients</span>
+          <span class="summary-value">{{ summaryData.totalPatients }}</span>
+        </div>
+      </div>
+
+      <!-- EMR Summary -->
+      <div *ngIf="selectedReportCategory?.value === 'emr'" class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">Total Treatments</span>
+          <span class="summary-value">{{ summaryData.totalTreatments }}</span>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Details Section -->
+  <div class="details-section">
+    <h3>Details</h3>
+    <p-table
+      [value]="detailsData"
+      [paginator]="true"
+      [rows]="50"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      styleClass="p-datatable-sm details-table"
+      [scrollable]="true"
+      scrollHeight="400px"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th
+            *ngFor="let col of detailsColumns"
+            [style.min-width]="col.field === 'treatments' ? '300px' : '120px'"
+          >
+            {{ col.header }}
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+        <tr>
+          <td *ngFor="let col of detailsColumns">
+            <!-- Currency fields -->
+            <span
+              *ngIf="
+                col.field === 'cost' ||
+                col.field === 'discount' ||
+                col.field === 'tax' ||
+                col.field === 'invoiceAmount' ||
+                col.field === 'amountPaid' ||
+                col.field === 'amountDue' ||
+                col.field === 'lastInvoice' ||
+                col.field === 'lastPayment' ||
+                col.field === 'advanceAmount'
+              "
+            >
+              {{ rowData[col.field] | currency : "INR" : "symbol" : "1.2-2" }}
+            </span>
+
+            <!-- All other fields (including dates) -->
+            <span
+              *ngIf="
+                col.field !== 'cost' &&
+                col.field !== 'discount' &&
+                col.field !== 'tax' &&
+                col.field !== 'invoiceAmount' &&
+                col.field !== 'amountPaid' &&
+                col.field !== 'amountDue' &&
+                col.field !== 'lastInvoice' &&
+                col.field !== 'lastPayment' &&
+                col.field !== 'advanceAmount'
+              "
+            >
+              {{ rowData[col.field] }}
+            </span>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="detailsColumns.length" class="text-center">
+            No data available for the selected report filters.
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
 </div>
