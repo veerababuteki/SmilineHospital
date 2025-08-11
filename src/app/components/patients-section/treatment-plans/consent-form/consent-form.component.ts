@@ -71,31 +71,31 @@ export class ConsentFormComponent implements OnInit {
     },
     treatmentPlan: {
       title: 'CHANGES IN TREATMENT PLAN:',
-      content: 'I understand that, during treatment, it may be necessary to change or add procedures because of conditions found while working on teeth That were not discovered during examination-the most common being root canal therapy following routine restorative procedures. I give my permission to the Dentist to make any or all changes and additions to the beatment plan as necessary.'
+      content: 'I understand that, during treatment, it may be necessary to change or add procedures because of conditions found while working on teeth That were not discovered during examination-the most common being root canal therapy following routine restorative procedures. I give my permission to the Dentist to make any or all changes and additions to the treatment  plan as necessary.'
     },
     drugs: {
       title: 'DRUGS AND MEDICATION:',
-      content: 'I understand that antibiotics, analgesics, and other medications can cause allergic reactions causing redness, swelling of tissues, pain itching, vomiting, and/or anaphylactic shock (sovere allergic reaction). They may cause drowsiness and lack of awareness and coordination, which can be increased by the use of alcohol or other drugs. I understand that failure to take medications prescribed for me in the manner prescribed may offer risks of continued or aggravated infection, pain, and potential resistance to effect treatment of my condition'
+      content: 'I understand that antibiotics, analgesics, and other medications can cause allergic reactions causing redness, swelling of tissues, pain itching, vomiting, and/or anaphylactic shock (severe allergic reaction). They may cause drowsiness and lack of awareness and coordination, which can be increased by the use of alcohol or other drugs. I understand that failure to take medications prescribed for me in the manner prescribed may offee risks of continued or aggravated infection, pain, and potential resistance to effect treatment of my condition'
     },
     anesthesia: {
       title: 'ADMINISTRATION OF LOCAL ANESTHESIA:',
-      content: 'I understand that local anesthesia is a safe mode of controlling pain during dental procedures which involve tooth preparation, root canal treatment, tooth removal or any other dental surgical procedures. However, I understand that the administration of local anesthesia and its performance carries certain risks, hazards, and unpleasant side effects which are infrequent, but nonetheless may occur. They include, but are not limited to the following: 1. Nerve damage or paresthesia. 2. A temporary, increased heart rate and/or a flushed feeling 3. Allergic reaction. 4. Hematoma or swelling near or at the injection site. 5. Trismus or difficulty opening jaw after the injection. 6. Facial paralysis. 7.Soft tissue damage after the dental procedure due to biting of tongue and cheek, or burning tissues with hot food or beverage while still numb 8. Infection 9. Sloughing of lissue. 10. Needle breakage'
+      content: 'I understand that local anesthesia is a safe mode of controlling pain during dental procedures which involve tooth preparation, root canal treatment, tooth removal or any other dental surgical procedures. However, I understand that the administration of local anesthesia and its performance carries certain risks, hazards, and unpleasant side effects which are infrequent, but nonetheless may occur. They include, but are not limited to the following: 1. Nerve damage or paresthesia. 2. A temporary, increased heart rate and/or a flushed feeling 3. Allergic reaction. 4. Hematoma or swelling near or at the injection site. 5. Trismus or difficulty opening jaw after the injection. 6. Facial paralysis. 7.Soft tissue damage after the dental procedure due to biting of tongue and cheek, or burning tissues with hot food or beverage while still numb 8. Infection 9. Sloughing of tissue. 10. Needle breakage'
     },
     fillings: {
       title: 'FILLINGS:',
-      content: 'I understand that care must be exercised in chewing on filling during the first 24 hours to avoid breakage, and tooth sensitivity is common after-effect of a newly placed filling. I understand more extensive filling or even a root canal may be required due to additional decay, which get disclosed while cleaning the cavity. I understand that over a period of time, the composite filings, because of mouth fluids, different foods eaten, smoking, etc. may cause the shade to change. Also due to extreme chewing forces or other traumatic factors, it is possible for composite resin fillings or bonded aesthetic restorations to be displaced or fractured. The resin-enamel bond may fall, resulting in leakage and recurrent decay. Though the dentist has no control over these factors but early detection can save the tooth from further damage.'
+      content: 'I understand that care must be exercised in chewing on filling during the first 24 hours to avoid breakage, and tooth sensitivity is common after-effect of a newly placed filling. I understand more extensive filling or even a root canal may be required due to additional decay, which get disclosed while cleaning the cavity. I understand that over a period of time, the composite fillings, because of mouth fluids, diffeeent foods eaten, smoking, etc. may cause the shade to change. Also due to extreme chewing forces or other traumatic factors, it is possible for composite resin fillings or bonded aesthetic restorations to be displaced or fractured. The resin-enamel bond may fail, resulting in leakage and recurrent decay. Though the dentist has no control over these factors but early detection can save the tooth from further damage.'
     },
     crowns: {
       title: 'CROWNS, BRIDGES, VENEERS:',
-      content: 'I understand that in order to replace a decayed, traumatized or a missing teeth, it is necessary to modify the existing tooth or the bridge supporting teeth so that crowns or bridges may be placed upon them. Tooth preparation will be done as conservatively as practical to achieve optimum esthetics and structural durability of the crown or bridge. Often after the preparation of the teeth for reception of the crown or bridges, the teeth may exhibit mild sensitivity for short period of time, which eventually subsides without any further interventions. Rarely in case the teeth remain too sensitive for long periods of time following crowning, root canal treatment may be necessary. I further understand that I may be wearing temporary crowns, which may come off easily and that I must be careful to ensure that they are kept on until the permanent crowns are delivered. I understand that sometimes it is not possible to match the color of natural teeth exactly with artificial teeth. Also the final opportunity to make changes in my new crowns, bridge or cap (including shape, fit, size, placement, and color) will be done before cementation. I understand that in very few cases, cosmetic procedures may result in the need for future root canal treatment, which cannot always be predicted or anticipated. I understand that cosmetic procedures may affect tooth surfaces and may require modification of daily cleaning procedures. I understand that it is my responsibility to follow all instructions, including scheduling and attending all appointments. Fallure to keep the cementation appointment can result in ultimate failure of the crown/ Bridge to fit properly and an additional fer may be assessed.'
+      content: 'I understand that in order to replace a decayed, traumatized or a missing teeth, it is necessary to modify the existing tooth or the bridge supporting teeth so that crowns or bridges may be placed upon them. Tooth preparation will be done as conservatively as practical to achieve optimum esthetics and structural durability of the crown or bridge. Often after the preparation of the teeth for reception of the crown or bridges, the teeth may exhibit mild sensitivity for short period of time, which eventually subsides without any further interventions. Rarely in case the teeth remain too sensitive for long periods of time following crowning, root canal treatment may be necessary. I further understand that I may be wearing temporary crowns, which may come off easily and that I must be careful to ensure that they are kept on until the permanent crowns are delivered. I understand that sometimes it is not possible to match the color of natural teeth exactly with artificial teeth. Also the final opportunity to make changes in my new crowns, bridge or cap (including shape, fit, size, placement, and color) will be done before cementation. I understand that in very few cases, cosmetic procedures may result in the need for future root canal treatment, which cannot always be predicted or anticipated. I understand that cosmetic procedures may affect tooth surfaces and may require modification of daily cleaning procedures. I understand that it is my responsibility to follow all instructions, including scheduling and attending all appointments. failure to keep the cementation appointment can result in ultimate failure of the crown/ Bridge to fit properly and an additional fee may be assessed.'
     },
     dentures: {
       title: 'DENTURES - COMPLETE OR PARTIAL:',
-      content: ' I realize that full or partial dentures are artificial, constructed of plastic, metal and or porcelain. The problems of wearing those appliances have been explained to me including looseness, soreness, and possible breakage. I realize the final opportunity to make changes in my new denture (including shape, fit, size, placement, and color) will be "teeth in wax" try-in visit. I understand that dentures might become looser when there are changes in the supporting gum tissues which may require relining at a later date. The cost for this procedure is not the Initial denture fee. I understand that failure to keep up with my delivery appointment may result in poorly fitted dentures. If any remake is required due to my delays, there will be additional charges. I understand that it is my responsibility to seek attention when problems occur and do not lessen in a reasonable amount of time; also, to be examined regularly to evaluate the dentures, condition of the gums, and the general oral health. No guarantees or promises have been made to me conceming the results relating to my ability to utilize artificial dentures successfully nor to their longevity'
+      content: ' I realize that full or partial dentures are artificial, constructed of plastic, metal and or porcelain. The problems of wearing those appliances have been explained to me including looseness, soreness, and possible breakage. I realize the final opportunity to make changes in my new denture (including shape, fit, size, placement, and color) will be "teeth in wax" try-in visit. I understand that dentures might become looser when there are changes in the supporting gum tissues which may require relining at a later date. The cost for this procedure is not the Initial denture fee. I understand that failure to keep up with my delivery appointment may result in poorly fitted dentures. If any remake is required due to my delays, there will be additional charges. I understand that it is my responsibility to seek attention when problems occur and do not lessen in a reasonable amount of time; also, to be examined regularly to evaluate the dentures, condition of the gums, and the general oral health. No guarantees or promises have been made to me concerning the results relating to my ability to utilize artificial dentures successfully nor to their longevity'
     },
     rootCanal: {
       title: 'ROOT CANAL TREATMENT:',
-      content: 'I realize there is no guarantee that root canal therapy will save my tooth, and that complications can occur from the treatment. Occasionally root canal filling material may extend through the tooth which does not necessarily effect the success of the treatment. I understand that endodontic files are very fine instruments and stresses from their manufacture can cause them to separate during use, which may in judgement of the doctor be left in the treated root canal or require additional surgery. I understand that occasionvally additional surgical procedures may be necessary following root canal treatment (apicoectomy). I understand that the tooth may be lost in spite of all efforts to save it. Successful completion of the root canal procedure does not prevent future decay or fracture. The root canal treated tooth will be more brittle and may discolor, a crown and/or post filling is recommended to prevent fracture and/or improve esthetics after completion of root canal.'
+      content: 'I realize there is no guarantee that root canal therapy will save my tooth, and that complications can occur from the treatment. Occasionally root canal filling material may extend through the tooth which does not necessarily effect the success of the treatment. I understand that endodontic files are very fine instruments and stresses from their manufacture can cause them to separate during use, which may in judgement of the doctor be left in the treated root canal or require additional surgery. I understand that occasionally additional surgical procedures may be necessary following root canal treatment (apicoectomy). I understand that the tooth may be lost in spite of all efforts to save it. Successful completion of the root canal procedure does not prevent future decay or fracture. The root canal treated tooth will be more brittle and may discolor, a crown and/or post filling is recommended to prevent fracture and/or improve esthetics after completion of root canal.'
     },
     periodontal: {
       title: 'PERIODONTAL TREATMENT:',
@@ -103,11 +103,11 @@ export class ConsentFormComponent implements OnInit {
     },
     extraction: {
       title: 'REMOVAL OF TEETH (EXTRACTION):',
-      content: 'I understand that if a tooth is not savable by e.g. root canal therapy, crowns, periodontal surgery, etc., it may be recommended that the tooth be extracted. I authorize dentist to remove the following teeth and any others necessary for reasons in paragraph #31 understand removing teeth does not always remove all infection if present and it may be necessary to have further treatment. I understand that the following are some risks involved in having teeth removed: pain, swelling, and spread of infection, dry socket, loss of feeling in my teeth, lips, tongue, and surrounding tissue (parasthesia) that can last for an indefinite period of time or fractured jaw. I understand the absolute necessity to foliow the post extraction instructions including the one to avoid alcohol and smoking following extraction for healing purpose. I understand I may need further treatment by a specialist or even hospitalization if complications arise during or following treatment, the cost of which is my responsibility.'
+      content: 'I understand that if a tooth is not savable by e.g. root canal therapy, crowns, periodontal surgery, etc., it may be recommended that the tooth be extracted. I authorize dentist to remove the following teeth and any others necessary for reasons in paragraph #31 understand removing teeth does not always remove all infection if present and it may be necessary to have further treatment. I understand that the following are some risks involved in having teeth removed: pain, swelling, and spread of infection, dry socket, loss of feeling in my teeth, lips, tongue, and surrounding tissue (paresthesia) that can last for an indefinite period of time or fractured jaw. I understand the absolute necessity to foliow the post extraction instructions including the one to avoid alcohol and smoking following extraction for healing purpose. I understand I may need further treatment by a specialist or even hospitalization if complications arise during or following treatment, the cost of which is my responsibility.'
     },
     general: {
       title: 'GENERAL:',
-      content: `I understand that dentistry is not an exact science and therefore, reputable practitioners cannot properly guarantee results. I hereby authorize any of the doctors to proceed with and perform the dental restorations and treatments as explained to me. I understand that this is only an estimate and subject to modification depending on unforeseen or undiagnosable circumstances that may arise during the course of treatment. I understand that I am responsible for payment of the dental fees. I agree to pay any attorney's fees, or court costs, that may be incumed to satisfy this obligation.`
+      content: `I understand that dentistry is not an exact science and therefore, reputable practitioners cannot properly guarantee results. I hereby authorize any of the doctors to proceed with and perform the dental restorations and treatments as explained to me. I understand that this is only an estimate and subject to modification depending on unforeseen or undiagnosable circumstances that may arise during the course of treatment. I understand that I am responsible for payment of the dental fees. I agree to pay any attorney's fees, or court costs, that may be incurred to satisfy this obligation.`
     }
   };
 
@@ -291,7 +291,7 @@ export class ConsentFormComponent implements OnInit {
     return formData.patientName && formData.doctorName && formData.date;
   }
 
-  async uploadConsentForms(): Promise<void> {
+ async uploadConsentForms(): Promise<void> {
     const newFiles = this.uploadedForms.filter(form => form.file && !form.isExisting);
     
     if (newFiles.length === 0) {
@@ -299,6 +299,35 @@ export class ConsentFormComponent implements OnInit {
         severity: 'error',
         summary: 'Error',
         detail: 'Please select files to upload.'
+      });
+      return;
+    }
+
+    // Validate file sizes and types
+    const maxSizeInBytes = 5* 1024 * 1024; // 10MB in bytes
+    const invalidFiles = newFiles.filter(form => {
+      const file = form.file;
+      return file.size > maxSizeInBytes || file.type !== 'application/pdf';
+    });
+
+    if (invalidFiles.length > 0) {
+      const oversizedFiles = invalidFiles.filter(form => form.file.size > maxSizeInBytes);
+      const nonPdfFiles = invalidFiles.filter(form => form.file.type !== 'application/pdf');
+      
+      let errorMessage = '';
+      if (oversizedFiles.length > 0) {
+        const fileNames = oversizedFiles.map(form => form.file.name).join(', ');
+        errorMessage += `File(s) exceed 10MB limit: ${fileNames}. `;
+      }
+      if (nonPdfFiles.length > 0) {
+        const fileNames = nonPdfFiles.map(form => form.file.name).join(', ');
+        errorMessage += `Only PDF files are allowed: ${fileNames}.`;
+      }
+
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Invalid Files',
+        detail: errorMessage.trim()
       });
       return;
     }
