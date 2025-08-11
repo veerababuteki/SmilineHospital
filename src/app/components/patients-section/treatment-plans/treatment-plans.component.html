@@ -1,112 +1,175 @@
 <div class="appointments-container">
-    <div class="appointments-header">
-        <h2>TREATMENT PLANS</h2>
-        <div>
-            <!-- <button class="mark-btn" *ngIf="generateInvoiceList.length == 0">Invoice selected Procedure</button> -->
-            <!-- <button class="mark-btn-active" *ngIf="generateInvoiceList.length > 0" (click)="generateInvoice()">Invoice
+  <div class="appointments-header">
+    <h2>TREATMENT PLANS</h2>
+    <div>
+      <!-- <button class="mark-btn" *ngIf="generateInvoiceList.length == 0">Invoice selected Procedure</button> -->
+      <!-- <button class="mark-btn-active" *ngIf="generateInvoiceList.length > 0" (click)="generateInvoice()">Invoice
                 selected Procedure</button> -->
-            <button [class.mark-btn]="markCompleteList.length == 0"
-                [class.mark-btn-active]="markCompleteList.length > 0" (click)="markAsComplete()">Mark As
-                Complete</button>
-            <button class="add-treatment-btn" (click)="navigateToAddPage()">+ Add</button>
-        </div>
+      <button
+        [class.mark-btn]="markCompleteList.length == 0"
+        [class.mark-btn-active]="markCompleteList.length > 0"
+        (click)="markAsComplete()"
+      >
+        Mark As Complete
+      </button>
+      <button class="add-treatment-btn" (click)="navigateToAddPage()">
+        + Add
+      </button>
     </div>
-    <div id="treatment-plans-container">
+  </div>
+  <div id="treatment-plans-container">
     <ng-container *ngIf="getSortedDates().length > 0">
-        <div *ngFor="let date of getSortedDates()">
-            <div class="appointment-date">{{ date | date: 'dd MMM, yyyy'}}</div>
+      <div *ngFor="let date of getSortedDates()">
+        <div class="appointment-date">{{ date | date : "dd MMM, yyyy" }}</div>
 
-            <div class="treatment-plan"
-                *ngFor="let treatmentkey of getSortedTreatmentIds(treatmentPlans[date]) | keyvalue">
-                <table class="procedures-table">
-                    <thead>
-                        <tr>
-                            <th class="checkbox-col"></th>
-                            <th class="procedure-col">PROCEDURE</th>
-                            <th class="cost-col">COST</th>
-                            <th class="cost-col">QUANTITY</th>
-                            <th class="discount-col">DISCOUNT</th>
-                            <th class="total-col">TOTAL</th>
-                            <th class="notes-col">NOTES</th>
-                            <th class="actions-col hide-on-print"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let treatment of filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)">
-                            <td><input type="checkbox" class="procedure-checkbox"
-                                    [checked]="treatment.status?.toLowerCase() === 'completed'"
-                                    [(ngModel)]="treatment.isChecked"
-                                    [disabled]="treatment.status?.toLowerCase() === 'completed'"
-                                    (change)="onCheckboxChange(treatment, treatment.id, treatment.treatment_unique_id)">
-                            </td>
-                            <td>{{treatment.procedure_details.name}}</td>
-                            <td class="amount">{{treatment.cost}}</td>
-                            <td class="amount">{{treatment.quantity}}</td>
-                            <td class="discount">{{treatment.discount+" "+treatment.discount_formate}}</td>
-                            <td class="amount">{{treatment.total_cost}}</td>
-                            <td>
-                                <div>Teeth:
-                                    <span class="teeth-number" [pTooltip]="getFullTeethNumbers(treatment.teeth_set)">
-                                        {{getShortTeethNumbers(treatment.teeth_set)}}
-                                        <span *ngIf="hasMoreTeeth(treatment.teeth_set)" class="more-teeth">...</span>
-                                    </span>
-                                </div>
-                                <div>{{treatment.notes}}</div>
-                            </td>
-                            <td class="actions hide-on-print">
-                                <app-treatment-plans-print [treatmentPlan]="treatment"></app-treatment-plans-print>
-                                <button
-                                  #menuButton
-                                  type="button"
-                                  pButton
-                                  icon="pi pi-chevron-down"
-                                  class="edit-btn border-right-radius p-button-text"
-                                  (click)="invoiceMenu.toggle($event); setCurrentTreatmentPlan(treatmentPlans[date],treatmentkey.value)">
-                                </button>
-                                <p-menu #invoiceMenu [popup]="true" [model]="items"></p-menu>
-                                
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div
+          class="treatment-plan"
+          *ngFor="
+            let treatmentkey of getSortedTreatmentIds(treatmentPlans[date])
+              | keyvalue
+          "
+        >
+          <table class="procedures-table">
+            <thead>
+              <tr>
+                <th class="checkbox-col"></th>
+                <th class="procedure-col">PROCEDURE</th>
+                <th class="cost-col">COST</th>
+                <th class="cost-col">QUANTITY</th>
+                <th class="discount-col">DISCOUNT</th>
+                <th class="total-col">TOTAL</th>
+                <th class="notes-col">NOTES</th>
+                <th class="actions-col hide-on-print"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="
+                  let treatment of filterRowsByTreatment(
+                    treatmentPlans[date],
+                    treatmentkey.value
+                  )
+                "
+              >
+                <td>
+                  <input
+                    type="checkbox"
+                    class="procedure-checkbox"
+                    [checked]="treatment.status?.toLowerCase() === 'completed'"
+                    [(ngModel)]="treatment.isChecked"
+                    [disabled]="treatment.status?.toLowerCase() === 'completed'"
+                    (change)="
+                      onCheckboxChange(
+                        treatment,
+                        treatment.id,
+                        treatment.treatment_unique_id
+                      )
+                    "
+                  />
+                </td>
+                <td>{{ treatment.procedure_details.name }}</td>
+                <td class="amount">{{ treatment.cost }}</td>
+                <td class="amount">{{ treatment.quantity }}</td>
+                <td class="discount">
+                  {{ treatment.discount + " " + treatment.discount_formate }}
+                </td>
+                <td class="amount">{{ treatment.total_cost | number : '1.2-2'}}</td>
+                <td>
+                  <div>
+                    Teeth:
+                    <span
+                      class="teeth-number"
+                      [pTooltip]="getFullTeethNumbers(treatment.teeth_set)"
+                    >
+                      {{ getShortTeethNumbers(treatment.teeth_set) }}
+                      <span
+                        *ngIf="hasMoreTeeth(treatment.teeth_set)"
+                        class="more-teeth"
+                        >...</span
+                      >
+                    </span>
+                  </div>
+                  <div>{{ treatment.notes }}</div>
+                </td>
+                <td class="actions hide-on-print">
+                  <app-treatment-plans-print
+                    [treatmentPlan]="treatment"
+                  ></app-treatment-plans-print>
+                  <button
+                    #menuButton
+                    type="button"
+                    pButton
+                    icon="pi pi-chevron-down"
+                    class="edit-btn border-right-radius p-button-text"
+                    (click)="
+                      invoiceMenu.toggle($event);
+                      setCurrentTreatmentPlan(
+                        treatmentPlans[date],
+                        treatmentkey.value
+                      )
+                    "
+                  ></button>
+                  <p-menu #invoiceMenu [popup]="true" [model]="items"></p-menu>
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
-                <div class="plan-footer">
-                    <div class="planned-by">
-                        Planned by <span class="doctor-name">{{"Dr. " +
-                            filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)[0]?.doctor_details_treat.user_profile_details[0].first_name
-                            +" "+
-                            filterRowsByTreatment(treatmentPlans[date],treatmentkey.value)[0].doctor_details_treat.user_profile_details[0].last_name}}</span>
-                    </div>
-                    <div class="estimated-amount">
-                        Estimated amount: <span
-                            class="amount">{{getTotalCost(treatmentPlans[date])}}</span>
-                    </div>
-                </div>
+          <div class="plan-footer">
+            <div class="planned-by">
+              Planned by
+              <span class="doctor-name">{{
+                "Dr. " +
+                  filterRowsByTreatment(
+                    treatmentPlans[date],
+                    treatmentkey.value
+                  )[0]?.doctor_details_treat.user_profile_details[0]
+                    .first_name +
+                  " " +
+                  filterRowsByTreatment(
+                    treatmentPlans[date],
+                    treatmentkey.value
+                  )[0].doctor_details_treat.user_profile_details[0].last_name
+              }}</span>
             </div>
-            <div>
-
+            <div class="estimated-amount">
+              Estimated amount:
+              <!-- <span class="amount">{{getTotalCost(treatmentPlans[date])}}</span> -->
+              <!-- <span class="amount">{{treatment.total_cost}}</span> -->
+              <span class="amount">
+                {{
+                  getGroupTotal(
+                    filterRowsByTreatment(
+                      treatmentPlans[date],
+                      treatmentkey.value
+                    )
+                  )
+                }}
+              </span>
             </div>
-
+          </div>
         </div>
+        <div></div>
+      </div>
     </ng-container>
-    </div>
-    <div class="no-treatment-plan-container" *ngIf="getSortedDates().length <= 0">
-        <img class="icon" src="assets/no-treatment-plans.png" />
-        <h3>No Treatment plans added</h3>
+  </div>
+  <div class="no-treatment-plan-container" *ngIf="getSortedDates().length <= 0">
+    <img class="icon" src="assets/no-treatment-plans.png" />
+    <h3>No Treatment plans added</h3>
 
-        <button class="add-treatment-btn" (click)="navigateToAddPage()">+ Add</button>
-    </div>
+    <button class="add-treatment-btn" (click)="navigateToAddPage()">
+      + Add
+    </button>
+  </div>
 
-
-    
-<!-- ✅ Consent Form Dialog at the bottom -->
-<p-dialog 
-  header="Consent Form"
-  [(visible)]="consentFormVisible"
-  [modal]="true"
-  [closable]="true"
-  [style]="{ width: '50vw' }">
-
-  <app-consent-form [treatment]="selectedConsentTreatment"></app-consent-form>
-
-</p-dialog>
+  <!-- ✅ Consent Form Dialog at the bottom -->
+  <p-dialog
+    header="Consent Form"
+    [(visible)]="consentFormVisible"
+    [modal]="true"
+    [closable]="true"
+    [style]="{ width: '50vw' }"
+  >
+    <app-consent-form [treatment]="selectedConsentTreatment"></app-consent-form>
+  </p-dialog>
+</div>
