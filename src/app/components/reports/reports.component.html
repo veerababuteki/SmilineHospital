@@ -201,9 +201,14 @@
             <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
                 <tr>
                     <td *ngFor="let col of detailsColumns">
-                        <span *ngIf="col.field === 'cost' || col.field === 'discount' || col.field === 'tax' || col.field === 'invoiceAmount' || col.field === 'amountPaid' || col.field === 'amount' || col.field === 'dueAmount'">
-                            {{ rowData[col.field] | currency:'INR':'symbol':'1.2-2' }}
-                        </span>
+                       <span *ngIf="col.field === 'cost' || col.field === 'discount' || col.field === 'tax' || col.field === 'invoiceAmount' || col.field === 'amountPaid' || col.field === 'amount' || col.field === 'dueAmount'">
+                    <ng-container *ngIf="col.field === 'discount'; else inrFormat">
+                        {{ rowData[col.field] | number:'1.2-2' }}%
+                    </ng-container>
+                    <ng-template #inrFormat>
+                        {{ rowData[col.field] | currency:'INR':'symbol':'1.2-2' }}
+                    </ng-template>
+                    </span>
                         <span *ngIf="col.field !== 'cost' && col.field !== 'discount' && col.field !== 'tax' && col.field !== 'invoiceAmount' && col.field !== 'amountPaid' && col.field !== 'amount' && col.field !== 'dueAmount'">
                             {{ rowData[col.field] }}
                         </span>
