@@ -81,7 +81,24 @@ import { Router } from '@angular/router';
                 <span class="dot"> </span>
                 <span>{{ event.extendedProps?.age || '' }} </span>
               </div>
-             <!-- <div class="show-balance">Show Balance</div> -->
+            <div 
+            class="show-balance" 
+            (click)="event.showBalance = !event.showBalance" 
+            [ngStyle]="{
+              'color': event.showBalance 
+                        ? (event.extendedProps?.availableAdvance == 0 ? 'red' : 'green') 
+                        : '#1a9ccf',
+              'opacity': event.showBalance && event.extendedProps?.availableAdvance == 0 ? 0.6 : 1,
+              'display': 'inline-block',
+              'width': '110px', 
+              'text-align': 'left'
+            }">
+            {{ event.showBalance 
+                ? (event.extendedProps?.availableAdvance == 0 
+                      ? 'INR 0.00' 
+                      : ('INR ' + event.extendedProps?.availableAdvance)) 
+                : 'Show Balance' }}
+          </div>
             </div>
           </div>
           <div>
@@ -97,7 +114,11 @@ import { Router } from '@angular/router';
           </div>
           <div class="info-item not-available">
             <i class="pi pi-envelope"></i>
-            {{event.extendedProps?.email}}
+            <span [ngClass]="{'text-muted': !event.extendedProps?.email}">
+          {{ event.extendedProps?.email && event.extendedProps?.email.trim() !== '' 
+            ? event.extendedProps.email 
+            : 'No email provided' }}
+        </span>
           </div>
           <div class="info-item token-info">
             <i class="pi pi-ticket"></i>
