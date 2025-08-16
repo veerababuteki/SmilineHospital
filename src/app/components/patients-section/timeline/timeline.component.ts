@@ -128,4 +128,15 @@ export class TimelineComponent implements OnInit {
   hasEvents(): boolean {
     return Object.keys(this.timeline).length > 0;
   }
+
+
+  hasAnyClinicalData(item: any): boolean {
+  return (
+    (item.chief_complaints && item.chief_complaints.trim()) ||
+    (item.observations && item.observations.trim()) ||
+    (item.investigations && item.investigations.trim()) ||
+    (item.diagnoses && item.diagnoses.trim()) ||
+    (item.notes && item.notes.trim())
+  );
+}
 }

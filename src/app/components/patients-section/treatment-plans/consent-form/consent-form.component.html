@@ -1,4 +1,4 @@
-<!-- consent-form.component.html -->
+<!-- Updated consent-form.component.html -->
 <p-toast></p-toast>
 <div class="consent-form-container">
   <div class="dialog-header">
@@ -39,16 +39,7 @@
               class="form-control"
               placeholder="Enter patient name">
           </div>
-          <div class="form-group">
-            <label for="date">Date:</label>
-            <input 
-              type="date" 
-              id="date" 
-              formControlName="date"
-              class="form-control">
-          </div>
-        </div>
-        <div class="form-group">
+           <div class="form-group">
           <label for="doctorName">Doctor's Name:</label>
           <input 
             type="text" 
@@ -57,6 +48,17 @@
             class="form-control"
             placeholder="Enter doctor's name">
         </div>
+        </div>
+       
+        <div class="form-group">
+            <!-- <label for="date">Date:</label> -->
+            <input 
+              type="date" 
+              id="date" 
+              formControlName="date"
+              hidden
+              class="form-control">
+          </div>
       </div>
 
       <!-- Consent Sections -->
@@ -118,6 +120,16 @@
 
     <!-- File Upload Section -->
     <div class="upload-section">
+      <!-- Loading indicator -->
+      <div *ngIf="isLoadingExistingForms" class="loading-message">
+        <p>Loading consent forms...</p>
+      </div>
+
+      <!-- No consent forms message -->
+      <div *ngIf="shouldShowNoConsentMessage()" class="no-consent-message">
+        <p><strong>No signed Consent form available</strong></p>
+      </div>
+
       <!-- Only show upload area if not in view-only mode -->
       <div class="upload-area" *ngIf="!viewOnly">
         <input 
@@ -143,7 +155,7 @@
       </div>
 
       <!-- Uploaded Files List -->
-      <div class="uploaded-files" *ngIf="uploadedForms.length > 0">
+      <div class="uploaded-files" *ngIf="uploadedForms.length > 0 && !shouldShowNoConsentMessage()">
         <h4 *ngIf="!viewOnly">Consent Forms:</h4>
         <div class="file-list">
           <div *ngFor="let file of uploadedForms; let i = index" class="file-item">
@@ -152,20 +164,26 @@
               <span class="upload-date">{{ file.uploadDate | date:'short' }}</span>
               <span class="file-status" *ngIf="file.isExisting">✓ Uploaded</span>
             </div>
-                              <div class="file-actions">
-                    <button 
-                      class="btn btn-primary btn-sm" 
-                      *ngIf="file.file_path"
-                      (click)="downloadConsentForm(file.file_path, file.name)">
-                      Download
-                    </button>
-                    <button 
-                      class="btn btn-danger btn-sm" 
-                      *ngIf="!file.isExisting"
-                      (click)="removeUploadedForm(i)">
-                      Remove
-                    </button>
-                  </div>
+            <div class="file-actions">
+              <button 
+                class="btn btn-primary btn-sm" 
+                *ngIf="file.file_path"
+                (click)="downloadConsentForm(file.file_path, file.name)">
+                Download
+              </button>
+              <button 
+                class="btn btn-danger btn-sm" 
+                *ngIf="!file.isExisting"
+                (click)="removeUploadedForm(i)">
+                Remove
+              </button>
+              <button 
+                class="btn btn-danger btn-sm" 
+                *ngIf="file.isExisting && !viewOnly"
+                (click)="deleteConsentForm(file.id)">
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       </div>

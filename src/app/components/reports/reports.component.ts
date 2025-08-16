@@ -56,7 +56,7 @@ export class ReportsComponent implements OnInit {
     toDate: Date = new Date();
     
     // Sample data for demonstration
-    summaryData: any = {};
+    summaryData: any = {totalPatients: 0};
     detailsData: any[] = [];
     detailsColumns: any[] = [];
 
@@ -211,65 +211,151 @@ export class ReportsComponent implements OnInit {
         }
     }
 
+    // private loadInvoicesData() {
+    //     this.reportsService.getInvoices(this.fromDate, this.toDate, this.selectedPractice.branch_id).subscribe(res => {
+    //         const summary = res.data.summary;
+    //         const data = res.data.data;
+    //         this.summaryData = {
+    //             cost: summary.cost,
+    //             discount: summary.discount,
+    //             incomeAfterDiscount: summary.income_after_discount,
+    //             tax: 0.00,
+    //             invoiceAmount: summary.invoice_amount
+    //         };
+
+    //         this.detailsColumns = [
+    //             { field: 'sNo', header: 'S.No.' },
+    //             { field: 'date', header: 'Date' },
+    //             { field: 'invoiceNumber', header: 'Invoice Number' },
+    //             { field: 'patient', header: 'Patient' },
+    //             { field: 'treatments', header: 'Treatments & Products' },
+    //             { field: 'cost', header: 'Cost (INR)' },
+    //             { field: 'discount', header: 'Discount (INR)' },
+    //             { field: 'tax', header: 'Tax (INR)' },
+    //             { field: 'invoiceAmount', header: 'Invoice Amount (INR)' },
+    //             { field: 'amountPaid', header: 'Amount Paid (INR)' }
+    //         ];
+    //         this.detailsData = [];
+
+    //         const sortedData = data.sort(
+    //             (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    //             );
+                
+    //         sortedData.forEach((inv: any, index: number) =>{
+    //             this.detailsData.push({
+    //                 sNo: index + 1,
+    //                 date: new Date(inv.date).toLocaleDateString('en-GB', {
+    //                   day: '2-digit',
+    //                   month: 'short',
+    //                   year: 'numeric'
+    //                 }),
+    //                 invoiceNumber: inv.invoice_number,
+    //                 patient: inv.patient,
+    //                 treatments: inv.treatments_products,
+    //                 cost: inv.cost,
+    //                 discount: inv.discount,
+    //                 tax: 0.00,
+    //                 invoiceAmount: inv.invoice_amount,
+    //                 amountPaid: inv.amount_paid
+    //             })
+    //         })
+    //     });
+    // }
     private loadInvoicesData() {
-        this.reportsService.getInvoices(this.fromDate, this.toDate, this.selectedPractice.branch_id).subscribe(res => {
-            const summary = res.data.summary;
-            const data = res.data.data;
-            this.summaryData = {
-                cost: summary.cost,
-                discount: summary.discount,
-                incomeAfterDiscount: summary.income_after_discount,
-                tax: 0.00,
-                invoiceAmount: summary.invoice_amount
-            };
+    this.reportsService.getInvoices(this.fromDate, this.toDate, this.selectedPractice.branch_id).subscribe(res => {
+        const data = res.data.data;
+        
+        // Initialize summary totals
+        let totalCost = 0;
+        let totalDiscount = 0;
+        let totalIncomeAfterDiscount = 0;
+        let totalTax = 0;
+        let totalInvoiceAmount = 0;
+        let totalAmountPaid = 0;
 
-            this.detailsColumns = [
-                { field: 'sNo', header: 'S.No.' },
-                { field: 'date', header: 'Date' },
-                { field: 'invoiceNumber', header: 'Invoice Number' },
-                { field: 'patient', header: 'Patient' },
-                { field: 'treatments', header: 'Treatments & Products' },
-                { field: 'cost', header: 'Cost (INR)' },
-                { field: 'discount', header: 'Discount (INR)' },
-                { field: 'tax', header: 'Tax (INR)' },
-                { field: 'invoiceAmount', header: 'Invoice Amount (INR)' },
-                { field: 'amountPaid', header: 'Amount Paid (INR)' }
-            ];
-            this.detailsData = [];
+        this.detailsColumns = [
+            { field: 'sNo', header: 'S.No.' },
+            { field: 'date', header: 'Date' },
+            { field: 'invoiceNumber', header: 'Invoice Number' },
+            { field: 'patient', header: 'Patient' },
+            { field: 'treatments', header: 'Treatments & Products' },
+            { field: 'cost', header: 'Cost (INR)' },
+            { field: 'discount', header: 'Discount (INR)' },
+            { field: 'tax', header: 'Tax (INR)' },
+            { field: 'invoiceAmount', header: 'Invoice Amount (INR)' },
+            { field: 'amountPaid', header: 'Amount Paid (INR)' }
+        ];
+        
+        this.detailsData = [];
 
+        if (data && data.length > 0) {
             const sortedData = data.sort(
                 (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
-                );
-                
-            sortedData.forEach((inv: any, index: number) =>{
+            );
+            
+            sortedData.forEach((inv: any, index: number) => {
+                // Convert string values to numbers for calculation
+                const cost = parseFloat(inv.cost) || 0;
+                const discount = parseFloat(inv.discount) || 0;
+                const tax = 0.00; // As you're setting this to 0
+                const invoiceAmount = parseFloat(inv.invoice_amount) || 0;
+                const amountPaid = parseFloat(inv.amount_paid) || 0;
+                const incomeAfterDiscount = cost - discount;
+
+                // Add to running totals
+                totalCost += cost;
+                totalDiscount += discount;
+                totalIncomeAfterDiscount += incomeAfterDiscount;
+                totalTax += tax;
+                totalInvoiceAmount += invoiceAmount;
+                totalAmountPaid += amountPaid;
+
                 this.detailsData.push({
                     sNo: index + 1,
                     date: new Date(inv.date).toLocaleDateString('en-GB', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric'
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
                     }),
                     invoiceNumber: inv.invoice_number,
                     patient: inv.patient,
                     treatments: inv.treatments_products,
-                    cost: inv.cost,
-                    discount: inv.discount,
-                    tax: 0.00,
-                    invoiceAmount: inv.invoice_amount,
-                    amountPaid: inv.amount_paid
-                })
-            })
-        });
-    }
+                    cost: cost.toFixed(2),
+                    discount: discount.toFixed(2),
+                    tax: tax.toFixed(2),
+                    invoiceAmount: invoiceAmount.toFixed(2),
+                    amountPaid: amountPaid.toFixed(2)
+                });
+            });
+        }
+
+        // Set summary data based on calculated totals from detail rows
+        this.summaryData = {
+            cost: totalCost.toFixed(2),
+            discount: totalDiscount.toFixed(2),
+            incomeAfterDiscount: totalIncomeAfterDiscount.toFixed(2),
+            tax: totalTax.toFixed(2),
+            invoiceAmount: totalInvoiceAmount.toFixed(2),
+            amountPaid: totalAmountPaid.toFixed(2) // Added this for completeness
+        };
+
+        console.log('Summary Data:', this.summaryData);
+        console.log('Details Data Count:', this.detailsData.length);
+    });
+}
 
     private loadPaymentsData() {
         this.reportsService.getPayments(this.fromDate, this.toDate, this.selectedPractice.branch_id).subscribe(res => {
             const summary = res.data.summary;
             const data = res.data.data;
             this.summaryData = {
+                
                 totalPayments: summary.total_payment,
                 totalAdvance: summary.total_advance,
+                
             };
+            console.log(this.summaryData.totalPayments);
+
             this.detailsColumns = [
                 { field: 'sNo', header: 'S.No.' },
                 { field: 'date', header: 'Inovice Date' },
@@ -380,41 +466,43 @@ export class ReportsComponent implements OnInit {
         });
     }
 
-    private loadPatientsData() {
-        this.reportsService.getPatients(this.fromDate, this.toDate, this.selectedPractice.branch_id).subscribe(res => {
-            const summary = res.data.total;
-            const data = res.data.data;
-            this.summaryData = {
-                totalPatients: summary.count,
-            };
-            this.detailsColumns = [
-                { field: 'sNo', header: 'S.No.' },
-                { field: 'date', header: 'Date' },
-                { field: 'name', header: 'Name' },
-                { field: 'patientNumber', header: 'Patient Number' },
-            ];
-            this.detailsData = [];
-            if(data == undefined || data.length == 0){
-                this.detailsData = [];
-            }
-            const sortedData = data.sort(
-            (a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-            );
-            
-            sortedData.forEach((app: any, index: number) => {
-                this.detailsData.push({
-                    sNo: index + 1,
-                    date: new Date(app.created_at,).toLocaleDateString('en-GB', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric'
-                    }),
-                    name: app.full_name,
-                    patientNumber: app.manual_unique_code,
-                });
-            })
-        });
-    }
+    
+   private loadPatientsData() {
+  this.reportsService
+    .getPatients(this.fromDate, this.toDate, this.selectedPractice.branch_id)
+    .subscribe(res => {
+      const summary = res.data.total || {};
+      const data = res.data.data || [];
+
+      // ✅ Just update the property directly
+      this.summaryData.totalPatients = summary.count || 0;
+      console.log(this.summaryData);
+
+      this.detailsColumns = [
+        { field: 'sNo', header: 'S.No.' },
+        { field: 'date', header: 'Date' },
+        { field: 'name', header: 'Name' },
+        { field: 'patientNumber', header: 'Patient Number' },
+      ];
+
+      const sortedData = data.sort(
+        (a: any, b: any) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+
+      this.detailsData = sortedData.map((app: any, index: number) => ({
+        sNo: index + 1,
+        date: new Date(app.created_at).toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        }),
+        name: app.full_name,
+        patientNumber: app.manual_unique_code
+      }));
+    });
+}
+
 
     private loadEMRData() {
         this.reportsService.getEMR(this.fromDate, this.toDate, this.selectedPractice.branch_id).subscribe(res => {
@@ -452,9 +540,9 @@ export class ReportsComponent implements OnInit {
         });
     }
 
-    printReport() {
-        window.print();
-    }
+    // printReport() {
+    //     window.print();
+    // }
 
     sendNotification() {
         // Implement send notification functionality
@@ -471,4 +559,399 @@ export class ReportsComponent implements OnInit {
             this.branchesSubscription.unsubscribe();
         }
     }
-}
+
+    printReport() {
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    
+    if (!printWindow) {
+        this.snackBar.open('Unable to open print window. Please check your browser settings.', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['error-snackbar']
+        });
+        return;
+    }
+
+    const printContent = this.generatePrintContent();
+    
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <title>Report - ${this.selectedReportCategory?.label}</title>
+        <style>
+            ${this.getPrintStyles()}
+        </style>
+        </head>
+        <body>
+        ${printContent}
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+    
+    // Wait for content to load then print
+    printWindow.onload = () => {
+        setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+        }, 250);
+    };
+    }
+
+    private generatePrintContent(): string {
+    const currentDate = new Date().toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    });
+    
+    const dateRange = this.showDatePickers() ? 
+        `From: ${this.fromDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} 
+        To: ${this.toDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}` 
+        : '';
+
+    let summaryHtml = this.generateSummaryHtml();
+    let detailsHtml = this.generateDetailsHtml();
+
+    return `
+        <div class="print-header">
+        <h1>Reports</h1>
+        <div class="report-info">
+            <p><strong>Practice:</strong> ${this.selectedPractice?.branch_name || 'N/A'}</p>
+            <p><strong>Report Type:</strong> ${this.selectedReportCategory?.label || 'N/A'}</p>
+            ${dateRange ? `<p><strong>Period:</strong> ${dateRange}</p>` : ''}
+            <p><strong>Generated on:</strong> ${currentDate}</p>
+        </div>
+        </div>
+
+        <div class="print-summary">
+        <h2>Summary</h2>
+        ${summaryHtml}
+        </div>
+
+        <div class="print-details">
+        <h2>Details</h2>
+        ${detailsHtml}
+        </div>
+    `;
+    }
+
+    private generateSummaryHtml(): string {
+    const categoryValue = this.selectedReportCategory?.value;
+    
+    switch (categoryValue) {
+        case 'invoices':
+        return `
+            <div class="summary-grid">
+            <div class="summary-row">
+                <span class="label">Cost (INR):</span>
+                <span class="value">${this.formatCurrency(this.summaryData.cost)}</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Discount (INR):</span>
+                <span class="value">${this.formatCurrency(this.summaryData.discount)}</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Income after Discount (INR):</span>
+                <span class="value">${this.formatCurrency(this.summaryData.incomeAfterDiscount)}</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Tax (INR):</span>
+                <span class="value">₹0.00</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Invoice Amount (INR):</span>
+                <span class="value">${this.formatCurrency(this.summaryData.invoiceAmount)}</span>
+            </div>
+            </div>
+        `;
+        
+        case 'payments':
+        return `
+            <div class="summary-grid">
+            <div class="summary-row">
+                <span class="label">Total Payments (INR):</span>
+                <span class="value">${this.formatCurrency(this.summaryData.totalPayments)}</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Total Advance Payment (INR):</span>
+                <span class="value">${this.formatCurrency(this.summaryData.totalAdvance)}</span>
+            </div>
+            </div>
+        `;
+        
+        case 'appointments':
+        return `
+            <div class="summary-grid">
+            <div class="summary-row">
+                <span class="label">Total Appointments:</span>
+                <span class="value">${this.summaryData.totalAppointments}</span>
+            </div>
+            </div>
+        `;
+        
+        case 'amount_due':
+        return `
+            <div class="summary-grid">
+            <div class="summary-row">
+                <span class="label">Total Amount Due (INR):</span>
+                <span class="value">${this.formatCurrency(this.summaryData.totalAmountDue)}</span>
+            </div>
+            </div>
+        `;
+        
+        case 'patients':
+        return `
+            <div class="summary-grid">
+            <div class="summary-row">
+                <span class="label">Total Patients:</span>
+                <span class="value">${this.summaryData.totalPatients}</span>
+            </div>
+            </div>
+        `;
+        
+        case 'emr':
+        return `
+            <div class="summary-grid">
+            <div class="summary-row">
+                <span class="label">Total Treatments:</span>
+                <span class="value">${this.summaryData.totalTreatments}</span>
+            </div>
+            </div>
+        `;
+        
+        default:
+        return '<p>No summary data available.</p>';
+    }
+    }
+
+    private generateDetailsHtml(): string {
+    if (!this.detailsData || this.detailsData.length === 0) {
+        return '<p>No detail data available for the selected report filters.</p>';
+    }
+
+    let tableHtml = '<table class="details-table">';
+    
+    // Table header
+    tableHtml += '<thead><tr>';
+    this.detailsColumns.forEach(col => {
+        tableHtml += `<th>${col.header}</th>`;
+    });
+    tableHtml += '</tr></thead>';
+    
+    // Table body
+    tableHtml += '<tbody>';
+    this.detailsData.forEach(row => {
+        tableHtml += '<tr>';
+        this.detailsColumns.forEach(col => {
+        let cellValue = row[col.field] || '';
+        
+        // Format currency fields
+        if (this.isCurrencyField(col.field)) {
+            cellValue = this.formatCurrency(cellValue);
+        }
+        
+        tableHtml += `<td>${cellValue}</td>`;
+        });
+        tableHtml += '</tr>';
+    });
+    tableHtml += '</tbody>';
+    
+    tableHtml += '</table>';
+    return tableHtml;
+    }
+
+    private isCurrencyField(fieldName: string): boolean {
+    const currencyFields = [
+        'cost', 'discount', 'tax', 'invoiceAmount', 'amountPaid', 
+        'amountDue', 'lastInvoice', 'lastPayment', 'advanceAmount'
+    ];
+    return currencyFields.includes(fieldName);
+    }
+
+    private formatCurrency(value: any): string {
+    if (value === null || value === undefined || value === '') {
+        return '₹0.00';
+    }
+    return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(Number(value));
+    }
+
+    private getPrintStyles(): string {
+    return `
+        * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        }
+
+        body {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        line-height: 1.4;
+        color: #333;
+        max-width: 100%;
+        margin: 0;
+        padding: 20px;
+        }
+
+        .print-header {
+        text-align: center;
+        margin-bottom: 8px;
+        border-bottom: 2px solid #333;
+        padding-bottom: 8px;
+        }
+
+        .print-header h1 {
+        font-size: 24px;
+        margin-bottom: 10px;
+        color: #333;
+        }
+
+        .report-info {
+        text-align: left;
+        display: inline-block;
+        }
+
+        .report-info p {
+        margin: 3px 0;
+        font-size: 14px;
+        }
+
+        .print-summary, .print-details {
+        margin-bottom: 15px;
+        }
+
+        .print-summary h2, .print-details h2 {
+        font-size: 18px;
+        margin-bottom: 8px;
+        color: #333;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 3px;
+        }
+
+        .summary-grid {
+        display: table;
+        width: 100%;
+        border-collapse: collapse;
+        }
+
+        .summary-row {
+        display: table-row;
+        border-bottom: 1px solid #eee;
+        }
+
+        .summary-row .label, .summary-row .value {
+        display: table-cell;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        }
+
+        .summary-row .label {
+        font-weight: bold;
+        background-color: #f5f5f5;
+        width: 60%;
+        }
+
+        .summary-row .value {
+        text-align: right;
+        font-weight: bold;
+        width: 40%;
+        }
+
+        .details-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+        }
+
+        .details-table th {
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        padding: 8px 6px;
+        text-align: left;
+        font-weight: bold;
+        font-size: 11px;
+        }
+
+        .details-table td {
+        border: 1px solid #ddd;
+        padding: 6px;
+        font-size: 10px;
+        word-wrap: break-word;
+        }
+
+        .details-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+        }
+
+        .details-table tr:hover {
+        background-color: #f5f5f5;
+        }
+
+        /* Specific column widths for better layout */
+        .details-table th:first-child,
+        .details-table td:first-child {
+        width: 40px;
+        text-align: center;
+        }
+
+        /* Currency columns */
+        .details-table td:nth-last-child(-n+5) {
+        text-align: right;
+        }
+
+        @media print {
+        body {
+            margin: 0;
+            padding: 15px;
+        }
+
+        .print-header {
+            page-break-after: avoid;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+        }
+
+        .print-summary {
+            page-break-before: avoid;
+            page-break-after: avoid;
+            margin-bottom: 10px;
+        }
+
+        .print-summary h2,
+        .print-details h2 {
+            margin-bottom: 5px;
+            padding-bottom: 2px;
+        }
+
+        /* Allow table to break across pages */
+        .details-table {
+            page-break-inside: auto;
+        }
+
+        /* Keep header repeated on every page */
+        .details-table thead {
+            display: table-header-group;
+        }
+
+        /* Prevent row split */
+        .details-table tr {
+            page-break-inside: avoid;
+        }
+        }
+
+        @page {
+        margin: 1cm;
+        size: A4;
+        }
+    `;
+    }}

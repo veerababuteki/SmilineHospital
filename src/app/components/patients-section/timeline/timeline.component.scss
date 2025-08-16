@@ -294,3 +294,93 @@
   max-width: 100%;
   border-radius: 4px;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+/* Add these styles to your timeline.component.scss file */
+
+.clinical-notes-content {
+  padding: 8px 0;
+}
+
+.doctor-info {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border-left: 3px solid #007bff;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.clinical-field {
+  margin-bottom: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.clinical-field:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.field-label {
+  margin-bottom: 4px;
+  color: #495057;
+  font-size: 13px;
+}
+
+.field-content {
+  color: #212529;
+  font-size: 14px;
+  line-height: 1.4;
+  padding-left: 8px;
+}
+
+.no-data-message {
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  padding: 16px;
+}
+
+.event-time {
+  font-size: 12px;
+  color: #6c757d;
+  margin-left: auto;
+}
+
+.event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Optional: Add different styling for each field type */
+.clinical-field.complaints .field-label {
+  color: #dc3545;
+}
+
+.clinical-field.observations .field-label {
+  color: #28a745;
+}
+
+.clinical-field.investigations .field-label {
+  color: #ffc107;
+}
+
+.clinical-field.diagnoses .field-label {
+  color: #17a2b8;
+}
+
+.clinical-field.notes .field-label {
+  color: #6f42c1;
+}

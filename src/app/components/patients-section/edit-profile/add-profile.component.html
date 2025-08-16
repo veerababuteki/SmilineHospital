@@ -144,7 +144,7 @@
                       Primary Mobile No. :
                     </div>
                     <div class="form-field">
-                      <input pInputText type="number" formControlName="primaryMobile">
+                      <input pInputText type="number" min="0" formControlName="primaryMobile" class="primaryMobile-number">
                       <div class="validation-error" *ngIf="patientForm.get('primaryMobile')?.invalid && patientForm.get('primaryMobile')?.touched">
                         <span *ngIf="patientForm.get('primaryMobile')?.errors?.['required']">Mobile number is required</span>
                         <span *ngIf="patientForm.get('primaryMobile')?.errors?.['pattern']">Please enter a valid 10-digit mobile number</span>

@@ -8,6 +8,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { LoaderService } from '../../services/loader.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @Component({
@@ -43,7 +44,7 @@ export class LoginComponent implements OnInit {
   
   // Forgot Password related properties
   isForgotPassword = false;
-  forgotPasswordStep: 'mobile' | 'otp' | 'reset' = 'mobile';
+  forgotPasswordStep: 'mobile' | 'otp' | 'reset' = 'mobile'; 
   forgotPasswordOtpSent = false;
   showNewPassword = false;
   showConfirmPassword = false;
@@ -51,6 +52,7 @@ export class LoginComponent implements OnInit {
   constructor(private formBuilder: FormBuilder,
     private authService: AuthService, 
     private messageService: MessageService,
+    private loaderService: LoaderService,
     private router: Router) {
     this.maxDate.setFullYear(this.maxDate.getFullYear()); // Set minimum age to 18
   }
@@ -279,32 +281,66 @@ export class LoginComponent implements OnInit {
     }
   }
 
+  // onSubmit() {
+  //   if (this.registrationForm.valid) {
+  //     var formData = this.registrationForm.value;
+  //     this.authService.registerUser({
+  //       firstName: formData.firstName,
+  //       lastName: formData.lastName,
+  //       email: formData.email,
+  //       password: formData.password,
+  //       mobileNumber: formData.mobileNumber,
+  //       roleID: formData.isDoctor ? 'bce9f008-d447-4fe2-a29e-d58d579534f0' : '2ac7787b-77d1-465b-9bc0-eee50933697f'
+  //     }).subscribe({
+  //       next: (response) => {
+  //         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Registered Successfully' });
+  //         setTimeout(() => {
+  //           window.location.reload();
+  //         }, 2000);
+  //       },
+  //       error: (error) =>{
+  //         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'User registration failed!' });
+  //         console.error('User registration failed:', error)
+  //       } 
+  //     });
+  //   } else {
+  //     this.markFormGroupTouched(this.registrationForm);
+  //   }
+  // }
+
   onSubmit() {
-    if (this.registrationForm.valid) {
-      var formData = this.registrationForm.value;
-      this.authService.registerUser({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        password: formData.password,
-        mobileNumber: formData.mobileNumber,
-        roleID: formData.isDoctor ? 'bce9f008-d447-4fe2-a29e-d58d579534f0' : '2ac7787b-77d1-465b-9bc0-eee50933697f'
-      }).subscribe({
-        next: (response) => {
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Registered Successfully' });
-          setTimeout(() => {
-            window.location.reload();
-          }, 2000);
-        },
-        error: (error) =>{
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'User registration failed!' });
-          console.error('User registration failed:', error)
-        } 
-      });
-    } else {
-      this.markFormGroupTouched(this.registrationForm);
-    }
+  if (this.registrationForm.valid) {
+    // Show loader before making the API call
+    this.loaderService.show();
+    
+    var formData = this.registrationForm.value;
+    this.authService.registerUser({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      password: formData.password,
+      mobileNumber: formData.mobileNumber,
+      roleID: formData.isDoctor ? 'bce9f008-d447-4fe2-a29e-d58d579534f0' : '2ac7787b-77d1-465b-9bc0-eee50933697f'
+    }).subscribe({
+      next: (response) => {
+        // Hide loader on success
+        this.loaderService.hide();
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Registered Successfully' });
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      },
+      error: (error) => {
+        // Hide loader on error
+        this.loaderService.hide();
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'User registration failed!' });
+        console.error('User registration failed:', error);
+      } 
+    });
+  } else {
+    this.markFormGroupTouched(this.registrationForm);
   }
+}
 
   // Forgot Password Methods
   onForgotPasswordClick() {

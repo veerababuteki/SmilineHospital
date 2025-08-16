@@ -8,6 +8,9 @@
       <!-- Left: Schedule Table (Wrapped for Printing) -->
       <div id="appointments-container" class="schedule" [ngClass]="getFontSizeClass()">
         <div class="schedule-header">
+          
+          <!-- <h2 style="text-align: center;"> {{currentPractice}}</h2> -->
+          <h2 style="text-align: center;">{{ currentPractice || 'No value' }}</h2>
           <h3>Schedule for {{selectedDoctor}}</h3>
           <p class="date" *ngIf="appointments.length > 0">{{dateRangeText}}</p>
           <p class="no-appointments" *ngIf="appointments.length === 0">No appointments found for this period</p>
