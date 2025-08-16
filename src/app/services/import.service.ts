@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class ImportService {
-  // private baseUrl = 'http://localhost:7001/api/v1/auth';
+  // private baseUrl = 'http://localhost:7001/api/v1';
   private baseUrl = 'https://apis.idental.ai/api/v1/auth';
 
   constructor(
