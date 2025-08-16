@@ -361,7 +361,7 @@ export class CalendarComponent implements OnInit {
 
   savePatient(event: any) {
     this.displayAddPatientDialog = false;
-    this.myButton.patientCode = event.unique_code;
+    this.myButton.patientCode = event.manual_unique_code;
     this.myButton.paitentNotFound = false;
     this.myButton.showDialog(false);
   }
@@ -407,7 +407,7 @@ export class CalendarComponent implements OnInit {
         allDay: false,
         extendedProps: {
           status: 'unavailable',
-          patientCode: a.patient_details.unique_code,
+          patientCode: a.patient_details.manual_unique_code,
           patientId: a.patient_details.patient_id,
           patientName: a.patient_details.user_profile_details[0].first_name + ' ' + a.patient_details.user_profile_details[0].last_name,
           phone: '+91 ' + a.patient_details.phone,
@@ -448,7 +448,7 @@ export class CalendarComponent implements OnInit {
         allDay: false,
         extendedProps: {
           status: 'unavailable',
-          patientCode: a.patient_details.unique_code,
+          patientCode: a.patient_details.manual_unique_code,
           patientId: a.patient_details.patient_id,
           patientName: a.patient_details.user_profile_details[0].first_name + ' ' + a.patient_details.user_profile_details[0].last_name,
           phone: '+91 ' + a.patient_details.phone,
@@ -722,60 +722,79 @@ export class CalendarComponent implements OnInit {
   }
 
   addAppointmentsToCalendar(appointments: any) {
-    var events: any[] = [];
-    var dAppointments: any[] = appointments.data.rows;
-    this.appointments = appointments.data.rows;
-    if (this.isDoctor) {
-      dAppointments = dAppointments.filter(a => a.doctor_details && a.doctor_details.doctor_id === this.currentUser.user_id)
-    } else if (!this.isAdmin && !this.isDoctor) {
-      dAppointments = dAppointments.filter(a => a.patient_details.patient_id === this.currentUser.user_id)
-    }
-    if (this.selectedDoctor !== null) {
-      dAppointments = dAppointments.filter(a => a.doctor_details && a.doctor_details.doctor_id === this.currentUser.user_id)
-    }
+  var events: any[] = [];
+  var dAppointments: any[] = appointments.data.rows;
+  this.appointments = appointments.data.rows;
 
-    dAppointments.forEach((a: any) => {
-      const doctor = this.doctorsList.find(d => d.user_id === a.doctor_details?.doctor_id);
-      const colorClass = doctor ? doctor.colorClass : this.doctorColorMap[a.doctor_details?.doctor_id];
-      const formattedTime = this.convertTo24Hour(a.appointment_time);
-      const startDateTime = new Date(`${a.appointment_date}T${formattedTime}`);
-      const endDateTime = new Date(startDateTime);
-      const minutesToAdd = Number(a.duration); // replace with your desired duration
-      endDateTime.setMinutes(startDateTime.getMinutes() + minutesToAdd);
-      events.push({
-        title: this.isDoctor || this.isAdmin ? a.patient_details.user_profile_details[0].first_name
-          //+ a.patient_details.user_profile_details[0].last_name 
-          : a.doctor_details?.user_profile_details[0].first_name,
-        //+ a.doctor_details.user_profile_details[0].last_name,
-        start: startDateTime,
-        end: endDateTime,
-        allDay: false,
-        extendedProps: {
-          status: 'unavailable',
-          patientCode: a.patient_details.unique_code,
-          patientId: a.patient_details.patient_id,
-          patientName: a.patient_details.user_profile_details[0].first_name + ' ' + a.patient_details.user_profile_details[0].last_name,
-          phone: '+91 ' + a.patient_details.phone,
-          email: a.patient_details.email,
-          doctor: a.doctor_details ? (a.doctor_details?.user_profile_details[0].first_name + ' ' + a.doctor_details?.user_profile_details[0].last_name) : null,
-          duration: a.duration + ' mins',
-          appointmentTime: a.appointment_time,
-          bookingType: a.booking_type === 'Offline' ? 'In-Clinic' : 'Online',
-          category: a.category_details?.name,
-          notes: a.notes,
-          appointmentId: a.id
-        },
-        className: [
-          `doctor-bg-${colorClass}`,
-          this.currentView === 'dayGridMonth' ? 'month-view' : this.currentView === 'timeGridWeek' ? 'week-view' : 'day-view'
-        ]
-      })
-    });
-    
-    this.addBlockCalendarEvents(events);
-
-    this.calendarOptions.events = events;
+  if (this.isDoctor) {
+    dAppointments = dAppointments.filter(
+      a => a.doctor_details && a.doctor_details.doctor_id === this.currentUser.user_id
+    );
+  } else if (!this.isAdmin && !this.isDoctor) {
+    dAppointments = dAppointments.filter(
+      a => a.patient_details.patient_id === this.currentUser.user_id
+    );
   }
+
+  if (this.selectedDoctor !== null) {
+    dAppointments = dAppointments.filter(
+      a => a.doctor_details && a.doctor_details.doctor_id === this.currentUser.user_id
+    );
+  }
+
+  dAppointments.forEach((a: any) => {
+    const doctor = this.doctorsList.find(d => d.user_id === a.doctor_details?.doctor_id);
+    const colorClass = doctor ? doctor.colorClass : this.doctorColorMap[a.doctor_details?.doctor_id];
+    const formattedTime = this.convertTo24Hour(a.appointment_time);
+
+    const startDateTime = new Date(`${a.appointment_date}T${formattedTime}`);
+    const endDateTime = new Date(startDateTime);
+    const minutesToAdd = Number(a.duration);
+    endDateTime.setMinutes(startDateTime.getMinutes() + minutesToAdd);
+
+    events.push({
+      title: this.isDoctor || this.isAdmin
+        ? a.patient_details.user_profile_details[0].first_name
+        : a.doctor_details?.user_profile_details[0].first_name,
+
+      start: startDateTime,
+      end: endDateTime,
+      allDay: false,
+      extendedProps: {
+        status: 'unavailable',
+        patientCode: a.patient_details.manual_unique_code,
+        patientId: a.patient_details.patient_id,
+        patientName:
+          a.patient_details.user_profile_details[0].first_name + ' ' +
+          a.patient_details.user_profile_details[0].last_name,
+        phone: '+91 ' + a.patient_details.phone,
+        email: a.patient_details.email,
+        doctor: a.doctor_details
+          ? (a.doctor_details?.user_profile_details[0].first_name + ' ' +
+             a.doctor_details?.user_profile_details[0].last_name)
+          : null,
+        duration: a.duration + ' mins',
+        appointmentTime: a.appointment_time,
+        bookingType: a.booking_type === 'Offline' ? 'In-Clinic' : 'Online',
+        category: a.category_details?.name,
+        notes: a.notes,
+        appointmentId: a.id,
+        availableAdvance: a.available_advance ?? 0
+      },
+      className: [
+        `doctor-bg-${colorClass}`,
+        this.currentView === 'dayGridMonth'
+          ? 'month-view'
+          : this.currentView === 'timeGridWeek'
+          ? 'week-view'
+          : 'day-view'
+      ]
+    });
+  });
+
+  this.addBlockCalendarEvents(events);
+  this.calendarOptions.events = events;
+}
 
   // New method to add block calendar events
   addBlockCalendarEvents(events: any[]) {

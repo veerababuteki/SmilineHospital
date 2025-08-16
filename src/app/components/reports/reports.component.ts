@@ -102,14 +102,17 @@ export class ReportsComponent implements OnInit {
     }
 
     private initializeDates(): void {
-        const today = new Date();
-        this.toDate = new Date(today);
-        
-        // Set from date to 30 days ago
-        const thirtyDaysAgo = new Date(today);
-        thirtyDaysAgo.setDate(today.getDate() - 30);
-        this.fromDate = thirtyDaysAgo;
-    }
+  const today = new Date();
+
+  this.toDate = new Date(today);
+  this.toDate.setHours(23, 59, 59, 999);  // include entire day
+
+  const thirtyDaysAgo = new Date(today);
+  thirtyDaysAgo.setDate(today.getDate() - 30);
+  thirtyDaysAgo.setHours(0, 0, 0, 0);     // start of the day
+  this.fromDate = thirtyDaysAgo;
+}
+
 
     private showErrorMessage(message: string) {
         this.snackBar.open(message, 'Close', {
@@ -178,8 +181,16 @@ export class ReportsComponent implements OnInit {
     }
 
     onDateChange() {
-        this.loadReportData();
-    }
+  if (this.fromDate) {
+    this.fromDate.setHours(0, 0, 0, 0); // Start of day
+  }
+
+  if (this.toDate) {
+    this.toDate.setHours(23, 59, 59, 999); // End of day
+  }
+
+  this.loadReportData();
+}
 
     showDatePickers(): boolean {
         return this.selectedReportCategory?.value !== 'amount_due';

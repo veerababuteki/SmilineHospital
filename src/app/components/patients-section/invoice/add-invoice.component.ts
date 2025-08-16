@@ -42,6 +42,7 @@ export class AddInvoiceComponent implements OnInit {
   editInvoiceKey: string | null = null;
   uniqueCode: string | null | undefined;
   doctorsLoaded: boolean = false;
+  selectedInvoiceList: any[] = [];
 
   constructor(
     private fb: FormBuilder, 
@@ -580,73 +581,59 @@ export class AddInvoiceComponent implements OnInit {
   }
 
   saveAndMakePayment() {
-    if (!this.treatmentForm.valid) return;
-    
-    const procedureLists: any[] = [];
-    const treatment = {
-      patient_id: this.patientId,
-      grand_total: this.calculateGrandTotal().toString(),
-      procedures_list: procedureLists
-    };
-    
-    this.treatmentForm.value.treatments.forEach((t: any) => {
-      treatment.procedures_list.push({
-        procedure_id: t.procedureId,
-        treatment_plan_id: t.id,
-        treatment_unique_id: t.unique_id,
-        doctor_id: t.doctorId,
-        quantity: t.quantity,
-        cost: t.cost,
-        discount: t.discount.toString(),
-        discount_formate: t.discountType,
-        teeth_set: t.selectedTeeth.toString(),
-        status: "Completed",
-        date: t.procedureDate,
-        total_cost: t.total,
-        total_discount: t.discount.toString(),
-        notes: t.notes,
-      });
+  if (!this.treatmentForm.valid) return;
+
+  const procedureLists: any[] = [];
+  const treatment = {
+    patient_id: this.patientId,
+    grand_total: this.calculateGrandTotal().toString(),
+    procedures_list: procedureLists
+  };
+
+  this.treatmentForm.value.treatments.forEach((t: any) => {
+    treatment.procedures_list.push({
+      procedure_id: t.procedureId,
+      treatment_plan_id: t.id,
+      treatment_unique_id: t.unique_id,
+      doctor_id: t.doctorId,
+      quantity: t.quantity,
+      cost: t.cost,
+      discount: t.discount.toString(),
+      discount_formate: t.discountType,
+      teeth_set: t.selectedTeeth.toString(),
+      status: "Completed",
+      date: t.procedureDate,
+      total_cost: t.total,
+      total_discount: t.discount.toString(),
+      notes: t.notes,
     });
+  });
+
+  this.treatmentPlansService.addInvoiceWithTreatmentPlan(treatment).subscribe(res => {
+    // Extract all invoice objects
+    const invoices = res.data.map((item: any) => item.addedInvoice);
+
+    this.saveInvoices();
     
-    this.treatmentPlansService.addInvoiceWithTreatmentPlan(treatment).subscribe(res => {
-      // Extract all invoice objects
-      const invoices = res.data.map((item: any) => item.addedInvoice);
-      
-      // Create a Set of unique invoice IDs
-      const uniqueInvoiceIds = new Set(invoices.map((invoice: any) => invoice.invoice_id));
-      
-      // Create array of payment observables only for unique invoice IDs
-      const paymentObservables = Array.from(uniqueInvoiceIds).map((invoiceId: any) => {
-        return this.treatmentPlansService.makePayment({
-          invoice_id: invoiceId,
-          amount_paid: 10,
-          payment_mode: 'Cash'
-        });
-      });
-    
-      // If there are any payments to process
-      if (paymentObservables.length > 0) {
-        // Wait for all payment requests to complete
-        forkJoin(paymentObservables).subscribe({
-          next: () => {
-            // Navigate only once after all payments are processed
-            if (this.patientId !== null && this.patientId !== undefined) {
-              this.fetchInvoices();
-            }
-          },
-          error: (error) => {
-            console.error('Error processing payments:', error);
-            // Handle error case - you might still want to navigate or show an error message
-          }
-        });
-      } else {
-        // If no payments were needed, navigate anyway
-        if (this.patientId !== null && this.patientId !== undefined) {
-          this.fetchInvoices();
+    // Create a Set of unique invoice IDs
+    const uniqueInvoiceIds = new Set(invoices.map((invoice: any) => invoice.invoice_id));
+
+    // Build the selectedInvoiceList for navigation
+    this.selectedInvoiceList = Array.from(uniqueInvoiceIds).map((invoiceId: any) => ({
+      invoice_id: invoiceId
+    }));
+
+    this.router.navigate(
+      ['patients', this.patientId, 'add-payment', this.uniqueCode],
+      {
+        state: {
+          procedures: this.selectedInvoiceList
         }
       }
-    });
-  }
+    );
+  });
+}
+
 
   calculateGrandTotal(): number {
     let totalCost = 0;
@@ -687,6 +674,17 @@ export class AddInvoiceComponent implements OnInit {
       };
       this.patientDataService.setData(updatedData);
       this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
+    });
+  }
+
+  saveInvoices() {
+    this.treatmentPlansService.getInvoices(Number(this.patientId)).subscribe(res => {
+      const existingData = this.patientDataService.getSnapshot();
+      const updatedData = {
+        ...existingData,
+        invoices: res
+      };
+      this.patientDataService.setData(updatedData);
     });
   }
 
