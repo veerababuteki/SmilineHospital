@@ -9,8 +9,8 @@ import { AuthService } from './auth.service';
 })
 
 export class AppointmentService {
-  private baseUrl = 'https://apis.idental.ai/api/v1/auth/appointment';  // Replace with actual API
-  // private baseUrl = 'http://localhost:7001/api/v1/auth/appointment';  // Replace with actual API
+  // private baseUrl = 'https://apis.idental.ai/api/v1/auth/appointment';  // Replace with actual API
+  private baseUrl = 'http://localhost:7001/api/v1/auth/appointment';  // Replace with actual API
   loggedIn: boolean = false;
   selectedPractice: any;
 
