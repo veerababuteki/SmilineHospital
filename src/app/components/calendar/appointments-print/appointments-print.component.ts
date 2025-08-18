@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, SimpleChanges, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DropdownModule } from 'primeng/dropdown';
@@ -7,17 +7,22 @@ import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { format, startOfWeek, endOfWeek, addDays } from 'date-fns';
 import { AppointmentService } from '../../../services/appointment.service';
+import { UserService } from '../../../services/user.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { catchError, of, Subscription } from 'rxjs';
 
 interface DoctorGroup {
   doctorId: string;
   doctorName: string;
   appointments: any[];
 }
+
 interface DateGroup {
   date: string;
   displayDate: string;
   appointments: any[];
 }
+
 @Component({
   selector: 'app-appointments-print',
   templateUrl: './appointments-print.component.html',
@@ -25,9 +30,15 @@ interface DateGroup {
   standalone: true,
   imports: [CommonModule, CheckboxModule, DropdownModule, FormsModule, ButtonModule, CalendarModule]
 })
-export class AppointmentsPrintComponent implements OnInit {
+export class AppointmentsPrintComponent implements OnInit, OnDestroy {
   @Input() appointments: any[] = [];
   @Output() closeDialog = new EventEmitter<void>();
+  @Input() selectedPractice: any; 
+  
+  // Practice management properties
+  private branchesSubscription!: Subscription;
+  practices: any[] = [];
+  public currentPractice: string = '';
 
   // Form values
   selectedDate = 'Today';
@@ -71,19 +82,95 @@ export class AppointmentsPrintComponent implements OnInit {
   // Current date for display
   currentDate: string = '';
   
-  constructor(private appointmentService: AppointmentService) {}
+  constructor(
+    private appointmentService: AppointmentService, 
+    private cdr: ChangeDetectorRef,
+    private userService: UserService,
+    private snackBar: MatSnackBar
+  ) {}
   
   ngOnInit() {
     // Set current date in format "Apr 07, 2025"
     this.currentDate = format(new Date(), 'MMM dd, yyyy');
     
-    // Get today's appointments by default
-    this.onDateOptionChange();
-    
-    // Add doctors from appointments to dropdown options
-    this.updateDoctorOptions();
+    // Load practices and initialize
+    this.initializePractices();
   }
-  
+
+  ngOnDestroy() {
+    if (this.branchesSubscription) {
+      this.branchesSubscription.unsubscribe();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['selectedPractice'] && changes['selectedPractice'].currentValue) {
+      console.log('Practice changed:', changes['selectedPractice']);
+      this.updateCurrentPractice();
+    }
+  }
+
+  private initializePractices(): void {
+    this.branchesSubscription = this.userService.getBranches()
+      .pipe(
+        catchError(error => {
+          this.showErrorMessage('Failed to load practices. Please try again.');
+          console.error('Error loading branches:', error);
+          return of({ data: [] });
+        })
+      )
+      .subscribe((res: { data: any[]; }) => {
+        this.practices = res.data;
+        this.loadSavedPractice();
+      });
+  }
+
+  private loadSavedPractice(): void {
+    try {
+      const savedPractice = localStorage.getItem('selectedPractice');
+      if (savedPractice) {
+        this.selectedPractice = JSON.parse(savedPractice);
+      } else if (this.practices && this.practices.length > 0) {
+        this.selectedPractice = this.practices[0];
+        localStorage.setItem('selectedPractice', JSON.stringify(this.selectedPractice));
+      }
+      
+      // Update current practice display
+      this.updateCurrentPractice();
+      
+      // Load initial appointments
+      this.onDateOptionChange();
+      
+      // Add doctors from appointments to dropdown options
+      this.updateDoctorOptions();
+
+    } catch (error) {
+      console.error('Error loading saved practice:', error);
+      this.showErrorMessage('Error loading saved practice settings.');
+    }
+  }
+
+  private updateCurrentPractice(): void {
+    this.currentPractice = this.getCurrentPractice(this.selectedPractice);
+    console.log('Updated currentPractice:', this.currentPractice);
+    
+    // Ensure UI updates
+    this.cdr.detectChanges();
+  }
+
+  getCurrentPractice(selectedPractice: any): string { 
+    return selectedPractice?.branch_name ?? 'No branch name found';
+  }
+
+  private showErrorMessage(message: string) {
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      panelClass: ['error-snackbar']
+    });
+  }
+
   onDateOptionChange() {
     const today = new Date();
     let firstDate: Date;
@@ -370,6 +457,7 @@ export class AppointmentsPrintComponent implements OnInit {
       default: return '14px';
     }
   }
+
   cancelPrint() {
     // If this component is opened in a dialog or modal
     // You can emit an event to close it from the parent
@@ -398,7 +486,6 @@ export class AppointmentsPrintComponent implements OnInit {
     // Reload today's appointments
     this.onDateOptionChange();
     this.closeDialog.emit();
-
   }
 
   getFontSizeClass(): string {
@@ -462,56 +549,56 @@ export class AppointmentsPrintComponent implements OnInit {
   }
 
   // Add this method to group appointments by date
-getDateGroupedAppointments(): DateGroup[] {
-  const filteredAppointments = this.filterAppointmentsByDoctor();
-  if (!filteredAppointments?.length) return [];
-  
-  const dateGroups: { [key: string]: DateGroup } = {};
-  
-  filteredAppointments.forEach(appointment => {
-    if (appointment.appointment_date) {
-      const dateKey = appointment.appointment_date;
-      const displayDate = this.formatDisplayDate(dateKey);
-      
-      if (!dateGroups[dateKey]) {
-        dateGroups[dateKey] = {
-          date: dateKey,
-          displayDate: displayDate,
-          appointments: []
-        };
+  getDateGroupedAppointments(): DateGroup[] {
+    const filteredAppointments = this.filterAppointmentsByDoctor();
+    if (!filteredAppointments?.length) return [];
+    
+    const dateGroups: { [key: string]: DateGroup } = {};
+    
+    filteredAppointments.forEach(appointment => {
+      if (appointment.appointment_date) {
+        const dateKey = appointment.appointment_date;
+        const displayDate = this.formatDisplayDate(dateKey);
+        
+        if (!dateGroups[dateKey]) {
+          dateGroups[dateKey] = {
+            date: dateKey,
+            displayDate: displayDate,
+            appointments: []
+          };
+        }
+        
+        dateGroups[dateKey].appointments.push(appointment);
       }
-      
-      dateGroups[dateKey].appointments.push(appointment);
-    }
-  });
-  
-  // Sort each date's appointments by time
-  Object.values(dateGroups).forEach(group => {
-    group.appointments.sort((a, b) => {
-      const timeA = this.convertTimeToMinutes(a.appointment_time);
-      const timeB = this.convertTimeToMinutes(b.appointment_time);
-      return timeA - timeB;
     });
-  });
-  
-  // Convert to array and sort by date
-  return Object.values(dateGroups).sort((a, b) => {
-    return new Date(a.date).getTime() - new Date(b.date).getTime();
-  });
-}
-
-// Helper method to format the date for display
-formatDisplayDate(dateString: string): string {
-  try {
-    const date = new Date(dateString);
-    return format(date, 'EEEE, MMM dd, yyyy'); // e.g., "Monday, Apr 07, 2025"
-  } catch (e) {
-    return dateString;
+    
+    // Sort each date's appointments by time
+    Object.values(dateGroups).forEach(group => {
+      group.appointments.sort((a, b) => {
+        const timeA = this.convertTimeToMinutes(a.appointment_time);
+        const timeB = this.convertTimeToMinutes(b.appointment_time);
+        return timeA - timeB;
+      });
+    });
+    
+    // Convert to array and sort by date
+    return Object.values(dateGroups).sort((a, b) => {
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    });
   }
-}
 
-// Add a helper method to check if we should use date grouping
-shouldGroupByDate(): boolean {
-  return this.selectedDate === 'This Week' || this.selectedDate === 'Next Seven Days';
-}
+  // Helper method to format the date for display
+  formatDisplayDate(dateString: string): string {
+    try {
+      const date = new Date(dateString);
+      return format(date, 'EEEE, MMM dd, yyyy'); // e.g., "Monday, Apr 07, 2025"
+    } catch (e) {
+      return dateString;
+    }
+  }
+
+  // Add a helper method to check if we should use date grouping
+  shouldGroupByDate(): boolean {
+    return this.selectedDate === 'This Week' || this.selectedDate === 'Next Seven Days';
+  }
 }

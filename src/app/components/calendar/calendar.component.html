@@ -1,3 +1,6 @@
+
+<!-- <app-appointments-print [selectedPractice]="selectedPractice"></app-appointments-print> -->
+
 <div class="calendar-container">
   <div class="calendar-top">
     <div class="left-section">
@@ -10,7 +13,7 @@
         <div class="practices-dropdown-panel" *ngIf="showPracticesDropdown" (click)="$event.stopPropagation()">
           <div class="search-container">
             <i class="pi pi-search search-icon"></i>
-            <input type="text" placeholder="Search by name" class="practice-search" [(ngModel)]="practiceSearchText"
+            <input type="text" placeholder="Search by name or Practice ID" class="practice-search" [(ngModel)]="practiceSearchText"
               (input)="filterPractices()">
           </div>
 
@@ -95,7 +98,7 @@
         <div class="doctors-list">
           <div class="all-doctors">
             <span>All doctors</span>
-            <!-- <span class="count">2100</span> -->
+            <span class="count">{{ filteredDoctors().length }}</span>
           </div>
 
           <!-- <div class="doctors-scroll">
@@ -250,6 +253,7 @@
 <app-cancel-appointment-dialog [visible]="showCancelDialog" [appointmentData]="selectedEvent"
   (close)="onCancelDialogClose()" (confirm)="onCancelAppointmentConfirm($event)">
 </app-cancel-appointment-dialog>
+<app-appointments-print [selectedPractice]="selectedPractice"></app-appointments-print>
 <p-confirmDialog 
   [style]="{width: '450px'}"
   [baseZIndex]="10000"

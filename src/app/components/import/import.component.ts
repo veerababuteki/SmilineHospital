@@ -63,7 +63,8 @@ export class ImportComponent implements OnInit {
     { value: 'invoices', label: 'Invoices' },
     { value: 'payments', label: 'Payments' },
     { value: 'treatment_plans', label: 'Treatment Plans' },
-    { value: 'procedure_catalog', label: 'Procedure Catalog' }
+    { value: 'procedure_catalog', label: 'Procedure Catalog' },
+    { value: 'amount_due', label: 'Amount Due'}
   ];
 
   selectedFiles: File[] = new Array(this.importTypes.length);

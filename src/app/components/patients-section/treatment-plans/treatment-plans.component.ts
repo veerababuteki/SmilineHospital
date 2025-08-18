@@ -257,9 +257,16 @@ consentform(plan: any): void {
     return Object.keys(this.treatmentPlans).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
   }
 
-  getTotalCost(treatmentGroup: any[]): number {
-    return treatmentGroup.reduce((acc, treatment) => acc + Number(treatment.total_cost || 0), 0);
-  }
+  // getTotalCost(treatmentGroup: any[]): number {
+  //   return treatmentGroup.reduce((acc, treatment) => acc + Number(treatment.total_cost || 0), 0);
+  // }
+  
+getGroupTotal(treatmentGroup: any[]): number {
+  const total = treatmentGroup.reduce((acc, t) => acc + Number(t.total_cost || 0), 0);
+  return parseFloat(total.toFixed(3)); // keeps only 2 decimals
+}
+
+
 
   printTreatmentPlans() {
     // Save the current body content

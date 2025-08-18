@@ -130,6 +130,8 @@
     /* Selected invoices section */
     .selected-invoices {
       margin-bottom: 15px;
+      max-height: 70vh;
+    overflow: auto;
 
       .selected-invoices-header {
         margin-bottom: 15px;
