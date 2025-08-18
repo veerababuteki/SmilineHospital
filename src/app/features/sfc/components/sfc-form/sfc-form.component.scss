@@ -225,7 +225,7 @@
 .sfc-header-static {
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 1;
 
 }
 
@@ -278,6 +278,14 @@ max-height: 350px;
 .sfc-table td button+button {
   margin-top: 0.5rem;
 }
+
+.readonly-field {
+  background-color: #797979;   /* light gray background */
+  color: rgb(165, 165, 165);                 /* dim text color */
+  border: 1px solid #ccc;      /* subtle border */
+  cursor: not-allowed;         /* make it obvious it's readonly */
+}
+
 
 .sfc-action-bar {
   display: flex;
