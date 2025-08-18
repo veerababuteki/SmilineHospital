@@ -86,6 +86,8 @@
               [(ngModel)]="newEntry.ageRelation"
               name="ageRelation"
               required
+              max="200"
+              min="0"
               [class.invalid-field]="isFieldInvalid('ageRelation')"
             />
             <div *ngIf="isFieldInvalid('ageRelation')" class="error-msg">
