@@ -17,7 +17,7 @@ import { AuthService } from '../../../services/auth.service';
 import { ClinicalNotesService } from '../../../services/clinical-notes.service';
 
 interface ConditionControls {
-    [key: string]: boolean[];
+  [key: string]: boolean[];
 }
 
 @Component({
@@ -25,7 +25,7 @@ interface ConditionControls {
   templateUrl: './add-profile.component.html',
   styleUrls: ['./add-profile.component.scss'],
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule,
+  imports: [CommonModule, ReactiveFormsModule,
     InputTextModule,
     ButtonModule,
     RadioButtonModule,
@@ -48,6 +48,7 @@ export class AddProfileComponent implements OnInit {
   addMedicalHistoryText: string = '';
   addNewGroupText: string = '';
   maxDate: Date;
+  form!: FormGroup;
 
   // Initialize forms early
   patientForm: FormGroup;
@@ -58,6 +59,7 @@ export class AddProfileComponent implements OnInit {
   insuranceGroups: any[] = [];
   filteredMedicalConditions: any[] = [];
   searchText: string = '';
+  //  form: any;
   formValid: boolean = false;
   bloodGroups: any[] = [
     { label: 'Select Blood Group', value: null },
@@ -80,15 +82,15 @@ export class AddProfileComponent implements OnInit {
   ];
 
   genders: any[] = [
-    {label: 'Male', value: 'Male'},
-    {label: 'Female', value: 'Female'},
+    { label: 'Male', value: 'Male' },
+    { label: 'Female', value: 'Female' },
   ];
 
   refferedBy: any[] = [
-    {label: 'Friend', value: 'Friend'},
-    {label: 'Family', value: 'Family'},
-    {label: 'Online', value: 'Online'},
-    {label: 'Other', value: 'Other'}
+    { label: 'Friend', value: 'Friend' },
+    { label: 'Family', value: 'Family' },
+    { label: 'Online', value: 'Online' },
+    { label: 'Other', value: 'Other' }
   ];
 
   languages: any[] = [
@@ -124,6 +126,9 @@ export class AddProfileComponent implements OnInit {
       groups: this.fb.group({})
     });
   }
+
+
+   
   checkFormValidity(): void {
     // Check if patient form is valid (which includes all required fields)
     this.formValid = this.patientForm.valid;
@@ -155,18 +160,18 @@ export class AddProfileComponent implements OnInit {
       this.updateMedicalHistoryForm();
     });
     const dateOfBirthControl = this.patientForm.get('dateOfBirth');
-  const ageControl = this.patientForm.get('age');
+    const ageControl = this.patientForm.get('age');
 
-  if (dateOfBirthControl && ageControl) {
-    dateOfBirthControl.valueChanges.subscribe(date => {
-      if (date) {
-        const age = this.calculateAge(date);
-        ageControl.setValue(age, { emitEvent: false });
-      } else {
-        ageControl.setValue('', { emitEvent: false });
-      }
-    });
-  }
+    if (dateOfBirthControl && ageControl) {
+      dateOfBirthControl.valueChanges.subscribe(date => {
+        if (date) {
+          const age = this.calculateAge(date);
+          ageControl.setValue(age, { emitEvent: false });
+        } else {
+          ageControl.setValue('', { emitEvent: false });
+        }
+      });
+    }
 
     // Load insurance groups
     this.userService.getInsuranceGroups().subscribe(res => {
@@ -201,7 +206,8 @@ export class AddProfileComponent implements OnInit {
       streetAddress: [''],
       locality: [''],
       city: [''],
-      pincode: ['']
+    pincode: ['',
+        Validators.pattern('^[1-9]\\d{6}$')],
     });
   }
 
@@ -270,12 +276,12 @@ export class AddProfileComponent implements OnInit {
 
       if (this.medicalHistoryForm.valid) {
         selectedConditions = Object.keys(this.medicalHistoryForm.value.conditions)
-            .filter(id => this.medicalHistoryForm.value.conditions[id]);
+          .filter(id => this.medicalHistoryForm.value.conditions[id]);
       }
 
       if (this.groupsForm.valid) {
         selectedGroups = Object.keys(this.groupsForm.value.groups)
-            .filter(id => this.groupsForm.value.groups[id]);
+          .filter(id => this.groupsForm.value.groups[id]);
       }
 
       this.authService.registerUser({
@@ -312,14 +318,14 @@ export class AddProfileComponent implements OnInit {
         this.medicalHistoryForm.reset();
         this.groupsForm.reset();
         this.userService.sendLoadPatients();
-        this.onSave.emit({user_id:res.data.user.user_id,unique_code:res.data.user.unique_code});
+        this.onSave.emit({ user_id: res.data.user.user_id, unique_code: res.data.user.unique_code });
       });
-    }else{
+    } else {
       this.markFormGroupTouched(this.patientForm);
     }
-    setTimeout(function() {
-    window.location.reload();
-}, 1500); 
+    setTimeout(function () {
+      window.location.reload();
+    }, 1500);
   }
   markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach(control => {

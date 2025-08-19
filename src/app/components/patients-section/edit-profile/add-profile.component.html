@@ -44,7 +44,7 @@
                       Aadhaar ID :
                     </div>
                     <div class="form-field">
-                      <input pInputText type="text" formControlName="aadhaarId" pattern="[0-9]*">
+                      <input pInputText type="number" formControlName="aadhaarId" pattern="[0-9]*">
                       <div class="validation-error" *ngIf="patientForm.get('aadhaarId')?.invalid && patientForm.get('aadhaarId')?.touched">
                         Please enter a valid 12-digit Aadhaar number.
                       </div>
@@ -77,7 +77,7 @@
                         appendTo="body">
                       </p-calendar>
                       <span class="or-text"> Age :</span>
-                      <input pInputText type="number" class="age-input" formControlName="age" min="0">
+                      <input pInputText type="number" class="age-input" formControlName="age" min="1" max="200" maxlength="3">
                     </div>
                   </div>
 
@@ -215,11 +215,12 @@
                     </div>
                   </div>
                   <div class="form-row">
-                    <div class="form-label ">
-                      Pincode :
-                    </div>
+                    <div class="form-label "> Pincode :</div>
                     <div class="form-field">
-                      <input pInputText type="text" formControlName="pincode">
+                      <input pInputText type="number" formControlName="pincode" pattern="[0-9]*">
+                      <div class="validation-error" *ngIf="patientForm.get('pincode')?.invalid && patientForm.get('pincode')?.touched">
+                        Please enter a valid 6-digit Pin-Code.
+                      </div>
                     </div>
                   </div>
 

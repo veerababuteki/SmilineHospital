@@ -3,14 +3,16 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
+import { environment } from '../../Env/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 
 export class AppointmentService {
-  private baseUrl = 'https://apis.idental.ai/api/v1/auth/appointment';  // Replace with actual API
-  // private baseUrl = 'http://localhost:7001/api/v1/auth/appointment';  // Replace with actual API
+  // private baseUrl = 'https://apis.idental.ai/api/v1/auth/appointment';  // Replace with actual API
+  private baseUrl = `${environment.baseUrl}/auth/appointment`;
+
   loggedIn: boolean = false;
   selectedPractice: any;
 

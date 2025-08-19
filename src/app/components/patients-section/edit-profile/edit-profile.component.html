@@ -43,10 +43,13 @@
 
                   <div class="form-row">
                     <div class="form-label">
-                      Aadhaar ID:
+                      Aadhaar ID :
                     </div>
                     <div class="form-field">
-                      <input pInputText type="text" formControlName="aadhaarId">
+                      <input pInputText type="number" formControlName="aadhaarId" pattern="[0-9]*">
+                      <div class="validation-error" *ngIf="patientForm.get('aadhaarId')?.invalid && patientForm.get('aadhaarId')?.touched">
+                        Please enter a valid 12-digit Aadhaar number.
+                      </div>
                     </div>
                   </div>
 
@@ -209,17 +212,16 @@
                     </div>
                   </div>
                   <div class="form-row">
-                    <div class="form-label ">
-                      Pincode :
-                    </div>
+                    <div class="form-label "> Pincode :</div>
                     <div class="form-field">
-                      <input pInputText type="text" formControlName="pincode">
+                      <input pInputText type="number" formControlName="pincode" pattern="[0-9]*">
+                      <div class="validation-error" *ngIf="patientForm.get('pincode')?.invalid && patientForm.get('pincode')?.touched">
+                        Please enter a valid 6-digit Pin-Code.
+                      </div>
                     </div>
                   </div>
-
                 </form>
               </div>
-
         </div>
 
         <div class="right-sidebar">

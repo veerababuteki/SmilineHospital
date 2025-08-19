@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../Env/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImportService {
-  // private baseUrl = 'http://localhost:7001/api/v1';
-  private baseUrl = 'https://apis.idental.ai/api/v1/auth';
+  private baseUrl = `${environment.baseUrl}/auth`;
+  // private baseUrl = 'https://apis.idental.ai/api/v1/auth';
 
   constructor(
     private http: HttpClient,

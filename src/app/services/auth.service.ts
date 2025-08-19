@@ -2,13 +2,17 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { environment } from '../../Env/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   // private baseUrl = 'http://localhost:7001/api/v1';  // Replace with actual API
-  private baseUrl = 'https://apis.idental.ai/api/v1';  // Replace with actual API
+  // private baseUrl = 'https://apis.idental.ai/api/v1';  // Replace with actual API
+    private baseUrl = environment.baseUrl;
+
+
   loggedIn: boolean = false;
 
   constructor(private http: HttpClient, private router: Router) {}

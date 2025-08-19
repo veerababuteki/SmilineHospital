@@ -2,14 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../Env/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 
 export class SfcService {
-  private baseUrl = 'https://apis.idental.ai/api/v1/auth/sfc'; // base path for SFC routes
-  // private baseUrl = 'http://localhost:7001/api/v1/auth/sfc'; // base path for SFC routes
+  // private baseUrl = 'https://apis.idental.ai/api/v1/auth/sfc'; // base path for SFC routes
+  private baseUrl = `${environment.baseUrl}/auth/sfc`;
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 

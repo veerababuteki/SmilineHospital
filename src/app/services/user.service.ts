@@ -7,13 +7,14 @@ import { options } from '@fullcalendar/core/preact.js';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { environment } from '../../Env/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-  // private baseUrl = 'http://localhost:7001/api/v1';  // Replace with actual API
-  private baseUrl = 'https://apis.idental.ai/api/v1';  // Replace with actual API
+  private baseUrl = environment.baseUrl;
+  // private baseUrl = 'https://apis.idental.ai/api/v1';  // Replace with actual API
   loggedIn: boolean = false;
 
   private loadPatients = new Subject<void>();
@@ -22,6 +23,10 @@ export class UserService {
 
   constructor(private http: HttpClient, private router: Router, private authService: AuthService) {}
 
+  // getBase() {
+  //   debugger
+  //   return this.baseUrl;
+  // }
   sendLoadPatients(){
     this.loadPatients.next();
   }

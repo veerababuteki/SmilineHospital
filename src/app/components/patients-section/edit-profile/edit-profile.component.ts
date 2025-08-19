@@ -274,7 +274,8 @@ export class EditProfileComponent implements OnInit {
       streetAddress: [''],
       locality: [''],
       city: [''],
-      pincode: ['']
+      pincode: ['',
+        Validators.pattern('^[1-9]\\d{6}$')],
     });
   }
   filteredMedicalConditions: any[] = [];
