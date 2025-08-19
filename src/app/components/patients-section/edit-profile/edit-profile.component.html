@@ -51,29 +51,23 @@
             </div>
           </div>
 
-                  <div class="form-row">
-                    <div class="form-label">
-                      Aadhaar ID :
-                    </div>
-                    <div class="form-field">
-                      <input pInputText type="number" formControlName="aadhaarId" pattern="[0-9]*">
-                      <div class="validation-error" *ngIf="patientForm.get('aadhaarId')?.invalid && patientForm.get('aadhaarId')?.touched">
-                        Please enter a valid 12-digit Aadhaar number.
-                      </div>
-                    </div>
-                  </div>
-
-              <!-- Error Message -->
+          <div class="form-row">
+            <div class="form-label">Aadhaar ID :</div>
+            <div class="form-field">
+              <input
+                pInputText
+                type="number"
+                formControlName="aadhaarId"
+                pattern="[0-9]*"
+              />
               <div
-                class="error"
-                *ngIf="aadhaarId?.touched && aadhaarId?.invalid"
+                class="validation-error"
+                *ngIf="
+                  patientForm.get('aadhaarId')?.invalid &&
+                  patientForm.get('aadhaarId')?.touched
+                "
               >
-                <small *ngIf="aadhaarId?.errors?.['required']"
-                  >Aadhaar ID is required.</small
-                >
-                <small *ngIf="aadhaarId?.errors?.['pattern']"
-                  >Aadhaar ID must be exactly 12 digits.</small
-                >
+                Please enter a valid 12-digit Aadhaar number.
               </div>
             </div>
           </div>
@@ -113,8 +107,7 @@
                 type="number"
                 class="age-input"
                 formControlName="age"
-                min="1"
-                max="200"
+                min="0"
               />
             </div>
           </div>
@@ -232,60 +225,81 @@
                                  [style]="{'width':'100%'}" optionLabel="label"></p-dropdown>
                     </div>
                   </div> -->
-                  <div class="form-row">
-                    <div class="form-label ">
-                      Landline No. :
-                    </div>
-                    <div class="form-field">
-                      <input pInputText type="text" formControlName="landLine">
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-label ">
-                      Email Address :
-                    </div>
-                    <div class="form-field">
-                      <input pInputText type="email" formControlName="email">
-                      <div class="validation-error" *ngIf="patientForm.get('email')?.invalid && patientForm.get('email')?.touched">
-                        Please enter a valid email address
-                      </div>
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-label ">
-                        Street Address :
-                    </div>
-                    <div class="form-field">
-                      <input pInputText type="text" formControlName="streetAddress">
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-label ">
-                        Locality :
-                    </div>
-                    <div class="form-field">
-                      <input pInputText type="text" formControlName="locality">
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-label ">
-                        City :
-                    </div>
-                    <div class="form-field">
-                      <input pInputText type="text" formControlName="city">
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-label "> Pincode :</div>
-                    <div class="form-field">
-                      <input pInputText type="number" formControlName="pincode" pattern="[0-9]*">
-                      <div class="validation-error" *ngIf="patientForm.get('pincode')?.invalid && patientForm.get('pincode')?.touched">
-                        Please enter a valid 6-digit Pin-Code.
-                      </div>
-                    </div>
-                  </div>
-                </form>
+          <div class="form-row">
+            <div class="form-label">Landline No. :</div>
+            <div class="form-field">
+              <input pInputText type="text" formControlName="landLine" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Email Address :</div>
+            <div class="form-field">
+              <input pInputText type="email" formControlName="email" />
+              <div
+                class="validation-error"
+                *ngIf="
+                  patientForm.get('email')?.invalid &&
+                  patientForm.get('email')?.touched
+                "
+              >
+                Please enter a valid email address
               </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Street Address :</div>
+            <div class="form-field">
+              <input pInputText type="text" formControlName="streetAddress" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Locality :</div>
+            <div class="form-field">
+              <input pInputText type="text" formControlName="locality" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">City :</div>
+            <div class="form-field">
+              <input pInputText type="text" formControlName="city" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Pincode :</div>
+            <div class="form-field">
+              <input
+                pInputText
+                type="number"
+                formControlName="pincode"
+                pattern="[0-9]*"
+              />
+              <div
+                class="validation-error"
+                *ngIf="
+                  patientForm.get('pincode')?.invalid &&
+                  patientForm.get('pincode')?.touched
+                "
+              >
+                Please enter a valid 6-digit Pin-Code.
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="right-sidebar">
+      <div class="medical-history-container">
+        <div class="header">
+          <h3>Medical History</h3>
+          <button class="btn-add-complaint">
+            <span *ngIf="!addMedicalHistory" (click)="addMedicalHistory = true"
+              >Add</span
+            >
+            <span *ngIf="addMedicalHistory" (click)="addMedicalHistory = false"
+              >Done</span
+            >
+          </button>
         </div>
 
         <input
