@@ -198,7 +198,8 @@ export class AddProfileComponent implements OnInit {
         Validators.required,
         Validators.pattern('^[1-9]\\d{9}$'), // Starts with 6-9 and has 10 digits
       ]],
-      email: [''],
+      // email: [''],
+       email: ['', Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')],
       secondaryMobile: ['',
         Validators.pattern('^[1-9]\\d{9}$')],
       languagePreference: [this.languages[0]],  // Default to first option
