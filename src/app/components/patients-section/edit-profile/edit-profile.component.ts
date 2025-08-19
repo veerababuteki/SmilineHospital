@@ -54,6 +54,7 @@ export class EditProfileComponent implements OnInit {
   patientId: string | null | undefined;
   maxDate: Date;
   formValid: boolean = false;
+  form: any;
 
   ngOnInit(): void {
 
@@ -256,7 +257,14 @@ export class EditProfileComponent implements OnInit {
     this.patientForm = this.fb.group({
       firstName: ['', Validators.required],
       customId: ['', Validators.required],
-      aadhaarId: [''],
+      // aadhaarId: [''],
+       aadhaarId: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^[0-9]{12}$/) // Only 12 digits
+        ]
+      ],
       gender: ['', Validators.required],
       dateOfBirth: [''],
       age: [''],
@@ -277,6 +285,11 @@ export class EditProfileComponent implements OnInit {
       pincode: ['',
         Validators.pattern('^[1-9]\\d{6}$')],
     });
+    
+  }
+  
+  get aadhaarId() {
+    return this.form.get('aadhaarId');
   }
   filteredMedicalConditions: any[] = [];
   searchText: string = '';

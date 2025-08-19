@@ -77,7 +77,8 @@
                         appendTo="body">
                       </p-calendar>
                       <span class="or-text"> Age :</span>
-                      <input pInputText type="number" class="age-input" formControlName="age" min="1" max="200" maxlength="3">
+
+                      <input pInputText type="number" class="age-input" formControlName="age" min="1" max="200">
                     </div>
                   </div>
 
@@ -176,7 +177,7 @@
                       Landline No. :
                     </div>
                     <div class="form-field">
-                      <input pInputText type="text" formControlName="landLine">
+                      <input pInputText type="number" formControlName="landLine" min="0">
                     </div>
                   </div>
                   <div class="form-row">
@@ -184,7 +185,7 @@
                       Email Address :
                     </div>
                     <div class="form-field">
-                      <input pInputText type="email" formControlName="email">
+                      <input pInputText type="email" formControlName="email" >
                       <div class="validation-error" *ngIf="patientForm.get('email')?.invalid && patientForm.get('email')?.touched">
                         Please enter a valid email address
                       </div>

@@ -1,45 +1,55 @@
 <p-toast position="top-right"></p-toast>
 
 <div class="profile-container">
-    <div class="header">
-        <h2 class="title">EDIT PATIENT PROFILE</h2>
-        <div class="actions">
-            <!-- <button class="btn-secondary">Delete Patient</button> -->
-            <button class="btn-secondary" (click)="cancel()">Cancel</button>
-            <button class="btn-primary" [disabled]="!formValid" (click)="onSubmit()">Save Patient Profile</button>
-        </div>
+  <div class="header">
+    <h2 class="title">EDIT PATIENT PROFILE</h2>
+    <div class="actions">
+      <!-- <button class="btn-secondary">Delete Patient</button> -->
+      <button class="btn-secondary" (click)="cancel()">Cancel</button>
+      <button class="btn-primary" [disabled]="!formValid" (click)="onSubmit()">
+        Save Patient Profile
+      </button>
     </div>
+  </div>
 
-    <div class="profile-content">
-        <div class="main-content">
-            <div class="profile-image-section">
-                <img src="assets/user.webp" alt="Profile" class="profile-image">
+  <div class="profile-content">
+    <div class="main-content">
+      <div class="profile-image-section">
+        <img src="assets/user.webp" alt="Profile" class="profile-image" />
+      </div>
+      <div class="patient-form-container">
+        <form [formGroup]="patientForm">
+          <!-- Patient Name Section -->
+          <div class="form-row">
+            <div class="form-label required">First Name :</div>
+            <div class="form-field">
+              <input pInputText type="text" formControlName="firstName" />
+              <div
+                class="validation-error"
+                *ngIf="
+                  patientForm.get('firstName')?.invalid &&
+                  patientForm.get('firstName')?.touched
+                "
+              >
+                Patient name is required
+              </div>
             </div>
-            <div class="patient-form-container">
-                <form [formGroup]="patientForm">
-                  <!-- Patient Name Section -->
-                  <div class="form-row">
-                    <div class="form-label required">
-                      First Name :
-                    </div>
-                    <div class="form-field">
-                      <input pInputText type="text" formControlName="firstName">
-                      <div class="validation-error" *ngIf="patientForm.get('firstName')?.invalid && patientForm.get('firstName')?.touched">
-                        Patient name is required
-                      </div>
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-label required">
-                      Patient Id :
-                    </div>
-                    <div class="form-field">
-                      <input pInputText type="text" formControlName="customId">
-                      <div class="validation-error" *ngIf="patientForm.get('customId')?.invalid && patientForm.get('customId')?.touched">
-                        Patient ID is required
-                      </div>
-                    </div>
-                  </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label required">Patient Id :</div>
+            <div class="form-field">
+              <input pInputText type="text" formControlName="customId" />
+              <div
+                class="validation-error"
+                *ngIf="
+                  patientForm.get('customId')?.invalid &&
+                  patientForm.get('customId')?.touched
+                "
+              >
+                Patient ID is required
+              </div>
+            </div>
+          </div>
 
                   <div class="form-row">
                     <div class="form-label">
@@ -53,32 +63,63 @@
                     </div>
                   </div>
 
-                  <div class="form-row">
-                    <div class="form-label required">
-                      Gender :
-                    </div>
-                    <div class="form-field">
-                      <div class="radio-group">
-                        <p-radioButton name="gender" value="Male" label="Male" formControlName="gender"></p-radioButton>
-                        <p-radioButton name="gender" value="Female" label="Female" formControlName="gender"></p-radioButton>
-                      </div>
-                    </div>
-                  </div>
+              <!-- Error Message -->
+              <div
+                class="error"
+                *ngIf="aadhaarId?.touched && aadhaarId?.invalid"
+              >
+                <small *ngIf="aadhaarId?.errors?.['required']"
+                  >Aadhaar ID is required.</small
+                >
+                <small *ngIf="aadhaarId?.errors?.['pattern']"
+                  >Aadhaar ID must be exactly 12 digits.</small
+                >
+              </div>
+            </div>
+          </div>
 
-                  <div class="form-row">
-                    <div class="form-label">
-                      Date of Birth :
-                    </div>
-                    <div class="form-field dob-field">
-                      <p-calendar formControlName="dateOfBirth"
-                        [maxDate]="maxDate"
-                        [showIcon]="true" appendTo="body"></p-calendar>
-                      <span class="or-text"> Age:</span>
-                      <input pInputText type="number" class="age-input" formControlName="age" min="0">
-                    </div>
-                  </div>
+          <div class="form-row">
+            <div class="form-label required">Gender :</div>
+            <div class="form-field">
+              <div class="radio-group">
+                <p-radioButton
+                  name="gender"
+                  value="Male"
+                  label="Male"
+                  formControlName="gender"
+                ></p-radioButton>
+                <p-radioButton
+                  name="gender"
+                  value="Female"
+                  label="Female"
+                  formControlName="gender"
+                ></p-radioButton>
+              </div>
+            </div>
+          </div>
 
-                  <!-- <div class="form-row">
+          <div class="form-row">
+            <div class="form-label">Date of Birth :</div>
+            <div class="form-field dob-field">
+              <p-calendar
+                formControlName="dateOfBirth"
+                [maxDate]="maxDate"
+                [showIcon]="true"
+                appendTo="body"
+              ></p-calendar>
+              <span class="or-text"> Age:</span>
+              <input
+                pInputText
+                type="number"
+                class="age-input"
+                formControlName="age"
+                min="1"
+                max="200"
+              />
+            </div>
+          </div>
+
+          <!-- <div class="form-row">
                     <div class="form-label">
                       Anniversary :
                     </div>
@@ -88,42 +129,47 @@
                     </div>
                   </div> -->
 
-                  <div class="form-row">
-                    <div class="form-label">
-                      Referred by :
-                    </div>
-                    <div class="form-field referred-field">
-                      <p-dropdown [options]="referredBy" formControlName="referredBy"  placeholder="Select"></p-dropdown>
-                      <!-- <a class="add-new-link">Or add new</a> -->
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-label">
-                      Name :
-                    </div>
-                    <div class="form-field">
-                      <input pInputText type="text" formControlName="referredByName">
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-label">
-                      Mobile Number :
-                    </div>
-                    <div class="form-field">
-                      <input pInputText type="number" formControlName="referredByMobile">
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-label">
-                      Blood Group :
-                    </div>
-                    <div class="form-field">
-                      <p-dropdown [options]="bloodGroups" formControlName="bloodGroup"
-                                 [style]="{'width':'100%'}" optionLabel="label" placeholder="Select Blood Group"></p-dropdown>
-                    </div>
-                  </div>
+          <div class="form-row">
+            <div class="form-label">Referred by :</div>
+            <div class="form-field referred-field">
+              <p-dropdown
+                [options]="referredBy"
+                formControlName="referredBy"
+                placeholder="Select"
+              ></p-dropdown>
+              <!-- <a class="add-new-link">Or add new</a> -->
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Name :</div>
+            <div class="form-field">
+              <input pInputText type="text" formControlName="referredByName" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Mobile Number :</div>
+            <div class="form-field">
+              <input
+                pInputText
+                type="number"
+                formControlName="referredByMobile"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Blood Group :</div>
+            <div class="form-field">
+              <p-dropdown
+                [options]="bloodGroups"
+                formControlName="bloodGroup"
+                [style]="{ width: '100%' }"
+                optionLabel="label"
+                placeholder="Select Blood Group"
+              ></p-dropdown>
+            </div>
+          </div>
 
-                  <!-- <div class="form-row">
+          <!-- <div class="form-row">
                     <div class="form-label">
                       Family :
                     </div>
@@ -133,33 +179,51 @@
                       <input pInputText type="text" class="family-input">
                     </div>
                   </div> -->
-                  <h3 style="font-size: 1.6rem;
-                  font-weight: 500;
-                  color: #333;">Contact Details</h3>
-                  <div class="form-row">
-                    <div class="form-label required">
-                        Primary Mobile No. :
-                    </div>
-                    <div class="form-field">
-                      <input pInputText type="number" formControlName="primaryMobile">
-                      <div class="validation-error" *ngIf="patientForm.get('primaryMobile')?.invalid && patientForm.get('primaryMobile')?.touched">
-                        <span *ngIf="patientForm.get('primaryMobile')?.errors?.['required']">Mobile number is required</span>
-                        <span *ngIf="patientForm.get('primaryMobile')?.errors?.['pattern']">Please enter a valid 10-digit mobile number</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-label">
-                      Secondary Mobile No. :
-                    </div>
-                    <div class="form-field">
-                      <input pInputText type="number" formControlName="secondaryMobile">
-                      <div class="validation-error" *ngIf="patientForm.get('secondaryMobile')?.invalid && patientForm.get('secondaryMobile')?.touched">
-                        Please enter a valid 10-digit mobile number
-                      </div>
-                    </div>
-                  </div>
-                  <!-- <div class="form-row">
+          <h3 style="font-size: 1.6rem; font-weight: 500; color: #333">
+            Contact Details
+          </h3>
+          <div class="form-row">
+            <div class="form-label required">Primary Mobile No. :</div>
+            <div class="form-field">
+              <input pInputText type="number" formControlName="primaryMobile" />
+              <div
+                class="validation-error"
+                *ngIf="
+                  patientForm.get('primaryMobile')?.invalid &&
+                  patientForm.get('primaryMobile')?.touched
+                "
+              >
+                <span
+                  *ngIf="patientForm.get('primaryMobile')?.errors?.['required']"
+                  >Mobile number is required</span
+                >
+                <span
+                  *ngIf="patientForm.get('primaryMobile')?.errors?.['pattern']"
+                  >Please enter a valid 10-digit mobile number</span
+                >
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Secondary Mobile No. :</div>
+            <div class="form-field">
+              <input
+                pInputText
+                type="number"
+                formControlName="secondaryMobile"
+              />
+              <div
+                class="validation-error"
+                *ngIf="
+                  patientForm.get('secondaryMobile')?.invalid &&
+                  patientForm.get('secondaryMobile')?.touched
+                "
+              >
+                Please enter a valid 10-digit mobile number
+              </div>
+            </div>
+          </div>
+          <!-- <div class="form-row">
                     <div class="form-label">
                       Language Preference :
                     </div>
@@ -224,84 +288,100 @@
               </div>
         </div>
 
-        <div class="right-sidebar">
-          <div class="medical-history-container">
-            <div class="header">
-              <h3>Medical History</h3>
-              <button class="btn-add-complaint">
-              <span *ngIf="!addMedicalHistory" (click)="addMedicalHistory = true">Add</span>
-              <span *ngIf="addMedicalHistory" (click)="addMedicalHistory = false">Done</span>
-            </button>
+        <input
+          (keydown.enter)="addNewMedicalHistory()"
+          type="text"
+          *ngIf="addMedicalHistory"
+          pInputText
+          class="w-full"
+          placeholder="Add Medical History"
+          [(ngModel)]="addMedicalHistoryText"
+        />
+        <small
+          class="enter-message"
+          *ngIf="addMedicalHistory && addMedicalHistoryText?.trim()"
+        >
+          Press 'Enter' to add.
+        </small>
+        <form
+          [formGroup]="medicalHistoryForm"
+          *ngIf="medicalConditions.length > 0"
+        >
+          <div class="search-box" *ngIf="!addMedicalHistory">
+            <span class="p-input-icon-left w-full">
+              <i class="pi pi-search"></i>
+              <input
+                type="text"
+                pInputText
+                class="w-full"
+                placeholder="Search History"
+                formControlName="searchHistory"
+              />
+            </span>
+          </div>
+          <div class="conditions-list" formGroupName="conditions">
+            <div
+              class="condition-item"
+              *ngFor="let condition of filteredMedicalConditions"
+            >
+              <p-checkbox
+                [formControlName]="condition.id"
+                [label]="condition.name"
+                [binary]="true"
+              >
+              </p-checkbox>
             </div>
-
-
-            <input (keydown.enter)="addNewMedicalHistory()" type="text" *ngIf="addMedicalHistory"
-            pInputText
-            class="w-full"
-            placeholder="Add Medical History"
-            [(ngModel)]="addMedicalHistoryText">
-            <small class="enter-message" *ngIf="addMedicalHistory && addMedicalHistoryText?.trim()">
-                Press 'Enter' to add.
-            </small>
-            <form [formGroup]="medicalHistoryForm" *ngIf="medicalConditions.length > 0">
-              <div class="search-box" *ngIf="!addMedicalHistory" >
-                <span class="p-input-icon-left w-full">
-                  <i class="pi pi-search"></i>
-                  <input type="text"
-                         pInputText
-                         class="w-full"
-                         placeholder="Search History"
-                         formControlName="searchHistory">
-
-                </span>
-              </div>
-                <div class="conditions-list" formGroupName="conditions">
-                  <div class="condition-item" *ngFor="let condition of filteredMedicalConditions">
-                    <p-checkbox [formControlName]="condition.id"
-                               [label]="condition.name"
-                               [binary]="true">
-                    </p-checkbox>
-                  </div>
-                </div>
-
-                <div class="other-history">
-                  <h3>Other History :</h3>
-                  <textarea pInputTextarea
-                            formControlName="otherHistory"
-                            [rows]="4"
-                            class="w-full">
-                  </textarea>
-                </div>
-              </form>
-              <div class="header">
-                <h3>Groups</h3>
-                <button class="btn-add-complaint">
-
-                  <span *ngIf="!addGroup" (click)="addGroup = true">Add</span>
-                  <span *ngIf="addGroup" (click)="addGroup = false">Done</span>
-                </button>
-              </div>
-              <input (keydown.enter)="addNewGroup()" type="text" *ngIf="addGroup"
-                         pInputText
-                         class="w-full"
-                         placeholder="Add Group"
-                         [(ngModel)]="addNewGroupText">
-              <small class="enter-message" *ngIf="addGroup && addNewGroupText?.trim()">
-                Press 'Enter' to add.
-                </small>
-              <form [formGroup]="groupsForm" *ngIf="insuranceGroups.length > 0">
-                <div class="conditions-list" formGroupName="groups">
-                  <div class="condition-item" *ngFor="let condition of insuranceGroups">
-                    <p-checkbox [formControlName]="condition.id"
-                               [label]="condition.name"
-                               [binary]="true">
-                    </p-checkbox>
-                  </div>
-                </div>
-              </form>
-
           </div>
 
+          <div class="other-history">
+            <h3>Other History :</h3>
+            <textarea
+              pInputTextarea
+              formControlName="otherHistory"
+              [rows]="4"
+              class="w-full"
+            >
+            </textarea>
+          </div>
+        </form>
+        <div class="header">
+          <h3>Groups</h3>
+          <button class="btn-add-complaint">
+            <span *ngIf="!addGroup" (click)="addGroup = true">Add</span>
+            <span *ngIf="addGroup" (click)="addGroup = false">Done</span>
+          </button>
         </div>
+        <input
+          (keydown.enter)="addNewGroup()"
+          type="text"
+          *ngIf="addGroup"
+          pInputText
+          class="w-full"
+          placeholder="Add Group"
+          [(ngModel)]="addNewGroupText"
+        />
+        <small
+          class="enter-message"
+          *ngIf="addGroup && addNewGroupText?.trim()"
+        >
+          Press 'Enter' to add.
+        </small>
+        <form [formGroup]="groupsForm" *ngIf="insuranceGroups.length > 0">
+          <div class="conditions-list" formGroupName="groups">
+            <div
+              class="condition-item"
+              *ngFor="let condition of insuranceGroups"
+            >
+              <p-checkbox
+                [formControlName]="condition.id"
+                [label]="condition.name"
+                [binary]="true"
+              >
+              </p-checkbox>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
