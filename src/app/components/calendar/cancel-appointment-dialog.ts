@@ -7,6 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { AppointmentService } from '../../services/appointment.service';
 
 @Component({
   selector: 'app-cancel-appointment-dialog',
@@ -49,11 +50,7 @@ import { ToastModule } from 'primeng/toast';
           <div class="notify-options">
             <div class="p-field-checkbox">
               <p-checkbox [(ngModel)]="notifyPatientSMS" [binary]="true" inputId="notifyPatientSMS"></p-checkbox>
-              <label for="notifyPatientSMS">SMS</label>
-            </div>
-            <div class="p-field-checkbox">
-              <p-checkbox [(ngModel)]="notifyPatientEmail" [binary]="true" inputId="notifyPatientEmail"></p-checkbox>
-              <label for="notifyPatientEmail">Email</label>
+              <label for="notifyPatientSMS">WhatsApp Alert</label>
             </div>
           </div>
         </div>
@@ -63,11 +60,7 @@ import { ToastModule } from 'primeng/toast';
           <div class="notify-options">
             <div class="p-field-checkbox">
               <p-checkbox [(ngModel)]="notifyDoctorSMS" [binary]="true" inputId="notifyDoctorSMS"></p-checkbox>
-              <label for="notifyDoctorSMS">SMS</label>
-            </div>
-            <div class="p-field-checkbox">
-              <p-checkbox [(ngModel)]="notifyDoctorEmail" [binary]="true" inputId="notifyDoctorEmail"></p-checkbox>
-              <label for="notifyDoctorEmail">Email</label>
+              <label for="notifyDoctorSMS">WhatsApp Alert</label>
             </div>
           </div>
         </div>
@@ -153,7 +146,7 @@ export class CancelAppointmentDialogComponent {
   @Output() close = new EventEmitter<void>();
   @Output() confirm = new EventEmitter<any>();
 
-  constructor(private messageService: MessageService){}
+  constructor(private messageService: MessageService, private appointmentService: AppointmentService){}
   
   reasonOptions = [
     { label: 'Doctor unavailable/busy', value: 'doctor_unavailable' },
@@ -173,26 +166,40 @@ export class CancelAppointmentDialogComponent {
   }
   
   onCancelAppointment() {
-    const cancelData = {
-      appointmentId: this.appointmentData?.extendedProps?.appointmentId,
-      reason: this.selectedReason.value,
-      notifyPatient: {
-        sms: this.notifyPatientSMS,
-        email: this.notifyPatientEmail
-      },
-      notifyDoctor: {
-        sms: this.notifyDoctorSMS,
-        email: this.notifyDoctorEmail
-      },
-      deletePermanently: this.deletePermanently
-    };
-    this.messageService.add({ 
-          severity: 'success', 
-          summary: 'Success', 
-          detail: 'Deleted Event Successfully' 
-        });
-    setTimeout(() => {
-    this.confirm.emit(cancelData);
-    }, 1300);
-  }
+  const cancelData = {
+    appointmentId: this.appointmentData?.extendedProps?.appointmentId,
+    reason: this.selectedReason.value,
+    notifyPatient: {
+      sms: this.notifyPatientSMS
+    },
+    notifyDoctor: {
+      sms: this.notifyDoctorSMS
+    },
+    deletePermanently: this.deletePermanently
+  };
+
+  console.log(cancelData)
+
+  this.appointmentService.cancelAppointment(cancelData).subscribe({
+    next: () => {
+      this.messageService.add({ 
+        severity: 'success', 
+        summary: 'Success', 
+        detail: 'Appointment Cancelled Successfully' 
+      });
+
+      setTimeout(() => {
+        this.confirm.emit(cancelData);
+      }, 1300);
+    },
+    error: () => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to cancel appointment'
+      });
+    }
+  });
+}
+
 }
