@@ -695,10 +695,14 @@ atLeastOneBlockTypeValidator() {
     }
     
     this.initAppointmentForm();
-    
     if (this.patientCode) {
-      this.appointmentForm.get('patientId')?.setValue(this.patientCode);
-      this.getPatientDetails();
+       this.userService.getPatient(this.patientCode).subscribe({
+       next: (response) => {
+          const patient = response.data?.[0];
+          this.appointmentForm.get('patientId')?.setValue(patient.manual_unique_code);
+          this.getPatientDetails();
+        },
+      });
     }
     
     if (this.selectedDate && !isEdit) {

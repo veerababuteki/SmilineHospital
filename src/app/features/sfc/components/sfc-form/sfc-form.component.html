@@ -115,17 +115,20 @@
           </td>
           <td>
             <select
-              [(ngModel)]="newEntry.smilinePatient"
-              name="smilinePatient"
-              required
-              [class.invalid-field]="isFieldInvalid('smilinePatient')"
-            >
-              <option value="Y">Y</option>
-              <option value="N">N</option>
-            </select>
-            <div *ngIf="isFieldInvalid('smilinePatient')" class="error-msg">
-              
-            </div>
+  [(ngModel)]="newEntry.smilinePatient"
+  name="smilinePatient"
+  required
+  [class.invalid-field]="isFieldInvalid('smilinePatient')"
+  [disabled]="editingIndex !== null"
+  [class.readonly-field]="editingIndex !== null"
+>
+  <option value="Y">Y</option>
+  <option value="N">N</option>
+</select>
+<div *ngIf="isFieldInvalid('smilinePatient')" class="error-msg">
+  <!-- error message here -->
+</div>
+
           </td>
           <td>
             <input
@@ -179,7 +182,7 @@
             <div class="action-dropdown" (click)="$event.stopPropagation()">
               <button 
                 class="action-trigger" 
-                (click)="toggleDropdown(i)"
+               (click)="toggleDropdown(i, $event)"
                 type="button"
               >
                 <i [class]="openDropdownIndex === i ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"></i>
