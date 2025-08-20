@@ -9,15 +9,17 @@ import { Component, Input } from '@angular/core';
 })
 export class TreatmentPlansPrintComponent {
   @Input() treatmentPlan: any;
+  @Input() grandTotal: any;
   generatedDate: string = '';
   savedPractice: any;
 
   constructor() {
     this.generatedDate = new Date().toLocaleDateString();
     const selectedPractice = localStorage.getItem('selectedPractice');
-    if(selectedPractice){
+    if (selectedPractice) {
       this.savedPractice = JSON.parse(selectedPractice);
     }
+    console.log('Grand Total:', this.grandTotal);
   }
 
   print() {

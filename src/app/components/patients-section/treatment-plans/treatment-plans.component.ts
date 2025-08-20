@@ -16,6 +16,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { PatientDataService } from '../../../services/patient-data.service';
 import { ConsentFormComponent } from './consent-form/consent-form.component';
 import { DialogModule } from 'primeng/dialog'; // ✅ Add this import at the top
+import { set } from 'date-fns';
 
 @Component({
   selector: 'app-treatment-plans',
@@ -47,6 +48,7 @@ export class TreatmentPlansComponent implements OnInit {
   doctor: any;
   date: Date = new Date()
   treatmentPlans: Record<string, any[]> = {};
+  grandTotal: number = 0;
   markCompleteList: { id: number, treatment_unique_id: string }[] = []
   patientId: string | null | undefined;
   generateInvoiceList: any[] = [];
@@ -257,16 +259,30 @@ consentform(plan: any): void {
     return Object.keys(this.treatmentPlans).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
   }
 
-  // getTotalCost(treatmentGroup: any[]): number {
-  //   return treatmentGroup.reduce((acc, treatment) => acc + Number(treatment.total_cost || 0), 0);
-  // }
-  
 getGroupTotal(treatmentGroup: any[]): number {
   const total = treatmentGroup.reduce((acc, t) => acc + Number(t.total_cost || 0), 0);
-  return parseFloat(total.toFixed(3)); // keeps only 2 decimals
+  const roundTotal =  parseFloat(total.toFixed(3)); // keeps only 2 decimals
+  this.grandTotal = roundTotal;
+  return roundTotal;
 }
 
 
+// getDiscountedTotal(): number {
+// const treatment = this.treatments.at(treatmentIndex);
+//     if (!treatment) return;
+
+//     const values = treatment.value;
+//     let total = values.cost * values.quantity;
+
+//     if (values.discount > 0) {
+//       if (values.discountType === '%') {
+//         total *= (1 - values.discount / 100);
+//       } else {
+//         total -= values.discount;
+//       }
+//     }
+//     return total;
+//   }
 
   printTreatmentPlans() {
     // Save the current body content

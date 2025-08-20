@@ -183,7 +183,10 @@ export class AddProfileComponent implements OnInit {
   // Helper method to create patient form
   private createPatientForm(): FormGroup {
     return this.fb.group({
-      firstName: ['', Validators.required],
+      firstName: ['',
+        Validators.pattern('^[a-zA-Z ]+$')], // Only letters and spaces
+      lastName: ['',
+        Validators.pattern('^[a-zA-Z ]+$')], // Only letters and spaces
       customId: ['', Validators.required],
       aadhaarId: ['', Validators.pattern('^[1-9]\\d{11}$')],
       gender: ['', Validators.required],
