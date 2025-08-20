@@ -255,7 +255,8 @@ export class EditProfileComponent implements OnInit {
   }
   initiateForm(){
     this.patientForm = this.fb.group({
-      firstName: ['', Validators.required],
+       firstName: ['',
+        Validators.pattern('^[a-zA-Z ]+$')],
       customId: ['', Validators.required],
       // aadhaarId: [''],
        aadhaarId: [

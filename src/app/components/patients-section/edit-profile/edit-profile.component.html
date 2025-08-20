@@ -31,8 +31,23 @@
                   patientForm.get('firstName')?.touched
                 "
               >
-                Patient name is required
+                <!-- Patient name is required -->
+                 <span *ngIf="patientForm.get('firstName')?.errors?.['required']">
+                  Patient name is required
+                </span>
+                 <span *ngIf="patientForm.get('firstName')?.errors?.['pattern']">
+                  Patient Name should contain only alphabets.
+                </span>
               </div>
+                <!-- <div class="validation-error"
+                *ngIf="patientForm.get('firstName')?.invalid && patientForm.get('firstName')?.touched">
+                <span *ngIf="patientForm.get('firstName')?.errors?.['required']">
+                  Patient name is required
+                </span>
+                <span *ngIf="patientForm.get('firstName')?.errors?.['pattern']">
+                  Patient Name should contain only alphabets.
+                </span>
+              </div> -->
             </div>
           </div>
           <div class="form-row">
