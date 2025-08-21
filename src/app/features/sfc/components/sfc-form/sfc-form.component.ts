@@ -166,17 +166,21 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CustomCalendarComponent } from './custom-calendar/custom-calendar.component';
 import { SfcService } from '../../../../services/sfc.service';
+import { UserService } from '../../../../services/user.service';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-sfc-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, CustomCalendarComponent],
+  imports: [CommonModule, FormsModule, CustomCalendarComponent, ToastModule],
   templateUrl: './sfc-form.component.html',
-  styleUrl: './sfc-form.component.scss'
+  styleUrl: './sfc-form.component.scss',
+  providers: [MessageService]
 })
 export class SfcFormComponent {
 
-  constructor(private sfcService: SfcService) {}
+  constructor(private sfcService: SfcService, private userService: UserService, private messageService: MessageService) {}
   // Your existing code remains the same...
   editId: number | null = null;
   newEntry: {
@@ -314,89 +318,215 @@ addEntry() {
     this.newEntry.doctorAdvice,
     this.newEntry.frontOfficeRemarks
   ];
+
   const isEmpty = requiredFields.some(field => !field || field.toString().trim() === '');
   if (isEmpty) return;
 
-  if (this.editId) {
-    this.sfcService.updateSfcEntry(this.editId, this.newEntry).subscribe({
-      next: (response) => {
-        console.log('Entry updated successfully:', response);
-
-        const updatedEntry = { id: this.editId, ...this.newEntry };
-
-        // Update in main entries
-        if (this.editingIndex !== null) {
-          this.entries[this.editingIndex] = updatedEntry;
-        } else {
-          const index = this.entries.findIndex(e => e.id === this.editId);
-          if (index !== -1) this.entries[index] = updatedEntry;
-        }
-
-        // Also update in filteredData (in case it's showing a filtered view)
-        const filteredIndex = this.filteredData.findIndex(e => e.id === this.editId);
-        if (filteredIndex !== -1) {
-          this.filteredData[filteredIndex] = updatedEntry;
-        }
-
-        this.resetForm();
-      },
-      error: (error) => {
-        console.error('Failed to update entry:', error);
-      }
-    });
-    return;
-  }
-
-  this.sfcService.addSfcEntry(this.newEntry).subscribe({
+  this.userService.getPatient(this.newEntry.patientId).subscribe({
     next: (response) => {
-      console.log('Entry added successfully:', response);
+      console.log("Patient API response:", response);
+      const patient = response.data[0];
 
-      const newRecord = { id: response.id || Date.now(), ...this.newEntry };
-      this.entries.unshift(newRecord);
-      this.filteredData = [...this.entries]; // Sync filtered data
+      if (!this.editId && patient && String(this.newEntry.patientId) === String(patient.manual_unique_code)) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: "Entered Patient Id already exist"
+        });
+        return;
+      }
 
-      this.resetForm();
-      this.currentPage = 1;
+      if (this.editId) {
+        this.sfcService.updateSfcEntry(this.editId, this.newEntry).subscribe({
+          next: (response) => {
+            console.log('Entry updated successfully:', response);
+            const updatedEntry = { id: this.editId, ...this.newEntry };
+
+            if (this.editingIndex !== null) {
+              this.entries[this.editingIndex] = updatedEntry;
+            } else {
+              const index = this.entries.findIndex(e => e.id === this.editId);
+              if (index !== -1) this.entries[index] = updatedEntry;
+            }
+
+            const filteredIndex = this.filteredData.findIndex(e => e.id === this.editId);
+            if (filteredIndex !== -1) {
+              this.filteredData[filteredIndex] = updatedEntry;
+            }
+
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Entry updated successfully'
+            });
+
+            this.resetForm();
+          },
+          error: (error) => {
+            console.error('Failed to update entry:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to update entry'
+            });
+          }
+        });
+      } else {
+        this.sfcService.addSfcEntry(this.newEntry).subscribe({
+          next: (response) => {
+            console.log('Entry added successfully:', response);
+            const newRecord = { id: response.id || Date.now(), ...this.newEntry };
+            this.entries.unshift(newRecord);
+            this.filteredData = [...this.entries];
+            this.resetForm();
+            this.currentPage = 1;
+
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Entry added successfully'
+            });
+          },
+          error: (error) => {
+            console.error('Failed to add entry:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to add entry'
+            });
+          }
+        });
+      }
     },
     error: (error) => {
-      console.error('Failed to add entry:', error);
+      console.error("Patient API error:", error);
+      if (this.editId) {
+        this.sfcService.updateSfcEntry(this.editId, this.newEntry).subscribe({
+          next: () => {
+            const updatedEntry = { id: this.editId, ...this.newEntry };
+
+            if (this.editingIndex !== null) {
+              this.entries[this.editingIndex] = updatedEntry;
+            } else {
+              const index = this.entries.findIndex(e => e.id === this.editId);
+              if (index !== -1) this.entries[index] = updatedEntry;
+            }
+
+            const filteredIndex = this.filteredData.findIndex(e => e.id === this.editId);
+            if (filteredIndex !== -1) {
+              this.filteredData[filteredIndex] = updatedEntry;
+            }
+
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Entry updated successfully'
+            });
+            this.resetForm();
+          },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to update entry'
+            });
+          }
+        });
+      } else {
+        this.sfcService.addSfcEntry(this.newEntry).subscribe({
+          next: (response) => {
+            const newRecord = { id: response.id || Date.now(), ...this.newEntry };
+            this.entries.unshift(newRecord);
+            this.filteredData = [...this.entries];
+            this.currentPage = 1;
+
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Entry added successfully'
+            });
+            this.resetForm();
+          },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to add entry'
+            });
+          }
+        });
+      }
     }
   });
 }
 
+removeEntry(entry: any) {
+  this.userService.getPatient(entry.patientId).subscribe({
+    next: (response) => {
+      const patient = response.data?.[0];
 
- removeEntry(entry: any) {
-  if (!confirm('Are you sure you want to remove this entry?')) return;
-
-  this.sfcService.deleteSfcEntry(entry.id).subscribe({
-    next: () => {
-      // Remove entry from main list
-      this.entries = this.entries.filter(e => e.id !== entry.id);
-
-      // Also remove from filteredData
-      this.filteredData = this.filteredData.filter(e => e.id !== entry.id);
-
-      // Reset editing index if needed
-      if (this.editingIndex !== null && this.entries[this.editingIndex]?.id === entry.id) {
-        this.editingIndex = null;
-        this.editId = null;
+      if (patient) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Action Not Allowed',
+          detail: 'This record belongs to an existing Smiline Clinic patient and cannot be removed.'
+        });
+        return;
       }
+      
 
-      // Adjust pagination
-      if (this.currentPage > this.totalPages()) {
-        this.currentPage = this.totalPages();
-      }
+      if (!confirm('Are you sure you want to remove this entry?')) return;
 
-      // Close any open dropdown
-      this.openDropdownIndex = null;
+      this.sfcService.deleteSfcEntry(entry.id).subscribe(() => {
+        this.entries = this.entries.filter(e => e.id !== entry.id);
+        this.filteredData = this.filteredData.filter(e => e.id !== entry.id);
+
+        if (this.editingIndex !== null && this.entries[this.editingIndex]?.id === entry.id) {
+          this.editingIndex = null;
+          this.editId = null;
+        }
+
+        if (this.currentPage > this.totalPages()) {
+          this.currentPage = this.totalPages();
+        }
+
+        this.openDropdownIndex = null;
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Removed',
+          detail: 'Entry deleted successfully.'
+        });
+      });
     },
-    error: (error) => {
-      console.error('Failed to delete entry:', error);
-      alert('Failed to delete entry. Please try again.');
+    error: () => {
+      // If patient API fails → still allow delete
+      if (!confirm('Are you sure you want to remove this entry?')) return;
+
+      this.sfcService.deleteSfcEntry(entry.id).subscribe(() => {
+        this.entries = this.entries.filter(e => e.id !== entry.id);
+        this.filteredData = this.filteredData.filter(e => e.id !== entry.id);
+
+        if (this.editingIndex !== null && this.entries[this.editingIndex]?.id === entry.id) {
+          this.editingIndex = null;
+          this.editId = null;
+        }
+
+        if (this.currentPage > this.totalPages()) {
+          this.currentPage = this.totalPages();
+        }
+
+        this.openDropdownIndex = null;
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Removed',
+          detail: 'Entry deleted successfully.'
+        });
+      });
     }
   });
 }
-
 
 
   // New method to toggle dropdown
