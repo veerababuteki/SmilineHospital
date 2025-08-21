@@ -228,7 +228,7 @@
       background: #fff;
       border: 1px solid #ddd;
       padding: 8px;
-      color: #333;
+      color: #999;
       font-size: 14px;
 
       &::placeholder {
@@ -416,6 +416,7 @@
 
 .ng-invalid {
   border-color: #f44336 !important;
+  
 
   &:focus {
     box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2) !important;

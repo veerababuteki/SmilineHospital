@@ -54,6 +54,7 @@ export class EditProfileComponent implements OnInit {
   patientId: string | null | undefined;
   maxDate: Date;
   formValid: boolean = false;
+  form: any;
 
   ngOnInit(): void {
 
@@ -254,9 +255,17 @@ export class EditProfileComponent implements OnInit {
   }
   initiateForm(){
     this.patientForm = this.fb.group({
-      firstName: ['', Validators.required],
+       firstName: ['',
+        Validators.pattern('^[a-zA-Z ]+$')],
       customId: ['', Validators.required],
-      aadhaarId: [''],
+      // aadhaarId: [''],
+       aadhaarId: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^[0-9]{12}$/) // Only 12 digits
+        ]
+      ],
       gender: ['', Validators.required],
       dateOfBirth: [''],
       age: [''],
@@ -270,12 +279,18 @@ export class EditProfileComponent implements OnInit {
         Validators.pattern('^[1-9]\\d{9}$')],
       languagePreference: ['english'],
       landLine: [''],
-      email: [''],
+      email: ['', Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')],
       streetAddress: [''],
       locality: [''],
       city: [''],
-      pincode: ['']
+      pincode: ['',
+        Validators.pattern('^[1-9]\\d{6}$')],
     });
+    
+  }
+  
+  get aadhaarId() {
+    return this.form.get('aadhaarId');
   }
   filteredMedicalConditions: any[] = [];
   searchText: string = '';

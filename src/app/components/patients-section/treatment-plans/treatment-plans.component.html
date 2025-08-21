@@ -73,7 +73,7 @@
                 <td class="discount">
                   {{ treatment.discount + " " + treatment.discount_formate }}
                 </td>
-                <td class="amount">{{ treatment.total_cost | number : '1.2-2'}}</td>
+                <td class="amount total_amount">{{ treatment.cost * treatment.quantity | number : '1.2-2'}}</td>
                 <td>
                   <div>
                     Teeth:
@@ -94,6 +94,7 @@
                 <td class="actions hide-on-print">
                   <app-treatment-plans-print
                     [treatmentPlan]="treatment"
+                    [grandTotal]="grandTotal"
                   ></app-treatment-plans-print>
                   <button
                     #menuButton

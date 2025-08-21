@@ -60,15 +60,15 @@
       </div>
       <div class="total-row">
         <span class="total-label">Total Cost:</span>
-        <span>INR {{ treatmentPlan.total_cost }}</span>
+        <span>INR {{ treatmentPlan.cost  * treatmentPlan.quantity }}</span>
       </div>
       <div class="total-row">
         <span class="total-label">Total Discount:</span>
-        <span>INR {{ treatmentPlan.total_discount }}</span>
+        <span>INR {{ treatmentPlan.total_discount}}</span>
       </div>
       <div class="total-row grand-total">
         <span class="total-label">Grand Total:</span>
-        <span>INR {{ treatmentPlan.grand_total }}</span>
+        <span>INR {{ grandTotal }}</span>
       </div>
     </div>
   

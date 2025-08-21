@@ -65,6 +65,7 @@
             <div *ngIf="isFieldInvalid('date')" class="error-msg"></div>
           </td>
           <td>
+
 <input
   [(ngModel)]="newEntry.name"
   name="name"
@@ -93,6 +94,8 @@
     type="number"
     [(ngModel)]="newEntry.ageRelation"
     name="ageRelation"
+    max="200"
+    min="0"
     required
     [class.invalid-field]="isFieldInvalid('ageRelation')"
     [readonly]="editingIndex !== null"

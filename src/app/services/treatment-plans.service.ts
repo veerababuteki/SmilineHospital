@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
+import { environment } from '../../Env/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -10,8 +11,8 @@ import { AuthService } from './auth.service';
 
 export class TreatmentPlansService {
   
-  // private baseUrl = 'http://localhost:7001/api/v1';  // Replace with actual API
-  private baseUrl = 'https://apis.idental.ai/api/v1';  // Replace with actual API
+  private baseUrl = environment.baseUrl;
+  // private baseUrl = 'https://apis.idental.ai/api/v1';  // Replace with actual API
   loggedIn: boolean = false;
 
   constructor(private http: HttpClient, private router: Router, private authService: AuthService) {}

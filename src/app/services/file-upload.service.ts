@@ -2,13 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../Env/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FileUploadService {
   // private baseUrl = 'http://localhost:7001/api/v1/auth';
-  private baseUrl = 'https://apis.idental.ai/api/v1/auth';
+  // private baseUrl = 'https://apis.idental.ai/api/v1/auth';
+  private baseUrl = `${environment.baseUrl}/auth`;
+  
 
   constructor(
     private http: HttpClient,
