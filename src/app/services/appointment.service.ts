@@ -78,6 +78,27 @@ export class AppointmentService {
       );
   }
 
+  cancelAppointment(cancelData: any) {
+  const token = this.authService.getAccessToken();
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+
+  return this.http.post<any>(`${this.baseUrl}/cancelAppointment`,
+    {
+      appointmentId: cancelData.appointmentId,
+      reason: cancelData.reason,
+      notifyPatient: cancelData.notifyPatient.sms,
+      notifyDoctor: cancelData.notifyDoctor.sms,
+      deletePermanently: cancelData.deletePermanently
+    },
+    { headers }
+  ).pipe(
+    catchError(this.handleError)
+  );
+}
+
+
 createBlockCalendar(blockData: any) {
   const savedPractice = localStorage.getItem('selectedPractice');
     if(savedPractice){
