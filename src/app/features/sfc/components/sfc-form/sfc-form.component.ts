@@ -322,217 +322,142 @@ addEntry() {
   const isEmpty = requiredFields.some(field => !field || field.toString().trim() === '');
   if (isEmpty) return;
 
+  // If editing, skip patient check and update directly
+  if (this.editId) {
+    this.addSfcEntry();
+    return;
+  }
+
+  // Only check patient table for new entries
   this.userService.getPatient(this.newEntry.patientId).subscribe({
     next: (response) => {
-      console.log("Patient API response:", response);
-      const patient = response.data[0];
+      const patient = response.data?.[0];
 
-      if (!this.editId && patient && String(this.newEntry.patientId) === String(patient.manual_unique_code)) {
+      if (patient && String(this.newEntry.patientId) === String(patient.manual_unique_code)) {
         this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: "Entered Patient Id already exist"
+          severity: 'warn',
+          summary: 'Action Not Allowed',
+          detail: 'A patient with this Patient ID already exists. Cannot add SFC entry.'
         });
-        return;
+        return; // stop execution
       }
 
-      if (this.editId) {
-        this.sfcService.updateSfcEntry(this.editId, this.newEntry).subscribe({
-          next: (response) => {
-            console.log('Entry updated successfully:', response);
-            const updatedEntry = { id: this.editId, ...this.newEntry };
-
-            if (this.editingIndex !== null) {
-              this.entries[this.editingIndex] = updatedEntry;
-            } else {
-              const index = this.entries.findIndex(e => e.id === this.editId);
-              if (index !== -1) this.entries[index] = updatedEntry;
-            }
-
-            const filteredIndex = this.filteredData.findIndex(e => e.id === this.editId);
-            if (filteredIndex !== -1) {
-              this.filteredData[filteredIndex] = updatedEntry;
-            }
-
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'Entry updated successfully'
-            });
-
-            this.resetForm();
-          },
-          error: (error) => {
-            console.error('Failed to update entry:', error);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to update entry'
-            });
-          }
-        });
-      } else {
-        this.sfcService.addSfcEntry(this.newEntry).subscribe({
-          next: (response) => {
-            console.log('Entry added successfully:', response);
-            const newRecord = { id: response.id || Date.now(), ...this.newEntry };
-            this.entries.unshift(newRecord);
-            this.filteredData = [...this.entries];
-            this.resetForm();
-            this.currentPage = 1;
-
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'Entry added successfully'
-            });
-          },
-          error: (error) => {
-            console.error('Failed to add entry:', error);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to add entry'
-            });
-          }
-        });
-      }
+      this.addSfcEntry();
     },
     error: (error) => {
-      console.error("Patient API error:", error);
-      if (this.editId) {
-        this.sfcService.updateSfcEntry(this.editId, this.newEntry).subscribe({
-          next: () => {
-            const updatedEntry = { id: this.editId, ...this.newEntry };
-
-            if (this.editingIndex !== null) {
-              this.entries[this.editingIndex] = updatedEntry;
-            } else {
-              const index = this.entries.findIndex(e => e.id === this.editId);
-              if (index !== -1) this.entries[index] = updatedEntry;
-            }
-
-            const filteredIndex = this.filteredData.findIndex(e => e.id === this.editId);
-            if (filteredIndex !== -1) {
-              this.filteredData[filteredIndex] = updatedEntry;
-            }
-
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'Entry updated successfully'
-            });
-            this.resetForm();
-          },
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to update entry'
-            });
-          }
-        });
+      // Ignore 400/404 → add SFC entry
+      if (error.status === 400 || error.status === 404) {
+        this.addSfcEntry();
       } else {
-        this.sfcService.addSfcEntry(this.newEntry).subscribe({
-          next: (response) => {
-            const newRecord = { id: response.id || Date.now(), ...this.newEntry };
-            this.entries.unshift(newRecord);
-            this.filteredData = [...this.entries];
-            this.currentPage = 1;
-
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'Entry added successfully'
-            });
-            this.resetForm();
-          },
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to add entry'
-            });
-          }
-        });
+        console.error('Unexpected error checking patient:', error);
+        this.addSfcEntry();
       }
     }
   });
 }
+
+// Separate function to add/update SFC entry
+private addSfcEntry() {
+  if (this.editId) {
+    this.sfcService.updateSfcEntry(this.editId, this.newEntry).subscribe({
+      next: (response) => {
+        const updatedEntry = { id: this.editId, ...this.newEntry };
+        const index = this.entries.findIndex(e => e.id === this.editId);
+        if (index !== -1) this.entries[index] = updatedEntry;
+
+        const filteredIndex = this.filteredData.findIndex(e => e.id === this.editId);
+        if (filteredIndex !== -1) this.filteredData[filteredIndex] = updatedEntry;
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Entry Updated Successfully.'
+        });
+        this.resetForm();
+      },
+      error: (error) => console.error('Failed to update entry:', error)
+    });
+    return;
+  }
+
+  // Add new SFC entry
+  this.sfcService.addSfcEntry(this.newEntry).subscribe({
+    next: (response) => {
+      const newRecord = { id: response.data?.id || response.id, ...this.newEntry };
+      this.entries.unshift(newRecord);
+      this.filteredData = [...this.entries];
+      this.resetForm();
+      this.currentPage = 1;
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Entry Added Successfully.'
+      });
+    },
+    error: (error) => console.error('Failed to add entry:', error)
+  });
+}
+
+
 
 removeEntry(entry: any) {
   this.userService.getPatient(entry.patientId).subscribe({
     next: (response) => {
       const patient = response.data?.[0];
-
-      if (patient) {
+      if (patient && String(entry.patientId) === String(patient.manual_unique_code)) {
+        // If patient exists in backend → do not delete
         this.messageService.add({
           severity: 'warn',
           summary: 'Action Not Allowed',
-          detail: 'This record belongs to an existing Smiline Clinic patient and cannot be removed.'
+          detail: 'This record belongs to an existing patient and cannot be removed.'
         });
         return;
       }
-      
-
-      if (!confirm('Are you sure you want to remove this entry?')) return;
-
-      this.sfcService.deleteSfcEntry(entry.id).subscribe(() => {
-        this.entries = this.entries.filter(e => e.id !== entry.id);
-        this.filteredData = this.filteredData.filter(e => e.id !== entry.id);
-
-        if (this.editingIndex !== null && this.entries[this.editingIndex]?.id === entry.id) {
-          this.editingIndex = null;
-          this.editId = null;
-        }
-
-        if (this.currentPage > this.totalPages()) {
-          this.currentPage = this.totalPages();
-        }
-
-        this.openDropdownIndex = null;
-
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Removed',
-          detail: 'Entry deleted successfully.'
-        });
-      });
+      this.confirmAndDelete(entry);
     },
     error: () => {
-      // If patient API fails → still allow delete
-      if (!confirm('Are you sure you want to remove this entry?')) return;
-
-      this.sfcService.deleteSfcEntry(entry.id).subscribe(() => {
-        this.entries = this.entries.filter(e => e.id !== entry.id);
-        this.filteredData = this.filteredData.filter(e => e.id !== entry.id);
-
-        if (this.editingIndex !== null && this.entries[this.editingIndex]?.id === entry.id) {
-          this.editingIndex = null;
-          this.editId = null;
-        }
-
-        if (this.currentPage > this.totalPages()) {
-          this.currentPage = this.totalPages();
-        }
-
-        this.openDropdownIndex = null;
-
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Removed',
-          detail: 'Entry deleted successfully.'
-        });
-      });
+      // If getPatient fails (like 400), still allow deletion
+      this.confirmAndDelete(entry);
     }
+  });
+}
+
+confirmAndDelete(entry: any) {
+  console.log(entry.id, "Entry ID")
+  if (!confirm('Are you sure you want to remove this entry?')) return;
+
+  this.sfcService.deleteSfcEntry(entry.id).subscribe(() => {
+    this.entries = this.entries.filter(e => e.id !== entry.id);
+    this.filteredData = this.filteredData.filter(e => e.id !== entry.id);
+    this.editingIndex = null;
+    this.editId = null;
+    this.currentPage = this.totalPages();
+    this.openDropdownIndex = null;
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Removed',
+      detail: 'Entry deleted successfully.'
+    });
   });
 }
 
 
   // New method to toggle dropdown
-  toggleDropdown(index: number) {
-    this.openDropdownIndex = this.openDropdownIndex === index ? null : index;
+toggleDropdown(i: number, event: MouseEvent) {
+  this.openDropdownIndex = this.openDropdownIndex === i ? null : i;
+
+  if (this.openDropdownIndex !== null) {
+    const trigger = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    const dropdown = document.querySelectorAll('.dropdown-menu')[i] as HTMLElement;
+
+    if (dropdown) {
+      dropdown.style.position = 'fixed';
+      dropdown.style.top = `${trigger.bottom + 8}px`;   // 8px gap
+      dropdown.style.left = `${trigger.left - 110}px`;   // shifted left by 80px
+    }
   }
+}
+
 
   // New method to close dropdown when clicking outside
   closeDropdown() {
