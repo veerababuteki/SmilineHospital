@@ -4,6 +4,7 @@ import { catchError, Observable, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { environment } from '../../Env/environment';
+import { format } from 'date-fns';
 
 @Injectable({
   providedIn: 'root',
@@ -50,6 +51,42 @@ export class AppointmentService {
 
     return this.http.get<any>(`${this.baseUrl}/appointmentsByDateAndBranch?from_date=${from_date}&to_date=${to_date}&branch_id=${this.selectedPractice.branch_id}`, { headers });
   }
+
+getAppointmentsByDateRange(fromDate: string, toDate: string) {
+  const formattedFrom = format(new Date(fromDate), 'yyyy-MM-dd HH:mm:ss');
+  const formattedTo = format(new Date(toDate), 'yyyy-MM-dd HH:mm:ss');
+
+  const token = this.authService.getAccessToken();
+  const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+
+  return this.http.get<any>(`${this.baseUrl}/getAppointmentByDateRange`, {
+    headers,
+    params: {
+      from_date: formattedFrom,
+      to_date: formattedTo
+    }
+  }).pipe(
+    catchError(this.handleError)
+  );
+}
+
+getAppointmentsByDateAndTimeRange(date: string, fromTime: string, toTime: string) {
+  const token = this.authService.getAccessToken();
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+
+  return this.http.get<any>(`${this.baseUrl}/getAppointmentByDateTimeRange`, {
+    headers,
+    params: {
+      date: date,
+      from_time: fromTime,
+      to_time: toTime
+    }
+  }).pipe(
+    catchError(this.handleError)
+  );
+}
 
   updateAppointment(appointment: any){
     const token = this.authService.getAccessToken();

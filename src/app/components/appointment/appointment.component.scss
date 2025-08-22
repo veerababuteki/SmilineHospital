@@ -1818,3 +1818,100 @@
     }
   }
 }
+
+.appointment-list {
+  border: 1px solid #f0c36d;
+  background: #fffdf5;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 14px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.alert-message {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: #a94442;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.alert-message i {
+  margin-right: 6px;
+  color: #d9534f;
+  font-size: 14px;
+}
+
+.appointment-items {
+  border-top: 1px solid #eee;
+  padding-top: 6px;
+
+  /* Scroll bar settings */
+  max-height: 141px;   /* reduced height for compact view */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Scrollbar customization (for WebKit browsers like Chrome/Edge/Safari) */
+.appointment-items::-webkit-scrollbar {
+  width: 5px;
+}
+
+.appointment-items::-webkit-scrollbar-track {
+  background: #f7f7f7;
+  border-radius: 4px;
+}
+
+.appointment-items::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.appointment-items::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+.appointment-item {
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed #eee;
+}
+
+.appointment-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.appointment-date {
+  font-weight: 600;
+  font-size: 13px;
+  color: #444;
+  margin-bottom: 3px;
+}
+
+.appointment-time,
+.doctor-name {
+  font-size: 12px;
+  color: #666;
+  margin: 1px 0;
+}
+
+.no-appointments {
+  background-color: #f4f6f8;
+  border: 1px dashed #b0b0b0;
+  color: #292929;
+  font-size: 12px;
+  padding: 16px;
+  margin-top: 16px;
+  border-radius: 8px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.no-appointments br {
+  margin-bottom: 6px;
+}
+
