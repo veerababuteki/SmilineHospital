@@ -77,7 +77,7 @@ export class ConsentFormComponent implements OnInit {
     },
     drugs: {
       title: 'DRUGS AND MEDICATION:',
-      content: 'I understand that antibiotics, analgesics, and other medications can cause allergic reactions causing redness, swelling of tissues, pain itching, vomiting, and/or anaphylactic shock (severe allergic reaction). They may cause drowsiness and lack of awareness and coordination, which can be increased by the use of alcohol or other drugs. I understand that failure to take medications prescribed for me in the manner prescribed may offee risks of continued or aggravated infection, pain, and potential resistance to effect treatment of my condition'
+      content: 'I understand that antibiotics, analgesics, and other medications can cause allergic reactions causing redness, swelling of tissues, pain itching, vomiting, and/or anaphylactic shock (severe allergic reaction). They may cause drowsiness and lack of awareness and coordination, which can be increased by the use of alcohol or other drugs. I understand that failure to take medications prescribed for me in the manner prescribed may offer risks of continued or aggravated infection, pain, and potential resistance to effect treatment of my condition'
     },
     anesthesia: {
       title: 'ADMINISTRATION OF LOCAL ANESTHESIA:',
@@ -85,7 +85,7 @@ export class ConsentFormComponent implements OnInit {
     },
     fillings: {
       title: 'FILLINGS:',
-      content: 'I understand that care must be exercised in chewing on filling during the first 24 hours to avoid breakage, and tooth sensitivity is common after-effect of a newly placed filling. I understand more extensive filling or even a root canal may be required due to additional decay, which get disclosed while cleaning the cavity. I understand that over a period of time, the composite fillings, because of mouth fluids, diffeeent foods eaten, smoking, etc. may cause the shade to change. Also due to extreme chewing forces or other traumatic factors, it is possible for composite resin fillings or bonded aesthetic restorations to be displaced or fractured. The resin-enamel bond may fail, resulting in leakage and recurrent decay. Though the dentist has no control over these factors but early detection can save the tooth from further damage.'
+      content: 'I understand that care must be exercised in chewing on filling during the first 24 hours to avoid breakage, and tooth sensitivity is common after-effect of a newly placed filling. I understand more extensive filling or even a root canal may be required due to additional decay, which get disclosed while cleaning the cavity. I understand that over a period of time, the composite fillings, because of mouth fluids, different foods eaten, smoking, etc. may cause the shade to change. Also due to extreme chewing forces or other traumatic factors, it is possible for composite resin fillings or bonded aesthetic restorations to be displaced or fractured. The resin-enamel bond may fail, resulting in leakage and recurrent decay. Though the dentist has no control over these factors but early detection can save the tooth from further damage.'
     },
     crowns: {
       title: 'CROWNS, BRIDGES, VENEERS:',
@@ -105,7 +105,7 @@ export class ConsentFormComponent implements OnInit {
     },
     extraction: {
       title: 'REMOVAL OF TEETH (EXTRACTION):',
-      content: 'I understand that if a tooth is not savable by e.g. root canal therapy, crowns, periodontal surgery, etc., it may be recommended that the tooth be extracted. I authorize dentist to remove the following teeth and any others necessary for reasons in paragraph #31 understand removing teeth does not always remove all infection if present and it may be necessary to have further treatment. I understand that the following are some risks involved in having teeth removed: pain, swelling, and spread of infection, dry socket, loss of feeling in my teeth, lips, tongue, and surrounding tissue (paresthesia) that can last for an indefinite period of time or fractured jaw. I understand the absolute necessity to foliow the post extraction instructions including the one to avoid alcohol and smoking following extraction for healing purpose. I understand I may need further treatment by a specialist or even hospitalization if complications arise during or following treatment, the cost of which is my responsibility.'
+      content: 'I understand that if a tooth is not savable by e.g. root canal therapy, crowns, periodontal surgery, etc., it may be recommended that the tooth be extracted. I authorize dentist to remove the following teeth and any others necessary for reasons in paragraph #31 understand removing teeth does not always remove all infection if present and it may be necessary to have further treatment. I understand that the following are some risks involved in having teeth removed: pain, swelling, and spread of infection, dry socket, loss of feeling in my teeth, lips, tongue, and surrounding tissue (paresthesia) that can last for an indefinite period of time or fractured jaw. I understand the absolute necessity to follow the post extraction instructions including the one to avoid alcohol and smoking following extraction for healing purpose. I understand I may need further treatment by a specialist or even hospitalization if complications arise during or following treatment, the cost of which is my responsibility.'
     },
     general: {
       title: 'GENERAL:',
@@ -306,7 +306,7 @@ export class ConsentFormComponent implements OnInit {
     }
 
     // Validate file sizes and types
-    const maxSizeInBytes = 5* 1024 * 1024; // 10MB in bytes
+    const maxSizeInBytes = 20 * 1024 * 1024; // 20MB in bytes
     const invalidFiles = newFiles.filter(form => {
       const file = form.file;
       return file.size > maxSizeInBytes || file.type !== 'application/pdf';

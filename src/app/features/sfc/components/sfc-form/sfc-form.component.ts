@@ -1,7 +1,7 @@
 // Updated sfc-form.component.ts - Modified methods for row-specific actions
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, Validators } from '@angular/forms';
 import { CustomCalendarComponent } from './custom-calendar/custom-calendar.component';
 import { SfcService } from '../../../../services/sfc.service';
 import { UserService } from '../../../../services/user.service';
@@ -145,6 +145,7 @@ export class SfcFormComponent {
 addEntry() {
   this.submitted = true;
 
+
   const requiredFields = [
     this.newEntry.date,
     this.newEntry.name,
@@ -159,6 +160,26 @@ addEntry() {
 
   const isEmpty = requiredFields.some(field => !field || field.toString().trim() === '');
   if (isEmpty) return;
+
+  // Character-only validation for name
+  if (!/^[A-Za-z ]+$/.test(this.newEntry.name)) {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Invalid Name',
+      detail: 'Name should contain characters only.'
+    });
+    return;
+  }
+
+  // Check for negative ageRelation
+  if (Number(this.newEntry.ageRelation) < 0) {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Invalid Age',
+      detail: 'Age cannot be negative.'
+    });
+    return;
+  }
 
   this.userService.getPatient(this.newEntry.patientId).subscribe({
     next: (response) => {
