@@ -609,7 +609,7 @@ atLeastOneBlockTypeValidator() {
       patientId: ['', Validators.required],
       mobileNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       emailId: ['', [Validators.email]],
-      doctor: [''],
+      doctor: ['', Validators.required],
       category: [''],
       scheduledDate: [scheduledDate, Validators.required],
       scheduledTime: [scheduledDate, Validators.required],

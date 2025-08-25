@@ -1,3 +1,4 @@
+<p-toast></p-toast>
 <div class="sfc-header">
   <div class="left-section">
     <span class="title">Smiline Family Club</span>
@@ -51,45 +52,55 @@
         <!-- Row for new entry -->
         <tr>
           <td>
-            <div class="date-input-container">
-              <app-custom-calendar
-                [selectedDate]="newEntry.date"
-                [isInvalid]="isFieldInvalid('date')"
-                (dateSelected)="onDateSelected($event)"
-              ></app-custom-calendar>
-            </div>
+           <div 
+  class="date-input-container" 
+  [ngStyle]="editingIndex !== null ? {'pointer-events': 'none', 'opacity': '0.7', 'cursor': 'not-allowed'} : {}"
+>
+  <app-custom-calendar
+    [selectedDate]="newEntry.date"
+    [isInvalid]="isFieldInvalid('date')"
+    (dateSelected)="onDateSelected($event)"
+  ></app-custom-calendar>
+</div>
             <div *ngIf="isFieldInvalid('date')" class="error-msg"></div>
           </td>
           <td>
-            <input
-              [(ngModel)]="newEntry.name"
-              name="name"
-              maxlength="150"
-              required
-              [class.invalid-field]="isFieldInvalid('name')"
-            />
-            <div *ngIf="isFieldInvalid('name')" class="error-msg">
-             
-            </div>
-          </td>
-          <td>
-            <input
-              [(ngModel)]="newEntry.patientId"
-              name="patientId"
-              [class.invalid-field]="isFieldInvalid('patientId')"
-            />
-            <div *ngIf="isFieldInvalid('patientId')" class="error-msg"></div>
-          </td>
-          <td>
-            <input
-              type="number"
-              [(ngModel)]="newEntry.ageRelation"
-              name="ageRelation"
-              required
-              max="200"
-              min="0"
-              [class.invalid-field]="isFieldInvalid('ageRelation')"
-            />
+
+<input
+  [(ngModel)]="newEntry.name"
+  name="name"
+  maxlength="150"
+  required
+  [required]="editingIndex === null"
+  [readonly]="editingIndex !== null"
+  [class.invalid-field]="isFieldInvalid('name')"
+  [class.readonly-field]="editingIndex !== null"
+/>
+<div *ngIf="isFieldInvalid('name')" class="error-msg"></div>
+
+<td>
+  <input
+    [(ngModel)]="newEntry.patientId"
+    name="patientId"
+    [class.invalid-field]="isFieldInvalid('patientId')"
+    [readonly]="editingIndex !== null"
+    [class.readonly-field]="editingIndex !== null"
+  />
+  <div *ngIf="isFieldInvalid('patientId')" class="error-msg"></div>
+</td>
+
+<td>
+  <input
+    type="number"
+    [(ngModel)]="newEntry.ageRelation"
+    name="ageRelation"
+    max="200"
+    min="0"
+    required
+    [class.invalid-field]="isFieldInvalid('ageRelation')"
+    [readonly]="editingIndex !== null"
+    [class.readonly-field]="editingIndex !== null"
+/>
             <div *ngIf="isFieldInvalid('ageRelation')" class="error-msg">
               
             </div>
