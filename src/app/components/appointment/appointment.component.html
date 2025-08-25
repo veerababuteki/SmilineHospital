@@ -365,6 +365,7 @@
                   optionLabel="name"
                   [style]="{'width':'100%'}" 
                   styleClass="bordered-dropdown"
+                  (onChange)="onDateSelectionChange()"
                   placeholder="All Doctors" 
                   [filter]="true" 
                   filterBy="name"
@@ -377,11 +378,11 @@
   <!-- Block Type Selection -->
   <div class="form-row block-type-row">
     <div class="radio-wrapper">
-      <input type="radio" formControlName="blockType" value="allDay" id="allDay">
+      <input type="radio" formControlName="blockType" value="allDay" id="allDay" (change)="onDateSelectionChange()">
       <label for="allDay" class="radio-label">All Day</label>
     </div>
     <div class="radio-wrapper">
-      <input type="radio" formControlName="blockType" value="blockSlot" id="blockSlot">
+      <input type="radio" formControlName="blockType" value="blockSlot" id="blockSlot" (change)="onDateSelectionChange()">
       <label for="blockSlot" class="radio-label">Block Slot</label>
     </div>
   </div>
@@ -393,6 +394,7 @@
     <div>
       <p-calendar formControlName="fromDate" 
                   [showIcon]="true" 
+                  (onSelect)="onDateSelectionChange()"
                   dateFormat="dd-mm-yy"
                   [minDate]="today">
       </p-calendar>
@@ -404,6 +406,7 @@
       <p-calendar formControlName="toDate" 
                   [showIcon]="true" 
                   dateFormat="dd-mm-yy"
+                  (onSelect)="onDateSelectionChange()"
                   [minDate]="today">
       </p-calendar>
       <small class="error-message" 
@@ -421,19 +424,22 @@
       <p-calendar formControlName="date" 
                   [showIcon]="true" 
                   dateFormat="dd-mm-yy"
+                  (onSelect)="onDateSelectionChange()"
                   [minDate]="today"
                   [ngClass]="{'ng-invalid': blockCalendarForm.get('date')?.invalid && blockCalendarForm.get('date')?.touched}">
       </p-calendar>
       <p-calendar formControlName="startTime" 
                   [timeOnly]="true" 
                   [showIcon]="false" 
+                  (onSelect)="onDateSelectionChange()"
                   hourFormat="12"
                   [ngClass]="{'ng-invalid': blockCalendarForm.get('startTime')?.invalid && blockCalendarForm.get('startTime')?.touched}">
       </p-calendar>
       <span>to</span>
       <p-calendar formControlName="endTime" 
                   [timeOnly]="true" 
-                  [showIcon]="false" 
+                  [showIcon]="false"
+                  (onSelect)="onDateSelectionChange()"
                   hourFormat="12"
                   [ngClass]="{'ng-invalid': blockCalendarForm.get('endTime')?.invalid && blockCalendarForm.get('endTime')?.touched}">
       </p-calendar>
@@ -464,6 +470,38 @@
       Please select at least one block type when blocking for all doctors
     </small>
   </div>
+
+<!-- Patient Appointment List (Dynamic) -->
+<div class="appointment-list" *ngIf="appointments?.length">
+  <div class="alert-message">
+    <i class="pi pi-exclamation-triangle"></i>
+    <span>
+      {{ appointments.length > 1 
+        ? 'All appointments below will be cancelled' 
+        : 'The below appointment will be cancelled' }}
+    </span>
+  </div>
+  <div class="appointment-items">
+    <div *ngFor="let appointment of appointments" class="appointment-item">
+      <div class="appointment-date">
+        {{ appointment.appointment_date | date: 'MMM d, EEEE' }}
+      </div>
+      <div class="appointment-details">
+        <div class="appointment-time">
+          {{ appointment.appointment_time || '--:--' }} - {{ appointment.patient_name }} ({{ appointment.manual_unique_code }})
+        </div>
+        <div class="doctor-name">
+  {{ appointment.doctor_name ? 'Dr. ' + appointment.doctor_name : '' }}
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- If no appointments found -->
+<div class="no-appointments" *ngIf="appointments?.length === 0 && showAppointments">
+  No appointments found for the selected range.
+</div>
 
   <!-- Caution Message -->
   <div class="caution-message">
@@ -545,4 +583,4 @@
 </p-dialog>
 <button *ngIf="activeTab === 'appointment' && !fromPatientsection" type="button" class="add-appointment-btn" label="Add Walk-in Appointment" (click)="showDialog()">{{isDoctor ? 'Add Appointment' : 'Book Appointment'}}</button>
 <button *ngIf="activeTab === 'appointment' && fromPatientsection" type="button" class="add-btn" label="Add Walk-in Appointment" (click)="showDialog()">{{isDoctor ? '+ Add' : 'Book Appointment'}}</button>
-<span *ngIf="activeTab === 'blockCalendar'" class="cursor-pointer" (click)="showDialog()">Block Calendar</span>
+<span *ngIf="activeTab === 'blockCalendar'" class="cursor-pointer" (click)="showDialog(); onDateSelectionChange()">Block Calendar</span>
