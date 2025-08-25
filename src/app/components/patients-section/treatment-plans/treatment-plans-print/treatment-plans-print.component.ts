@@ -22,6 +22,12 @@ export class TreatmentPlansPrintComponent {
     console.log('Grand Total:', this.grandTotal);
   }
 
+  calculateDiscount(cost: number): number {
+    let discountRate: number = this.treatmentPlan.discount/100;
+    let totalDiscountedAmount: number = discountRate * cost;
+    return totalDiscountedAmount;
+  }
+
   print() {
     const printContent = document.getElementById(`treatmentPlan${this.treatmentPlan.id}`)!;
     if (!printContent) return;
