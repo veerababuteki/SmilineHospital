@@ -968,8 +968,8 @@ onSubmit() {
       if (isStatusUnchanged && isOtherFieldsModified) {
         this.messageService.add({
           severity: 'warn',
-          summary: 'Status Update Recommended',
-          detail: 'Consider updating the status field to reflect the appointment changes.'
+          summary: 'Please review and update the status field if needed.',
+          detail: 'Update the status field to reflect appointment changes.'
         });
       }
       
