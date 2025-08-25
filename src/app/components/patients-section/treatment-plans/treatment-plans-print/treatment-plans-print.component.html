@@ -64,11 +64,14 @@
       </div>
       <div class="total-row">
         <span class="total-label">Total Discount:</span>
-        <span>INR {{ treatmentPlan.total_discount}}</span>
+        <span>INR {{ calculateDiscount(treatmentPlan.total_discount)}}</span>
+
       </div>
       <div class="total-row grand-total">
         <span class="total-label">Grand Total:</span>
-        <span>INR {{ grandTotal }}</span>
+        <!-- <span>INR {{ grandTotal }}</span> -->
+        <span>INR {{ (treatmentPlan.cost  * treatmentPlan.quantity) - calculateDiscount(treatmentPlan.total_discount) }}</span>
+
       </div>
     </div>
   

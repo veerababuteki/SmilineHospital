@@ -3,6 +3,25 @@
     padding: 15px;
     background: #fff;
 
+  .initial-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    background-color: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    margin: 20px 0;
+
+    p {
+      font-size: 16px;
+      color: #6c757d;
+      margin: 0;
+      text-align: center;
+      font-weight: 500;
+    }
+  }
+    
     .header {
       display: flex;
       justify-content: space-between;

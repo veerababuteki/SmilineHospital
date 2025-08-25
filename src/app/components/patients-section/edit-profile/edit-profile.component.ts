@@ -262,7 +262,6 @@ export class EditProfileComponent implements OnInit {
        aadhaarId: [
         '',
         [
-          Validators.required,
           Validators.pattern(/^[0-9]{12}$/) // Only 12 digits
         ]
       ],
@@ -283,8 +282,11 @@ export class EditProfileComponent implements OnInit {
       streetAddress: [''],
       locality: [''],
       city: [''],
-      pincode: ['',
-        Validators.pattern('^[1-9]\\d{6}$')],
+        pincode: ['', [     
+          Validators.pattern('^[1-9][0-9]{5}$'),
+          Validators.minLength(6),
+          Validators.maxLength(6)
+        ]],
     });
     
   }
