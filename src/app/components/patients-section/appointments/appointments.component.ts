@@ -8,13 +8,16 @@ import { AppointmentComponent } from '../../appointment/appointment.component';
 import { AuthService } from '../../../services/auth.service';
 import { MessageService } from '../../../services/message.service';
 import { PatientDataService } from '../../../services/patient-data.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService as Toaster } from 'primeng/api';
 
 @Component({
   selector: 'app-appointments',
   templateUrl: './appointments.component.html',
   styleUrls: ['./appointments.component.scss'],
   standalone: true,
-  imports: [ CommonModule, AppointmentComponent ]
+  imports: [ CommonModule, AppointmentComponent, ToastModule ],
+  providers: [Toaster]
 })
 export class AppointmentsComponent implements OnInit {
   appointments: Record<string, any[]> = {};
@@ -36,6 +39,7 @@ export class AppointmentsComponent implements OnInit {
     private router: Router, 
     private appointmentService: AppointmentService,
     private messageService: MessageService,
+    private toaster: Toaster
   ) {}
   
     // Set the minDate to beginning of today (midnight)

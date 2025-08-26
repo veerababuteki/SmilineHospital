@@ -83,23 +83,23 @@ import { Router } from '@angular/router';
                 <span>{{ event.extendedProps?.age || '' }} </span>
               </div>
             <div 
-            class="show-balance" 
-            (click)="event.showBalance = !event.showBalance" 
-            [ngStyle]="{
-              'color': event.showBalance 
-                        ? (event.extendedProps?.availableAdvance == 0 ? 'red' : 'green') 
-                        : '#1a9ccf',
-              'opacity': event.showBalance && event.extendedProps?.availableAdvance == 0 ? 0.6 : 1,
-              'display': 'inline-block',
-              'width': '110px', 
-              'text-align': 'left'
-            }">
-            {{ event.showBalance 
-                ? (event.extendedProps?.availableAdvance == 0 
-                      ? 'INR 0.00' 
-                      : ('INR ' + event.extendedProps?.availableAdvance)) 
-                : 'Show Balance' }}
-          </div>
+  class="show-balance" 
+  (click)="event.showBalance = !event.showBalance" 
+  [ngStyle]="{
+    'color': event.showBalance 
+              ? (event.extendedProps?.availableAdvance == 0 ? 'red' : 'green') 
+              : '#1a9ccf',
+    'opacity': event.showBalance && event.extendedProps?.availableAdvance == 0 ? 0.6 : 1,
+    'display': 'inline-block',
+    'width': '110px', 
+    'text-align': 'left'
+  }">
+  {{ event.showBalance 
+      ? (event.extendedProps?.availableAdvance == 0 
+            ? 'INR 0.00' 
+            : ('INR ' + (event.extendedProps?.availableAdvance | number:'1.2-2'))) 
+      : 'Show Balance' }}
+</div>
             </div>
           </div>
           <div>

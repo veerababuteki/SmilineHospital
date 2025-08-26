@@ -571,6 +571,9 @@ td.action-column {
   
   .dropdown-menu {
     position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
     pointer-events: all;
     width: 160px;
     background: white;
