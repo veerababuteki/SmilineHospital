@@ -73,6 +73,7 @@ import { Router } from '@angular/router';
       <div *ngIf="!isBlockCalendarEvent" class="appointment-content">
         <div class="event-header">
           <div class="avatar-section">
+            <!-- <pre>{{ getInitials(event.extendedProps?.patientName) }} </pre> -->
             <p-avatar [label]="getInitials(event.extendedProps?.patientName)" shape="circle" size="large" class="patient-avatar"></p-avatar>
             <div class="patient-info">
               <a (click)="navigateToProfile()"><h3>{{ event.extendedProps?.patientName }}</h3></a>
@@ -535,15 +536,21 @@ export class EventPopoverComponent {
   }
 
   navigateToProfile() {
+  const patientId = this.event.extendedProps?.patientId;
+  const patientCode = this.event.extendedProps?.patientCode || this.event.extendedProps?.unique_code;
+  if (patientId && patientCode) {
     const url = this.router.createUrlTree([
       'patients',
-      this.event.extendedProps?.patientId,
+      patientId,
       'profile',
-      this.event.extendedProps?.patientCode
-    ]).toString()
+      patientCode
+    ]).toString();
     window.open(url, '_blank');
+  } else {
+    // Optionally show an error or fallback
+    alert('Patient ID or Code missing!');
   }
-
+}
   deleteEvent() {
     this.delete.emit(this.event);
     this.close.emit();

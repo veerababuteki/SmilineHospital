@@ -262,7 +262,6 @@ export class EditProfileComponent implements OnInit {
        aadhaarId: [
         '',
         [
-          Validators.required,
           Validators.pattern(/^[0-9]{12}$/) // Only 12 digits
         ]
       ],
@@ -274,17 +273,30 @@ export class EditProfileComponent implements OnInit {
       referredByMobile: ['',
         Validators.pattern('^[1-9]\\d{9}$')],
       bloodGroup: [null],
-      primaryMobile: ['', Validators.required],
+      primaryMobile: ['', Validators.required,
+        [Validators.pattern('^[1-9]\\d{9}$'),
+          Validators.minLength(10),
+          Validators.maxLength(10)
+        ]
+      ],
       secondaryMobile: ['',
-        Validators.pattern('^[1-9]\\d{9}$')],
+       [Validators.pattern('^[1-9]\\d{9}$'),
+        Validators.minLength(10),
+        Validators.maxLength(10)]
+      ],
       languagePreference: ['english'],
-      landLine: [''],
+      landLine: ['',[ Validators.pattern('^[1-9]\\d{9}$'),
+]
+      ],
       email: ['', Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')],
       streetAddress: [''],
       locality: [''],
       city: [''],
-      pincode: ['',
-        Validators.pattern('^[1-9]\\d{6}$')],
+        pincode: ['', [     
+          Validators.pattern('^[1-9][0-9]{5}$'),
+          Validators.minLength(6),
+          Validators.maxLength(6)
+        ]],
     });
     
   }
@@ -365,7 +377,7 @@ export class EditProfileComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Validation Error',
-        detail: 'Please fill all required fields'
+        detail: 'Please check the highlighted fields.'
       });
       this.markFormGroupTouched(this.patientForm);
     }

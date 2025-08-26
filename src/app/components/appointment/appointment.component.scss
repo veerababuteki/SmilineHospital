@@ -2,6 +2,7 @@
 :host ::ng-deep .appointment-dialog {
   .p-dialog-content {
     padding: 0;
+    
   }
 }
 
@@ -228,7 +229,7 @@
       background: #fff;
       border: 1px solid #ddd;
       padding: 8px;
-      color: #999;
+      color: #333;
       font-size: 14px;
 
       &::placeholder {
