@@ -764,6 +764,7 @@ export class CalendarComponent implements OnInit {
         status: 'unavailable',
         patientCode: a.patient_details.manual_unique_code,
         patientId: a.patient_details.patient_id,
+        patientUniqueCode: a.patient_details.unique_code,
         patientName:
           a.patient_details.user_profile_details[0].first_name + ' ' +
           a.patient_details.user_profile_details[0].last_name,
