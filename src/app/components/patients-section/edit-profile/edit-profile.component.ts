@@ -285,8 +285,7 @@ export class EditProfileComponent implements OnInit {
       streetAddress: [''],
       locality: [''],
       city: [''],
-      pincode: ['',
-        Validators.pattern('^[1-9]\\d{6}$')],
+      pincode: [''],
     });
     
   }
