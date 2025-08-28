@@ -407,7 +407,7 @@ export class CalendarComponent implements OnInit {
         allDay: false,
         extendedProps: {
           status: 'unavailable',
-          patientCode: a.patient_details.manual_unique_code,
+          patientCode: a.patient_details.unique_code,
           patientId: a.patient_details.patient_id,
           patientName: a.patient_details.user_profile_details[0].first_name + ' ' + a.patient_details.user_profile_details[0].last_name,
           phone: '+91 ' + a.patient_details.phone,
@@ -448,7 +448,7 @@ export class CalendarComponent implements OnInit {
         allDay: false,
         extendedProps: {
           status: 'unavailable',
-          patientCode: a.patient_details.manual_unique_code,
+          patientCode: a.patient_details.unique_code,
           patientId: a.patient_details.patient_id,
           patientName: a.patient_details.user_profile_details[0].first_name + ' ' + a.patient_details.user_profile_details[0].last_name,
           phone: '+91 ' + a.patient_details.phone,

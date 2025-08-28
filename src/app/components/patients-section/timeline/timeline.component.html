@@ -202,7 +202,7 @@
                     Clinical Notes
                   </div>
                   <div class="event-time" *ngIf="item.created_at">
-                    {{ item.created_at | date : "MMM dd, yyyy HH:mm" }}
+                    {{ item.created_at | date : "MMM dd, yyyy " }}
                   </div>
                 </div>
                 <div class="event-body">
@@ -287,12 +287,12 @@
                       *ngIf="item.followup_appointment"
                     >
                       <div class="field-label">
-                        <strong>Follow-up:</strong>
+                        <strong>Next Follow-up:</strong>
                       </div>
                       <div class="field-content">
                         {{
                           item.followup_appointment
-                            | date : "MMM dd, yyyy HH:mm"
+                            | date : "MMM dd, yyyy "
                         }}
                       </div>
                     </div>
