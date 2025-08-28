@@ -84,7 +84,8 @@ export class AppointmentComponent implements OnInit {
   ];
 
   today = new Date();
-
+  appointments: any[] = [];
+  showAppointments = false;
   // Block calendar properties
   blockCalendarData: any[] = [];
   allDoctorBlocks: any[] = [];
@@ -115,6 +116,13 @@ export class AppointmentComponent implements OnInit {
     this.activeTab = this.data;
     this.initAppointmentForm();
     this.initBlockCalendarForm();
+     this.blockCalendarForm.get('blockType')?.valueChanges.subscribe((selectedValue) => {
+    if (selectedValue === 'allDay') {
+      this.onDateSelectionChange();
+    } else if (selectedValue === 'blockSlot') {
+      this.onDateSelectionChange();
+    }
+  });
   }
 
   initAppointmentForm() {
@@ -171,6 +179,97 @@ export class AppointmentComponent implements OnInit {
       }
     });
   }
+
+onDateSelectionChange() {
+  const blockType = this.blockCalendarForm.get('blockType')?.value;
+  const selectedDoctor = this.blockCalendarForm.get('doctor')?.value; // doctor object or null
+
+  if (blockType === 'allDay') {
+    const fromDate = this.blockCalendarForm.get('fromDate')?.value;
+    const toDate = this.blockCalendarForm.get('toDate')?.value;
+
+    if (fromDate && toDate) {
+      const formattedFromDate = new Date(fromDate).toLocaleDateString("en-CA");
+      const formattedToDate = new Date(toDate).toLocaleDateString("en-CA");
+
+      this.appointmentService
+        .getAppointmentsByDateRange(formattedFromDate, formattedToDate)
+        .subscribe(
+          (res: any) => {
+            let appointments = res.data || [];
+
+            if (selectedDoctor) {
+              appointments = appointments.filter(
+                (a: any) => a.doctor_id === selectedDoctor.user_id
+              );
+            }
+
+            this.appointments = appointments;
+            this.showAppointments = true;
+          },
+          () => {
+            this.appointments = [];
+            this.showAppointments = true;
+          }
+        );
+    }
+  } 
+  else if (blockType === 'blockSlot') {
+    const selectedDate = this.blockCalendarForm.get('date')?.value;
+    const startTime = this.blockCalendarForm.get('startTime')?.value;
+    const endTime = this.blockCalendarForm.get('endTime')?.value;
+
+    if (selectedDate && startTime && endTime) {
+      const startDateTime = new Date(selectedDate);
+      startDateTime.setHours(new Date(startTime).getHours());
+      startDateTime.setMinutes(new Date(startTime).getMinutes());
+
+      const endDateTime = new Date(selectedDate);
+      endDateTime.setHours(new Date(endTime).getHours());
+      endDateTime.setMinutes(new Date(endTime).getMinutes());
+
+      const extractedDate = startDateTime.toLocaleDateString('en-CA');
+
+      const formattedStartTime = startDateTime.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+
+      const formattedEndTime = endDateTime.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+
+      this.appointmentService
+        .getAppointmentsByDateAndTimeRange(
+          extractedDate,
+          formattedStartTime,
+          formattedEndTime
+        )
+        .subscribe(
+          (res: any) => {
+            let appointments = res.data || [];
+
+            if (selectedDoctor) {
+              appointments = appointments.filter(
+                (a: any) => a.doctor_id === selectedDoctor.user_id
+              );
+            }
+
+            this.appointments = appointments;
+            this.showAppointments = true;
+          },
+          () => {
+            this.appointments = [];
+            this.showAppointments = true;
+          }
+        );
+    }
+  }
+}
+
 
   // Method to check doctor availability and block calendar for selected date
   async checkBlockCalendar() {
@@ -687,7 +786,7 @@ atLeastOneBlockTypeValidator() {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
 
-  showDialog(isEdit: boolean = false) {
+ showDialog(isEdit: boolean = false) {
     if (isEdit) {
       this.editAppointment = true;
     } else {
@@ -695,10 +794,14 @@ atLeastOneBlockTypeValidator() {
     }
     
     this.initAppointmentForm();
-    
     if (this.patientCode) {
-      this.appointmentForm.get('patientId')?.setValue(this.patientCode);
-      this.getPatientDetails();
+       this.userService.getPatient(this.patientCode).subscribe({
+       next: (response) => {
+          const patient = response.data?.[0];
+          this.appointmentForm.get('patientId')?.setValue(patient.manual_unique_code);
+          this.getPatientDetails();
+        },
+      });
     }
     
     if (this.selectedDate && !isEdit) {
