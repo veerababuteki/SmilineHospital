@@ -275,7 +275,7 @@ export class AddProfileComponent implements OnInit {
     }
   }
 
-  onSubmit() {
+ onSubmit() {
   if (this.patientForm.valid) {
     const patientDetails = this.patientForm.value;
     const historyDetails = this.medicalHistoryForm.value;
@@ -291,60 +291,71 @@ export class AddProfileComponent implements OnInit {
           return;
         }
 
-        let selectedConditions: string[] = [];
-        let selectedGroups: string[] = [];
-
-        if (this.medicalHistoryForm.valid) {
-          selectedConditions = Object.keys(this.medicalHistoryForm.value.conditions)
-            .filter(id => this.medicalHistoryForm.value.conditions[id]);
-        }
-
-        if (this.groupsForm.valid) {
-          selectedGroups = Object.keys(this.groupsForm.value.groups)
-            .filter(id => this.groupsForm.value.groups[id]);
-        }
-
-        this.authService.registerUser({
-          first_name: patientDetails.firstName,
-          manual_unique_code: patientDetails.customId,
-          date_of_birth: patientDetails.dateOfBirth,
-          address: patientDetails.streetAddress,
-          aadhaar_id: patientDetails.aadhaarId,
-          abhi_id: null,
-          age: patientDetails.age,
-          anniversary: null,
-          referred_by: patientDetails.referredBy,
-          referred_name: patientDetails.refferedByName,
-          referred_mobile: patientDetails.refferedByMobile,
-          blood_group: patientDetails.bloodGroup !== null ? patientDetails.bloodGroup.label : '',
-          email: patientDetails.email,
-          family: null,
-          gender: patientDetails.gender,
-          phone: patientDetails.primaryMobile,
-          secondary_mobile: patientDetails.secondaryMobile,
-          langugae: patientDetails.languagePreference.label,
-          land_line: patientDetails.landLine,
-          street_address: patientDetails.streetAddress,
-          locality: patientDetails.locality,
-          city: patientDetails.city,
-          pin_code: patientDetails.pincode,
-          medical_history: selectedConditions,
-          groups_list: selectedGroups,
-          other_history: historyDetails.otherHistory,
-          profile: null,
-        }).subscribe(res => {
-          this.patientForm.reset();
-          this.medicalHistoryForm.reset();
-          this.groupsForm.reset();
-          this.userService.sendLoadPatients();
-          this.onSave.emit({ user_id: res.data.user.user_id, unique_code: res.data.user.unique_code });
-        });
+        this.registerPatient(patientDetails, historyDetails);
+      },
+      error: () => {
+        this.registerPatient(patientDetails, historyDetails);
       }
     });
   } else {
     this.markFormGroupTouched(this.patientForm);
   }
 }
+
+private registerPatient(patientDetails: any, historyDetails: any) {
+  let selectedConditions: string[] = [];
+  let selectedGroups: string[] = [];
+
+  if (this.medicalHistoryForm.valid) {
+    selectedConditions = Object.keys(this.medicalHistoryForm.value.conditions)
+      .filter(id => this.medicalHistoryForm.value.conditions[id]);
+  }
+
+  if (this.groupsForm.valid) {
+    selectedGroups = Object.keys(this.groupsForm.value.groups)
+      .filter(id => this.groupsForm.value.groups[id]);
+  }
+
+  this.authService.registerUser({
+    first_name: patientDetails.firstName,
+    manual_unique_code: patientDetails.customId,
+    date_of_birth: patientDetails.dateOfBirth,
+    address: patientDetails.streetAddress,
+    aadhaar_id: patientDetails.aadhaarId,
+    abhi_id: null,
+    age: patientDetails.age,
+    anniversary: null,
+    referred_by: patientDetails.referredBy,
+    referred_name: patientDetails.refferedByName,
+    referred_mobile: patientDetails.refferedByMobile,
+    blood_group: patientDetails.bloodGroup !== null ? patientDetails.bloodGroup.label : '',
+    email: patientDetails.email,
+    family: null,
+    gender: patientDetails.gender,
+    phone: patientDetails.primaryMobile,
+    secondary_mobile: patientDetails.secondaryMobile,
+    langugae: patientDetails.languagePreference.label,
+    land_line: patientDetails.landLine,
+    street_address: patientDetails.streetAddress,
+    locality: patientDetails.locality,
+    city: patientDetails.city,
+    pin_code: patientDetails.pincode,
+    medical_history: selectedConditions,
+    groups_list: selectedGroups,
+    other_history: historyDetails.otherHistory,
+    profile: null,
+  }).subscribe(res => {
+    this.patientForm.reset();
+    this.medicalHistoryForm.reset();
+    this.groupsForm.reset();
+    this.userService.sendLoadPatients();
+    this.onSave.emit({
+      user_id: res.data.user.user_id,
+      unique_code: res.data.user.unique_code
+    });
+  });
+}
+
 
   markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach(control => {
