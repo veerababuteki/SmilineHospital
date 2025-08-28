@@ -6,19 +6,21 @@ import { DropdownModule } from 'primeng/dropdown';
 import { ButtonModule } from 'primeng/button';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { MessageService } from '../../services/message.service';
 import { AuthService } from '../../services/auth.service';
 import { AppointmentService } from '../../services/appointment.service';
 import { UserService } from '../../services/user.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { forkJoin, Subscription } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ClinicalNotesService } from '../../services/clinical-notes.service';
 import { TreatmentPlansService } from '../../services/treatment-plans.service';
 import { FileService } from '../../services/file.service';
 import { PatientDataService } from '../../services/patient-data.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService as Toaster } from 'primeng/api';
 
 @Component({
   selector: 'app-patients-section',
@@ -36,8 +38,10 @@ import { PatientDataService } from '../../services/patient-data.service';
     ButtonModule,
     RadioButtonModule,
     InputNumberModule,
-    MatSnackBarModule
-  ]
+    MatSnackBarModule,
+    ToastModule
+  ],
+  providers: [Toaster]
 })
 export class PatientsSectionComponent implements OnInit, OnDestroy {
     patientId: string | null | undefined;
@@ -81,10 +85,37 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
         private treatmentPlansService: TreatmentPlansService,
         private filesService: FileService,
         private patientDataService: PatientDataService,
-
+        private toaster: Toaster
     ) {}
 
     ngOnInit(): void {
+ this.router.events
+    .pipe(filter(event => event instanceof NavigationEnd))
+    .subscribe(() => {
+      const state = history.state as { message?: string };
+
+      if (state?.message) {
+        setTimeout(() => {
+          this.toaster.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: state.message
+          });
+        }, 500);
+      }
+       console.log("TOASTER", state);
+    });
+
+    this.treatmentPlansService.getInvoices(Number(this.uniqueCode)).subscribe(res => {
+        const existingData = this.patientDataService.getSnapshot();
+
+        const updatedData = {
+          ...existingData,
+          invoices: res
+        };
+        this.patientDataService.setData(updatedData);
+      })
+ 
       this.branchesSubscription = this.userService.getBranches()
         .pipe(
           catchError(error => {

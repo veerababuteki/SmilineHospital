@@ -1113,7 +1113,14 @@ onSubmit() {
     Object.keys(this.appointmentForm.controls).forEach(key => { 
       const control = this.appointmentForm.get(key); 
       if (control) { 
-        control.markAsTouched(); 
+        control.markAsTouched();
+        if (control.invalid) {
+        this.messageService.add({
+        severity: 'warn',
+        summary: 'Form Incomplete',
+        detail: `Some required fields are missing. Please review and complete all mandatory fields before proceeding.`
+        });
+      }
       } 
     }); 
   } 

@@ -5,13 +5,16 @@ import { TreatmentPlansService } from '../../../services/treatment-plans.service
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { MessageService } from '../../../services/message.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService as Toaster } from 'primeng/api';
 
 @Component({
   selector: 'app-add-payment',
   templateUrl: './add-payment.component.html',
   styleUrls: ['./add-payment.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, ToastModule],
+  providers: [Toaster]
 })
 export class AddPaymentComponent implements OnInit {
   // Payment properties
@@ -44,7 +47,7 @@ export class AddPaymentComponent implements OnInit {
   dueAfterAdvance: number = 0;
   dueAfterPayment: number = 0;
   totalAdvanceInput: string = '0'; // New field for editable total advance in one-time mode
-  
+  showDisabledMsg: boolean = false;
   // Filter and search
   searchText: string = '';
   filteredInvoices: any[] = [];
@@ -59,7 +62,8 @@ export class AddPaymentComponent implements OnInit {
   constructor(
     private treatmentPlansService: TreatmentPlansService,
     private route: ActivatedRoute, private messageService:MessageService,
-    private router: Router
+    private router: Router,
+    private toaster: Toaster
   ) { 
     this.router.events.pipe(
           filter(event => event instanceof NavigationEnd)
@@ -74,6 +78,21 @@ export class AddPaymentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.router.events
+    .pipe(filter(event => event instanceof NavigationEnd))
+    .subscribe(() => {
+      const state = history.state as { message?: string };
+
+      if (state?.message) {
+        setTimeout(() => {
+          this.toaster.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: state.message
+          });
+        }, 500);
+      }
+    });
     this.route.parent?.paramMap.subscribe(params => {
       if(this.patientId == null) {
         this.patientId = params.get('id');
@@ -88,6 +107,20 @@ export class AddPaymentComponent implements OnInit {
       }
     });
   }
+
+  isSaveDisabled(): boolean {
+    const payNow = this.totalPayNowInput || '';
+    const advance = this.totalAdvanceInput || '';
+    const total = +payNow + +advance;
+
+    return !this.isFormValid() ||
+      ((!payNow || payNow === '') && (!advance || advance === '')) ||
+      total > this.calculateTotalDueAmount();
+  }
+
+  showTooltip(): boolean {
+    return this.showDisabledMsg && this.isSaveDisabled();
+  }
   
   loadPatientData(): void {
     // Get available advance amount
@@ -97,7 +130,7 @@ export class AddPaymentComponent implements OnInit {
     
     // Get pending invoices
     this.treatmentPlansService.getInvoices(Number(this.patientId)).subscribe(res => {
-      const rawInvoices = res.data.rows.filter((i: any) => i.payment_status === 'Pending');
+      const rawInvoices = res.data.rows.filter((i: any) => i.payment_status === 'Pending' || i.payment_status === 'Partial');
       this.invoices = this.groupInvoicesByInvoiceId(rawInvoices);
       this.filteredInvoices = [...this.invoices];
       if(this.proceduresToProcess.length > 0){
@@ -849,7 +882,8 @@ export class AddPaymentComponent implements OnInit {
     }
     
     this.treatmentPlansService.savePayment(paymentData).subscribe(res => {
-      this.router.navigate(['patients', this.patientId, 'payments', this.uniqueCode])
+      this.router.navigate(['patients', this.patientId, 'payments', this.uniqueCode],
+      { state: { message: 'Invoice updated!' } })
     });
   }
   

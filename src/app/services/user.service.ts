@@ -78,6 +78,15 @@ export class UserService {
     return this.http.get<any>(`${this.baseUrl}/admin/group/getAllMedicalHistory`, { headers});
   }
 
+   getProfileByManualUniqueCode(code: string): Observable<any> {
+      const token = this.authService.getAccessToken();
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+      });
+
+      return this.http.get<any>(`${this.baseUrl}/auth/user/getProfileByManualUniqueCode/${code}`, { headers });
+    }
+
   getBranches(){
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({

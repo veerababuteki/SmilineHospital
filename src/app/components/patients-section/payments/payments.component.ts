@@ -1,25 +1,53 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TreatmentPlansService } from '../../../services/treatment-plans.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { MessageService } from '../../../services/message.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService as Toaster } from 'primeng/api';
+import { filter } from 'rxjs/operators';
+import { PatientDataService } from '../../../services/patient-data.service';
 
 @Component({
   selector: 'app-payments',
   templateUrl: './payments.component.html',
   styleUrls: ['./payments.component.scss'],
   standalone: true,
-  imports: [ CommonModule
-  ]
+  imports: [ CommonModule, ToastModule
+  ],
+  providers: [Toaster]
 })
 export class PaymentsComponent implements OnInit {
     payments:Record<string, any[]> = {};
   patientId: string | null | undefined;
   uniqueCode: string | null | undefined;
-  constructor(private treatmentPlansService: TreatmentPlansService, private messageService:MessageService, private route: ActivatedRoute, private router: Router){
+  constructor(private treatmentPlansService: TreatmentPlansService, private messageService:MessageService, private route: ActivatedRoute, private router: Router, private toaster: Toaster, private patientDataService: PatientDataService){
 
   }
     ngOnInit(): void {
+     this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        const state = history.state as { message?: string };
+
+        if (state?.message) {
+          setTimeout(() => {
+            this.toaster.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: state.message
+            });
+          }, 500);
+        }
+        this.treatmentPlansService.getInvoices(Number(this.patientId)).subscribe(res => {
+          const existingData = this.patientDataService.getSnapshot();
+          const updatedData = {
+            ...existingData,
+            invoices: res
+          };
+          this.patientDataService.setData(updatedData);
+        });
+      });
       this.route.parent?.paramMap.subscribe(params => {
         if(this.patientId == null) {
           this.patientId = params.get('id');

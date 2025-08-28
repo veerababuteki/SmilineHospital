@@ -214,6 +214,15 @@ export class TreatmentPlansService {
         catchError(this.handleError)
       );
   }
+
+  getPatientDueAmount(invoiceId: string) {
+      const token = this.authService.getAccessToken();
+      const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+
+      return this.http.get<any>(`${this.baseUrl}/auth/payment/getPatientDueAmount/${invoiceId}`, { headers })
+        .pipe(catchError(this.handleError));
+    }
+
   getPatientAdvance(patientId: number) {
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({

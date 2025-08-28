@@ -7,7 +7,7 @@ import { AppointmentComponent } from './components/appointment/appointment.compo
 import { AvailabilityComponent } from './components/availability/availability.component';
 import { CalendarComponent } from './components/calendar/calendar.component';
 import { LoginComponent } from './components/login/login.component';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { BrowserModule } from '@angular/platform-browser';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
@@ -41,6 +41,7 @@ interface NavItem {
     ProgressSpinnerModule,
     MessageComponent
 ],
+providers: [MessageService]
 })
 export class AppComponent implements OnInit {
   isLoading: boolean = false;

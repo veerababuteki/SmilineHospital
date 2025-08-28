@@ -305,75 +305,91 @@ export class EditProfileComponent implements OnInit {
     }
   }
   onSubmit() {
-    if (this.patientForm.valid) {
-      const patientDetails = this.patientForm.value;
-      const historyDetails = this.medicalHistoryForm.value;
-      let selectedConditions: string[] = [];
-      let selectedGroups: string[] = [];
-      if (this.medicalHistoryForm.valid) {
-        selectedConditions = Object.keys(this.medicalHistoryForm.value.conditions)
-            .filter(id => this.medicalHistoryForm.value.conditions[id]);
-      }
-      if (this.groupsForm.valid) {
-        selectedGroups = Object.keys(this.groupsForm.value.groups)
-            .filter(id => this.groupsForm.value.groups[id]);
-      }
-      this.userService.updateUserProfile({
-        id: this.patientDetails.id,
-        first_name: patientDetails.firstName,
-        manual_unique_code: patientDetails.customId,
-        date_of_birth: patientDetails.dateOfBirth,
-        address: patientDetails.streetAddress,
-        aadhaar_id: patientDetails.aadhaarId,
-        abhi_id: null,
-        age: patientDetails.age,
-        anniversary: null,
-        referred_by: patientDetails.referredBy,
-        referred_name: patientDetails.referredByName,
-        referred_mobile: patientDetails.referredByMobile,
-        blood_group: patientDetails.bloodGroup !== null && patientDetails.bloodGroup !== undefined ? patientDetails.bloodGroup.label: '',
-        family: null,
-        gender: patientDetails.gender,
-        secondary_mobile: patientDetails.secondaryMobile,
-        land_line: patientDetails.landLine,
-        street_address: patientDetails.streetAddress,
-        locality: patientDetails.locality,
-        city: patientDetails.city,
-        pin_code: patientDetails.pincode,
-        profile: null,
-        user_id: this.patientDetails.user_id,
-        medical_history: selectedConditions,
-        groups_list: selectedGroups,
-        other_history: historyDetails.otherHistory,
-      }).subscribe(res=>{
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Patient profile updated successfully'
-        });
-        setTimeout(() => {
-          this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode]);
-        }, 1000);
-      }, error => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to update patient profile'
-        });
-      });
-    } else {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Validation Error',
-        detail: 'Please fill all required fields'
-      });
-      this.markFormGroupTouched(this.patientForm);
-    }
-    setTimeout(function() {
-    window.location.reload();
-}, 1500); 
+  if (this.patientForm.valid) {
+    const patientDetails = this.patientForm.value;
+    const historyDetails = this.medicalHistoryForm.value;
 
+    this.userService.getProfileByManualUniqueCode(patientDetails.customId).subscribe({
+      next: (existingUser) => {
+        if (existingUser && existingUser.data) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Duplicate ID',
+            detail: `Please enter a unique ID. A patient already exists with the ID: ${patientDetails.customId}`
+          });
+          return;
+        }
+
+        let selectedConditions: string[] = [];
+        let selectedGroups: string[] = [];
+        if (this.medicalHistoryForm.valid) {
+          selectedConditions = Object.keys(this.medicalHistoryForm.value.conditions)
+            .filter(id => this.medicalHistoryForm.value.conditions[id]);
+        }
+        if (this.groupsForm.valid) {
+          selectedGroups = Object.keys(this.groupsForm.value.groups)
+            .filter(id => this.groupsForm.value.groups[id]);
+        }
+        this.userService.updateUserProfile({
+          id: this.patientDetails.id,
+          first_name: patientDetails.firstName,
+          manual_unique_code: patientDetails.customId,
+          date_of_birth: patientDetails.dateOfBirth,
+          address: patientDetails.streetAddress,
+          aadhaar_id: patientDetails.aadhaarId,
+          abhi_id: null,
+          age: patientDetails.age,
+          anniversary: null,
+          referred_by: patientDetails.referredBy,
+          referred_name: patientDetails.referredByName,
+          referred_mobile: patientDetails.referredByMobile,
+          blood_group: patientDetails.bloodGroup !== null && patientDetails.bloodGroup !== undefined
+            ? patientDetails.bloodGroup.label
+            : '',
+          family: null,
+          gender: patientDetails.gender,
+          secondary_mobile: patientDetails.secondaryMobile,
+          land_line: patientDetails.landLine,
+          street_address: patientDetails.streetAddress,
+          locality: patientDetails.locality,
+          city: patientDetails.city,
+          pin_code: patientDetails.pincode,
+          profile: null,
+          user_id: this.patientDetails.user_id,
+          medical_history: selectedConditions,
+          groups_list: selectedGroups,
+          other_history: historyDetails.otherHistory,
+        }).subscribe(res=>{
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Patient profile updated successfully'
+          });
+          setTimeout(() => {
+            this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode]);
+          }, 1000);
+        }, error => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to update patient profile'
+          });
+        });
+      }
+    });
+  } else {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Validation Error',
+      detail: 'Please fill all required fields'
+    });
+    this.markFormGroupTouched(this.patientForm);
   }
+  setTimeout(function() {
+    window.location.reload();
+  }, 1500);
+
+}
   markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
