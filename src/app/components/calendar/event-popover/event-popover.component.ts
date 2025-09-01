@@ -543,8 +543,8 @@ export class EventPopoverComponent {
       'patients',
       patientId,
       'profile',
-      this.event.extendedProps?.patientUniqueCode
-    ]).toString()
+      patientCode
+    ]).toString();
     window.open(url, '_blank');
   } else {
     // Optionally show an error or fallback

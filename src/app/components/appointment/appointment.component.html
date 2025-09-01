@@ -87,11 +87,7 @@
             <label class="required">Doctor</label>
             <p-dropdown formControlName="doctor" [options]="doctors" optionLabel="name"
                        [style]="{'width':'100%'}" [placeholder]="'Select Doctor'"
-                       [filter]="true" filterBy="name" [ngClass]="{'ng-invalid': appointmentForm.get('doctor')?.invalid && appointmentForm.get('doctor')?.touched}"></p-dropdown>
-            <small class="error-message" 
-              *ngIf="appointmentForm.get('doctor')?.invalid && appointmentForm.get('doctor')?.touched">
-              Doctor is required
-            </small>
+                       [filter]="true" filterBy="name"></p-dropdown>
           </div>
         </div>
 

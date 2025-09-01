@@ -3,21 +3,7 @@
     <div class="title">ADD PAYMENT</div>
     <div class="action-buttons">
       <button class="cancel-btn" (click)="navigateToPayment()">Cancel</button>
-      <div class="button-container">
-        <button class="save-btn"
-               type="submit"
-               [disabled]="isSaveDisabled()"
-               (mouseenter)="showDisabledMsg = true"
-               (mouseleave)="showDisabledMsg = false"
-               (click)="savePayment()">
-                Save Payment
-        </button>
-
-        <div class="tooltip"
-        [class.visible]="showTooltip()">
-        ⚠ Please check the payment inputs. Either the amount is zero, empty, or exceeds the total due.
-        </div>
-      </div>
+      <button class="save-btn" type="submit" [disabled]="!isFormValid()" (click)="savePayment()">Save Payment</button>
     </div>
   </div>
 

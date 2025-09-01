@@ -349,35 +349,3 @@
     }
   }
 }
-
-.invoice-header {
-  position: relative; 
-}
-
-.payment-status {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  font-weight: bold;
-  font-size: 10.5px;
-  padding: 2px 15px;
-  border-radius: 2px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  border: 1px solid #ececec;
-}
-
-.payment-status.paid {
-  color: #155724;
-  background: #d4edda;
-}
-
-.payment-status.partial {
-  color: #856404;
-  background: #fff3cd;
-}
-
-.payment-status.pending {
-  color: #721c24;
-  background: #f8d7da;
-}

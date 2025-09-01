@@ -25,16 +25,7 @@
       <table class="invoice-table table-condensed">
         <thead class="border-bottom">
           <tr>
-            <th class="invoice-header">
-              <div class="payment-status"
-             [ngClass]="{
-               'paid': invoiceGroup.value[0].payment_status === 'Paid',
-               'partial': invoiceGroup.value[0].payment_status === 'Partial',
-               'pending': invoiceGroup.value[0].payment_status === 'Pending'
-             }">
-          {{ invoiceGroup.value[0].payment_status }}
-        </div>
-              Invoice Number</th>
+            <th>Invoice Number</th>
             <th width="70%">
               <table class="full-table">
                 <thead>
@@ -82,8 +73,7 @@
               <label class="invoice-label">
                 <input
                   type="checkbox"
-                  *ngIf="['Partial', 'Pending'].includes(invoiceGroup.value[0].payment_status)"
-
+                  *ngIf="invoiceGroup.value[0].payment_status === 'Pending'"
                   [(ngModel)]="invoiceGroup.value[0].isChecked"
                   (change)="
                     onCheckboxChange(invoiceGroup.value, invoiceGroup.key)
@@ -99,15 +89,15 @@
                 <tbody>
                   <tr>
                     <td colspan="2">
-                      <div *ngIf="invoiceGroup.value[0].due_amount > 0">Balance</div>
-                      <div 
-  class="amount" 
-  *ngIf="invoiceGroup.value[0].due_amount > 0"
-  [ngClass]="{ 'red': invoiceGroup.value[0].due_amount > 0 }">
-  {{ invoiceGroup.value[0].due_amount }}
-</div>
-
-
+                      <div>Balance</div>
+                      <div
+                        class="amount red"
+                        *ngIf="
+                          invoiceGroup.value[0].payment_status === 'Pending'
+                        "
+                      >
+                        {{ getTotalCost(invoiceGroup.value) }}
+                      </div>
                     </td>
                   </tr>
                   <tr>
@@ -125,7 +115,7 @@
                           invoiceGroup.value[0].payment_status !== 'Pending'
                         "
                       >
-                      {{ invoiceGroup.value[0].treatment_plans.grand_total - invoiceGroup.value[0].due_amount }}
+                        {{ getTotalCost(invoiceGroup.value) }}
                       </div>
                       <div
                         class="amount"

@@ -6,21 +6,19 @@ import { DropdownModule } from 'primeng/dropdown';
 import { ButtonModule } from 'primeng/button';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { ActivatedRoute, NavigationEnd, Router, RouterModule, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { MessageService } from '../../services/message.service';
 import { AuthService } from '../../services/auth.service';
 import { AppointmentService } from '../../services/appointment.service';
 import { UserService } from '../../services/user.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { forkJoin, Subscription } from 'rxjs';
-import { catchError, filter } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ClinicalNotesService } from '../../services/clinical-notes.service';
 import { TreatmentPlansService } from '../../services/treatment-plans.service';
 import { FileService } from '../../services/file.service';
 import { PatientDataService } from '../../services/patient-data.service';
-import { ToastModule } from 'primeng/toast';
-import { MessageService as Toaster } from 'primeng/api';
 
 @Component({
   selector: 'app-patients-section',
@@ -38,10 +36,8 @@ import { MessageService as Toaster } from 'primeng/api';
     ButtonModule,
     RadioButtonModule,
     InputNumberModule,
-    MatSnackBarModule,
-    ToastModule
-  ],
-  providers: [Toaster]
+    MatSnackBarModule
+  ]
 })
 export class PatientsSectionComponent implements OnInit, OnDestroy {
     patientId: string | null | undefined;
@@ -85,68 +81,33 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
         private treatmentPlansService: TreatmentPlansService,
         private filesService: FileService,
         private patientDataService: PatientDataService,
-        private toaster: Toaster
+
     ) {}
 
     ngOnInit(): void {
-  this.router.events
-    .pipe(filter(event => event instanceof NavigationEnd))
-    .subscribe(() => {
-      const state = history.state as { message?: string };
+      this.branchesSubscription = this.userService.getBranches()
+        .pipe(
+          catchError(error => {
+            this.showErrorMessage('Failed to load practices. Please try again.');
+            console.error('Error loading branches:', error);
+            return of({ data: [] });
+          })
+        )
+        .subscribe(res => {
+          this.practices = res.data;
+          this.loadSavedPractice();
+        });
 
-      if (state?.message) {
-        setTimeout(() => {
-          this.toaster.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: state.message
-          });
-        }, 500);
-      }
-      console.log("TOASTER", state);
-    });
+      this.messageSubscription = this.messageService.message$.subscribe((message) => {
+        this.patientId = message.text;
+        this.uniqueCode = message.code;
+        
+        if (this.uniqueCode) {
+          this.loadPatientProfile();
+        }
+      });
 
-  this.treatmentPlansService.getInvoices(Number(this.uniqueCode))
-    .pipe(
-      catchError(error => {
-        console.error('Failed to load invoices:', error);
-        return of(null); 
-      })
-    )
-    .subscribe(res => {
-      if (res) { // Only process if invoices were successfully fetched
-        const existingData = this.patientDataService.getSnapshot();
-        const updatedData = {
-          ...existingData,
-          invoices: res
-        };
-        this.patientDataService.setData(updatedData);
-      }
-    });
-
-  this.branchesSubscription = this.userService.getBranches()
-    .pipe(
-      catchError(error => {
-        this.showErrorMessage('Failed to load practices. Please try again.');
-        console.error('Error loading branches:', error);
-        return of({ data: [] });
-      })
-    )
-    .subscribe(res => {
-      this.practices = res.data;
-      this.loadSavedPractice();
-    });
-
-  this.messageSubscription = this.messageService.message$.subscribe((message) => {
-    this.patientId = message.text;
-    this.uniqueCode = message.code;
-
-    if (this.uniqueCode) {
-      this.loadPatientProfile();
-    }
-  });
-
-  this.route.firstChild?.firstChild?.paramMap.subscribe(params => {
+    this.route.firstChild?.firstChild?.paramMap.subscribe(params => {
     this.patientId = this.route.firstChild?.snapshot.paramMap.get('id');
     this.uniqueCode = params.get('source');
     if (this.patientId && this.uniqueCode) {
@@ -173,17 +134,17 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
   });
 
   this.userSubscription = this.authService.getUser()
-    .pipe(
-      catchError(error => {
-        this.showErrorMessage('Failed to load user information.');
-        console.error('Error loading user:', error);
-        return of({ data: { privileges: [] } });
-      })
-    )
-    .subscribe(res => {
-      this.patient = res.data;
-      this.userPrivileges = this.patient.privileges.map((p: any) => p.name);
-    });
+        .pipe(
+          catchError(error => {
+            this.showErrorMessage('Failed to load user information.');
+            console.error('Error loading user:', error);
+            return of({ data: { privileges: [] } });
+          })
+        )
+        .subscribe(res => {
+          this.patient = res.data;
+          this.userPrivileges = this.patient.privileges.map((p: any) => p.name);
+        });
 }
 
     ngOnDestroy(): void {
