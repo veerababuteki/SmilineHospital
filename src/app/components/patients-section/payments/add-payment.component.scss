@@ -586,3 +586,33 @@
     color: #28a745;
   }
 }
+
+.button-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip {
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  background: #fff3cd;
+  color: #856404;
+  padding: 6px 12px;
+  border: 1px solid #ffeeba;
+  border-radius: 4px;
+  font-size: 13px;
+  max-width: 240px;
+  white-space: normal;
+  word-wrap: break-word;
+  text-align: left;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.tooltip.visible {
+  opacity: 1;
+  visibility: visible;
+}
