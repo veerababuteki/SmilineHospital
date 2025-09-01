@@ -255,49 +255,40 @@ export class EditProfileComponent implements OnInit {
   ) {
     this.maxDate = new Date();
   }
-  initiateForm(){
-    this.patientForm = this.fb.group({
-       firstName: ['',
-        Validators.pattern('^[a-zA-Z ]+$')],
-      customId: ['', Validators.required],
-      // aadhaarId: [''],
-       aadhaarId: [
-        '',
-        [
-          Validators.pattern(/^[0-9]{12}$/) // Only 12 digits
-        ]
-      ],
-      gender: ['', Validators.required],
-      dateOfBirth: [''],
-      age: [''],
-      referredBy: [''],
-      referredByName: [''],
-      referredByMobile: ['',
-        Validators.pattern('^[1-9]\\d{9}$')],
-      bloodGroup: [null],
-      primaryMobile: ['', Validators.required,
-        [Validators.pattern('^[1-9]\\d{9}$'),
-          Validators.minLength(10),
-          Validators.maxLength(10)
-        ]
-      ],
-      secondaryMobile: ['',
-       [Validators.pattern('^[1-9]\\d{9}$'),
-        Validators.minLength(10),
-        Validators.maxLength(10)]
-      ],
-      languagePreference: ['english'],
-      landLine: ['',[ Validators.pattern('^[1-9]\\d{9}$'),
-]
-      ],
-      email: ['', Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')],
-      streetAddress: [''],
-      locality: [''],
-      city: [''],
-      pincode: [''],
-    });
-    
-  }
+  initiateForm() {
+  this.patientForm = this.fb.group({
+    firstName: ['', Validators.pattern('^[a-zA-Z ]+$')],
+    customId: ['', Validators.required],
+    aadhaarId: ['', [Validators.pattern(/^[0-9]{12}$/)]],
+    gender: ['', Validators.required],
+    dateOfBirth: [''],
+    age: [''],
+    referredBy: [''],
+    referredByName: [''],
+    referredByMobile: ['', Validators.pattern('^[1-9]\\d{9}$')],
+    bloodGroup: [null],
+    primaryMobile: ['', [
+      Validators.required,
+      Validators.pattern('^[1-9]\\d{9}$'),
+      Validators.minLength(10),
+      Validators.maxLength(10)
+    ]],
+    secondaryMobile: ['', [
+      Validators.pattern('^[1-9]\\d{9}$'),
+      Validators.minLength(10),
+      Validators.maxLength(10)
+    ]],
+    languagePreference: ['english'],
+    landLine: ['', [
+      Validators.pattern('^[1-9]\\d{9}$')
+    ]],
+    email: ['', Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')],
+    streetAddress: [''],
+    locality: [''],
+    city: [''],
+    pincode: [''],
+  });
+}
   
   get aadhaarId() {
     return this.form.get('aadhaarId');
