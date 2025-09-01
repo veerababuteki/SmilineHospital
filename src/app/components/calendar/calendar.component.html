@@ -253,7 +253,6 @@
 <app-cancel-appointment-dialog [visible]="showCancelDialog" [appointmentData]="selectedEvent"
   (close)="onCancelDialogClose()" (confirm)="onCancelAppointmentConfirm($event)">
 </app-cancel-appointment-dialog>
-<app-appointments-print [selectedPractice]="selectedPractice"></app-appointments-print>
 <p-confirmDialog 
   [style]="{width: '450px'}"
   [baseZIndex]="10000"
