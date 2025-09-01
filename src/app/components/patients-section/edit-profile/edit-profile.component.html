@@ -7,7 +7,7 @@
       <!-- <button class="btn-secondary">Delete Patient</button> -->
       <button class="btn-secondary" (click)="cancel()">Cancel</button>
       <button class="btn-primary" [disabled]="!formValid" (click)="onSubmit()">
-        Save Patient Profile
+        Update Patient Profile
       </button>
     </div>
   </div>
@@ -287,6 +287,7 @@
                 type="number"
                 formControlName="pincode"
                 pattern="[0-9]*"
+                maxlength="6"
               />
               <div
                 class="validation-error"

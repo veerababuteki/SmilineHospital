@@ -26,8 +26,11 @@
   <div class="main-content">
     <div
       class="treatments-section"
-      [class.visibility-hidden]="treatments.length == 0"
     >
+    <!-- Initial Message - Show when no treatments -->
+      <div class="initial-message" *ngIf="treatments.length === 0">
+        <p>Select a billable workdone from the right. You can add multiple Procedures.</p>
+      </div>
       <form [formGroup]="treatmentForm" (ngSubmit)="onSubmit()">
         <div formArrayName="treatments">
           <!-- Each treatment gets its own table and teeth grid -->
@@ -293,7 +296,7 @@
       </form>
 
       <!-- Totals Section -->
-      <div class="totals-section">
+      <div class="totals-section" *ngIf="treatments.length > 0">
         <div class="totals-row">
           <!-- <span>Total Cost</span>
             <span class="amount">INR {{calculateGrandTotal() | number:'1.2-2'}}</span>
