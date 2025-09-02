@@ -79,6 +79,44 @@
   </div>
 </div>
 
+<!-- Progress Bar for Large Imports -->
+<div class="import-progress" *ngIf="importProgress">
+  <div class="progress-header">
+    <h3>Import Progress</h3>
+    <span class="progress-status">{{importProgress.status | titlecase}}</span>
+  </div>
+  
+  <!-- Debug info -->
+  <div class="debug-info" style="background: #fff3cd; padding: 8px; margin: 8px 0; border-radius: 4px; font-size: 12px;">
+    <strong>Debug:</strong> Import ID: {{importId}} | Progress Object: {{importProgress | json}}
+  </div>
+  
+  <div class="progress-bar-container">
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="(importProgress.processedRecords / importProgress.totalRecords) * 100"></div>
+    </div>
+    <div class="progress-text">
+      {{(importProgress.processedRecords / importProgress.totalRecords) * 100 | number:'1.0-1'}}% Complete
+      ({{importProgress.processedRecords | number}} / {{importProgress.totalRecords | number}} records)
+    </div>
+  </div>
+  
+  <div class="progress-details">
+    <div class="progress-item">
+      <span class="label">Current Batch:</span>
+      <span class="value">{{importProgress.currentBatch}} / {{importProgress.totalBatches}}</span>
+    </div>
+    <div class="progress-item" *ngIf="importProgress.estimatedTimeRemaining">
+      <span class="label">Estimated Time Remaining:</span>
+      <span class="value">{{importProgress.estimatedTimeRemaining / 1000 | number:'1.0-0'}} seconds</span>
+    </div>
+    <div class="progress-item" *ngIf="importProgress.memoryUsage">
+      <span class="label">Memory Usage:</span>
+      <span class="value">{{importProgress.memoryUsage.heapUsed / 1024 / 1024 | number:'1.0-1'}} MB</span>
+    </div>
+  </div>
+</div>
+
 <div class="import-results" *ngIf="importResults">
   <div class="results-summary">
     <h3>Import Results</h3>
@@ -90,6 +128,10 @@
       <div class="stat-item success">
         <span class="stat-label">Created:</span>
         <span class="stat-value">{{importResults.created?.length || 0}}</span>
+      </div>
+      <div class="stat-item info" *ngIf="importResults.summary?.autoCreatedDoctors">
+        <span class="stat-label">Doctors Auto-Created:</span>
+        <span class="stat-value">{{importResults.summary.autoCreatedDoctors}}</span>
       </div>
       <div class="stat-item warning" *ngIf="importResults.skipped?.length">
         <span class="stat-label">Skipped:</span>
@@ -122,6 +164,9 @@
             </mat-panel-title>
             <mat-panel-description>
               Successfully Created
+              <span class="doctor-created-badge" *ngIf="item.doctorCreated" title="Doctor was auto-created">
+                <i class="pi pi-user-plus"></i> New Doctor
+              </span>
             </mat-panel-description>
           </mat-expansion-panel-header>
 

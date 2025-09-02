@@ -55,6 +55,11 @@ export class ImportComponent implements OnInit {
   importing = false;
   importResults: any = null;
   currentImportType: string = '';
+  
+  // Progress tracking
+  importProgress: any = null;
+  importId: string | null = null;
+  progressInterval: any = null;
 
   importTypes = [
     { value: 'clinical_notes', label: 'Clinical Notes' },
@@ -64,7 +69,7 @@ export class ImportComponent implements OnInit {
     { value: 'payments', label: 'Payments' },
     { value: 'treatment_plans', label: 'Treatment Plans' },
     { value: 'procedure_catalog', label: 'Procedure Catalog' },
-    { value: 'amount_due', label: 'Amount Due'}
+    // { value: 'amount_due', label: 'Amount Due'} // Commented out - this is a reporting feature, not an import feature
   ];
 
   selectedFiles: File[] = new Array(this.importTypes.length);
@@ -186,6 +191,8 @@ export class ImportComponent implements OnInit {
     this.importing = true;
     this.importResults = null;
     this.currentImportType = type;
+    this.importProgress = null;
+    this.importId = null;
     
     // Reset pagination state for new import
     this.createdPageIndex = 0;
@@ -235,11 +242,21 @@ export class ImportComponent implements OnInit {
         console.log('Import response:', res);
         console.log('Response data:', res?.data);
         this.importResults = res?.data || null;
+        this.importId = res?.data?.importId || null;
         console.log('Import results:', this.importResults);
+        console.log('Import ID:', this.importId);
         
         const created = this.importResults?.created?.length || 0;
         const skipped = (this.importResults?.duplicates?.length || 0) + (this.importResults?.skipped?.length || 0);
         const failed = this.importResults?.errors?.length || 0;
+        
+        // Start progress tracking if import ID is available
+        if (this.importId) {
+          console.log('Starting progress tracking with import ID:', this.importId);
+          this.startProgressTracking();
+        } else {
+          console.log('No import ID received from backend');
+        }
         
         this.messageService.add({
           severity: 'success',
@@ -502,9 +519,7 @@ export class ImportComponent implements OnInit {
     }
   }
 
-  ngOnDestroy() {
-    // No subscriptions to unsubscribe in this component
-  }
+
 
   // Add helper methods for template
   formatObjectEntries(obj: any): string {
@@ -649,5 +664,66 @@ export class ImportComponent implements OnInit {
   onFailedPageChange(event: PageEvent) {
     this.failedPageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
+  }
+
+  // Progress tracking methods
+  private startProgressTracking() {
+    console.log('Starting progress tracking for import ID:', this.importId);
+    if (!this.importId) return;
+    
+    // Clear any existing interval
+    if (this.progressInterval) {
+      clearInterval(this.progressInterval);
+    }
+    
+    // Start polling for progress updates every 2 seconds
+    this.progressInterval = setInterval(() => {
+      this.fetchProgress();
+    }, 2000);
+    
+    // Fetch initial progress
+    this.fetchProgress();
+  }
+
+  private async fetchProgress() {
+    if (!this.importId) return;
+    
+    try {
+      console.log('Fetching progress for import ID:', this.importId);
+      // Call the progress endpoint
+      const response = await fetch(`/api/v1/import/progress/${this.importId}`);
+      console.log('Progress response status:', response.status);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Progress response data:', data);
+        if (data?.data) {
+          this.importProgress = data.data;
+          console.log('Updated import progress:', this.importProgress);
+          
+          // Stop tracking if import is complete
+          if (this.importProgress.status === 'completed' || this.importProgress.status === 'failed') {
+            this.stopProgressTracking();
+          }
+        }
+      } else {
+        console.error('Progress response not ok:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching progress:', error);
+      // Stop tracking on error
+      this.stopProgressTracking();
+    }
+  }
+
+  private stopProgressTracking() {
+    if (this.progressInterval) {
+      clearInterval(this.progressInterval);
+      this.progressInterval = null;
+    }
+  }
+
+  // Clean up on component destroy
+  ngOnDestroy() {
+    this.stopProgressTracking();
   }
 } 
