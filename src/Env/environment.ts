@@ -1,4 +1,5 @@
 export const environment = {
-  production: false,
-  baseUrl: 'http://localhost:7001/api/v1',
+  baseUrl: 'https://apis.idental.ai/api/v1',
 };
+//http://localhost:7001/api/v1
+//https://apis.idental.ai/api/v1

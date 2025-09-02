@@ -10,13 +10,16 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter, forkJoin } from 'rxjs';
 import { MessageService } from '../../../services/message.service';
 import { PatientDataService } from '../../../services/patient-data.service';
+import { MessageService as Toaster } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-add-invoice',
   templateUrl: './add-invoice.component.html',
   styleUrls: ['./add-invoice.component.scss'],
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule, FormsModule, DropdownModule, CalendarModule  ]
+  imports: [ CommonModule, ReactiveFormsModule, FormsModule, DropdownModule, CalendarModule, ToastModule  ],
+  providers: [Toaster]
 })
 export class AddInvoiceComponent implements OnInit {
   treatmentForm!: FormGroup;
@@ -51,7 +54,8 @@ export class AddInvoiceComponent implements OnInit {
     private patientDataService: PatientDataService,
     private treatmentPlansService: TreatmentPlansService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private toaster: Toaster
   ) {
     this.initForm();
     
@@ -627,7 +631,8 @@ export class AddInvoiceComponent implements OnInit {
       ['patients', this.patientId, 'add-payment', this.uniqueCode],
       {
         state: {
-          procedures: this.selectedInvoiceList
+          procedures: this.selectedInvoiceList,
+          message: 'Invoice has been saved, and payment created successfully!'
         }
       }
     );
@@ -673,7 +678,10 @@ export class AddInvoiceComponent implements OnInit {
         invoices: res
       };
       this.patientDataService.setData(updatedData);
-      this.router.navigate(['/patients', this.patientId, 'invoices', this.uniqueCode]);
+      this.router.navigate(
+      ['/patients', this.patientId, 'invoices', this.uniqueCode],
+      { state: { message: `Invoice added!` } }
+      );
     });
   }
 
