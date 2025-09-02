@@ -35,25 +35,26 @@ export class ClinicalNotesComponent implements OnInit {
   
   ngOnInit(): void {
     const routeId = this.route.parent?.snapshot.paramMap.get('id');
-  const source = this.route.snapshot.paramMap.get('source');
+    const source = this.route.snapshot.paramMap.get('source');
 
-  if (routeId && source) {
-    this.patientId = routeId;
-    this.uniqueCode = source;
-  } else {
-    const cached = localStorage.getItem('patientContext');
-    if (cached) {
-      const context = JSON.parse(cached);
-      this.patientId = context.patientId;
-      this.uniqueCode = context.uniqueCode;
+    if (routeId && source) {
+      this.patientId = routeId;
+      this.uniqueCode = source;
+    } else {
+      const cached = localStorage.getItem('patientContext');
+      if (cached) {
+        const context = JSON.parse(cached);
+        this.patientId = context.patientId;
+        this.uniqueCode = context.uniqueCode;
+      }
     }
-  }
 
-  // Subscribe to shared data
-  this.patientDataService.data$.subscribe((res) => {
-    const clinicalNotes = res?.clinicalNotes?.data?.rows || [];
-    this.clinicalNotes = clinicalNotes;
-  });
+    // Subscribe to shared data and sort when received
+    this.patientDataService.data$.subscribe((res) => {
+      const clinicalNotes = res?.clinicalNotes?.data?.rows || [];
+      this.clinicalNotes = clinicalNotes;
+      this.sortClinicalNotes(); // Sort immediately after receiving data
+    });
 
     this.items = [
       {
@@ -62,6 +63,35 @@ export class ClinicalNotesComponent implements OnInit {
         command: (event) => this.updateClinicalNotes(event)
       }
     ];
+  }
+
+  // Sort clinical notes by date (latest first)
+  sortClinicalNotes(): void {
+    if (this.clinicalNotes && this.clinicalNotes.length > 0) {
+      console.log('Before sorting:', this.clinicalNotes.map(note => ({ 
+        date: note.date, 
+        created_at: note.created_at 
+      })));
+
+      this.clinicalNotes = this.clinicalNotes.sort((a, b) => {
+        // Try to use the date field that exists in your data
+        const dateA = new Date(a.date || a.created_at || a.createdAt).getTime();
+        const dateB = new Date(b.date || b.created_at || b.createdAt).getTime();
+        
+        // Check if dates are valid
+        if (isNaN(dateA) || isNaN(dateB)) {
+          console.warn('Invalid date found:', { a: a.date, b: b.date });
+          return 0;
+        }
+        
+        return dateB - dateA; // Descending order (latest first)
+      });
+
+      console.log('After sorting:', this.clinicalNotes.map(note => ({ 
+        date: note.date, 
+        created_at: note.created_at 
+      })));
+    }
   }
   
   setCurrentClinicalNotes(event: any): void {
@@ -80,6 +110,7 @@ export class ClinicalNotesComponent implements OnInit {
       // }
     ];
   }
+
   updateClinicalNotes(event: any): void {
     this.router.navigate(['/patients', this.patientId, 'add-clinical-note', this.uniqueCode], {
       state: { mode: 'edit', noteData: event }
@@ -89,12 +120,14 @@ export class ClinicalNotesComponent implements OnInit {
   loadPatientData(patientId: string){
     this.clinicalNotesService.getClinicalNotes(Number(patientId)).subscribe(res => {
       this.clinicalNotes = res.data.rows;
+      this.sortClinicalNotes(); // Sort after loading data
     })
   }
 
   navigateToAdd(){
     this.router.navigate(['/patients', this.patientId, 'add-clinical-note', this.uniqueCode])
   }
+
   formatStringToArray(value: string | null | undefined): string[] {
     try {
       if (typeof value !== "string" || !value) {
@@ -113,7 +146,4 @@ export class ClinicalNotesComponent implements OnInit {
       return []; // Return empty array on error
     }
   }
-  getSortedDates(): string[] {
-    return Object.keys(this.clinicalNotes).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-  }
-  }  
+}
