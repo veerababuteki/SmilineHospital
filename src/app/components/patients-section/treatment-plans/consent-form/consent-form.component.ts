@@ -1,12 +1,14 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
 import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import { FileUploadService } from '../../../../services/file-upload.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../../../services/auth.service';
+import { SignaturePadComponent } from '../../../shared/signature-pad/signature-pad.component';
 
 interface ConsentFormData {
   id: string;
@@ -28,10 +30,16 @@ interface ConsentFormData {
   };
 }
 
+interface SignatureData {
+  patientSignature?: string;
+  doctorSignature?: string;
+  timestamp: Date;
+}
+
 @Component({
   selector: 'app-consent-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, DatePipe, ToastModule],
+  imports: [CommonModule, ReactiveFormsModule, DatePipe, ToastModule, SignaturePadComponent],
   providers: [MessageService],
   templateUrl: './consent-form.component.html',
   styleUrls: ['./consent-form.component.scss']
@@ -65,6 +73,12 @@ export class ConsentFormComponent implements OnInit {
   isLoading: boolean = false;
   isLoadingExistingForms: boolean = false; // New property to track loading state
   hasLoadedExistingForms: boolean = false; // New property to track if we've attempted to load
+  
+  // Digital signature properties
+  showSignatureMode: boolean = false;
+  currentSignatures: SignatureData = { timestamp: new Date() };
+  signatureHistory: SignatureData[] = [];
+  showSignatureHistory: boolean = false;
 
   sectionDescriptions: { [key: string]: { title: string; content: string } } = {
     examination: {
@@ -200,9 +214,7 @@ export class ConsentFormComponent implements OnInit {
     });
   }
 
-  selectMode(mode: string): void {
-    this.selectedMode = mode;
-  }
+
 
   goBack(): void {
     this.selectedMode = null;
@@ -212,53 +224,7 @@ export class ConsentFormComponent implements OnInit {
     return 'form_' + Math.random().toString(36).substr(2, 9);
   }
 
-  async downloadFormAsPDF(): Promise<void> {
-    const formData = this.consentForm.value;
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pageHeight = pdf.internal.pageSize.height;
-    let yPosition = 20;
 
-    // Header
-    pdf.setFontSize(16);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('INFORMED CONSENT FORM', 105, yPosition, { align: 'center' });
-    yPosition += 15;
-
-    // Basic Information
-    pdf.setFontSize(12);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(`Patient Name: ${formData.patientName}`, 20, yPosition);
-    pdf.text(`Date: ${formData.date}`, 150, yPosition);
-    yPosition += 10;
-    pdf.text(`Doctor Name: ${formData.doctorName}`, 20, yPosition);
-    yPosition += 15;
-
-    // Selected Sections
-    Object.keys(formData.sections).forEach(sectionKey => {
-      if (formData.sections[sectionKey]) {
-        const section = this.sectionDescriptions[sectionKey];
-        if (yPosition > pageHeight - 40) {
-          pdf.addPage();
-          yPosition = 20;
-        }
-        
-        pdf.setFont('helvetica', 'bold');
-        pdf.text(section.title, 20, yPosition);
-        yPosition += 8;
-        
-        pdf.setFont('helvetica', 'normal');
-        const lines = pdf.splitTextToSize(section.content, 170);
-        pdf.text(lines, 20, yPosition);
-        yPosition += lines.length * 5 + 10;
-        
-        pdf.text('Patient Signature: ____________________', 20, yPosition);
-        pdf.text("Doctor's Signature: ____________________", 120, yPosition);
-        yPosition += 15;
-      }
-    });
-
-    pdf.save(`consent-form-${formData.patientName || 'patient'}-${formData.date}.pdf`);
-  }
 
   onFileSelected(event: any): void {
     const file = event.target.files[0];
@@ -490,4 +456,375 @@ export class ConsentFormComponent implements OnInit {
            this.hasLoadedExistingForms && 
            !this.hasExistingConsentForms();
   }
+
+  // Digital signature methods
+  selectMode(mode: string): void {
+    this.selectedMode = mode;
+    if (mode === 'download') {
+      this.showSignatureMode = false;
+    }
+  }
+
+  requestSignaturesAndDownload(): void {
+    this.showSignatureMode = true;
+  }
+
+  openSignatureMode(): void {
+    this.showSignatureMode = true;
+  }
+
+  closeSignatureMode(): void {
+    this.showSignatureMode = false;
+    this.currentSignatures = { timestamp: new Date() };
+  }
+
+  onPatientSignatureChange(signatureData: string | null): void {
+    this.currentSignatures.patientSignature = signatureData || undefined;
+  }
+
+  onDoctorSignatureChange(signatureData: string | null): void {
+    this.currentSignatures.doctorSignature = signatureData || undefined;
+  }
+
+  saveSignatures(): void {
+    if (this.currentSignatures.patientSignature || this.currentSignatures.doctorSignature) {
+      this.signatureHistory.push({
+        ...this.currentSignatures,
+        timestamp: new Date()
+      });
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Signatures saved successfully!'
+      });
+      this.closeSignatureMode();
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Please add at least one signature before saving.'
+      });
+    }
+  }
+
+  async saveSignaturesAndDownload(): Promise<void> {
+    if (this.currentSignatures.patientSignature || this.currentSignatures.doctorSignature) {
+      // Save signatures first
+      this.signatureHistory.push({
+        ...this.currentSignatures,
+        timestamp: new Date()
+      });
+      
+      // Show success message
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Signatures saved! Generating signed form...'
+      });
+      
+      // Automatically download the signed form with current signatures
+      await this.downloadFormWithCurrentSignatures();
+      
+      // Close the signature modal after download is complete
+      this.closeSignatureMode();
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Please add at least one signature before saving.'
+      });
+    }
+  }
+
+  removeSignature(index: number): void {
+    this.signatureHistory.splice(index, 1);
+  }
+
+  async downloadFormAsPDF(): Promise<void> {
+    const formData = this.consentForm.value;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pageHeight = pdf.internal.pageSize.height;
+    let yPosition = 20;
+
+    // Header
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('INFORMED CONSENT FORM', 105, yPosition, { align: 'center' });
+    yPosition += 15;
+
+    // Basic Information
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`Patient Name: ${formData.patientName}`, 20, yPosition);
+    pdf.text(`Date: ${formData.date}`, 150, yPosition);
+    yPosition += 10;
+    pdf.text(`Doctor Name: ${formData.doctorName}`, 20, yPosition);
+    yPosition += 15;
+
+    // Selected Sections
+    Object.keys(formData.sections).forEach(sectionKey => {
+      if (formData.sections[sectionKey]) {
+        const section = this.sectionDescriptions[sectionKey];
+        if (yPosition > pageHeight - 40) {
+          pdf.addPage();
+          yPosition = 20;
+        }
+        
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(section.title, 20, yPosition);
+        yPosition += 8;
+        
+        pdf.setFont('helvetica', 'normal');
+        const lines = pdf.splitTextToSize(section.content, 170);
+        pdf.text(lines, 20, yPosition);
+        yPosition += lines.length * 5 + 10;
+        
+        // Add signature areas
+        pdf.text('Patient Signature: ____________________', 20, yPosition);
+        pdf.text("Doctor's Signature: ____________________", 120, yPosition);
+        yPosition += 15;
+      }
+    });
+
+    pdf.save(`consent-form-${formData.patientName || 'patient'}-${formData.date}.pdf`);
+  }
+
+  async downloadFormWithSignatures(): Promise<void> {
+    if (this.signatureHistory.length === 0) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Please add signatures before downloading the form.'
+      });
+      return;
+    }
+
+    try {
+      // Get the latest signature (most recent one)
+      const latestSignature = this.signatureHistory[this.signatureHistory.length - 1];
+      
+      // Create a temporary div to render the form with signatures
+      const tempDiv = document.createElement('div');
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      tempDiv.style.top = '0';
+      tempDiv.style.width = '800px';
+      tempDiv.style.backgroundColor = 'white';
+      tempDiv.style.padding = '20px';
+      tempDiv.style.fontFamily = 'Arial, sans-serif';
+      tempDiv.style.fontSize = '12px';
+      tempDiv.style.lineHeight = '1.4';
+      
+      document.body.appendChild(tempDiv);
+
+      // Generate HTML content with signatures
+      const formData = this.consentForm.value;
+      let htmlContent = `
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h1 style="margin: 0; font-size: 18px; font-weight: bold;">INFORMED CONSENT FORM</h1>
+        </div>
+        <div style="margin-bottom: 15px;">
+          <p><strong>Patient Name:</strong> ${formData.patientName}</p>
+          <p><strong>Doctor Name:</strong> ${formData.doctorName}</p>
+          <p><strong>Date:</strong> ${formData.date}</p>
+        </div>
+      `;
+
+      // Add selected sections
+      Object.keys(formData.sections).forEach(sectionKey => {
+        if (formData.sections[sectionKey]) {
+          const section = this.sectionDescriptions[sectionKey];
+          htmlContent += `
+            <div style="margin-bottom: 20px;">
+              <h3 style="margin: 0 0 10px 0; font-size: 14px; font-weight: bold;">${section.title}</h3>
+              <p style="margin: 0 0 15px 0; text-align: justify;">${section.content}</p>
+              <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                <div style="flex: 1; margin-right: 20px;">
+                  <p style="margin: 0 0 5px 0;"><strong>Patient Signature:</strong></p>
+                  <div style="border-bottom: 1px solid #000; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    ${this.getSignatureImageHTML(latestSignature?.patientSignature)}
+                  </div>
+                </div>
+                <div style="flex: 1;">
+                  <p style="margin: 0 0 5px 0;"><strong>Doctor's Signature:</strong></p>
+                  <div style="border-bottom: 1px solid #000; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    ${this.getSignatureImageHTML(latestSignature?.doctorSignature)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      tempDiv.innerHTML = htmlContent;
+
+      // Convert to canvas and then to PDF
+      const canvas = await html2canvas(tempDiv, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+      });
+
+      document.body.removeChild(tempDiv);
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210;
+      const pageHeight = 295;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`consent-form-signed-${formData.patientName || 'patient'}-${formData.date}.pdf`);
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Signed consent form downloaded successfully!'
+      });
+
+    } catch (error) {
+      console.error('Error generating PDF with signatures:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to generate PDF with signatures. Please try again.'
+      });
+    }
+  }
+
+  private getSignatureImageHTML(signatureData: string | undefined): string {
+    if (signatureData) {
+      return `<img src="${signatureData}" style="max-width: 100%; max-height: 50px; object-fit: contain;" />`;
+    }
+    return '<span style="color: #999;">No signature</span>';
+  }
+
+  async downloadFormWithCurrentSignatures(): Promise<void> {
+    try {
+      // Create a temporary div to render the form with signatures
+      const tempDiv = document.createElement('div');
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      tempDiv.style.top = '0';
+      tempDiv.style.width = '800px';
+      tempDiv.style.backgroundColor = 'white';
+      tempDiv.style.padding = '20px';
+      tempDiv.style.fontFamily = 'Arial, sans-serif';
+      tempDiv.style.fontSize = '12px';
+      tempDiv.style.lineHeight = '1.4';
+      
+      document.body.appendChild(tempDiv);
+
+      // Generate HTML content with current signatures
+      const formData = this.consentForm.value;
+      let htmlContent = `
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h1 style="margin: 0; font-size: 18px; font-weight: bold;">INFORMED CONSENT FORM</h1>
+        </div>
+        <div style="margin-bottom: 15px;">
+          <p><strong>Patient Name:</strong> ${formData.patientName}</p>
+          <p><strong>Doctor Name:</strong> ${formData.doctorName}</p>
+          <p><strong>Date:</strong> ${formData.date}</p>
+        </div>
+      `;
+
+      // Add selected sections
+      Object.keys(formData.sections).forEach(sectionKey => {
+        if (formData.sections[sectionKey]) {
+          const section = this.sectionDescriptions[sectionKey];
+          htmlContent += `
+            <div style="margin-bottom: 20px;">
+              <h3 style="margin: 0 0 10px 0; font-size: 14px; font-weight: bold;">${section.title}</h3>
+              <p style="margin: 0 0 15px 0; text-align: justify;">${section.content}</p>
+              <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                <div style="flex: 1; margin-right: 20px;">
+                  <p style="margin: 0 0 5px 0;"><strong>Patient Signature:</strong></p>
+                  <div style="border-bottom: 1px solid #000; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    ${this.getSignatureImageHTML(this.currentSignatures.patientSignature)}
+                  </div>
+                </div>
+                <div style="flex: 1;">
+                  <p style="margin: 0 0 5px 0;"><strong>Doctor's Signature:</strong></p>
+                  <div style="border-bottom: 1px solid #000; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    ${this.getSignatureImageHTML(this.currentSignatures.doctorSignature)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      tempDiv.innerHTML = htmlContent;
+
+      // Convert to canvas and then to PDF
+      const canvas = await html2canvas(tempDiv, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+      });
+
+      document.body.removeChild(tempDiv);
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210;
+      const pageHeight = 295;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`consent-form-signed-${formData.patientName || 'patient'}-${formData.date}.pdf`);
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Signed consent form downloaded successfully!'
+      });
+
+    } catch (error) {
+      console.error('Error generating PDF with signatures:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to generate PDF with signatures. Please try again.'
+      });
+    }
+  }
+
+  hasSignatures(): boolean {
+    return this.signatureHistory.length > 0;
+  }
+
+  getLatestSignatures(): SignatureData | null {
+    return this.signatureHistory.length > 0 ? this.signatureHistory[this.signatureHistory.length - 1] : null;
+  }
+
+
 }

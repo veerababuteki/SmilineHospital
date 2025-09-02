@@ -1,0 +1,153 @@
+.sfc-list-container {
+  background: white;
+  width: 100%;
+
+  .sfc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 0px 20px 0px;
+    border-bottom: 1px solid #e0e0e0;
+
+    h3 {
+      margin: 0;
+      color: #2196f3;
+      font-size: 24px;
+      font-weight: normal;
+    }
+
+    button {
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      background: #2196f3;
+      border: none;
+      color: white;
+      font-weight: 600;
+    }
+  }
+
+  .sfc-content {
+    padding-top: 20px;
+  }
+
+  .loading-message {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-size: 14px;
+  }
+
+  .no-members {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-size: 14px;
+
+    p {
+      margin: 10px 0;
+    }
+  }
+
+  .members-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .member-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 20px;
+    background: white;
+
+    .member-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+
+      h4 {
+        margin: 0;
+        color: #333;
+        font-size: 16px;
+        font-weight: 500;
+      }
+    }
+
+    .status-badge {
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: 500;
+
+      &.badge-success {
+        background: #e3f2fd;
+        color: #2196f3;
+      }
+
+      &.badge-secondary {
+        background: #e2e3e5;
+        color: #383d41;
+      }
+    }
+
+    .member-details {
+      .detail-row {
+        display: flex;
+        margin-bottom: 12px;
+        font-size: 14px;
+
+        .label {
+          width: 150px;
+          color: #666;
+          text-align: left;
+          padding-right: 15px;
+          font-weight: 500;
+        }
+
+        .value {
+          color: #333;
+          font-weight: 400;
+          flex: 1;
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .sfc-list-container {
+    .sfc-header {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+
+      button {
+        align-self: flex-end;
+      }
+    }
+
+    .member-card {
+      .member-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .member-details {
+        .detail-row {
+          flex-direction: column;
+          gap: 4px;
+
+          .label {
+            width: auto;
+            padding-right: 0;
+          }
+        }
+      }
+    }
+  }
+}

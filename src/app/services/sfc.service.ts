@@ -64,6 +64,16 @@ export class SfcService {
       .pipe(catchError(this.handleError));
   }
 
+  getSfcByPatientId(patientId: string) {
+    const token = this.authService.getAccessToken();
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+    return this.http
+      .get<any>(`${this.baseUrl}/patient/${patientId}`, { headers })
+      .pipe(catchError(this.handleError));
+  }
+
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error.message || 'Server error');
   }

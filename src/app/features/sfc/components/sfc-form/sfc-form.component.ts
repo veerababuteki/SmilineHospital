@@ -1,5 +1,5 @@
 // Updated sfc-form.component.ts - Modified methods for row-specific actions
-import { Component } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, Validators } from '@angular/forms';
 import { CustomCalendarComponent } from './custom-calendar/custom-calendar.component';
@@ -17,6 +17,9 @@ import { ToastModule } from 'primeng/toast';
   providers: [MessageService]
 })
 export class SfcFormComponent {
+  @Input() patientId: string = '';
+  @Input() patientName: string = '';
+  @Output() onSfcAdded = new EventEmitter<void>();
 
   constructor(private sfcService: SfcService, private userService: UserService, private messageService: MessageService) {}
   // Your existing code remains the same...
@@ -32,6 +35,7 @@ export class SfcFormComponent {
     doctorFrontOfficeComment: string;
     doctorAdvice: string;
     frontOfficeRemarks: string;
+    referredBy: string;
   } = {
     date: '',
     name: '',
@@ -41,7 +45,8 @@ export class SfcFormComponent {
     smilinePatient: 'Y',
     doctorFrontOfficeComment: '',
     doctorAdvice: '',
-    frontOfficeRemarks: ''
+    frontOfficeRemarks: '',
+    referredBy: ''
   };
 
   // Add property to track open dropdown
@@ -125,7 +130,8 @@ export class SfcFormComponent {
     smilinePatient: 'Y',
     doctorFrontOfficeComment: '',
     doctorAdvice: '',
-    frontOfficeRemarks: ''
+    frontOfficeRemarks: '',
+    referredBy: ''
   };
   this.editingIndex = null;
   this.editId = null;
@@ -240,6 +246,11 @@ private addSfcEntry() {
   }
 
   // Add new SFC entry
+  // Set the referredBy field if patientId is provided
+  if (this.patientId) {
+    this.newEntry.referredBy = this.patientId;
+  }
+  
   this.sfcService.addSfcEntry(this.newEntry).subscribe({
     next: (response) => {
       const newRecord = { id: response.data?.id || response.id, ...this.newEntry };
@@ -252,6 +263,9 @@ private addSfcEntry() {
         summary: 'Success',
         detail: 'Entry Added Successfully.'
       });
+      
+      // Emit event to notify parent component
+      this.onSfcAdded.emit();
     },
     error: (error) => console.error('Failed to add entry:', error)
   });

@@ -9,14 +9,14 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { MessageService } from '../../../services/message.service';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { UserService } from '../../../services/user.service';
+import { SfcListComponent } from './sfc-list/sfc-list.component';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
   standalone: true,
-  imports: [ CommonModule,
-  ]
+  imports: [ CommonModule, SfcListComponent ]
 })
 export class ProfileComponent implements OnInit {
   patientId: string | null | undefined;

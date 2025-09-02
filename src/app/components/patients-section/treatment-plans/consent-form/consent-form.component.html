@@ -89,13 +89,19 @@
       </div>
     </form>
 
-    <!-- Download Button -->
+    <!-- Download Buttons -->
     <div class="action-buttons">
       <button 
         class="btn btn-primary"
         [disabled]="!isFormValid()"
         (click)="downloadFormAsPDF()">
         Download Form as PDF
+      </button>
+      <button 
+        class="btn btn-success"
+        [disabled]="!isFormValid()"
+        (click)="requestSignaturesAndDownload()">
+        Download Signed Form
       </button>
     </div>
 
@@ -184,6 +190,55 @@
                 Delete
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Digital Signature Modal -->
+  <div *ngIf="showSignatureMode" class="signature-modal-overlay">
+    <div class="signature-modal">
+      <div class="signature-modal-header">
+        <h2>Add Signatures for Signed Form</h2>
+        <button class="btn btn-outline" (click)="closeSignatureMode()">×</button>
+      </div>
+
+      <div class="signature-container">
+        <div class="signature-section">
+          <p class="signature-instructions">
+            Please add signatures to download the signed consent form. 
+            You can draw signatures using your mouse/touch or upload signature images.
+          </p>
+          
+          <div class="signature-pads">
+            <div class="signature-pad-wrapper">
+              <app-signature-pad 
+                title="Patient Signature"
+                (signatureChange)="onPatientSignatureChange($event)">
+              </app-signature-pad>
+            </div>
+            
+            <div class="signature-pad-wrapper">
+              <app-signature-pad 
+                title="Doctor's Signature"
+                (signatureChange)="onDoctorSignatureChange($event)">
+              </app-signature-pad>
+            </div>
+          </div>
+
+          <div class="signature-actions">
+            <button 
+              class="btn btn-secondary"
+              (click)="closeSignatureMode()">
+              Cancel
+            </button>
+            <button 
+              class="btn btn-primary"
+              [disabled]="!currentSignatures.patientSignature && !currentSignatures.doctorSignature"
+              (click)="saveSignaturesAndDownload()">
+              Save & Download
+            </button>
           </div>
         </div>
       </div>

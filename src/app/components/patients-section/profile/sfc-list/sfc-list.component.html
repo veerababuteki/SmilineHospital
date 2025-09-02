@@ -1,0 +1,81 @@
+<p-toast></p-toast>
+
+<div class="sfc-list-container">
+  <div class="sfc-header">
+    <h3>SFC Members Recommended by {{ patientName }}</h3>
+    <button 
+      pButton 
+      type="button" 
+      label="Add New SFC Member" 
+      icon="pi pi-plus" 
+      class="p-button-primary p-button-sm"
+      (click)="openAddSfcDialog()">
+    </button>
+  </div>
+
+  <div class="sfc-content">
+    <div *ngIf="loading" class="loading-message">
+      <p>Loading SFC members...</p>
+    </div>
+
+    <div *ngIf="!loading && sfcMembers.length === 0" class="no-members">
+      <p>No SFC members have been recommended by this patient yet.</p>
+      <p>Click "Add New SFC Member" to add the first recommendation.</p>
+    </div>
+
+    <div *ngIf="!loading && sfcMembers.length > 0" class="members-list">
+      <div *ngFor="let member of sfcMembers" class="member-card">
+        <div class="member-header">
+          <h4>Name: {{ member.patient_name }}</h4>
+          <span [class]="getStatusBadgeClass(member.smiline_patient)" class="status-badge">
+            {{ getStatusText(member.smiline_patient) }}
+          </span>
+        </div>
+        
+        <div class="member-details">
+          <div class="detail-row" *ngIf="member.age">
+            <span class="label">Age:</span>
+            <span class="value">{{ member.age }}</span>
+          </div>
+          
+          <div class="detail-row" *ngIf="member.occupation">
+            <span class="label">Occupation:</span>
+            <span class="value">{{ member.occupation }}</span>
+          </div>
+          
+          <div class="detail-row" *ngIf="member.doctor_front_office_comment">
+            <span class="label">Doctor's Comment:</span>
+            <span class="value">{{ member.doctor_front_office_comment }}</span>
+          </div>
+          
+          <div class="detail-row" *ngIf="member.doctor_advice_for_lead_gen">
+            <span class="label">Doctor's Advice:</span>
+            <span class="value">{{ member.doctor_advice_for_lead_gen }}</span>
+          </div>
+          
+          <div class="detail-row" *ngIf="member.front_office_remarks">
+            <span class="label">Front Office Remarks:</span>
+            <span class="value">{{ member.front_office_remarks }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add SFC Member Dialog -->
+<p-dialog 
+  header="Add New SFC Member" 
+  [(visible)]="showAddSfcDialog" 
+  [modal]="true" 
+  [style]="{width: '90vw', maxWidth: '1200px'}"
+  [draggable]="false" 
+  [resizable]="false"
+  (onHide)="closeAddSfcDialog()">
+  
+  <app-sfc-form 
+    [patientId]="patientId"
+    [patientName]="patientName"
+    (onSfcAdded)="closeAddSfcDialog()">
+  </app-sfc-form>
+</p-dialog>

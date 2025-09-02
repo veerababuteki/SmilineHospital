@@ -139,4 +139,12 @@
             </div>
         </div>
     </div>
+
+    <!-- SFC Members Section -->
+    <div class="sfc-section" *ngIf="patientDetails">
+        <app-sfc-list 
+            [patientId]="patientDetails.user_details.manual_unique_code"
+            [patientName]="patientDetails.first_name + ' ' + patientDetails.last_name">
+        </app-sfc-list>
+    </div>
 </div>
