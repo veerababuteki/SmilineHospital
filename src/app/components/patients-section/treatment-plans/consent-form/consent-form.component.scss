@@ -880,3 +880,48 @@
   border-radius: 6px;
   border: 1px solid #e9ecef;
 }
+
+/* Auto-upload toggle styles */
+.auto-upload-toggle {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.toggle-checkbox {
+  margin-right: 12px;
+  transform: scale(1.2);
+  accent-color: #007bff;
+}
+
+.toggle-text {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.toggle-hint {
+  color: #6c757d;
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0;
+  padding-left: 28px;
+}
+
+.file-size-warning {
+  color: #dc3545;
+  font-size: 11px;
+  line-height: 1.4;
+  margin: 8px 0 0 0;
+  padding-left: 28px;
+  font-weight: 500;
+}

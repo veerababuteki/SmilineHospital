@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -39,7 +39,7 @@ interface SignatureData {
 @Component({
   selector: 'app-consent-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, DatePipe, ToastModule, SignaturePadComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, DatePipe, ToastModule, SignaturePadComponent],
   providers: [MessageService],
   templateUrl: './consent-form.component.html',
   styleUrls: ['./consent-form.component.scss']
@@ -79,6 +79,7 @@ export class ConsentFormComponent implements OnInit {
   currentSignatures: SignatureData = { timestamp: new Date() };
   signatureHistory: SignatureData[] = [];
   showSignatureHistory: boolean = false;
+  autoUploadSignedForm: boolean = true; // New property to control auto-upload
 
   sectionDescriptions: { [key: string]: { title: string; content: string } } = {
     examination: {
@@ -476,14 +477,26 @@ export class ConsentFormComponent implements OnInit {
   closeSignatureMode(): void {
     this.showSignatureMode = false;
     this.currentSignatures = { timestamp: new Date() };
+    // Reset auto-upload to default for next session
+    this.autoUploadSignedForm = true;
   }
 
-  onPatientSignatureChange(signatureData: string | null): void {
-    this.currentSignatures.patientSignature = signatureData || undefined;
+  async onPatientSignatureChange(signatureData: string | null): Promise<void> {
+    if (signatureData) {
+      // Compress the signature to reduce file size
+      this.currentSignatures.patientSignature = await this.compressSignatureImage(signatureData);
+    } else {
+      this.currentSignatures.patientSignature = undefined;
+    }
   }
 
-  onDoctorSignatureChange(signatureData: string | null): void {
-    this.currentSignatures.doctorSignature = signatureData || undefined;
+  async onDoctorSignatureChange(signatureData: string | null): Promise<void> {
+    if (signatureData) {
+      // Compress the signature to reduce file size
+      this.currentSignatures.doctorSignature = await this.compressSignatureImage(signatureData);
+    } else {
+      this.currentSignatures.doctorSignature = undefined;
+    }
   }
 
   saveSignatures(): void {
@@ -522,11 +535,28 @@ export class ConsentFormComponent implements OnInit {
         detail: 'Signatures saved! Generating signed form...'
       });
       
-      // Automatically download the signed form with current signatures
-      await this.downloadFormWithCurrentSignatures();
-      
-      // Close the signature modal after download is complete
-      this.closeSignatureMode();
+      try {
+        // Generate the signed form as a blob
+        const signedFormBlob = await this.generateSignedFormAsBlob();
+        
+        if (this.autoUploadSignedForm) {
+          // Auto-upload the signed form
+          await this.autoUploadSignedFormToServer(signedFormBlob);
+        } else {
+          // Download the signed form
+          await this.downloadFormWithCurrentSignatures();
+        }
+        
+        // Close the signature modal after completion
+        this.closeSignatureMode();
+      } catch (error) {
+        console.error('Error processing signed form:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to process signed form. Please try again.'
+        });
+      }
     } else {
       this.messageService.add({
         severity: 'error',
@@ -708,99 +738,58 @@ export class ConsentFormComponent implements OnInit {
 
   private getSignatureImageHTML(signatureData: string | undefined): string {
     if (signatureData) {
-      return `<img src="${signatureData}" style="max-width: 100%; max-height: 50px; object-fit: contain;" />`;
+      // Compress signature image to reduce file size
+      return `<img src="${signatureData}" style="max-width: 100%; max-height: 50px; object-fit: contain; image-rendering: optimizeQuality;" />`;
     }
     return '<span style="color: #999;">No signature</span>';
   }
 
+  // New method to compress signature images before adding to PDF
+  private async compressSignatureImage(signatureDataUrl: string): Promise<string> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        
+        // Set canvas size with reduced dimensions
+        const maxWidth = 200;
+        const maxHeight = 100;
+        let { width, height } = img as HTMLImageElement;
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Clear and ensure transparent background (no black boxes)
+        ctx.clearRect(0, 0, width, height);
+        
+        // Draw image
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Export as PNG to preserve transparency
+        const compressedDataUrl = canvas.toDataURL('image/png');
+        resolve(compressedDataUrl);
+      };
+      img.src = signatureDataUrl;
+    });
+  }
+
   async downloadFormWithCurrentSignatures(): Promise<void> {
     try {
-      // Create a temporary div to render the form with signatures
-      const tempDiv = document.createElement('div');
-      tempDiv.style.position = 'absolute';
-      tempDiv.style.left = '-9999px';
-      tempDiv.style.top = '0';
-      tempDiv.style.width = '800px';
-      tempDiv.style.backgroundColor = 'white';
-      tempDiv.style.padding = '20px';
-      tempDiv.style.fontFamily = 'Arial, sans-serif';
-      tempDiv.style.fontSize = '12px';
-      tempDiv.style.lineHeight = '1.4';
-      
-      document.body.appendChild(tempDiv);
-
-      // Generate HTML content with current signatures
-      const formData = this.consentForm.value;
-      let htmlContent = `
-        <div style="text-align: center; margin-bottom: 20px;">
-          <h1 style="margin: 0; font-size: 18px; font-weight: bold;">INFORMED CONSENT FORM</h1>
-        </div>
-        <div style="margin-bottom: 15px;">
-          <p><strong>Patient Name:</strong> ${formData.patientName}</p>
-          <p><strong>Doctor Name:</strong> ${formData.doctorName}</p>
-          <p><strong>Date:</strong> ${formData.date}</p>
-        </div>
-      `;
-
-      // Add selected sections
-      Object.keys(formData.sections).forEach(sectionKey => {
-        if (formData.sections[sectionKey]) {
-          const section = this.sectionDescriptions[sectionKey];
-          htmlContent += `
-            <div style="margin-bottom: 20px;">
-              <h3 style="margin: 0 0 10px 0; font-size: 14px; font-weight: bold;">${section.title}</h3>
-              <p style="margin: 0 0 15px 0; text-align: justify;">${section.content}</p>
-              <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-                <div style="flex: 1; margin-right: 20px;">
-                  <p style="margin: 0 0 5px 0;"><strong>Patient Signature:</strong></p>
-                  <div style="border-bottom: 1px solid #000; height: 60px; display: flex; align-items: center; justify-content: center;">
-                    ${this.getSignatureImageHTML(this.currentSignatures.patientSignature)}
-                  </div>
-                </div>
-                <div style="flex: 1;">
-                  <p style="margin: 0 0 5px 0;"><strong>Doctor's Signature:</strong></p>
-                  <div style="border-bottom: 1px solid #000; height: 60px; display: flex; align-items: center; justify-content: center;">
-                    ${this.getSignatureImageHTML(this.currentSignatures.doctorSignature)}
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-        }
-      });
-
-      tempDiv.innerHTML = htmlContent;
-
-      // Convert to canvas and then to PDF
-      const canvas = await html2canvas(tempDiv, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff'
-      });
-
-      document.body.removeChild(tempDiv);
-
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 210;
-      const pageHeight = 295;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-
-      let position = 0;
-
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      pdf.save(`consent-form-signed-${formData.patientName || 'patient'}-${formData.date}.pdf`);
+      const signedFormBlob = await this.generateSignedFormAsBlob();
+      this.downloadBlobAsFile(signedFormBlob, `consent-form-signed-${this.consentForm.value.patientName || 'patient'}-${this.consentForm.value.date}.pdf`);
 
       this.messageService.add({
         severity: 'success',
@@ -826,5 +815,178 @@ export class ConsentFormComponent implements OnInit {
     return this.signatureHistory.length > 0 ? this.signatureHistory[this.signatureHistory.length - 1] : null;
   }
 
+  // New method to generate signed form as blob
+  private async generateSignedFormAsBlob(): Promise<Blob> {
+    // Create a temporary div to render the form with signatures
+    const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    tempDiv.style.top = '0';
+    tempDiv.style.width = '800px';
+    tempDiv.style.backgroundColor = 'white';
+    tempDiv.style.padding = '20px';
+    tempDiv.style.fontFamily = 'Arial, sans-serif';
+    tempDiv.style.fontSize = '12px';
+    tempDiv.style.lineHeight = '1.4';
+    
+    document.body.appendChild(tempDiv);
+
+    // Generate HTML content with current signatures
+    const formData = this.consentForm.value;
+    let htmlContent = `
+      <div style="text-align: center; margin-bottom: 20px;">
+        <h1 style="margin: 0; font-size: 18px; font-weight: bold;">INFORMED CONSENT FORM</h1>
+      </div>
+      <div style="margin-bottom: 15px;">
+        <p><strong>Patient Name:</strong> ${formData.patientName}</p>
+        <p><strong>Doctor Name:</strong> ${formData.doctorName}</p>
+        <p><strong>Date:</strong> ${formData.date}</p>
+      </div>
+    `;
+
+    // Add selected sections
+    Object.keys(formData.sections).forEach(sectionKey => {
+      if (formData.sections[sectionKey]) {
+        const section = this.sectionDescriptions[sectionKey];
+        htmlContent += `
+          <div style="margin-bottom: 20px;">
+            <h3 style="margin: 0 0 10px 0; font-size: 14px; font-weight: bold;">${section.title}</h3>
+            <p style="margin: 0 0 15px 0; text-align: justify;">${section.content}</p>
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+              <div style="flex: 1; margin-right: 20px;">
+                <p style="margin: 0 0 5px 0;"><strong>Patient Signature:</strong></p>
+                <div style="border-bottom: 1px solid #000; height: 60px; display: flex; align-items: center; justify-content: center;">
+                  ${this.getSignatureImageHTML(this.currentSignatures.patientSignature)}
+                </div>
+              </div>
+              <div style="flex: 1;">
+                <p style="margin: 0 0 5px 0;"><strong>Doctor's Signature:</strong></p>
+                <div style="border-bottom: 1px solid #000; height: 60px; display: flex: align-items: center; justify-content: center;">
+                  ${this.getSignatureImageHTML(this.currentSignatures.doctorSignature)}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    });
+
+    tempDiv.innerHTML = htmlContent;
+
+    // Convert to canvas and then to PDF with optimized settings to reduce file size
+    const canvas = await html2canvas(tempDiv, {
+      scale: 1.5, // Reduced from 2 to 1.5 to decrease file size
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      imageTimeout: 0,
+      removeContainer: true
+    });
+
+    document.body.removeChild(tempDiv);
+
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgWidth = 210;
+    const pageHeight = 295;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+
+    let position = 0;
+
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft >= 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    // Convert PDF to blob
+    const pdfDataUrl = pdf.output('dataurlstring');
+    
+    // Convert data URL to blob
+    const response = await fetch(pdfDataUrl);
+    const pdfBlob = await response.blob();
+    return pdfBlob;
+  }
+
+  // New method to auto-upload signed form
+  private async autoUploadSignedFormToServer(signedFormBlob: Blob): Promise<void> {
+    try {
+      // Check file size before upload (typical server limit is 10MB)
+      const fileSizeMB = signedFormBlob.size / (1024 * 1024);
+      if (fileSizeMB > 10) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'File Too Large',
+          detail: `Generated PDF is ${fileSizeMB.toFixed(1)}MB. Server limit is 10MB. Falling back to download.`
+        });
+        // Fallback to download if file is too large
+        this.downloadBlobAsFile(signedFormBlob, `consent-form-signed-${this.consentForm.value.patientName || 'patient'}-${this.consentForm.value.date}.pdf`);
+        return;
+      }
+
+      // Create a File object from the blob
+      const fileName = `consent-form-signed-${this.consentForm.value.patientName || 'patient'}-${this.consentForm.value.date}.pdf`;
+      const signedFormFile = new File([signedFormBlob], fileName, { type: 'application/pdf' });
+
+      // Upload the signed form
+      this.isLoading = true;
+      const result = await firstValueFrom(
+        this.fileUploadService.uploadConsentForm(signedFormFile, this.userId, this.treatmentUniqueId)
+      );
+
+      if (result.success) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Signed consent form uploaded successfully!'
+        });
+        
+        // Reload existing consent forms to show the newly uploaded one
+        this.loadExistingConsentForms();
+      } else {
+        throw new Error(result.message || 'Upload failed');
+      }
+    } catch (error) {
+      console.error('Error auto-uploading signed form:', error);
+      
+      // Check if it's a file size error
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('413') || errorMessage.includes('Request Entity Too Large')) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'File Too Large',
+          detail: 'Generated PDF is too large for server upload. Please try with simpler signatures or contact support.'
+        });
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to auto-upload signed form. Please try manual upload.'
+        });
+      }
+      
+      // Fallback to download if auto-upload fails
+      this.downloadBlobAsFile(signedFormBlob, `consent-form-signed-${this.consentForm.value.patientName || 'patient'}-${this.consentForm.value.date}.pdf`);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  // Helper method to download blob as file
+  private downloadBlobAsFile(blob: Blob, fileName: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  }
 
 }

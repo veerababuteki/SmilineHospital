@@ -207,9 +207,29 @@
       <div class="signature-container">
         <div class="signature-section">
           <p class="signature-instructions">
-            Please add signatures to download the signed consent form. 
+            Please add signatures to generate the signed consent form. 
             You can draw signatures using your mouse/touch or upload signature images.
           </p>
+          
+          <!-- Auto-upload toggle -->
+          <div class="auto-upload-toggle">
+            <label class="toggle-label">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="autoUploadSignedForm"
+                class="toggle-checkbox">
+              <span class="toggle-text">
+                {{ autoUploadSignedForm ? '✓' : '○' }} Auto-upload signed form after generation
+              </span>
+            </label>
+            <small class="toggle-hint">
+              When enabled, the signed form will be automatically uploaded to the server. 
+              When disabled, it will be downloaded to your device.
+            </small>
+            <small class="file-size-warning">
+              ⚠️ Note: Server upload limit is 10MB. Large files will automatically download instead.
+            </small>
+          </div>
           
           <div class="signature-pads">
             <div class="signature-pad-wrapper">
@@ -230,14 +250,20 @@
           <div class="signature-actions">
             <button 
               class="btn btn-secondary"
-              (click)="closeSignatureMode()">
+              (click)="closeSignatureMode()"
+              [disabled]="isLoading">
               Cancel
             </button>
             <button 
               class="btn btn-primary"
-              [disabled]="!currentSignatures.patientSignature && !currentSignatures.doctorSignature"
+              [disabled]="!currentSignatures.patientSignature && !currentSignatures.doctorSignature || isLoading"
               (click)="saveSignaturesAndDownload()">
-              Save & Download
+              <span *ngIf="!isLoading">
+                {{ autoUploadSignedForm ? 'Save & Upload' : 'Save & Download' }}
+              </span>
+              <span *ngIf="isLoading">
+                {{ autoUploadSignedForm ? 'Uploading...' : 'Generating...' }}
+              </span>
             </button>
           </div>
         </div>
