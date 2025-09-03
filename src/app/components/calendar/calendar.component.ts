@@ -762,7 +762,7 @@ export class CalendarComponent implements OnInit {
       allDay: false,
       extendedProps: {
         status: 'unavailable',
-        patientCode: a.patient_details.unique_code,
+        patientCode: a.patient_details.manual_unique_code,
         patientId: a.patient_details.patient_id,
         patientUniqueCode: a.patient_details.unique_code,
         patientName:
