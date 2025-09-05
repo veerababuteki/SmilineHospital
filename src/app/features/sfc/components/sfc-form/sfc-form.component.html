@@ -79,13 +79,63 @@
 <div *ngIf="isFieldInvalid('name')" class="error-msg"></div>
 
 <td>
+  <div class="patient-search-container" *ngIf="editingIndex === null">
+    <input
+      [(ngModel)]="newEntry.patientId"
+      name="patientId"
+      placeholder="Search Patient ID..."
+      (input)="onPatientIdInput($event)"
+      (focus)="showPatientSearch = true"
+      [class.invalid-field]="isFieldInvalid('patientId')"
+    />
+    
+    <!-- Patient Search Dropdown -->
+    <div class="patient-search-dropdown" *ngIf="showPatientSearch && newEntry.patientId.trim().length > 0">
+      <!-- Loading indicator -->
+      <div class="search-loading" *ngIf="isSearchingPatients">
+        <i class="pi pi-spinner pi-spin"></i>
+        <span>Searching patients...</span>
+      </div>
+      
+      <!-- Search results -->
+      <div class="search-results" *ngIf="!isSearchingPatients && patientSearchResults.length > 0">
+        <div *ngFor="let patient of patientSearchResults" 
+             class="search-result-item" 
+             (click)="selectPatient(patient)">
+          <div class="patient-info">
+            <div class="patient-name">{{ patient.name }}</div>
+            <div class="patient-details">
+              <span class="patient-id">ID: {{ patient.manual_unique_code || patient.id }}</span>
+              <span class="patient-phone">{{ patient.phone }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- No results found -->
+      <div class="no-results" *ngIf="!isSearchingPatients && patientSearchResults.length === 0 && newEntry.patientId.trim().length >= 2">
+        <i class="pi pi-search"></i>
+        <span>No patients found</span>
+      </div>
+      
+      <!-- Minimum character requirement -->
+      <div class="search-hint" *ngIf="!isSearchingPatients && newEntry.patientId.trim().length > 0 && newEntry.patientId.trim().length < 2">
+        <i class="pi pi-info-circle"></i>
+        <span>Type at least 2 characters to search</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Readonly input for editing mode -->
   <input
+    *ngIf="editingIndex !== null"
     [(ngModel)]="newEntry.patientId"
     name="patientId"
     [class.invalid-field]="isFieldInvalid('patientId')"
-    [readonly]="editingIndex !== null"
-    [class.readonly-field]="editingIndex !== null"
+    [readonly]="true"
+    [class.readonly-field]="true"
   />
+  
   <div *ngIf="isFieldInvalid('patientId')" class="error-msg"></div>
 </td>
 

@@ -2,6 +2,45 @@
   background: white;
   width: 100%;
 
+  .referral-section {
+    margin-bottom: 30px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    background: #e9ecef;
+    border-radius: 6px;
+    
+    h4 {
+      margin: 0;
+      color: #495057;
+      font-size: 16px;
+      font-weight: 600;
+      
+      i {
+        margin-right: 8px;
+        color: #007bff;
+      }
+    }
+  }
+
+  .count-badge {
+    background: #007bff;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
   .sfc-header {
     display: flex;
     justify-content: space-between;
@@ -61,6 +100,27 @@
     border-radius: 4px;
     padding: 20px;
     background: white;
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    &.referral-made {
+      border-left: 4px solid #28a745;
+      
+      .member-header h4 {
+        color: #28a745;
+      }
+    }
+
+    &.referral-received {
+      border-left: 4px solid #ffc107;
+      
+      .member-header h4 {
+        color: #e0a800;
+      }
+    }
 
     .member-header {
       display: flex;

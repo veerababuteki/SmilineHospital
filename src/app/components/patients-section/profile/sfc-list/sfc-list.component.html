@@ -2,7 +2,7 @@
 
 <div class="sfc-list-container">
   <div class="sfc-header">
-    <h3>SFC Members Recommended by {{ patientName }}</h3>
+    <h3>SFC Referral Network for {{ patientName }}</h3>
     <button 
       pButton 
       type="button" 
@@ -15,47 +15,105 @@
 
   <div class="sfc-content">
     <div *ngIf="loading" class="loading-message">
-      <p>Loading SFC members...</p>
+      <p>Loading SFC referral network...</p>
     </div>
 
-    <div *ngIf="!loading && sfcMembers.length === 0" class="no-members">
-      <p>No SFC members have been recommended by this patient yet.</p>
-      <p>Click "Add New SFC Member" to add the first recommendation.</p>
-    </div>
+    <!-- Referrals Made by This Patient -->
+    <div class="referral-section" *ngIf="!loading">
+      <div class="section-header">
+        <h4><i class="pi pi-arrow-right"></i> Referrals Made by {{ patientName }}</h4>
+        <span class="count-badge">{{ sfcMembers.length }}</span>
+      </div>
+      
+      <div *ngIf="sfcMembers.length === 0" class="no-members">
+        <p>No referrals have been made by this patient yet.</p>
+        <p>Click "Add New SFC Member" to add the first referral.</p>
+      </div>
 
-    <div *ngIf="!loading && sfcMembers.length > 0" class="members-list">
-      <div *ngFor="let member of sfcMembers" class="member-card">
-        <div class="member-header">
-          <h4>Name: {{ member.patient_name }}</h4>
-          <span [class]="getStatusBadgeClass(member.smiline_patient)" class="status-badge">
-            {{ getStatusText(member.smiline_patient) }}
-          </span>
+      <div *ngIf="sfcMembers.length > 0" class="members-list">
+        <div *ngFor="let member of sfcMembers" class="member-card referral-made">
+          <div class="member-header">
+            <h4>{{ member.patient_name }}</h4>
+            <span [class]="getStatusBadgeClass(member.smiline_patient)" class="status-badge">
+              {{ getStatusText(member.smiline_patient) }}
+            </span>
+          </div>
+          
+          <div class="member-details">
+            <div class="detail-row" *ngIf="member.age">
+              <span class="label">Age:</span>
+              <span class="value">{{ member.age }}</span>
+            </div>
+            
+            <div class="detail-row" *ngIf="member.occupation">
+              <span class="label">Occupation:</span>
+              <span class="value">{{ member.occupation }}</span>
+            </div>
+            
+            <div class="detail-row" *ngIf="member.doctor_front_office_comment">
+              <span class="label">Doctor's Comment:</span>
+              <span class="value">{{ member.doctor_front_office_comment }}</span>
+            </div>
+            
+            <div class="detail-row" *ngIf="member.doctor_advice_for_lead_gen">
+              <span class="label">Doctor's Advice:</span>
+              <span class="value">{{ member.doctor_advice_for_lead_gen }}</span>
+            </div>
+            
+            <div class="detail-row" *ngIf="member.front_office_remarks">
+              <span class="label">Front Office Remarks:</span>
+              <span class="value">{{ member.front_office_remarks }}</span>
+            </div>
+          </div>
         </div>
-        
-        <div class="member-details">
-          <div class="detail-row" *ngIf="member.age">
-            <span class="label">Age:</span>
-            <span class="value">{{ member.age }}</span>
+      </div>
+    </div>
+
+    <!-- Referrals Received by This Patient -->
+    <div class="referral-section" *ngIf="!loading">
+      <div class="section-header">
+        <h4><i class="pi pi-arrow-left"></i> Referrals Received by {{ patientName }}</h4>
+        <span class="count-badge">{{ referralsReceived.length }}</span>
+      </div>
+      
+      <div *ngIf="referralsReceived.length === 0" class="no-members">
+        <p>This patient has not been referred by anyone yet.</p>
+      </div>
+
+      <div *ngIf="referralsReceived.length > 0" class="members-list">
+        <div *ngFor="let referral of referralsReceived" class="member-card referral-received">
+          <div class="member-header">
+            <h4>Referred by: {{ referral.referred_by }}</h4>
+            <span [class]="getStatusBadgeClass(referral.smiline_patient)" class="status-badge">
+              {{ getStatusText(referral.smiline_patient) }}
+            </span>
           </div>
           
-          <div class="detail-row" *ngIf="member.occupation">
-            <span class="label">Occupation:</span>
-            <span class="value">{{ member.occupation }}</span>
-          </div>
-          
-          <div class="detail-row" *ngIf="member.doctor_front_office_comment">
-            <span class="label">Doctor's Comment:</span>
-            <span class="value">{{ member.doctor_front_office_comment }}</span>
-          </div>
-          
-          <div class="detail-row" *ngIf="member.doctor_advice_for_lead_gen">
-            <span class="label">Doctor's Advice:</span>
-            <span class="value">{{ member.doctor_advice_for_lead_gen }}</span>
-          </div>
-          
-          <div class="detail-row" *ngIf="member.front_office_remarks">
-            <span class="label">Front Office Remarks:</span>
-            <span class="value">{{ member.front_office_remarks }}</span>
+          <div class="member-details">
+            <div class="detail-row" *ngIf="referral.age">
+              <span class="label">Age:</span>
+              <span class="value">{{ referral.age }}</span>
+            </div>
+            
+            <div class="detail-row" *ngIf="referral.occupation">
+              <span class="label">Occupation:</span>
+              <span class="value">{{ referral.occupation }}</span>
+            </div>
+            
+            <div class="detail-row" *ngIf="referral.doctor_front_office_comment">
+              <span class="label">Doctor's Comment:</span>
+              <span class="value">{{ referral.doctor_front_office_comment }}</span>
+            </div>
+            
+            <div class="detail-row" *ngIf="referral.doctor_advice_for_lead_gen">
+              <span class="label">Doctor's Advice:</span>
+              <span class="value">{{ referral.doctor_advice_for_lead_gen }}</span>
+            </div>
+            
+            <div class="detail-row" *ngIf="referral.front_office_remarks">
+              <span class="label">Front Office Remarks:</span>
+              <span class="value">{{ referral.front_office_remarks }}</span>
+            </div>
           </div>
         </div>
       </div>

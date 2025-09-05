@@ -74,6 +74,26 @@ export class SfcService {
       .pipe(catchError(this.handleError));
   }
 
+  getReferralsMadeByPatient(patientId: string) {
+    const token = this.authService.getAccessToken();
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+    return this.http
+      .get<any>(`${this.baseUrl}/patient/${patientId}/referrals-made`, { headers })
+      .pipe(catchError(this.handleError));
+  }
+
+  getReferralsReceivedByPatient(patientId: string) {
+    const token = this.authService.getAccessToken();
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+    return this.http
+      .get<any>(`${this.baseUrl}/patient/${patientId}/referrals-received`, { headers })
+      .pipe(catchError(this.handleError));
+  }
+
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error.message || 'Server error');
   }

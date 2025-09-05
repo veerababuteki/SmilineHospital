@@ -1,5 +1,5 @@
 // Updated sfc-form.component.ts - Modified methods for row-specific actions
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, Validators } from '@angular/forms';
 import { CustomCalendarComponent } from './custom-calendar/custom-calendar.component';
@@ -7,6 +7,7 @@ import { SfcService } from '../../../../services/sfc.service';
 import { UserService } from '../../../../services/user.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { Subject, debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-sfc-form',
@@ -16,12 +17,21 @@ import { ToastModule } from 'primeng/toast';
   styleUrl: './sfc-form.component.scss',
   providers: [MessageService]
 })
-export class SfcFormComponent {
+export class SfcFormComponent implements OnDestroy {
   @Input() patientId: string = '';
   @Input() patientName: string = '';
   @Output() onSfcAdded = new EventEmitter<void>();
 
-  constructor(private sfcService: SfcService, private userService: UserService, private messageService: MessageService) {}
+  // Patient search properties
+  patientSearchResults: any[] = [];
+  showPatientSearch: boolean = false;
+  isSearchingPatients: boolean = false;
+  patientSearchSubject = new Subject<string>();
+  private destroy$ = new Subject<void>();
+
+  constructor(private sfcService: SfcService, private userService: UserService, private messageService: MessageService) {
+    this.setupPatientSearch();
+  }
   // Your existing code remains the same...
   editId: number | null = null;
   newEntry: {
@@ -69,6 +79,79 @@ export class SfcFormComponent {
   ngOnInit() {
         this.getSfcEntries();
     }
+
+  setupPatientSearch() {
+    this.patientSearchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(searchTerm => {
+        if (searchTerm && searchTerm.trim().length >= 2) {
+          this.isSearchingPatients = true;
+          return this.userService.searchPatients(searchTerm.trim(), 10);
+        } else {
+          this.patientSearchResults = [];
+          this.showPatientSearch = false;
+          return [];
+        }
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (response) => {
+        this.isSearchingPatients = false;
+        if (response && response.data) {
+          this.patientSearchResults = response.data.map((patient: any) => ({
+            id: patient.unique_code,
+            userId: patient.user_id,
+            name: patient.first_name + ' ' + patient.last_name,
+            email: patient.email,
+            phone: patient.phone,
+            manual_unique_code: patient.manual_unique_code
+          }));
+          this.showPatientSearch = this.patientSearchResults.length > 0;
+        } else {
+          this.patientSearchResults = [];
+          this.showPatientSearch = false;
+        }
+      },
+      error: (error) => {
+        this.isSearchingPatients = false;
+        console.error('Patient search error:', error);
+        this.patientSearchResults = [];
+        this.showPatientSearch = false;
+      }
+    });
+  }
+
+  onPatientIdInput(event: any) {
+    const searchTerm = event.target.value;
+    if (searchTerm && searchTerm.trim().length >= 2) {
+      this.patientSearchSubject.next(searchTerm);
+    } else {
+      this.patientSearchResults = [];
+      this.showPatientSearch = false;
+    }
+  }
+
+  selectPatient(patient: any) {
+    this.newEntry.patientId = patient.manual_unique_code || patient.id;
+    this.newEntry.name = patient.name;
+    this.patientSearchResults = [];
+    this.showPatientSearch = false;
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // Handle clicking outside to close search dropdown
+  @HostListener('document:click', ['$event'])
+  handleDocumentClick(event: MouseEvent) {
+    const searchContainer = document.querySelector('.patient-search-container');
+    if (searchContainer && !searchContainer.contains(event.target as Node)) {
+      this.showPatientSearch = false;
+    }
+  }
 
   filteredData: any[] = [];
 
@@ -199,24 +282,35 @@ addEntry() {
       const patient = response.data?.[0];
 
       if (patient && String(this.newEntry.patientId) === String(patient.manual_unique_code)) {
+        // Patient exists - this is good! Auto-populate name and proceed
+        if (!this.newEntry.name || this.newEntry.name.trim() === '') {
+          this.newEntry.name = `${patient.first_name} ${patient.last_name}`.trim();
+        }
+        
         this.messageService.add({
-          severity: 'warn',
-          summary: 'Action Not Allowed',
-          detail: 'A patient with this Patient ID already exists. Cannot add SFC entry.'
+          severity: 'success',
+          summary: 'Patient Found',
+          detail: `Patient "${this.newEntry.name}" found. Proceeding to add SFC entry.`
         });
-        return; // stop execution
       }
 
+      // Always proceed to add SFC entry (whether patient exists or not)
       this.addSfcEntry();
     },
     error: (error) => {
-      // Ignore 400/404 → add SFC entry
+      // If patient doesn't exist (400/404), still allow adding SFC entry
       if (error.status === 400 || error.status === 404) {
-        this.addSfcEntry();
+        this.messageService.add({
+          severity: 'info',
+          summary: 'New Patient',
+          detail: 'Patient not found in system. Adding as new SFC entry.'
+        });
       } else {
         console.error('Unexpected error checking patient:', error);
-        this.addSfcEntry();
       }
+      
+      // Always proceed to add SFC entry
+      this.addSfcEntry();
     }
   });
 }

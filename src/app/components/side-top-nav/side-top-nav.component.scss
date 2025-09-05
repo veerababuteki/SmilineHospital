@@ -369,6 +369,45 @@
       text-align: center;
       color: #6c757d;
       font-style: italic;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      
+      i {
+        font-size: 16px;
+      }
+    }
+
+    .search-loading {
+      padding: 20px;
+      text-align: center;
+      color: #007bff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      
+      i {
+        font-size: 16px;
+      }
+    }
+
+    .search-hint {
+      padding: 15px 20px;
+      text-align: center;
+      color: #6c757d;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: #f8f9fa;
+      border-top: 1px solid #e9ecef;
+      
+      i {
+        font-size: 14px;
+      }
     }
   }
 }

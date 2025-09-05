@@ -96,6 +96,24 @@ export class UserService {
     return this.http.get<any>(`${this.baseUrl}/admin/role/branches`, { headers});
   }
 
+  searchPatients(searchQuery: string, limit: number = 20): Observable<any> {
+    const token = this.authService.getAccessToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    const params = new HttpParams()
+      .set('search', searchQuery)
+      .set('limit', limit.toString());
+
+    return this.http.get<any>(`${this.baseUrl}/auth/user/searchPatients`, { 
+      headers, 
+      params 
+    }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   getInsuranceGroups(){
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({

@@ -155,8 +155,8 @@ export class SignaturePadComponent implements OnInit, AfterViewInit {
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef<HTMLInputElement>;
   
   @Input() title: string = '';
-  @Input() width: number = 400;
-  @Input() height: number = 120;
+  @Input() width: number = 300;  // Reduced from 400 for smaller file sizes
+  @Input() height: number = 100; // Reduced from 120 for smaller file sizes
   @Input() lineWidth: number = 2;
   @Input() strokeStyle: string = '#000000';
   
@@ -328,6 +328,7 @@ export class SignaturePadComponent implements OnInit, AfterViewInit {
 
   getSignatureDataUrl(): string | null {
     if (!this.hasSignature) return null;
+    // Use PNG format for better signature quality and visibility
     return this.canvas.toDataURL('image/png');
   }
 

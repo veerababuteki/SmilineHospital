@@ -28,21 +28,37 @@
 
         <!-- Search results dropdown -->
         <div class="search-results-dropdown" *ngIf="showSearchResults && searchText.trim().length > 0">
-          <div class="search-results-list" *ngIf="filteredPatients.length > 0">
+          <!-- Loading indicator -->
+          <div class="search-loading" *ngIf="isSearching">
+            <i class="pi pi-spinner pi-spin"></i>
+            <span>Searching patients...</span>
+          </div>
+          
+          <!-- Search results -->
+          <div class="search-results-list" *ngIf="!isSearching && filteredPatients.length > 0">
             <div class="search-result-item" *ngFor="let patient of filteredPatients" (click)="selectPatient(patient)">
               <img [src]="patient.image" alt="Patient" class="patient-thumbnail">
               <div class="patient-details">
                 <div class="patient-header">
                   <div class="patient-name">{{patient.name}}</div>
-                  <div class="patient-id">{{patient.user_id}}</div>
-                  </div>
+                  <div class="patient-id">{{patient.manual_unique_code}}</div>
+                </div>
                 <div class="patient-email">{{patient.phone}}</div>
                 <div class="patient-email">{{patient.email}}</div>
               </div>
             </div>
           </div>
-          <div class="no-results-found" *ngIf="filteredPatients.length === 0">
-            No patients found matching "{{searchText}}"
+          
+          <!-- No results found -->
+          <div class="no-results-found" *ngIf="!isSearching && filteredPatients.length === 0 && searchText.trim().length >= 2">
+            <i class="pi pi-search"></i>
+            <span>No patients found matching "{{searchText}}"</span>
+          </div>
+          
+          <!-- Minimum character requirement -->
+          <div class="search-hint" *ngIf="!isSearching && searchText.trim().length > 0 && searchText.trim().length < 2">
+            <i class="pi pi-info-circle"></i>
+            <span>Type at least 2 characters to search</span>
           </div>
         </div>
       </div>

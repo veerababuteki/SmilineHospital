@@ -45,6 +45,118 @@
     }
   }
 
+  // Patient search container styling
+  .patient-search-container {
+    position: relative;
+    width: 100%;
+
+    .patient-search-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 400px; // Fixed wider width
+      min-width: 350px; // Minimum width
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 2px;
+
+      .search-loading {
+        padding: 20px;
+        text-align: center;
+        color: #007bff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-size: 14px;
+        
+        i {
+          font-size: 18px;
+        }
+      }
+
+      .search-results {
+        .search-result-item {
+          padding: 16px 20px;
+          cursor: pointer;
+          border-bottom: 1px solid #f0f0f0;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background-color: #f8f9fa;
+            transform: translateX(2px);
+          }
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .patient-info {
+            .patient-name {
+              font-weight: 600;
+              color: #333;
+              margin-bottom: 6px;
+              font-size: 15px;
+            }
+
+            .patient-details {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              font-size: 13px;
+              color: #666;
+
+              .patient-id {
+                font-weight: 500;
+                background-color: #e3f2fd;
+                padding: 2px 8px;
+                border-radius: 12px;
+                color: #1976d2;
+              }
+
+              .patient-phone {
+                color: #666;
+                font-family: monospace;
+              }
+            }
+          }
+        }
+      }
+
+      .no-results, .search-hint {
+        padding: 20px;
+        text-align: center;
+        color: #666;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+
+        i {
+          font-size: 16px;
+        }
+      }
+
+      .search-hint {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        border-radius: 6px;
+        margin: 8px;
+      }
+
+      .no-results {
+        color: #999;
+        font-style: italic;
+      }
+    }
+  }
+
   button {
     background: #007bff;
     color: #fff;

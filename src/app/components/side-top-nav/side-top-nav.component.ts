@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnDestroy } from '@angular/core';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -16,6 +16,7 @@ import { DialogModule } from 'primeng/dialog';
 import { AddProfileComponent } from '../patients-section/edit-profile/add-profile.component';
 import { ToastModule } from 'primeng/toast';
 import { UserService } from '../../services/user.service';
+import { Subject, debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs';
 
 interface NavItem {
   icon: string;
@@ -42,12 +43,15 @@ interface NavItem {
   ],
   providers: [MessageService]
 })
-export class SideTopNavComponent {
+export class SideTopNavComponent implements OnDestroy {
   allPatients: any[] = [];
   patients: any[] = [];
   filteredPatients: any[] = [];
   showSearchResults: boolean = false;
   loadPaitentsSubscriber: any;
+  isSearching: boolean = false;
+  searchSubject = new Subject<string>();
+  private destroy$ = new Subject<void>();
 
   constructor(private authService: AuthService, private userService: UserService, private router: Router, private messageService: MessageService) {
     this.authService.getUser().subscribe(user => {
@@ -56,10 +60,13 @@ export class SideTopNavComponent {
       this.addNavItems(privilegeNames);
       this.navItems = this.navItems.filter(nav => nav.hasAccess);
     });
+    
     this.userService.loadPatients$.subscribe(_ => {
-      this.getPatients();
+      // No need to fetch all patients anymore, search will handle it
     });
-    this.getPatients();
+    
+    // Setup debounced search
+    this.setupSearch();
   }
 
   displayAddPatientDialog = false;
@@ -103,18 +110,26 @@ export class SideTopNavComponent {
   }
   practices: any[] = [];
 
-  getPatients() {
-    this.userService.getBranches().subscribe(res=>{
-      this.practices = res.data;
-      const savedPractice = localStorage.getItem('selectedPractice');
-      if (savedPractice) {
-      } else {
-        localStorage.setItem('selectedPractice', JSON.stringify(this.practices[0]));
-      }
-      this.userService.getDoctors('2ac7787b-77d1-465b-9bc0-eee50933697f').subscribe(res => {
-        this.allPatients = res.data;
-        this.allPatients.forEach(patient => {
-          this.patients.push({
+  setupSearch() {
+    this.searchSubject.pipe(
+      debounceTime(300), // Wait 300ms after user stops typing
+      distinctUntilChanged(), // Only search if the search term has changed
+      switchMap(searchTerm => {
+        if (searchTerm && searchTerm.trim().length >= 2) {
+          this.isSearching = true;
+          return this.userService.searchPatients(searchTerm.trim(), 20);
+        } else {
+          this.filteredPatients = [];
+          this.showSearchResults = false;
+          return [];
+        }
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (response) => {
+        this.isSearching = false;
+        if (response && response.data) {
+          this.filteredPatients = response.data.map((patient: any) => ({
             id: patient.unique_code,
             userId: patient.user_id,
             name: patient.first_name + ' ' + patient.last_name,
@@ -123,10 +138,37 @@ export class SideTopNavComponent {
             image: 'assets/user.webp',
             gender: patient.gender,
             manual_unique_code: patient.manual_unique_code
-          })
-          this.filteredPatients = [...this.patients]
-        })
-      })
+          }));
+          this.showSearchResults = this.filteredPatients.length > 0;
+        } else {
+          this.filteredPatients = [];
+          this.showSearchResults = false;
+        }
+      },
+      error: (error) => {
+        this.isSearching = false;
+        console.error('Search error:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Search Error',
+          detail: 'Failed to search patients. Please try again.'
+        });
+        this.filteredPatients = [];
+        this.showSearchResults = false;
+      }
+    });
+  }
+
+  getPatients() {
+    // This method is kept for compatibility but no longer fetches all patients
+    // Search functionality now handles patient retrieval
+    this.userService.getBranches().subscribe(res=>{
+      this.practices = res.data;
+      const savedPractice = localStorage.getItem('selectedPractice');
+      if (savedPractice) {
+      } else {
+        localStorage.setItem('selectedPractice', JSON.stringify(this.practices[0]));
+      }
     })
   }
 
@@ -142,26 +184,30 @@ export class SideTopNavComponent {
   }
   filterPatients() {
     if (!this.searchText || this.searchText.trim() === '') {
-      this.filteredPatients = [...this.patients];
+      this.filteredPatients = [];
+      this.showSearchResults = false;
     } else {
-      const searchValue = this.searchText.toLowerCase().trim();
-      this.filteredPatients = this.patients.filter(patient =>
-        patient.name.toLowerCase().includes(searchValue) ||
-        patient.email.toLowerCase().includes(searchValue) ||
-        patient.phone.toLowerCase().includes(searchValue) ||
-        patient.id.toLowerCase().includes(searchValue) ||
-        (patient.manual_unique_code ? patient.manual_unique_code.toLowerCase().includes(searchValue) : false)
-      );
+      // Show search results dropdown immediately when user starts typing
+      this.showSearchResults = true;
+      // Trigger the search subject which will handle the API call
+      this.searchSubject.next(this.searchText);
     }
   }
 
   selectPatient(patient: any) {
-    // You can handle what happens when a patient is selected here
-    // For example, navigate to patient details page
-    this.router.navigate(['patients', patient.userId, 'profile', patient.id]);
-    this.searchText = ''; // Set search input to selected patient name
+    // Open patient profile in a new tab/window
+    const url = this.router.createUrlTree(['patients', patient.userId, 'profile', patient.id]);
+    window.open(url.toString(), '_blank');
+    
+    // Clear search state
+    this.searchText = ''; // Clear search input
     this.showSearchResults = false; // Hide dropdown
-    // Example: this.router.navigate(['/patients', patient.id]);
+    this.filteredPatients = []; // Clear search results
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // Add this to handle clicking outside the dropdown

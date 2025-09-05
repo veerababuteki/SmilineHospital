@@ -20,6 +20,7 @@ export class SfcListComponent implements OnInit {
   @Input() patientName: string = '';
 
   sfcMembers: any[] = [];
+  referralsReceived: any[] = [];
   loading: boolean = false;
   showAddSfcDialog: boolean = false;
 
@@ -36,9 +37,13 @@ export class SfcListComponent implements OnInit {
 
   loadSfcMembers(): void {
     this.loading = true;
+    
+    // Load both referrals made by this patient and referrals received by this patient
     this.sfcService.getSfcByPatientId(this.patientId).subscribe({
       next: (response) => {
-        this.sfcMembers = response.data || [];
+        const data = response.data || {};
+        this.sfcMembers = data.referralsMade || [];
+        this.referralsReceived = data.referralsReceived || [];
         this.loading = false;
       },
       error: (error) => {

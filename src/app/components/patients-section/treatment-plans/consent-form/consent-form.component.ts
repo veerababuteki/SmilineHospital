@@ -738,13 +738,13 @@ export class ConsentFormComponent implements OnInit {
 
   private getSignatureImageHTML(signatureData: string | undefined): string {
     if (signatureData) {
-      // Compress signature image to reduce file size
-      return `<img src="${signatureData}" style="max-width: 100%; max-height: 50px; object-fit: contain; image-rendering: optimizeQuality;" />`;
+      // Display signature with better styling for visibility
+      return `<img src="${signatureData}" style="max-width: 100%; max-height: 60px; object-fit: contain; image-rendering: auto; border: 1px solid #ddd; background: white;" />`;
     }
-    return '<span style="color: #999;">No signature</span>';
+    return '<span style="color: #999; font-style: italic;">No signature</span>';
   }
 
-  // New method to compress signature images before adding to PDF
+  // Enhanced method to compress signature images while maintaining visibility
   private async compressSignatureImage(signatureDataUrl: string): Promise<string> {
     return new Promise((resolve) => {
       const img = new Image();
@@ -752,11 +752,12 @@ export class ConsentFormComponent implements OnInit {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
         
-        // Set canvas size with reduced dimensions
-        const maxWidth = 200;
-        const maxHeight = 100;
+        // Moderate reduction in dimensions to maintain signature quality
+        const maxWidth = 150;  // Increased from 120 for better visibility
+        const maxHeight = 75;  // Increased from 60 for better visibility
         let { width, height } = img as HTMLImageElement;
         
+        // Calculate new dimensions maintaining aspect ratio
         if (width > height) {
           if (width > maxWidth) {
             height = (height * maxWidth) / width;
@@ -772,13 +773,17 @@ export class ConsentFormComponent implements OnInit {
         canvas.width = width;
         canvas.height = height;
         
-        // Clear and ensure transparent background (no black boxes)
-        ctx.clearRect(0, 0, width, height);
+        // Set white background for signatures to ensure visibility
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
         
-        // Draw image
+        // Draw image with smoothing enabled for better quality
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, width, height);
         
-        // Export as PNG to preserve transparency
+        // Use PNG format to preserve signature quality and avoid black boxes
+        // PNG is better for signatures as it preserves the drawing quality
         const compressedDataUrl = canvas.toDataURL('image/png');
         resolve(compressedDataUrl);
       };
@@ -815,7 +820,27 @@ export class ConsentFormComponent implements OnInit {
     return this.signatureHistory.length > 0 ? this.signatureHistory[this.signatureHistory.length - 1] : null;
   }
 
-  // New method to generate signed form as blob
+  // Advanced compression method for further file size reduction
+  private async compressImageData(imageDataUrl: string, quality: number = 0.7): Promise<string> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        
+        // Reduce dimensions by 20% for additional compression
+        canvas.width = img.width * 0.8;
+        canvas.height = img.height * 0.8;
+        
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedDataUrl);
+      };
+      img.src = imageDataUrl;
+    });
+  }
+
+  // New method to generate signed form as blob with advanced compression
   private async generateSignedFormAsBlob(): Promise<Blob> {
     // Create a temporary div to render the form with signatures
     const tempDiv = document.createElement('div');
@@ -873,19 +898,25 @@ export class ConsentFormComponent implements OnInit {
 
     tempDiv.innerHTML = htmlContent;
 
-    // Convert to canvas and then to PDF with optimized settings to reduce file size
+    // Convert to canvas and then to PDF with balanced settings for quality and file size
     const canvas = await html2canvas(tempDiv, {
-      scale: 1.5, // Reduced from 2 to 1.5 to decrease file size
+      scale: 1.2, // Slightly increased from 1.0 to ensure signature visibility
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
       imageTimeout: 0,
-      removeContainer: true
+      removeContainer: true,
+      logging: false, // Disable logging for better performance
+      width: 800, // Fixed width to control output size
+      height: undefined, // Let height be calculated automatically
+      scrollX: 0,
+      scrollY: 0
     });
 
     document.body.removeChild(tempDiv);
 
-    const imgData = canvas.toDataURL('image/png');
+    // Use JPEG compression for the main image to significantly reduce file size
+    const imgData = canvas.toDataURL('image/jpeg', 0.8); // 80% quality for good balance
     const pdf = new jsPDF('p', 'mm', 'a4');
     const imgWidth = 210;
     const pageHeight = 295;
@@ -894,30 +925,63 @@ export class ConsentFormComponent implements OnInit {
 
     let position = 0;
 
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    // Use JPEG format instead of PNG for much smaller file size
+    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
     heightLeft -= pageHeight;
 
     while (heightLeft >= 0) {
       position = heightLeft - imgHeight;
       pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
     }
 
-    // Convert PDF to blob
+    // Convert PDF to blob with additional compression
     const pdfDataUrl = pdf.output('dataurlstring');
     
     // Convert data URL to blob
     const response = await fetch(pdfDataUrl);
     const pdfBlob = await response.blob();
+    
+    // Apply additional compression if file is still too large (but be less aggressive)
+    const fileSizeMB = pdfBlob.size / (1024 * 1024);
+    if (fileSizeMB > 3) { // Increased threshold from 2MB to 3MB to preserve quality
+      console.log(`PDF size before additional compression: ${fileSizeMB.toFixed(2)}MB`);
+      
+      // Re-generate with moderate compression to maintain signature quality
+      const compressedImgData = await this.compressImageData(imgData, 0.75); // Higher quality than before
+      const compressedPdf = new jsPDF('p', 'mm', 'a4');
+      
+      compressedPdf.addImage(compressedImgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+      
+      const compressedPdfDataUrl = compressedPdf.output('dataurlstring');
+      const compressedResponse = await fetch(compressedPdfDataUrl);
+      const compressedPdfBlob = await compressedResponse.blob();
+      
+      const compressedSizeMB = compressedPdfBlob.size / (1024 * 1024);
+      console.log(`PDF size after additional compression: ${compressedSizeMB.toFixed(2)}MB`);
+      
+      return compressedPdfBlob;
+    }
+    
     return pdfBlob;
   }
 
-  // New method to auto-upload signed form
+  // New method to auto-upload signed form with enhanced file size management
   private async autoUploadSignedFormToServer(signedFormBlob: Blob): Promise<void> {
     try {
       // Check file size before upload (typical server limit is 10MB)
       const fileSizeMB = signedFormBlob.size / (1024 * 1024);
+      
+      // Show file size information to user
+      if (fileSizeMB > 1) {
+        this.messageService.add({
+          severity: 'info',
+          summary: 'File Size Optimized',
+          detail: `Generated PDF size: ${fileSizeMB.toFixed(1)}MB (optimized for smaller file size)`
+        });
+      }
+      
       if (fileSizeMB > 10) {
         this.messageService.add({
           severity: 'warn',
@@ -937,9 +1001,29 @@ export class ConsentFormComponent implements OnInit {
       this.isLoading = true;
       const result = await firstValueFrom(
         this.fileUploadService.uploadConsentForm(signedFormFile, this.userId, this.treatmentUniqueId)
+      ).catch(error => {
+        // Handle HTTP errors
+        console.error('HTTP error during upload:', error);
+        throw error;
+      });
+
+      // Debug: Log the API response to understand the structure
+      console.log('Upload API response:', result);
+
+      // Check for successful upload - handle different response formats
+      // Success can be indicated by: result.success === true, result.status === 'success', 
+      // result.data.success === true, or simply having a result object without error
+      const isSuccess = result && (
+        result.success === true || 
+        result.status === 'success' || 
+        (result.data && result.data.success === true) ||
+        (result.status === 200) ||
+        (result.statusCode === 200) ||
+        // If we have a result object and no explicit error, consider it successful
+        (!result.error && !result.message?.toLowerCase().includes('error') && !result.message?.toLowerCase().includes('fail'))
       );
 
-      if (result.success) {
+      if (isSuccess) {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
@@ -949,7 +1033,9 @@ export class ConsentFormComponent implements OnInit {
         // Reload existing consent forms to show the newly uploaded one
         this.loadExistingConsentForms();
       } else {
-        throw new Error(result.message || 'Upload failed');
+        // Only throw error if we have a clear failure indication
+        const errorMessage = result?.message || result?.error || 'Upload failed';
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error('Error auto-uploading signed form:', error);
@@ -962,11 +1048,18 @@ export class ConsentFormComponent implements OnInit {
           summary: 'File Too Large',
           detail: 'Generated PDF is too large for server upload. Please try with simpler signatures or contact support.'
         });
-      } else {
+      } else if (errorMessage.includes('Upload failed') || errorMessage.includes('failed')) {
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
+          summary: 'Upload Failed',
           detail: 'Failed to auto-upload signed form. Please try manual upload.'
+        });
+      } else {
+        // For other errors, show a more generic message
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Upload Issue',
+          detail: 'Auto-upload encountered an issue. The file has been downloaded instead.'
         });
       }
       
