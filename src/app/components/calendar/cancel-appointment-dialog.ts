@@ -180,26 +180,25 @@ export class CancelAppointmentDialogComponent {
 
   console.log(cancelData)
 
-  // this.appointmentService.cancelAppointment(cancelData).subscribe({
-  //   next: () => {
-  //     this.messageService.add({ 
-  //       severity: 'success', 
-  //       summary: 'Success', 
-  //       detail: 'Appointment Cancelled Successfully' 
-  //     });
-
-  //     setTimeout(() => {
-  //       this.confirm.emit(cancelData);
-  //     }, 1300);
-  //   },
-  //   error: () => {
-  //     this.messageService.add({
-  //       severity: 'error',
-  //       summary: 'Error',
-  //       detail: 'Failed to cancel appointment'
-  //     });
-  //   }
-  // });
+  this.appointmentService.cancelAppointment(cancelData).subscribe({
+    next: () => {
+      this.messageService.add({ 
+        severity: 'success', 
+        summary: 'Success', 
+        detail: 'Appointment Cancelled Successfully' 
+      });
+      setTimeout(() => {
+        this.confirm.emit(cancelData);
+      }, 1300);
+    },
+    error: () => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to cancel appointment'
+      });
+    }
+  });
 }
 
 }

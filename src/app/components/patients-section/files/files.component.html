@@ -1,91 +1,169 @@
 <div class="appointments-container">
-    <div class="appointments-header">
-        <h2>Files</h2>
-        <div>
-            <button class="mark-btn" *ngIf="selectedFileIds.length == 0">Delete</button>
-            <button class="mark-btn-active" (click)="deleteFiles()" *ngIf="selectedFileIds.length > 0">Delete</button>
-            <button class="mark-btn">Email</button>
-            <input type="file" #fileInput (change)="onFileSelected($event)" multiple accept="image/*" style="display: none;">
-            <button class="add-btn" (click)="fileInput.click()">+ Add</button>
-        </div>
+  <div class="appointments-header">
+    <h2>Files</h2>
+    <div>
+      <button class="mark-btn" *ngIf="selectedFileIds.length == 0">
+        Delete
+      </button>
+      <button
+        class="mark-btn-active"
+        (click)="deleteFiles()"
+        *ngIf="selectedFileIds.length > 0"
+      >
+        Delete
+      </button>
+      <button class="mark-btn">Email</button>
+      <input
+        type="file"
+        #fileInput
+        (change)="onFileSelected($event)"
+        multiple
+        accept="image/*"
+        style="display: none"
+      />
+      <button class="add-btn" (click)="fileInput.click()">+ Add</button>
     </div>
+  </div>
 
-    <div class="treatment-plan">
-        <div class="files-container">
-            <!-- Left Sidebar -->
-            <div class="files-sidebar">
-                <div class="uploaded-files">
-                    <h3>Uploaded Files</h3>
-                    <div class="display-on-right">
-                        <button class="add-label-btn" *ngIf="!addLabel" (click)="addLabel = true">Add Label</button>
-                        <button class="add-label-btn" *ngIf="addLabel" (click)="addLabel = false">Done</button>
-                    </div>
-                    <input type="text" placeholder="+Add label" class="search-input"
-                    [(ngModel)]="newLabel" 
-                    (keyup.enter)="saveLabel()" [class.display-none]="addLabel == false">
-                    <small class="enter-message" *ngIf="newLabel?.trim()">
-                     Press 'Enter' to add.
-                    </small>
-                    <div class="file-categories">
-                        <div class="category active" [class.active]="selectedLabelId === null" 
-                        (click)="filterFiles(0)" (click)="selectedLabelId = null">All files</div>
-                        <div class="category-item" *ngFor="let label of labels" [class.active]="selectedLabelId === label.file_label_id" 
-                        (click)="filterFiles(label.file_label_id)">{{label.name}}</div>
-                    </div>
-                </div>
+  <div class="treatment-plan">
+    <div class="files-container">
+      <!-- Left Sidebar -->
+      <div class="files-sidebar">
+        <div class="uploaded-files">
+          <h3>Uploaded Files</h3>
+          <div class="display-on-right">
+            <button
+              class="add-label-btn"
+              *ngIf="!addLabel"
+              (click)="addLabel = true"
+            >
+              Add Label
+            </button>
+            <button
+              class="add-label-btn"
+              *ngIf="addLabel"
+              (click)="addLabel = false"
+            >
+              Done
+            </button>
+          </div>
+          <input
+            type="text"
+            placeholder="+Add label"
+            class="search-input"
+            [(ngModel)]="newLabel"
+            (keyup.enter)="saveLabel()"
+            [class.display-none]="addLabel == false"
+          />
+          <small class="enter-message" *ngIf="newLabel?.trim()">
+            Press 'Enter' to add.
+          </small>
+          <div class="file-categories">
+            <div
+              class="category active"
+              [class.active]="selectedLabelId === null"
+              (click)="filterFiles(0)"
+              (click)="selectedLabelId = null"
+            >
+              All files
             </div>
-        
-            <!-- Main Content Area -->
-            <div class="files-content">
-                <!-- Date Group -->
-                <div class="date-group" *ngFor="let fileGroup of filesDict | keyvalue">
-                    <div class="date-header">{{ fileGroup.key | date: 'dd MMM, yyyy' }}</div>
-                    <div class="files-grid">
-                        <div class="file-item" *ngFor="let file of (fileGroup.value ?? [])">
-                            <div class="checkbox-wrapper">
-                                <input type="checkbox" (change)="onCheckboxChange(file, file.id)" [(ngModel)]="file.isChecked">
-                            </div>
-                            <div class="file-preview" [ngClass]="{'pdf': isPdf(file.file_type)}" (click)="openFile(file, $event)">
-                                <img *ngIf="!isPdf(file.file_type)" [src]="file.file_path" [alt]="file.file_type">
-                                <div *ngIf="isPdf(file.file_type)" class="pdf-placeholder">PDF</div>
-                            </div>
-                            <div class="file-name" (click)="openFile(file, $event)">{{ getFileName(file.file_path) }}</div>
-                        </div>
-                    </div>
-                </div>
+            <div
+              class="category-item"
+              *ngFor="let label of labels"
+              [class.active]="selectedLabelId === label.file_label_id"
+              (click)="filterFiles(label.file_label_id)"
+            >
+              {{ label.name }}
             </div>
+          </div>
         </div>
-    </div>
-</div>
-<!-- Add this after your existing HTML content -->
-<div class="file-preview-modal" *ngIf="previewModalOpen">
-    <div class="modal-overlay" (click)="closePreviewModal()"></div>
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>{{ currentPreviewFile ? getFileName(currentPreviewFile.file_path) : 'File Preview' }}</h3>
-        <button class="close-button" (click)="closePreviewModal()">×</button>
       </div>
-      <div class="modal-body">
-        <!-- Image preview -->
-        <img *ngIf="currentPreviewFile && isImage(currentPreviewFile.file_type)" 
-             [src]="safeFileUrl" 
-             alt="File preview" 
-             class="preview-image">
-             
-        <!-- PDF preview (iframe) -->
-        <iframe *ngIf="currentPreviewFile && isPdf(currentPreviewFile.file_type)"
-                [src]="safeFileUrl"
-                class="preview-pdf"
-                title="PDF Preview"></iframe>
-                
-        <!-- Download button for other file types -->
-        <div *ngIf="currentPreviewFile && !isImage(currentPreviewFile.file_type) && !isPdf(currentPreviewFile.file_type)" 
-             class="download-prompt">
-          <p>This file type cannot be previewed directly.</p>
-          <button class="download-btn" (click)="downloadFile(currentPreviewFile)">
-            Download File
-          </button>
+
+      <!-- Main Content Area -->
+      <div class="files-content">
+        <!-- Date Group -->
+        <div class="date-group" *ngFor="let fileGroup of filesDict | keyvalue: dateDescOrder">
+          <div class="date-header">
+            {{ fileGroup.key | date : "dd MMM, yyyy" }}
+          </div>
+          <div class="files-grid">
+            <div class="file-item" *ngFor="let file of fileGroup.value ?? []">
+              <div class="checkbox-wrapper">
+                <input
+                  type="checkbox"
+                  (change)="onCheckboxChange(file, file.id)"
+                  [(ngModel)]="file.isChecked"
+                />
+              </div>
+              <div
+                class="file-preview"
+                [ngClass]="{ pdf: isPdf(file.file_type) }"
+                (click)="openFile(file, $event)"
+              >
+                <img
+                  *ngIf="!isPdf(file.file_type)"
+                  [src]="file.file_path"
+                  [alt]="file.file_type"
+                />
+                <div *ngIf="isPdf(file.file_type)" class="pdf-placeholder">
+                  PDF
+                </div>
+              </div>
+              <div class="file-name" (click)="openFile(file, $event)">
+                {{ getFileName(file.file_path) }}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+</div>
+<!-- Add this after your existing HTML content -->
+<div class="file-preview-modal" *ngIf="previewModalOpen">
+  <div class="modal-overlay" (click)="closePreviewModal()"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>
+        {{
+          currentPreviewFile
+            ? getFileName(currentPreviewFile.file_path)
+            : "File Preview"
+        }}
+      </h3>
+      <button class="close-button" (click)="closePreviewModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <!-- Image preview -->
+      <img
+        *ngIf="currentPreviewFile && isImage(currentPreviewFile.file_type)"
+        [src]="safeFileUrl"
+        alt="File preview"
+        class="preview-image"
+      />
+
+      <!-- PDF preview (iframe) -->
+      <iframe
+        *ngIf="currentPreviewFile && isPdf(currentPreviewFile.file_type)"
+        [src]="safeFileUrl"
+        class="preview-pdf"
+        title="PDF Preview"
+      ></iframe>
+
+      <!-- Download button for other file types -->
+      <div
+        *ngIf="
+          currentPreviewFile &&
+          !isImage(currentPreviewFile.file_type) &&
+          !isPdf(currentPreviewFile.file_type)
+        "
+        class="download-prompt"
+      >
+        <p>This file type cannot be previewed directly.</p>
+        <button class="download-btn" (click)="downloadFile(currentPreviewFile)">
+          Download File
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

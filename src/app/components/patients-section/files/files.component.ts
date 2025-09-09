@@ -46,6 +46,7 @@ export class FilesComponent implements OnInit {
     safeFileUrl: SafeResourceUrl | null = null;
 
     filesDict: Record<string, FileItem[]> = {};
+getSortedDates: any;
     
     constructor(
         private fileService: FileService, 
@@ -207,6 +208,13 @@ export class FilesComponent implements OnInit {
     isPdf(fileType: string): boolean {
       return fileType === 'application/pdf';
     }
+
+    dateDescOrder = (a: any, b: any): number => {
+      const dateA = new Date(a.key).getTime();
+      const dateB = new Date(b.key).getTime();
+      return dateB - dateA; // latest first
+    };
+
 
     groupByDate(rows: FileItem[]): Record<string, FileItem[]> {
       // First, group the files by date
