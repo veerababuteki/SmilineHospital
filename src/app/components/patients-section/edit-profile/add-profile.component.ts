@@ -211,12 +211,16 @@ export class AddProfileComponent implements OnInit {
       secondaryMobile: ['',
         Validators.pattern('^[1-9]\\d{9}$')],
       languagePreference: [this.languages[0]],  // Default to first option
-      landLine: [''],
+      landLine: ['',
+        Validators.pattern('^[1-9]\\d{9}$')
+      ],
       streetAddress: [''],
       locality: [''],
       city: [''],
     pincode: ['',
-        Validators.pattern('^[1-9]\\d{6}$')],
+        [Validators.pattern('^[1-9][0-9]{5}$')]
+    ],
+
     });
   }
 

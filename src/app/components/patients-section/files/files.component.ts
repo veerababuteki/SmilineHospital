@@ -77,6 +77,13 @@ export class FilesComponent implements OnInit {
       });
     }
 
+
+    dateDescOrder = (a: any, b: any): number => {
+      const dateA = new Date(a.key).getTime();
+      const dateB = new Date(b.key).getTime();
+      return dateB - dateA; // latest first
+    };
+
     loadFileLabels(): void {
       this.fileService.getFileLabels().subscribe((labels: any) => {
         this.labels = labels.data;

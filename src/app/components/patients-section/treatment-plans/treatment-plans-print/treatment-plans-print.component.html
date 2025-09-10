@@ -31,7 +31,7 @@
     <p><strong>Billing Incharge:</strong> Kiran</p>
     <p><strong>Patient:</strong> {{ treatmentPlan.patient_details_treat.user_profile_details[0].first_name }}
       {{ treatmentPlan.patient_details_treat.user_profile_details[0].last_name }}
-      ({{ treatmentPlan.patient_details_treat.unique_code }})
+      ({{ treatmentPlan.patient_details_treat.manual_unique_code }})
       {{ treatmentPlan.patient_details_treat.user_profile_details[0].gender }}
     </p>
     <p><strong>By:</strong> Dr. {{ treatmentPlan.doctor_details_treat.user_profile_details[0].first_name }}

@@ -38,7 +38,7 @@
             <!-- Main Content Area -->
             <div class="files-content">
                 <!-- Date Group -->
-                <div class="date-group" *ngFor="let fileGroup of filesDict | keyvalue">
+                <div class="date-group" *ngFor="let fileGroup of filesDict | keyvalue : dateDescOrder">
                     <div class="date-header">{{ fileGroup.key | date: 'dd MMM, yyyy' }}</div>
                     <div class="files-grid">
                         <div class="file-item" *ngFor="let file of (fileGroup.value ?? [])">
