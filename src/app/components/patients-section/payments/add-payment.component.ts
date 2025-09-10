@@ -886,6 +886,22 @@ export class AddPaymentComponent implements OnInit {
       { state: { message: 'Invoice updated!' } })
     });
   }
+
+  allowOnlyNumbers(event: KeyboardEvent) {
+    const charCode = event.key.charCodeAt(0);
+    // Allow only digits (0-9)
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+    }
+  }
+
+  allowOnlyAlphabets(event: KeyboardEvent) {
+    const char = event.key;
+    // Allow only alphabets and space
+    if (!/^[a-zA-Z ]$/.test(char)) {
+      event.preventDefault();
+    }
+  }
   
   navigateToPayment(){
     this.router.navigate(['patients', this.patientId, 'payments', this.uniqueCode])
