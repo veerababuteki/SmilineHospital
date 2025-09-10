@@ -3,7 +3,9 @@
     <div class="title">TREATMENT PLANS</div>
     <div class="action-buttons">
       <button class="cancel-btn" (click)="cancel()">Cancel</button>
-      <button class="save-btn" type="submit" (click)="onSubmit()">Save Treatment Plan</button>
+      <button class="save-btn" [disabled]="treatments.length == 0" [ngClass]="{'disabled' : treatments.length == 0}" type="submit" (click)="onSubmit()">
+        Save Treatment Plan
+      </button>
     </div>
   </div>
 
