@@ -370,8 +370,8 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
     });
   }
 
-  isPatientView(): boolean {
-    return this.currentUrl.includes('/profile');
+  isPatientDirectory(): boolean {
+    return this.currentUrl.includes('/patient-directory');
   }
 
   isUrlActive(url: string){
