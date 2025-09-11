@@ -113,7 +113,12 @@ export class ClinicalNotesComponent implements OnInit {
       return []; // Return empty array on error
     }
   }
-  getSortedDates(): string[] {
-    return Object.keys(this.clinicalNotes).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-  }
+  
+
+  // modify this function for sorting a data according to latest date
+ getSortedDates() {
+  return this.clinicalNotes
+    .slice() 
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
   }  

@@ -123,12 +123,15 @@
     padding: 1.5rem;
     background-color: #ffffff;
     min-height: calc(100vh - 80px);
-
+//  fix the button position and add the css 
     .report-controls {
         background: #f8f9fa;
         padding: 1.5rem;
         border-radius: 8px;
         margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         border: 1px solid #e9ecef;
 
         .controls-row {

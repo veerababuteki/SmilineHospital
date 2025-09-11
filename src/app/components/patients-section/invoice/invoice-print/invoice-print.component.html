@@ -31,7 +31,8 @@
 
         <p><strong>Date:</strong> {{ invoice.value[0].created_at | date: 'dd MMM, yyyy' }}</p>
         <p><strong>Billing Incharge:</strong> Kiran</p>
-        <p><strong>Patient:</strong> {{ invoice.value[0].treatment_plans.patient_details_treat?.user_profile_details[0].first_name }} ({{ invoice.value[0].treatment_plans.patient_details_treat?.unique_code }})
+         <!-- i replaced unique_code to manual_unique_code , because we need to show custom id, not system generated id -->
+        <p><strong>Patient:</strong> {{ invoice.value[0].treatment_plans.patient_details_treat?.user_profile_details[0].first_name }} ({{ invoice.value[0].treatment_plans.patient_details_treat?.manual_unique_code }})
           {{ invoice.value[0].treatment_plans.patient_details_treat?.user_profile_details[0].gender }}</p>
 
         <hr />

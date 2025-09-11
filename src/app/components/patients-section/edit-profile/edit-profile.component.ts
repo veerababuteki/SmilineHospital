@@ -286,7 +286,10 @@ export class EditProfileComponent implements OnInit {
     streetAddress: [''],
     locality: [''],
     city: [''],
-    pincode: [''],
+      // add numeric value validation. before its taking  character value and morethan 6 digit . Pin code no should be 6 digit 
+    pincode: ['',
+      [Validators.pattern('^[1-9][0-9]{5}$')]
+    ],
   });
 }
   

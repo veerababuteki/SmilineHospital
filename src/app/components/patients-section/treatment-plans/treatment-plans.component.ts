@@ -315,7 +315,7 @@ getGroupTotal(treatmentGroup: any[]): number {
         }
         
         // Get patient ID/code
-        patientId = patientDetails.unique_code || patientId;
+        patientId = patientDetails.manual_unique_code || patientId;
       }
     }
   }

@@ -4,7 +4,8 @@
         <h2>CLINICAL NOTES</h2>
         <button class="add-btn" (click)="navigateToAdd()">+ Add</button>
     </div>
-    <div *ngFor="let note of clinicalNotes">
+
+    <div *ngFor="let note of getSortedDates()" class="appointment-card">   <!-- i added getSorted function here, because i need to show clinical notes by latest date -->
         <div class="appointment-date">{{note.date | date: 'dd MMM, yyyy' }}</div>
 
         <div class="procedures-table">

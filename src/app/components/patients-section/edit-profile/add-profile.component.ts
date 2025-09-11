@@ -210,13 +210,19 @@ export class AddProfileComponent implements OnInit {
        email: ['', Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')],
       secondaryMobile: ['',
         Validators.pattern('^[1-9]\\d{9}$')],
-      languagePreference: [this.languages[0]],  // Default to first option
-      landLine: [''],
+      languagePreference: [this.languages[0]],  
+      // add numeric value validation. before its taking  character value and morethan 8 digit . landline no should be 8 digit 
+      landLine: ['',
+        Validators.pattern('^[1-9]\\d{7}$')
+      ],
       streetAddress: [''],
       locality: [''],
       city: [''],
+      // add numeric value validation. before its taking  character value and morethan 6 digit . Pin code no should be 6 digit 
     pincode: ['',
-        Validators.pattern('^[1-9]\\d{6}$')],
+        [Validators.pattern('^[1-9][0-9]{5}$')]
+    ],
+
     });
   }
 
