@@ -68,14 +68,14 @@
             <div class="section-content" [class.collapsed]="!patientExpanded || isNavCollapsed">
                 <a class="nav-item" *ngIf="userPrivileges?.includes('Profile')"
                    (click)="handleNavigation('/profile')"
-                   routerLinkActive="active">
+                   [ngClass]="{'active' : isUrlActive('/profile')}">
                     <i class="pi pi-user"></i>
                     <span [class.hidden]="isNavCollapsed">Profile</span>
                 </a>
                 <div *ngIf="userPrivileges?.includes('Appointments')" >
                     <a class="nav-item"
                        (click)="handleNavigation('/appointments')"
-                       routerLinkActive="active" >
+                       [ngClass]="{'active' : isUrlActive('/appointments')}" >
                         <i class="pi pi-calendar"></i>
                         <span [class.hidden]="isNavCollapsed">Appointments<span *ngIf="appointments && appointments.count > 0" class="count">{{appointments.count}}</span></span>
                     </a>
@@ -93,31 +93,31 @@
             <div class="section-content" [class.collapsed]="!emrExpanded || isNavCollapsed">
                 <a *ngIf="userPrivileges?.includes('ClinicalNotes')" class="nav-item"
                    (click)="handleNavigation('/clinical-notes')"
-                   routerLinkActive="active">
+                   [ngClass]="{'active' : isUrlActive('/clinical-notes')}">
                     <i class="pi pi-file-edit"></i>
                     <span [class.hidden]="isNavCollapsed">Clinical Notes<span *ngIf="clinicalNotes && clinicalNotes.count > 0"  class="count">{{clinicalNotes.count}}</span></span>
                 </a>
                 <a *ngIf="userPrivileges?.includes('TreatmentPlans')" class="nav-item"
                    (click)="handleNavigation('/treatment-plans')"
-                   routerLinkActive="active">
+                   [ngClass]="{'active' : isUrlActive('/treatment-plans')}">
                     <i class="pi pi-list"></i>
                     <span [class.hidden]="isNavCollapsed">Treatment Plans<span *ngIf="treatmentPlans && treatmentPlans.length > 0" class="count">{{treatmentPlans.length}}</span></span>
                 </a>
                 <a *ngIf="userPrivileges?.includes('CompletedProcedures')" class="nav-item"
                    (click)="handleNavigation('/completed-procedures')"
-                   routerLinkActive="active">
+                   [ngClass]="{'active' : isUrlActive('/completed-procedures')}">
                     <i class="pi pi-check-circle"></i>
                     <span [class.hidden]="isNavCollapsed">Completed Procedures<span *ngIf="completedProcedures && completedProcedures.length > 0" class="count">{{completedProcedures.length}}</span></span>
                 </a>
                 <a *ngIf="userPrivileges?.includes('Files')" class="nav-item"
                    (click)="handleNavigation('/files')"
-                   routerLinkActive="active">
+                   [ngClass]="{'active' : isUrlActive('/files')}">
                     <i class="pi pi-folder"></i>
                     <span [class.hidden]="isNavCollapsed">Files<span *ngIf="files && files.length > 0" class="count">{{files.length}}</span></span>
                 </a>
                 <a *ngIf="userPrivileges?.includes('Timeline')" class="nav-item"
                    (click)="handleNavigation('/timeline')"
-                   routerLinkActive="active">
+                   [ngClass]="{'active' : isUrlActive('/timeline')}">
                     <i class="pi pi-clock"></i>
                     <span [class.hidden]="isNavCollapsed">Timeline</span>
                 </a>
@@ -133,13 +133,13 @@
             <div class="section-content" [class.collapsed]="!billingExpanded || isNavCollapsed">
                 <a class="nav-item" *ngIf="userPrivileges?.includes('Invoices')"
                    (click)="handleNavigation('/invoices')"
-                   routerLinkActive="active">
+                   [ngClass]="{'active' : isUrlActive('/invoices')}">
                     <i class="pi pi-dollar"></i>
                     <span [class.hidden]="isNavCollapsed">Invoices<span *ngIf="invoices && invoices.length > 0" class="count">{{invoices.length}}</span></span>
                 </a>
                 <a class="nav-item" *ngIf="userPrivileges?.includes('Payments')"
                    (click)="handleNavigation('/payments')"
-                   routerLinkActive="active">
+                   [ngClass]="{'active' : isUrlActive('/payments')}">
                     <i class="pi pi-money-bill"></i>
                     <span [class.hidden]="isNavCollapsed">Payments</span>
                 </a>

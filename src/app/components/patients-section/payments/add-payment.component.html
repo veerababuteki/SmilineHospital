@@ -42,18 +42,20 @@
         <div class="bank-number-row">
           <div class="bank-field" *ngIf="paymentMethod !== 'cash' && paymentMethod !== 'online'">
             <label>Bank</label>
-            <input type="text" [(ngModel)]="bank" [ngClass]="{'error': bankError && formSubmitted}">
+            <input type="text" [(ngModel)]="bank" placeholder="Bank Name" [ngClass]="{'error': bankError && formSubmitted}" (keypress)="allowOnlyAlphabets($event)">
             <div class="error-message" *ngIf="bankError && formSubmitted">Bank name is required</div>
           </div>
           <div class="number-field" *ngIf="paymentMethod === 'cheque'">
             <label>Number</label>
-            <input type="text" [(ngModel)]="chequeNumber" [ngClass]="{'error': chequeNumberError && formSubmitted}">
+            <input type="text" [(ngModel)]="chequeNumber" placeholder="6-digit Cheque number" [ngClass]="{'error': chequeNumberError && formSubmitted}" (keypress)="allowOnlyNumbers($event)" maxlength="6">
             <div class="error-message" *ngIf="chequeNumberError && formSubmitted">Cheque number is required</div>
+            <div class="error-message" *ngIf=" chequeNumber != '' && chequeNumber.length != 6">Cheque number must have 6 digits</div>
           </div>
           <div class="number-field" *ngIf="paymentMethod === 'card'">
             <label>Enter last 4 digits</label>
-            <input type="text" [(ngModel)]="cardLastDigits" maxlength="4" [ngClass]="{'error': cardDigitsError && formSubmitted}">
+            <input type="text" [(ngModel)]="cardLastDigits" maxlength="4" [ngClass]="{'error': cardDigitsError && formSubmitted}" (keypress)="allowOnlyNumbers($event)">
             <div class="error-message" *ngIf="cardDigitsError && formSubmitted">Last 4 digits are required</div>
+            <div class="error-message" *ngIf="cardLastDigits != '' && cardLastDigits.length != 4">Please enter 4 digits</div>
           </div>
           <div class="number-field" *ngIf="paymentMethod !== 'cash'">
             <label>Reference Number</label>
