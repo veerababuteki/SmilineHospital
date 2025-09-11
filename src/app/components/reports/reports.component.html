@@ -257,21 +257,19 @@
         <tr>
           <td *ngFor="let col of detailsColumns">
             <!-- Currency fields -->
-            <span
-              *ngIf="
-                col.field === 'cost' ||
-                col.field === 'discount' ||
-                col.field === 'tax' ||
-                col.field === 'invoiceAmount' ||
-                col.field === 'amountPaid' ||
-                col.field === 'amountDue' ||
-                col.field === 'lastInvoice' ||
-                col.field === 'lastPayment' ||
-                col.field === 'advanceAmount'
-              "
-            >
-              {{ rowData[col.field] | currency : "INR" : "symbol" : "1.2-2" }}
-            </span>
+            <span *ngIf="
+      col.field === 'cost' ||
+      col.field === 'discount' ||
+      col.field === 'tax' ||
+      col.field === 'invoiceAmount' ||
+      col.field === 'amountPaid' ||
+      col.field === 'amountDue' ||
+      col.field === 'lastInvoice' ||
+      col.field === 'lastPayment' ||
+      col.field === 'advanceAmount'
+    ">
+  {{ col.field === 'discount' ? rowData[col.field] : (rowData[col.field] | currency:'INR':'symbol':'1.2-2') }}
+</span>
 
             <!-- All other fields (including dates) -->
             <span

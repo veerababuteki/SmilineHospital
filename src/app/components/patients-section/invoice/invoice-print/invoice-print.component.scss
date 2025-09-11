@@ -5,6 +5,8 @@
   cursor: pointer;
   font-weight: 600;
   padding: 4px;
+  padding-left: 10px;
+  padding-right: 10px;
 
   &:hover {
     color: #333;
@@ -13,6 +15,9 @@
   i {
     font-size: 16px;
   }
+}
+.edit-btn:hover {
+  background-color: #cce7ff !important; /* slightly darker light blue */
 }
 
 .invoice-print {
