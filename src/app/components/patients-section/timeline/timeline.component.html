@@ -201,6 +201,7 @@
                     <i class="pi pi-file-edit"></i>
                     Clinical Notes
                   </div>
+                    <!-- i remove time attribute , because we dont want to show time here-->
                   <div class="event-time" *ngIf="item.created_at">
                     {{ item.created_at | date : "MMM dd, yyyy" }}
                   </div>
@@ -289,6 +290,7 @@
                       <div class="field-label">
                         <strong>Follow-up:</strong>
                       </div>
+                      <!-- i remove time attribute , because we dont want to show time here-->
                       <div class="field-content">
                         {{
                           item.followup_appointment

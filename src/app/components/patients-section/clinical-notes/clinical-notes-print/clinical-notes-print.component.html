@@ -30,7 +30,7 @@
     <p><strong>Billing Incharge:</strong> Kiran</p>
     <p><strong>Patient:</strong> {{ clinicalNotes.patient_details_clinic.user_profile_details[0].first_name }}
       {{ clinicalNotes.patient_details_clinic.user_profile_details[0].last_name }}
-      ({{ clinicalNotes.patient_details_clinic.manual_unique_code }})
+      ({{ clinicalNotes.patient_details_clinic.manual_unique_code }}) <!-- i replaced unique_code to manual_unique_code , because we need to show custom id, not system generated id -->
       {{ clinicalNotes.patient_details_clinic.user_profile_details[0].gender }}
     </p>
     <p><strong>By:</strong> Dr. {{ clinicalNotes.doctor_details_clinic.user_profile_details[0].first_name }}

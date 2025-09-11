@@ -113,6 +113,9 @@ export class ClinicalNotesComponent implements OnInit {
       return []; // Return empty array on error
     }
   }
+  
+
+  // modify this function for sorting a data according to latest date
  getSortedDates() {
   return this.clinicalNotes
     .slice() 

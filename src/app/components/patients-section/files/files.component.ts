@@ -77,7 +77,7 @@ export class FilesComponent implements OnInit {
       });
     }
 
-
+    // this is functionality for sorting data by latest date
     dateDescOrder = (a: any, b: any): number => {
       const dateA = new Date(a.key).getTime();
       const dateB = new Date(b.key).getTime();
