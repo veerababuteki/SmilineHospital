@@ -73,10 +73,7 @@ export class PatientDirectoryComponent implements OnInit {
       }
 
     navigateToProfile(patientId: number, uniqueCode: string) {
-        //Sending details via message service is triggering an unwanted toast, so using session storage for now.
-        // this.messageService.sendMessage(patientId.toString(), uniqueCode);
-        sessionStorage.setItem('selectedPatientId', patientId.toString());
-        sessionStorage.setItem('selectedPatientCode', uniqueCode);
+        this.messageService.sendMessage(patientId.toString(), uniqueCode);
         this.router.navigate(['/patients', patientId, 'profile', uniqueCode]);
     }
     showAddPatientDialog() {
