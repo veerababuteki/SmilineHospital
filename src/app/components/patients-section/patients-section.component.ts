@@ -149,9 +149,15 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
         this.loadSavedPractice();
       });
 
+    //Taking patientId and uniqueCode from session storage.
+    this.patientId = sessionStorage.getItem('selectedPatientId');
+    this.uniqueCode = sessionStorage.getItem('selectedPatientCode');
+
+    //Same details are being extracted via message service but this is triggering a toast that is unwanted.
+    // Hence commenting it out for now.
     this.messageSubscription = this.messageService.message$.subscribe((message) => {
-      this.patientId = message.text;
-      this.uniqueCode = message.code;
+      // this.patientId = message.text;
+      // this.uniqueCode = message.code;
 
       if (this.uniqueCode) {
         this.loadPatientProfile();
