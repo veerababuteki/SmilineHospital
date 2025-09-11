@@ -155,6 +155,9 @@
   <small class="error-message" *ngIf="appointmentForm.get('scheduledTime')?.hasError('timeBlocked')">
     Selected time conflicts with blocked calendar
   </small>
+  <small class="valid-message" *ngIf="!appointmentForm.get('scheduledTime')?.hasError('timeBlocked') && appointmentForm.get('scheduledDate')?.value && appointmentForm.get('scheduledTime')?.value && appointmentForm.get('doctor')?.value">
+    Doctor is available at the selected time
+  </small>
 </div>
 
 <!-- NEW: Doctor Availability Section -->
