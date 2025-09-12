@@ -56,6 +56,7 @@ export class EditProfileComponent implements OnInit {
   formValid: boolean = false;
   form: any;
   manualUniqueCode: string | null | undefined
+  age: number | null = null;
 
   ngOnInit(): void {
 
@@ -74,6 +75,7 @@ export class EditProfileComponent implements OnInit {
     dateOfBirthControl.valueChanges.subscribe(date => {
       if (date) {
         const age = this.calculateAge(date);
+        this.age = age;
         ageControl.setValue(age, { emitEvent: false });
       } else {
         ageControl.setValue('', { emitEvent: false });
@@ -96,6 +98,7 @@ export class EditProfileComponent implements OnInit {
 
     });
   }
+
   checkFormValidity(): void {
     // Check if patient form is valid (which includes all required fields)
     this.formValid = this.patientForm.valid;
@@ -468,5 +471,15 @@ private updatePatientProfile(patientDetails: any, historyDetails: any) {
   }
   cancel(){
     this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode])
+  }
+
+  isDobAgeMismatch(): boolean {
+    const dob = this.patientForm.get('dateOfBirth')?.value;
+    const age = this.patientForm.get('age')?.value;
+    if (dob && age !== null && age !== undefined) {
+      const calculatedAge = this.calculateAge(dob);
+      return calculatedAge !== age;
+    }
+    return false;
   }
 }
