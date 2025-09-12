@@ -75,6 +75,11 @@
           margin-bottom: 15px;
           align-items: center;
 
+          &.validation-row {
+            margin-top: -10px;
+            margin-bottom: 10px;
+          }
+
           .form-label {
             width: 150px;
             text-align: left;

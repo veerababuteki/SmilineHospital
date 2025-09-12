@@ -76,6 +76,11 @@
           margin-bottom: 15px;
           align-items: center;
 
+          &.validation-row {
+            margin-top: -10px;
+            margin-bottom: 10px;
+          }
+
           .form-label {
             width: 150px;
             text-align: right;
@@ -567,6 +572,10 @@
   color: red;
   font-size: 0.8rem;
   margin-top: 4px;
+
+  &.age-dob {
+    margin-left: 4rem;
+  }
 }
 
 /* Optional: Style the disabled button */

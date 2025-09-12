@@ -53,6 +53,7 @@ export class AddProfileComponent implements OnInit {
   addNewGroupText: string = '';
   maxDate: Date;
   form!: FormGroup;
+  age: number | null = null;
 
   // Initialize forms early
   patientForm: FormGroup;
@@ -171,6 +172,7 @@ export class AddProfileComponent implements OnInit {
       dateOfBirthControl.valueChanges.subscribe(date => {
         if (date) {
           const age = this.calculateAge(date);
+          this.age = age;
           ageControl.setValue(age, { emitEvent: false });
         } else {
           ageControl.setValue('', { emitEvent: false });
@@ -412,5 +414,15 @@ private registerPatient(patientDetails: any, historyDetails: any) {
   }
   cancel() {
     this.onCancel.emit();
+  }
+
+  isDobAgeMismatch(): boolean {
+    const dob = this.patientForm.get('dateOfBirth')?.value;
+    const age = this.patientForm.get('age')?.value;
+    if (dob && age !== null && age !== undefined) {
+      const calculatedAge = this.calculateAge(dob);
+      return calculatedAge !== age;
+    }
+    return false;
   }
 }
