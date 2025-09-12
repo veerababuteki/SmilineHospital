@@ -28,6 +28,7 @@ export class InvoiceComponent implements OnInit {
   items: MenuItem[] = [];
   currentInvoiceKey: any;
   uniqueCode: string | null | undefined;
+  paymentFilter: string = 'all';
   
   constructor(private treatmentPlansService: TreatmentPlansService, 
               private patientDataService: PatientDataService,

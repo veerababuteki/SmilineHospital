@@ -291,7 +291,7 @@ export class ReportsComponent implements OnInit {
             { field: 'patient', header: 'Patient' },
             { field: 'treatments', header: 'Treatments & Products' },
             { field: 'cost', header: 'Cost (INR)' },
-            { field: 'discount', header: 'Discount (INR)' },
+            { field: 'discount', header: 'Discount (INR/%)' },
             { field: 'tax', header: 'Tax (INR)' },
             { field: 'invoiceAmount', header: 'Invoice Amount (INR)' },
             { field: 'amountPaid', header: 'Amount Paid (INR)' }
@@ -332,7 +332,7 @@ export class ReportsComponent implements OnInit {
                     patient: inv.patient,
                     treatments: inv.treatments_products,
                     cost: cost.toFixed(2),
-                    discount: discount.toFixed(2),
+                    discount: discount.toFixed(2) + ' ' + (inv.discount_format || ''),
                     tax: tax.toFixed(2),
                     invoiceAmount: invoiceAmount.toFixed(2),
                     amountPaid: amountPaid.toFixed(2)

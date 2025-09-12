@@ -7,13 +7,15 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService as Toaster } from 'primeng/api';
 import { filter } from 'rxjs/operators';
 import { PatientDataService } from '../../../services/patient-data.service';
+import { FormsModule } from '@angular/forms';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'app-payments',
   templateUrl: './payments.component.html',
   styleUrls: ['./payments.component.scss'],
   standalone: true,
-  imports: [ CommonModule, ToastModule
+  imports: [ CommonModule, ToastModule, FormsModule, DialogModule
   ],
   providers: [Toaster]
 })
@@ -21,6 +23,9 @@ export class PaymentsComponent implements OnInit {
     payments:Record<string, any[]> = {};
   patientId: string | null | undefined;
   uniqueCode: string | null | undefined;
+  paymentFilter: string = 'all';
+  selectedInvoiceData: any[] = [];
+  showInvoiceDialog: boolean = false; 
   constructor(private treatmentPlansService: TreatmentPlansService, private messageService:MessageService, private route: ActivatedRoute, private router: Router, private toaster: Toaster, private patientDataService: PatientDataService){
 
   }
@@ -64,6 +69,22 @@ export class PaymentsComponent implements OnInit {
         }
       });
     }
+    
+openInvoiceMetadata(data: any) {
+  try {
+    this.selectedInvoiceData = typeof data === 'string' ? JSON.parse(data) : data;
+    this.showInvoiceDialog = true;
+  } catch (err) {
+    console.error('Invalid invoice data', err);
+    this.selectedInvoiceData = [];
+    this.showInvoiceDialog = false;
+  }
+}
+
+closeInvoiceDialog() {
+  this.showInvoiceDialog = false;
+  this.selectedInvoiceData = [];
+}
 
     navigateToAddPayment(){
       this.router.navigate(['/patients', this.patientId, 'add-payment', this.uniqueCode])

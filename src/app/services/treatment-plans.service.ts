@@ -252,7 +252,8 @@ export class TreatmentPlansService {
       "notes": paymentData.notes,
       "use_advance_amount": paymentData.use_advance_amount,
       "invoices_data": paymentData.invoices_data,
-      "reference_number" : paymentData.reference_number
+      "reference_number" : paymentData.reference_number,
+      "towards": paymentData.towards
     }, {headers}).pipe(
         catchError(this.handleError)
       );

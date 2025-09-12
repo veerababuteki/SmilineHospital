@@ -18,10 +18,11 @@ import { MessageService as Toaster } from 'primeng/api';
 })
 export class AddPaymentComponent implements OnInit {
   // Payment properties
-  amount: string = '0';
+  amount: number = 0;
   paymentMethod: string = 'cash'; // Changed default to cash
   bank: string = '';
   chequeNumber: string = '';
+  towards: string = '';
   cardLastDigits: string = '';
   isAdvancePayment: boolean = true;
   notes: string = '';
@@ -46,12 +47,12 @@ export class AddPaymentComponent implements OnInit {
   totalPayNow: number = 0;
   dueAfterAdvance: number = 0;
   dueAfterPayment: number = 0;
-  totalAdvanceInput: string = '0'; // New field for editable total advance in one-time mode
+  totalAdvanceInput: number = 0; // New field for editable total advance in one-time mode
   showDisabledMsg: boolean = false;
   // Filter and search
   searchText: string = '';
   filteredInvoices: any[] = [];
-  totalPayNowInput: string = '0';
+  totalPayNowInput: number = 0;
   // API data
   patientId: any;
   availableAdvance: number = 0;
@@ -78,6 +79,8 @@ export class AddPaymentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.amount = 0;
+    this.totalPayNowInput = 0;
     this.router.events
     .pipe(filter(event => event instanceof NavigationEnd))
     .subscribe(() => {
@@ -108,15 +111,23 @@ export class AddPaymentComponent implements OnInit {
     });
   }
 
-  isSaveDisabled(): boolean {
-    const payNow = this.totalPayNowInput || '';
-    const advance = this.totalAdvanceInput || '';
-    const total = +payNow + +advance;
-
-    return !this.isFormValid() ||
-      ((!payNow || payNow === '') && (!advance || advance === '')) ||
-      total > this.calculateTotalDueAmount();
+isSaveDisabled(): boolean {
+  const advanceNoteVisible = !!document.querySelector('.advance-payment-note');
+ if (advanceNoteVisible) {
+    return !this.amount || Number(this.amount) === 0;
   }
+
+   if (this.isPayPerService) {
+    return !this.totalPayNow || Number(this.totalPayNow) === 0;
+  }
+  const payNow = this.totalPayNowInput || 0;
+  const advance = this.totalAdvanceInput || 0;
+  const total = +payNow + +advance;
+ 
+  return !this.isFormValid() ||
+    ((!payNow || payNow === 0) && (!advance || advance === 0)) ||
+    total > this.calculateTotalDueAmount();
+}
 
   showTooltip(): boolean {
     return this.showDisabledMsg && this.isSaveDisabled();
@@ -206,10 +217,10 @@ export class AddPaymentComponent implements OnInit {
         invoice.fromAdvanceAmount = totalFromAdvance.toFixed(2);
         invoice.payNowAmount = totalPayNow.toFixed(2);
       });
-      this.totalPayNowInput = this.totalPayNow.toString();
+      this.totalPayNowInput = this.totalPayNow;
 
       // Set total advance input for global editing
-      this.totalAdvanceInput = this.totalFromAdvance.toString();
+      this.totalAdvanceInput = this.totalFromAdvance;
     }
     
     this.calculateTotals();
@@ -251,7 +262,7 @@ export class AddPaymentComponent implements OnInit {
       });
       
       // Update the input field with valid amount
-      this.totalAdvanceInput = validAdvanceAmount.toString();
+      this.totalAdvanceInput = validAdvanceAmount;
       
       this.calculateTotals();
     }
@@ -288,7 +299,7 @@ export class AddPaymentComponent implements OnInit {
       // If not selected, add to selection and set as current viewing
       const invoiceCopy = JSON.parse(JSON.stringify(invoice)); // Create deep copy
       if (!this.isPayPerService) {
-        this.totalPayNowInput = this.totalPayNow.toString();
+        this.totalPayNowInput = this.totalPayNow;
       }
       // Initialize payment fields
       if (this.isPayPerService) {
@@ -317,7 +328,7 @@ export class AddPaymentComponent implements OnInit {
     
     // Update total advance input in one-time mode
     if (!this.isPayPerService) {
-      this.totalAdvanceInput = this.totalFromAdvance.toString();
+      this.totalAdvanceInput = this.totalFromAdvance;
     }
   }
   
@@ -343,10 +354,10 @@ export class AddPaymentComponent implements OnInit {
     
     // Update total advance input in one-time mode
     if (!this.isPayPerService) {
-      this.totalAdvanceInput = this.totalFromAdvance.toString();
+      this.totalAdvanceInput = this.totalFromAdvance;
     }
     if (!this.isPayPerService) {
-      this.totalPayNowInput = this.totalPayNow.toString();
+      this.totalPayNowInput = this.totalPayNow;
     }
   }
   
@@ -361,7 +372,7 @@ export class AddPaymentComponent implements OnInit {
     this.totalPayNow = 0;
     this.dueAfterAdvance = 0;
     this.dueAfterPayment = 0;
-    
+   
     // Calculate totals for all selected invoices
     this.selectedInvoices.forEach(invoice => {
       if (this.isPayPerService) {
@@ -437,7 +448,7 @@ export class AddPaymentComponent implements OnInit {
     
     // Update total advance input field in one-time mode
     if (!this.isPayPerService) {
-      this.totalAdvanceInput = this.totalFromAdvance.toString();
+      this.totalAdvanceInput = this.totalFromAdvance;
     }
     
     // Recalculate totals after adjustment (without calling this method again to avoid infinite recursion)
@@ -575,7 +586,7 @@ export class AddPaymentComponent implements OnInit {
       });
       
       // Update the input field
-      this.totalPayNowInput = newTotalPayNow.toString();
+      this.totalPayNowInput = newTotalPayNow;
       
       this.calculateTotals();
     }
@@ -647,8 +658,7 @@ export class AddPaymentComponent implements OnInit {
       }
     } else {
       // Advance payment mode
-      if (!this.amount || parseFloat(this.amount) <= 0) {
-        this.amountError = true;
+      if (!this.amount || this.amount <= 0) {        this.amountError = true;
         return false;
       }
     }
@@ -696,7 +706,7 @@ export class AddPaymentComponent implements OnInit {
       }
     } else {
       // Advance payment mode
-      this.amountError = !this.amount || parseFloat(this.amount) <= 0;
+      this.amountError = !this.amount || this.amount <= 0;
     }
     
     // Method-specific validation
@@ -720,57 +730,56 @@ export class AddPaymentComponent implements OnInit {
    * @param rawInvoices Raw invoice data from API
    * @returns Array of grouped invoices ready for display
    */
-  groupInvoicesByInvoiceId(rawInvoices: any[]): any[] {
-    // Get unique invoice IDs
-    const uniqueInvoiceIds = [...new Set(rawInvoices.map(inv => inv.invoice_id))];
-    const groupedInvoices: Record<string, any> = {};
+ groupInvoicesByInvoiceId(rawInvoices: any[]): any[] {
+  // Get unique invoice IDs
+  const uniqueInvoiceIds = [...new Set(rawInvoices.map(inv => inv.invoice_id))];
+  const groupedInvoices: Record<string, any> = {};
 
-    uniqueInvoiceIds.forEach(invoiceId => {
-      const invoicesForId = rawInvoices.filter(inv => inv.invoice_id === invoiceId);
-      
-      // Calculate totals
-      let totalAmount = 0;
-      let paidAmount = 0;
-      
-      // Get the items/services for this invoice
-      const items = invoicesForId.map(inv => {
-        const itemCost = parseFloat(inv.treatment_plans.total_cost) || 0;
-        totalAmount += itemCost;
-        
-        // Determine paid amount based on payment_status
-        if (inv.payment_status === 'Paid') {
-          paidAmount += itemCost;
-        }
-        
-        return {
-          id: inv.treatment_id,
-          unique_id: inv.treatment_unique_id,
-          name: inv.treatment_plans.procedure_details.name,
-          price: itemCost,
-          teeth_set: inv.treatment_plans.teeth_set,
-          quantity: inv.treatment_plans.quantity,
-          fromAdvance: '0',
-          payNow: '0'
-        };
-      });
-      
-      // Use the first invoice for common details
-      const firstInvoice = invoicesForId[0];
-      
-      groupedInvoices[invoiceId] = {
-        invoice_id: invoiceId,
-        created_at: firstInvoice.created_at,
-        payment_status: this.calculateOverallStatus(invoicesForId),
-        items: items,
-        totalAmount: totalAmount,
-        paidAmount: paidAmount,
-        amountDue: totalAmount - paidAmount
+  uniqueInvoiceIds.forEach(invoiceId => {
+    const invoicesForId = rawInvoices.filter(inv => inv.invoice_id === invoiceId);
+
+    // Get the items/services for this invoice
+    const items = invoicesForId.map(inv => {
+      const itemCost = Number(inv.treatment_plans.total_cost) || 0;
+
+      return {
+        id: inv.treatment_id,
+        unique_id: inv.treatment_unique_id,
+        name: inv.treatment_plans.procedure_details.name,
+        price: itemCost,
+        teeth_set: inv.treatment_plans.teeth_set,
+        quantity: inv.treatment_plans.quantity,
+        fromAdvance: '0',
+        payNow: '0'
       };
     });
 
-    // Convert to array for Angular ngFor
-    return Object.values(groupedInvoices);
-  }
+    // Use the first invoice for common details
+    const firstInvoice = invoicesForId[0];
+
+    //  Use DB values if available, otherwise fallback to calculation
+    const totalAmount =
+      Number(firstInvoice.total_amount) ||
+      items.reduce((sum, it) => sum + (it.price || 0), 0);
+
+    const paidAmount = Number(firstInvoice.amount_paid) || 0;
+
+    const amountDue =
+      Number(firstInvoice.due_amount) || (totalAmount - paidAmount);
+
+    groupedInvoices[invoiceId] = {
+      invoice_id: invoiceId,
+      created_at: firstInvoice.created_at,
+      payment_status: this.calculateOverallStatus(invoicesForId),
+      items: items,
+      totalAmount: totalAmount,
+      paidAmount: paidAmount,
+      amountDue: amountDue
+    };
+  });
+
+  return Object.values(groupedInvoices);
+}
 
   /**
    * Determine overall payment status for an invoice group
@@ -810,9 +819,10 @@ export class AddPaymentComponent implements OnInit {
       amount_paid: this.totalPayNow.toString(),
       notes: this.notes,
       use_advance_amount: this.totalFromAdvance.toString(),
-      invoices_data: []
+      invoices_data: [],
+      towards: this.towards
     };
-    
+
     // Add invoice data for selected invoices
     if (this.selectedInvoices.length > 0) {
       this.selectedInvoices.forEach(invoice => {
@@ -828,6 +838,7 @@ export class AddPaymentComponent implements OnInit {
             if (parseFloat(item.fromAdvance) > 0 || parseFloat(item.payNow) > 0) {
               invoiceData.treatments.push({
                 treatment_id: item.id,
+                treatment_name: item.name,
                 treatment_unique_id: item.unique_id,
                 from_advance: item.fromAdvance,
                 amount_applied: item.payNow
@@ -864,21 +875,26 @@ export class AddPaymentComponent implements OnInit {
             
             invoiceData.treatments.push({
               treatment_id: item.id,
+              treatment_name: item.name,
               treatment_unique_id: item.unique_id,
               from_advance: itemAdvance.toString(),
               amount_applied: itemPayNow.toString()
             });
           });
         }
-        
+
         paymentData.invoices_data.push(invoiceData);
         paymentData.record_type = 'FromInvoice'
+        this.towards = 'Invoice Payment';
+        paymentData.towards = this.towards;
       });
     } else {
       // This is an advance payment with no invoices
       paymentData.amount_paid = this.amount;
       paymentData.use_advance_amount = "0";
       paymentData.record_type = 'FromUser'
+      this.towards = 'Advance Payment';
+      paymentData.towards = this.towards;
     }
     
     this.treatmentPlansService.savePayment(paymentData).subscribe(res => {

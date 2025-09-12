@@ -1,54 +1,126 @@
-<!-- HTML -->
 <p-toast></p-toast>
 <div class="appointments-container">
-    <div class="appointments-header">
-        <h2>PAYMENTS</h2>
-        <div>
-            <!-- <button class="mark-btn-active">Refund</button> -->
-            <button class="add-btn" (click)="navigateToAddPayment()">+ Add</button>
-        </div>
-    </div>
-    <div>
-    <div *ngFor="let date of getSortedDates()">
-    <div class="appointment-date">{{ date | date: 'dd MMM, yyyy'}}</div>
+  <div class="appointments-header">
+    <h2>PAYMENTS</h2>
+<ng-container *ngIf="payments && (payments | keyvalue).length > 0; else noPayments">
+      <div class="filter-options"
+           style="display: inline-flex; gap: 16px; margin-right: 380px; align-items: center; font-size: 14px;">
+        <label style="cursor: pointer;">
+          <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="all" checked>
+          All
+        </label>
+        <label style="cursor: pointer;">
+          <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="advance">
+          Advance Payments
+        </label>
+        <label style="cursor: pointer;">
+          <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="invoice">
+          Invoices
+        </label>
+      </div>
+    </ng-container>
 
-    <div class="treatment-plan" *ngFor="let payment of payments[date]">
-        <table class="completed-procedures">
-            <thead>
-                <tr>
-                    <th class="procedure-col">RECEIPT NUMBER</th>
-                    <th class="procedure-col">REFERENCE NUMBER</th>
-                    <th class="cost-col">AMOUNT PAID</th>
-                    <th class="discount-col">INVOICES</th>
-                    <th class="total-col">TOWARDS</th>
-                    <th class="notes-col">MODE OF PAYMENT</th>
-                    <!-- <th class="actions-col"></th> -->
-                </tr>
-            </thead>
-            <tbody>
-                <!-- First Procedure -->
-                <tr class="procedure-row">
-                    <td class="procedure-col">{{payment.receipt_id}}</td>
-                    <td class="reference-col">{{ payment.reference_number || 'N/A' }}</td>
-                    <td class="cost-col">{{payment.amount_paid}}</td>
-                    <td class="discount-col">{{payment.invoice_id}}</td>
-                    <td class="total-col"></td>
-                    <td class="notes-col">{{payment.payment_method}}</td>
-                    <!-- <td class="actions-col">
-                        <button class="edit-btn border-left-radius">
-                            <i class="pi pi-print"></i>
-                        </button>
-                        <button class="edit-btn border-right-radius">
-                            <i class="pi pi-chevron-down"></i>
-                        </button>
-                    </td> -->
-                </tr>
-                <!-- <tr class="completed-by">
-                    <td colspan="6"><span class="doctor">Notes:</span>&nbsp;Scaling</td>
-                </tr> -->
-            </tbody>
+    <ng-template #noPayments>
+  <div style="text-align:center; color:#777; font-size:14px; padding:20px;">
+    No payments to show.
+  </div>
+</ng-template>
+    <div>
+      <button class="add-btn" (click)="navigateToAddPayment()">+ Add</button>
+    </div>
+  </div>
+  <div>
+    <div *ngFor="let date of getSortedDates()">
+      <div class="appointment-date">{{ date | date: 'dd MMM, yyyy'}}</div>
+
+      <div class="treatment-plan" *ngFor="let payment of payments[date]">
+        <table class="completed-procedures"
+               *ngIf="paymentFilter === 'all' 
+                       || (paymentFilter === 'advance' && payment.towards === 'Advance Payment') 
+                       || (paymentFilter === 'invoice' && payment.towards === 'Invoice Payment')">
+          <thead>
+            <tr>
+              <th class="procedure-col">RECEIPT NUMBER</th>
+              <th class="procedure-col">REFERENCE NUMBER</th>
+              <th class="cost-col">AMOUNT PAID</th>
+              <th class="discount-col">INVOICES</th>
+              <th class="total-col">TOWARDS</th>
+              <th class="notes-col">MODE OF PAYMENT</th>
+              <th class="metadata-col">DETAILS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="procedure-row" >
+              <td class="reference-col">{{payment.receipt_id}}</td>
+              <td class="reference-col">{{ payment.reference_number || 'N/A' }}</td>
+              <td class="cost-col">{{ payment.amount_paid | number:'1.2-2' }}</td>
+              <td class="discount-col">
+                <ng-container  *ngIf="payment?.invoice_id; else noInvoice">
+                  <div *ngFor="let inv of payment.invoice_id.split(',,')">
+                    {{ inv.trim() }}
+                  </div>
+                </ng-container>
+                <ng-template #noInvoice>N/A</ng-template>
+              </td>
+              <td class="total-col">{{payment.towards}}</td>
+              <td class="notes-col">{{payment.payment_method}}</td>
+
+              <td class="metadata-col">
+  <button type="button" 
+          class="p-button p-button-text p-button-rounded" 
+          (click)="openInvoiceMetadata(payment.invoices_data)"
+          style="padding:4px; min-width:30px;">
+    <i class="pi pi-eye" style="font-size: 1.2rem;"></i>
+  </button>
+</td>
+            </tr>
+          </tbody>
         </table>
+      </div>
     </div>
+  </div>
+</div>
+
+<p-dialog
+    [(visible)]="showInvoiceDialog" 
+    [modal]="true" 
+    [closable]="true" 
+    [style]="{width:'420px'}" 
+    (onHide)="closeInvoiceDialog()"
+>
+  <ng-container *ngIf="selectedInvoiceData?.length">
+    <div *ngFor="let invoice of selectedInvoiceData" 
+         style="margin-bottom:20px; padding:15px; border-radius:8px; border:1px solid #e0e0e0; background-color:#fafafa;">
+      <div style="font-size:16px; font-weight:600; margin-bottom:5px; color:#333;">
+        Invoice ID: {{invoice.invoice_id}}
+      </div>
+      <div style="margin-bottom:10px; color:#555;">
+        Amount Applied: <strong>{{invoice.amount_applied | number:'1.2-2'}}</strong>
+      </div>
+
+      <div style="margin-left:10px;">
+        <div *ngFor="let t of invoice.treatments" 
+             style="padding:8px; margin-bottom:8px; border-left:3px solid #4caf50; background-color:#f9f9f9; border-radius:4px;">
+          <div style="color:#444; font-size:14px; margin-bottom:2px;">
+            <strong>Treatment Name:</strong> {{t.treatment_name}}
+          </div>
+          <!-- <div style="color:#444; font-size:14px; margin-bottom:2px;">
+            <strong>Treatment Unique ID:</strong> {{t.treatment_unique_id}}
+          </div> -->
+          <div style="color:#444; font-size:14px; margin-bottom:2px;">
+            <strong>From Advance:</strong> {{t.from_advance}}
+          </div>
+          <div style="color:#444; font-size:14px;">
+            <strong>Amount Applied:</strong> {{t.amount_applied | number:'1.2-2'}}
+          </div>
+        </div>
+      </div>
     </div>
-</div>
-</div>
+  </ng-container>
+
+  <ng-container *ngIf="!selectedInvoiceData?.length">
+    <div style="text-align:center; color:#999; font-size:14px; padding:20px;">
+      No details available.
+    </div>
+  </ng-container>
+</p-dialog>
