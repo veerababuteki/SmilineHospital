@@ -36,7 +36,7 @@
     </div>
 </div>
 
-<div class="top-bar" *ngIf="patientDetails">
+<div class="top-bar" *ngIf="patientDetails && !isPatientDirectory()">
     <div class="left-section">
         <img src="assets/patientpicker.webp" alt="User Icon" class="user-icon" (click)="openPatientDirectory()">
         <img *ngIf="patientDetails" src="assets/user.webp" alt="Profile Photo" class="adjust profile-photo">
@@ -56,7 +56,7 @@
 </div>
 
 <div class="app-container">
-    <div *ngIf="patientDetails" class="side-nav" [class.collapsed]="isNavCollapsed">
+    <div *ngIf="patientDetails && !isPatientDirectory()" class="side-nav" [class.collapsed]="isNavCollapsed">
         <button class="collapse-toggle" (click)="toggleNav()">
             <i class="pi" [ngClass]="isNavCollapsed ? 'pi-angle-double-right' : 'pi-angle-double-left'"></i>
         </button>

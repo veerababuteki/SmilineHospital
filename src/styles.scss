@@ -30,3 +30,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   .cdk-overlay-container {
     z-index: 1200 !important;
   }
+
+textarea{
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  &::placeholder{
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+  }
+}

@@ -713,7 +713,7 @@ atLeastOneBlockTypeValidator() {
       scheduledDate: [scheduledDate, Validators.required],
       scheduledTime: [scheduledDate, Validators.required],
       duration: [15],
-      bookingType: ['offline'],
+      bookingType: ['', Validators.required],
       plannedProcedures: [''],
       notes: [''],
       status: [{ value: 'Scheduled', disabled: !isPast }],
