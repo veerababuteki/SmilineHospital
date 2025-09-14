@@ -96,8 +96,8 @@ import { Router } from '@angular/router';
   }">
   {{ event.showBalance 
       ? (event.extendedProps?.availableAdvance == 0 
-            ? 'INR 0.00' 
-            : ('INR ' + (event.extendedProps?.availableAdvance | number:'1.2-2'))) 
+            ? '₹0.00' 
+            : ('₹' + (event.extendedProps?.availableAdvance | number:'1.2-2'))) 
       : 'Show Balance' }}
 </div>
             </div>
