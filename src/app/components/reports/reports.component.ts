@@ -291,7 +291,7 @@ export class ReportsComponent implements OnInit {
             { field: 'patient', header: 'Patient' },
             { field: 'treatments', header: 'Treatments & Products' },
             { field: 'cost', header: 'Cost (INR)' },
-            { field: 'discount', header: 'Discount (INR/%)' },
+            { field: 'discount', header: 'Discount (INR)' },
             { field: 'tax', header: 'Tax (INR)' },
             { field: 'invoiceAmount', header: 'Invoice Amount (INR)' },
             { field: 'amountPaid', header: 'Amount Paid (INR)' }
@@ -322,21 +322,22 @@ export class ReportsComponent implements OnInit {
                 totalAmountPaid += amountPaid;
 
                 this.detailsData.push({
-                    sNo: index + 1,
-                    date: new Date(inv.date).toLocaleDateString('en-GB', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric'
-                    }),
-                    invoiceNumber: inv.invoice_number,
-                    patient: inv.patient,
-                    treatments: inv.treatments_products,
-                    cost: cost.toFixed(2),
-                    discount: discount.toFixed(2) + ' ' + (inv.discount_format || ''),
-                    tax: tax.toFixed(2),
-                    invoiceAmount: invoiceAmount.toFixed(2),
-                    amountPaid: amountPaid.toFixed(2)
-                });
+    sNo: index + 1,
+    date: new Date(inv.date).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    }),
+    invoiceNumber: inv.invoice_number,
+    patient: inv.patient,
+    treatments: inv.treatments_products,
+    cost: cost.toFixed(2),
+    discount: '₹' +discount.toFixed(2),
+    discountFormat: inv.discount_format,
+    tax: tax.toFixed(2),
+    invoiceAmount: invoiceAmount.toFixed(2),
+    amountPaid: amountPaid.toFixed(2)
+  });
             });
         }
 
@@ -369,7 +370,7 @@ export class ReportsComponent implements OnInit {
 
             this.detailsColumns = [
                 { field: 'sNo', header: 'S.No.' },
-                { field: 'date', header: 'Inovice Date' },
+                { field: 'date', header: 'Invoice Date' },
                 { field: 'patient', header: 'Patient' },
                 { field: 'receiptNumber', header: 'Receipt Number' },
                 { field: 'invoice', header: 'Invoice(s)' },
@@ -448,35 +449,48 @@ export class ReportsComponent implements OnInit {
     }
 
     private loadAmountDueData() {
-        this.reportsService.getAmountDue(this.selectedPractice.branch_id).subscribe(res => {
-            const summary = res.data.summary;
-            const data = res.data.data;
-            this.summaryData = {
-                totalAmountDue: summary.total_due,
-            };
-            this.detailsColumns = [
-                { field: 'sNo', header: 'S.No.' },
-                { field: 'name', header: 'Name' },
-                { field: 'amountDue', header: 'Amount Due(INR)' },
-                { field: 'lastInvoice', header: 'Last Invoice(INR)' },
-                { field: 'lastPayment', header: 'Last Payment (INR)' },
-            ];
-            this.detailsData = [];
-            if(data == undefined || data.length == 0){
-                this.detailsData = [];
-            }
-            data.forEach((app: any, index: number) => {
-                this.detailsData.push({
-                    sNo: index + 1,
-                    name: app.patient_name,
-                    amountDue: app.amount_due,
-                    lastInvoice: app.last_invoice,
-                    lastPayment: app.last_payment,
-                });
-            })
-        });
-    }
+    this.reportsService.getAmountDue(this.selectedPractice.branch_id).subscribe(res => {
+        const summary = res.data.summary;
+        const data = res.data.data;
 
+        this.summaryData = {
+            totalAmountDue: summary.total_due,
+        };
+
+        this.detailsColumns = [
+            { field: 'sNo', header: 'S.No.' },
+            { field: 'name', header: 'Name' },
+            { field: 'amountDue', header: 'Amount Due (INR)' },
+            { field: 'lastPayment', header: 'Last Payment (INR)' },
+            { field: 'lastInvoiceDate', header: 'Last Invoice Date' },
+        ];
+
+        this.detailsData = [];
+
+        if (!data || data.length === 0) {
+            return;
+        }
+
+        data.forEach((app: any, index: number) => {
+            let invoiceDate: string | null = '-';
+            let paymentAmount: number | null = null;
+
+            if (app.last_invoice && app.last_invoice.includes(" on ")) {
+                const [amount, date] = app.last_invoice.split(" on ");
+                paymentAmount = parseFloat(amount.replace(/,/g, '')) || null; // fix here
+                invoiceDate = date || '-';
+            }
+
+            this.detailsData.push({
+                sNo: index + 1,
+                name: app.patient_name,
+                amountDue: parseFloat((app.amount_due || '0').toString().replace(/,/g, '')),
+                lastPayment: paymentAmount,
+                lastInvoiceDate: invoiceDate,
+            });
+        });
+    });
+}
     
    private loadPatientsData() {
   this.reportsService
