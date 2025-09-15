@@ -23,6 +23,7 @@ import { LoaderService } from '../../services/loader.service';
 import { ToastModule } from 'primeng/toast';
 import { AddProfileComponent } from "../patients-section/edit-profile/add-profile.component";
 
+
 @Component({
   selector: 'app-appointment',
   templateUrl: './appointment.component.html',
@@ -554,21 +555,23 @@ onDateSelectionChange() {
 
   // Enhanced appointment.component.ts - Block Calendar specific methods
   initBlockCalendarForm() {
-    this.blockCalendarForm = this.fb.group({
-      leaveDetails: ['', [Validators.required, Validators.minLength(10)]],
-      doctor: [null, Validators.required], // null means "All Doctors"
-      blockType: ['allDay', Validators.required],
-      fromDate: [new Date(), Validators.required],
-      toDate: [new Date(), Validators.required],
-      date: [new Date(), Validators.required],
-      startTime: [new Date(), Validators.required],
-      endTime: [new Date(), Validators.required],
-      blockVideo: [false],
-      blockInClinic: [false]
-    });
+  // Add 'All Doctors' option to the doctors array if it doesn't exist
+  if (this.doctors && this.doctors.length > 0 && this.doctors[0]?.id !== 'all') {
+    this.doctors = [{ id: 'all', name: 'All Doctors' }, ...this.doctors];
+  }
 
-    // SET INITIAL VALIDATOR - This was missing!
-    this.blockCalendarForm.setValidators([this.atLeastOneBlockTypeValidator()]);
+  this.blockCalendarForm = this.fb.group({
+    leaveDetails: ['', [Validators.required, Validators.minLength(10)]],
+    doctor: [this.doctors && this.doctors.length > 0 ? this.doctors[0] : null, Validators.required],
+    blockType: ['allDay', Validators.required],
+    fromDate: [new Date(), Validators.required],
+    toDate: [new Date(), Validators.required],
+    date: [new Date(), Validators.required],
+    startTime: [new Date(), Validators.required],
+    endTime: [new Date(), Validators.required],
+    blockVideo: [false],
+    blockInClinic: [false]
+  }, { validators: this.atLeastOneBlockTypeValidator() });
 
     // Watch for changes in fromDate
     this.blockCalendarForm.get('fromDate')?.valueChanges.subscribe((fromDate) => {
@@ -683,8 +686,11 @@ atLeastOneBlockTypeValidator() {
       const blockInClinic = formGroup.get('blockInClinic')?.value;
       const doctor = formGroup.get('doctor')?.value;
       
-      // Only validate if "All Doctors" is selected
-      if (doctor === null && !blockVideo && !blockInClinic) {
+      // Check if it's 'All Doctors' (either null or id is 'all')
+      const isAllDoctors = !doctor || doctor.id === 'all';
+      
+      // Only validate if "All Doctors" is selected and no block type is selected
+      if (isAllDoctors && !blockVideo && !blockInClinic) {
         return { atLeastOneBlockType: true };
       }
       return null;
@@ -1152,44 +1158,99 @@ private hasOtherFieldsChanged(formValue: any): boolean {
 
 
   onBlockCalendarSubmit() {
-  if (this.blockCalendarForm.valid) {
-    const formValue = this.blockCalendarForm.value;
+    // Mark all fields as touched to trigger validation
+    this.blockCalendarForm.markAllAsTouched();
     
-    const blockData = {
-      leave_details: formValue.leaveDetails,
-      doctor_id: formValue.doctor?.user_id || null,
-      block_type: formValue.blockType,
-      ...(formValue.blockType === 'allDay' ? {
-        fromDate: format(new Date(formValue.fromDate), 'yyyy-MM-dd'),
-        toDate: format(new Date(formValue.toDate), 'yyyy-MM-dd')
-      } : {
-        date: format(new Date(formValue.date), 'yyyy-MM-dd'),
-        startTime: format(new Date(formValue.startTime), 'HH:mm'),
-        endTime: format(new Date(formValue.endTime), 'HH:mm')
-      }),
-      blockVideo: formValue.blockVideo,
-      blockInClinic: formValue.blockInClinic
-    };
+    const formValue = this.blockCalendarForm.value;
+    const isAllDoctors = this.isAllDoctors;
+    
+    // Debug log
+    console.log('Form values:', formValue);
+    console.log('Is All Doctors:', isAllDoctors);
+    
+    // For 'All Doctors', we need to ensure at least one block type is selected
+    if (isAllDoctors && !formValue.blockVideo && !formValue.blockInClinic) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Please select at least one block type (Video or In-Clinic) when blocking for all doctors',
+        life: 5000
+      });
+      return;
+    }
+    
+    if (this.blockCalendarForm.valid) {
+      // Match backend's expected property names
+      const blockData: any = {
+        leave_details: formValue.leaveDetails,
+        block_type: formValue.blockType,
+        blockVideo: !!formValue.blockVideo,  // Match backend's expected camelCase
+        blockInClinic: !!formValue.blockInClinic,  // Match backend's expected camelCase
+        branch_id: 1  // Add branch_id as required by backend
+      };
+      
+      // Only add doctor_id if not 'All Doctors'
+      if (!isAllDoctors && formValue.doctor?.user_id) {
+        blockData.doctor_id = formValue.doctor.user_id;
+      } else if (isAllDoctors) {
+        // Explicitly set to null when it's for all doctors
+        blockData.doctor_id = null;
+      }
+      
+      // Add date range or specific time slot based on block type
+      if (formValue.blockType === 'allDay') {
+        blockData.fromDate = format(new Date(formValue.fromDate), 'yyyy-MM-dd');
+        blockData.toDate = format(new Date(formValue.toDate), 'yyyy-MM-dd');
+      } else {
+        blockData.date = format(new Date(formValue.date), 'yyyy-MM-dd');
+        blockData.startTime = format(new Date(formValue.startTime), 'HH:mm');
+        blockData.endTime = format(new Date(formValue.endTime), 'HH:mm');
+      }
+      
+      // Add branch_id if needed (from the error message)
+      blockData.branch_id = 1; // Or get this from your app's state
+      
+      console.log('Submitting block data:', JSON.stringify(blockData, null, 2));
 
     this.appointmentService.createBlockCalendar(blockData).subscribe({
       next: (response) => {
         console.log('Block calendar created:', response);
         this.display = false;
-        // Refresh calendar or show success message
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Block calendar created successfully',
+          life: 3000
+        });
+        
+        // Reload the page after a short delay to show the success message
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       },
       error: (error) => {
         console.error('Error creating block calendar:', error);
-        // Show error message
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.error?.message || 'Failed to create block calendar',
+          life: 5000
+        });
       }
     });
   }
 }
 get isAllDoctors(): boolean {
-  return this.blockCalendarForm.get('doctor')?.value === null;
+  const doctorValue = this.blockCalendarForm?.get('doctor')?.value;
+  return !doctorValue || doctorValue.id === 'all';
 }
 get hasBlockTypeError(): boolean {
-  return this.blockCalendarForm.hasError('atLeastOneBlockType') && 
-         this.blockCalendarForm.touched;
+  if (!this.blockCalendarForm) return false;
+  const form = this.blockCalendarForm;
+  const isAllDoctors = this.isAllDoctors;
+  const hasBlockTypeSelected = form.get('blockVideo')?.value || form.get('blockInClinic')?.value;
+  
+  return isAllDoctors && !hasBlockTypeSelected && (form.touched || form.dirty);
 }
 get isAllDay(): boolean {
   return this.blockCalendarForm.get('blockType')?.value === 'allDay';
