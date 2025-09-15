@@ -19,8 +19,8 @@ export class ReportsService {
    // 1. Payments Report
   getPayments(from_date: any, to_date: any, branch_id: number): Observable<any> {
     const params = new HttpParams()
-      .set('from_date', new Date(from_date).toISOString().split('T')[0])
-      .set('to_date', new Date(to_date).toISOString().split('T')[0])
+      .set('from_date', new Date(from_date).toLocaleDateString('en-CA'))
+      .set('to_date', new Date(to_date).toLocaleDateString('en-CA'))
       .set('branch_id', branch_id);
     return this.http.get(`${this.baseUrl}/report/payments`, { headers: this.getAuthHeaders(), params })
       .pipe(catchError(this.handleError));
@@ -28,13 +28,24 @@ export class ReportsService {
 
   // 2. Appointments Report
   getAppointments(from_date: any, to_date: any, branch_id: number): Observable<any> {
-    const params = new HttpParams()
-      .set('from_date', new Date(from_date).toISOString().split('T')[0])
-      .set('to_date', new Date(to_date).toISOString().split('T')[0])
-      .set('branch_id', branch_id);
-    return this.http.get(`${this.baseUrl}/report/appointments`, { headers: this.getAuthHeaders(), params })
-      .pipe(catchError(this.handleError));
-  }
+  const formatDate = (d: any) => {
+    const date = new Date(d);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`; // local date, not UTC
+  };
+
+  const params = new HttpParams()
+    .set('from_date', formatDate(from_date))
+    .set('to_date', formatDate(to_date))
+    .set('branch_id', branch_id);
+
+  return this.http.get(`${this.baseUrl}/report/appointments`, {
+    headers: this.getAuthHeaders(),
+    params
+  }).pipe(catchError(this.handleError));
+}
 
   // 3. Patients Report
   getPatients(from_date: any, to_date: any, branch_id: number): Observable<any> {
@@ -73,14 +84,21 @@ export class ReportsService {
   }
 
   // 7. Invoices Report
-  getInvoices(from_date: any, to_date: any, branch_id: number): Observable<any> {
-    const params = new HttpParams()
-      .set('from_date', new Date(from_date).toISOString().split('T')[0])
-      .set('to_date', new Date(to_date).toISOString().split('T')[0])
-      .set('branch_id', branch_id);
-    return this.http.get(`${this.baseUrl}/report/invoices`, { headers: this.getAuthHeaders(), params })
-      .pipe(catchError(this.handleError));
-  }
+getInvoices(from_date: any, to_date: any, branch_id: number): Observable<any> {
+  const fromDateTime = new Date(from_date);
+  fromDateTime.setHours(0, 0, 0, 0);
+
+  const toDateTime = new Date(to_date);
+  toDateTime.setHours(23, 59, 59, 999);
+
+  const params = new HttpParams()
+    .set('from_date', fromDateTime.toISOString().slice(0, 19).replace('T', ' '))
+    .set('to_date', toDateTime.toISOString().slice(0, 19).replace('T', ' '))
+    .set('branch_id', branch_id);
+
+  return this.http.get(`${this.baseUrl}/report/invoices`, { headers: this.getAuthHeaders(), params })
+    .pipe(catchError(this.handleError));
+}
 
   private getAuthHeaders(): HttpHeaders {
     const token = this.authService.getAccessToken();
