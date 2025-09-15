@@ -553,6 +553,7 @@
       }
     }
     
+    
     .radio-options {
       display: flex;
       gap: 32px;
@@ -1923,3 +1924,38 @@
   margin-bottom: 6px;
 }
 
+
+
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip text */
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -10px; 
+  left: 210%;
+  transform: translateX(-50%);
+  background-color: #2e3b4e;
+  color: #fff;
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  white-space: normal; /* Allow text wrapping */
+  max-width: 200px; /* Set maximum width for wrapping */
+  width: max-content; /* Adjust width to content */
+  line-height: 1.4; /* Better line spacing for readability */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 10;
+  text-align: left; /* Align text to left for better readability */
+}
+
+/* Show tooltip on hover */
+.tooltip:hover::after {
+  opacity: 1;
+}
