@@ -308,7 +308,10 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
 
     // Save to localStorage
     localStorage.setItem('selectedPractice', JSON.stringify(practice));
-    window.location.reload();
+    this.router.navigate(['/patients/patient-directory']);
+    setTimeout(() => {
+      window.location.reload();
+    }, 250);
   }
 
   // Filter practices based on search text
