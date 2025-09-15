@@ -3,7 +3,7 @@
     <h2 class="title">NEW PATIENT REGISTRATION</h2>
     <div class="actions">
       <button class="btn-secondary" (click)="cancel()">Cancel</button>
-      <button class="btn-primary" [disabled]="!formValid" (click)="onSubmit()">Save Patient</button>
+      <button class="btn-primary" [disabled]="!formValid || !isDobAgeMismatch" (click)="onSubmit()">Save Patient</button>
     </div>
   </div>
 
@@ -87,6 +87,15 @@
               <span class="or-text"> Age :</span>
               <input pInputText type="number" class="age-input" formControlName="age" min="1" max="200">
             </div>
+          </div>
+
+          <div class="form-row validation-row">
+            <div class="validation-error"
+                *ngIf="isDobAgeMismatch()">
+                <span>
+                  Age is not matching with Date of Birth.
+                </span>
+              </div>
           </div>
 
           <div class="form-row">

@@ -6,7 +6,7 @@
     <div class="actions">
       <!-- <button class="btn-secondary">Delete Patient</button> -->
       <button class="btn-secondary" (click)="cancel()">Cancel</button>
-      <button class="btn-primary" (click)="onSubmit()">
+      <button class="btn-primary" [disabled]="!formValid || !isDobAgeMismatch" (click)="onSubmit()">
         Update Patient Profile
       </button>
     </div>
@@ -125,6 +125,15 @@
                 min="0"
               />
             </div>
+          </div>
+
+          <div class="form-row validation-row">
+            <div class="validation-error age-dob"
+                *ngIf="isDobAgeMismatch()">
+                <span>
+                  Age is not matching with Date of Birth.
+                </span>
+              </div>
           </div>
 
           <!-- <div class="form-row">

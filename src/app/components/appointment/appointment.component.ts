@@ -1269,4 +1269,11 @@ get isAllDay(): boolean {
    hideAddPatientDialog() {
         this.displayAddPatientDialog = false;
     }
+
+  appointmentUnblocked(): boolean {
+    return !this.appointmentForm.get('scheduledTime')?.hasError('timeBlocked') 
+      && this.appointmentForm.get('scheduledDate')?.value 
+      && this.appointmentForm.get('scheduledTime')?.value 
+      && this.appointmentForm.get('doctor')?.value
+  }
 }
