@@ -799,109 +799,109 @@ isSaveDisabled(): boolean {
   
   // Save payment
   savePayment(): void {
-    this.formSubmitted = true;
-    this.resetValidationErrors();
-    
-    // Validate form fields
-    if (!this.isFormValid()) {
-      this.setValidationErrors();
-      return;
-    }
-    
-    // Prepare payment data based on the selected mode
-    const paymentData: any = {
-      patient_id: Number(this.patientId),
-      payment_method: this.paymentMethod.charAt(0).toUpperCase() + this.paymentMethod.slice(1), // Capitalize
-      bank_name: this.bank,
-      cheque_number: this.chequeNumber,
-      card_digits: this.cardLastDigits,
-      reference_number: this.referenceNumber,
-      amount_paid: this.totalPayNow.toString(),
-      notes: this.notes,
-      use_advance_amount: this.totalFromAdvance.toString(),
-      invoices_data: [],
-      towards: this.towards
-    };
+  this.formSubmitted = true;
+  this.resetValidationErrors();
+  
+  // Validate form fields
+  if (!this.isFormValid()) {
+    this.setValidationErrors();
+    return;
+  }
+  
+  // Prepare payment data based on the selected mode
+  const paymentData: any = {
+    patient_id: Number(this.patientId),
+    payment_method: this.paymentMethod.charAt(0).toUpperCase() + this.paymentMethod.slice(1), // Capitalize
+    bank_name: this.bank,
+    cheque_number: this.chequeNumber,
+    card_digits: this.cardLastDigits,
+    reference_number: this.referenceNumber,
+    amount_paid: this.totalPayNow.toString(),
+    notes: this.notes,
+    use_advance_amount: this.totalFromAdvance.toString(),
+    invoices_data: [],
+    towards: this.towards
+  };
 
-    // Add invoice data for selected invoices
-    if (this.selectedInvoices.length > 0) {
-      this.selectedInvoices.forEach(invoice => {
-        const invoiceData: any = {
-          invoice_id: invoice.invoice_id,
-          amount_applied: invoice.totalPayNow.toString(),
-          treatments: []
-        };
-        
-        if (this.isPayPerService) {
-          // Add per-service payment details
-          invoice.items.forEach((item: any) => {
-            if (parseFloat(item.fromAdvance) > 0 || parseFloat(item.payNow) > 0) {
-              invoiceData.treatments.push({
-                treatment_id: item.id,
-                treatment_name: item.name,
-                treatment_unique_id: item.unique_id,
-                from_advance: item.fromAdvance,
-                amount_applied: item.payNow
-              });
-            }
-          });
-        } else {
-          // For one-time payment, distribute proportionally across treatments
-          let remainingAdvance = parseFloat(invoice.fromAdvanceAmount);
-          let remainingPayNow = parseFloat(invoice.payNowAmount);
-          
-          invoice.items.forEach((item: any, index: number) => {
-            const isLastItem = index === invoice.items.length - 1;
-            let itemAdvance = 0;
-            let itemPayNow = 0;
-            
-            if (isLastItem) {
-              // Last item gets all remaining amounts
-              itemAdvance = remainingAdvance;
-              itemPayNow = remainingPayNow;
-            } else {
-              // Distribute proportionally
-              const itemProportion = item.price / invoice.totalAmount;
-              itemAdvance = Math.min(remainingAdvance, itemProportion * parseFloat(invoice.fromAdvanceAmount));
-              itemPayNow = Math.min(remainingPayNow, itemProportion * parseFloat(invoice.payNowAmount));
-              
-              // Round to 2 decimal places
-              itemAdvance = Math.round(itemAdvance * 100) / 100;
-              itemPayNow = Math.round(itemPayNow * 100) / 100;
-            }
-            
-            remainingAdvance -= itemAdvance;
-            remainingPayNow -= itemPayNow;
-            
+  // Add invoice data for selected invoices
+  if (this.selectedInvoices.length > 0) {
+    this.selectedInvoices.forEach(invoice => {
+      const invoiceData: any = {
+        invoice_id: invoice.invoice_id,
+        amount_applied: (parseFloat(invoice.totalPayNow) + parseFloat(invoice.fromAdvanceAmount)).toString(), // ✅ invoice level applied amount
+        treatments: []
+      };
+      
+      if (this.isPayPerService) {
+        // Add per-service payment details
+        invoice.items.forEach((item: any) => {
+          if (parseFloat(item.fromAdvance) > 0 || parseFloat(item.payNow) > 0) {
             invoiceData.treatments.push({
               treatment_id: item.id,
               treatment_name: item.name,
               treatment_unique_id: item.unique_id,
-              from_advance: itemAdvance.toString(),
-              amount_applied: itemPayNow.toString()
+              from_advance: item.fromAdvance,
+              amount_applied: (parseFloat(item.payNow) + parseFloat(item.fromAdvance)).toString() // ✅ treatment level
             });
+          }
+        });
+      } else {
+        // For one-time payment, distribute proportionally across treatments
+        let remainingAdvance = parseFloat(invoice.fromAdvanceAmount);
+        let remainingPayNow = parseFloat(invoice.payNowAmount);
+        
+        invoice.items.forEach((item: any, index: number) => {
+          const isLastItem = index === invoice.items.length - 1;
+          let itemAdvance = 0;
+          let itemPayNow = 0;
+          
+          if (isLastItem) {
+            // Last item gets all remaining amounts
+            itemAdvance = remainingAdvance;
+            itemPayNow = remainingPayNow;
+          } else {
+            // Distribute proportionally
+            const itemProportion = item.price / invoice.totalAmount;
+            itemAdvance = Math.min(remainingAdvance, itemProportion * parseFloat(invoice.fromAdvanceAmount));
+            itemPayNow = Math.min(remainingPayNow, itemProportion * parseFloat(invoice.payNowAmount));
+            
+            // Round to 2 decimal places
+            itemAdvance = Math.round(itemAdvance * 100) / 100;
+            itemPayNow = Math.round(itemPayNow * 100) / 100;
+          }
+          
+          remainingAdvance -= itemAdvance;
+          remainingPayNow -= itemPayNow;
+          
+          invoiceData.treatments.push({
+            treatment_id: item.id,
+            treatment_name: item.name,
+            treatment_unique_id: item.unique_id,
+            from_advance: itemAdvance.toString(),
+            amount_applied: (itemPayNow + itemAdvance).toString() 
           });
-        }
+        });
+      }
 
-        paymentData.invoices_data.push(invoiceData);
-        paymentData.record_type = 'FromInvoice'
-        this.towards = 'Invoice Payment';
-        paymentData.towards = this.towards;
-      });
-    } else {
-      // This is an advance payment with no invoices
-      paymentData.amount_paid = this.amount;
-      paymentData.use_advance_amount = "0";
-      paymentData.record_type = 'FromUser'
-      this.towards = 'Advance Payment';
+      paymentData.invoices_data.push(invoiceData);
+      paymentData.record_type = 'FromInvoice';
+      this.towards = 'Invoice Payment';
       paymentData.towards = this.towards;
-    }
-    
-    this.treatmentPlansService.savePayment(paymentData).subscribe(res => {
-      this.router.navigate(['patients', this.patientId, 'payments', this.uniqueCode],
-      { state: { message: 'Invoice updated!' } })
     });
+  } else {
+    // This is an advance payment with no invoices
+    paymentData.amount_paid = this.amount;
+    paymentData.use_advance_amount = "0";
+    paymentData.record_type = 'FromUser';
+    this.towards = 'Advance Payment';
+    paymentData.towards = this.towards;
   }
+  
+  this.treatmentPlansService.savePayment(paymentData).subscribe(res => {
+    this.router.navigate(['patients', this.patientId, 'payments', this.uniqueCode],
+    { state: { message: 'Invoice updated!' } })
+  });
+}
 
   allowOnlyNumbers(event: KeyboardEvent) {
     const charCode = event.key.charCodeAt(0);

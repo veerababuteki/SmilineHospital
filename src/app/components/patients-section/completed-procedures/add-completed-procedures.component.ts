@@ -393,68 +393,76 @@ export class AddCompletedProceduresComponent implements OnInit {
     this.calculateTotal(index);
   }
 
-  onSubmit(){
-    if(this.treatmentForm.valid){
-      var procedureLists: any[] = [];
-      var treatment = {
-        patient_id: this.patientId,
-        grand_total: this.calculateGrandTotal().toString(),
-        procedures_list: procedureLists
-      };
-      if(this.isEditMode){
-        this.treatmentForm.value.treatments.forEach((t: any)=>{
-          treatment.procedures_list.push({
-            procedure_id: t.procedureId,
-            id: t.id,
-            treatment_unique_id: t.unique_id,
-            doctor_id: t.doctorId,
-            quantity: t.quantity,
-            cost: t.cost,
-            discount: t.discount.toString(),
-            discount_formate: t.discountType,
-            teeth_set: t.selectedTeeth.toString(),
-            status: "Completed",
-            date: t.procedureDate,
-            total_cost: t.total,
-            total_discount: t.discount.toString(),
-            notes: t.notes,
-            action: this.isEditMode ? 'Update' : 'Add'
-          });
-        })
-      }
-      else{
-        this.treatmentForm.value.treatments.forEach((t: any)=>{
-          treatment.procedures_list.push({
-            procedure_id: t.procedureId,
-            treatment_plan_id: t.id,
-            treatment_unique_id: t.unique_id,
-            doctor_id: t.doctorId,
-            quantity: t.quantity,
-            cost: t.cost,
-            discount: t.discount.toString(),
-            discount_formate: t.discountType,
-            teeth_set: t.selectedTeeth.toString(),
-            status: "Completed",
-            date: t.procedureDate,
-            total_cost: t.total,
-            total_discount: t.discount.toString(),
-            notes: t.notes,
-          });
-        })
-      }
-      
-      if(this.isEditMode){
-        this.treatmentPlansService.updateCompletedProcedure(treatment).subscribe(res => {
-          this.updateTreatmentPlans()
-        }); 
-      }
-      else{
-        this.treatmentPlansService.addCompletedProcedure(treatment).subscribe(res => {
-          this.updateTreatmentPlans()
-        }); 
-      }
+  onSubmit() {
+  if (this.treatmentForm.valid) {
+    var procedureLists: any[] = [];
+    var treatment = {
+      patient_id: this.patientId,
+      grand_total: this.calculateGrandTotal().toString(),
+      procedures_list: procedureLists
+    };
+
+    const formatDate = (date: any): string | null => {
+      if (!date) return null;
+      const d = new Date(date);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`; 
+    };
+
+    if (this.isEditMode) {
+      this.treatmentForm.value.treatments.forEach((t: any) => {
+        treatment.procedures_list.push({
+          procedure_id: t.procedureId,
+          id: t.id,
+          treatment_unique_id: t.unique_id,
+          doctor_id: t.doctorId,
+          quantity: t.quantity,
+          cost: t.cost,
+          discount: t.discount.toString(),
+          discount_formate: t.discountType,
+          teeth_set: t.selectedTeeth.toString(),
+          status: "Completed",
+          date: formatDate(t.procedureDate), 
+          total_cost: t.total,
+          total_discount: t.discount.toString(),
+          notes: t.notes,
+          action: this.isEditMode ? 'Update' : 'Add'
+        });
+      });
+    } else {
+      this.treatmentForm.value.treatments.forEach((t: any) => {
+        treatment.procedures_list.push({
+          procedure_id: t.procedureId,
+          treatment_plan_id: t.id,
+          treatment_unique_id: t.unique_id,
+          doctor_id: t.doctorId,
+          quantity: t.quantity,
+          cost: t.cost,
+          discount: t.discount.toString(),
+          discount_formate: t.discountType,
+          teeth_set: t.selectedTeeth.toString(),
+          status: "Completed",
+          date: formatDate(t.procedureDate), 
+          total_cost: t.total,
+          total_discount: t.discount.toString(),
+          notes: t.notes,
+        });
+      });
+    }
+
+    if (this.isEditMode) {
+      this.treatmentPlansService.updateCompletedProcedure(treatment).subscribe(res => {
+        this.updateTreatmentPlans();
+      });
+    } else {
+      this.treatmentPlansService.addCompletedProcedure(treatment).subscribe(res => {
+        this.updateTreatmentPlans();
+      });
     }
   }
+}
 updateTreatmentPlans(){
     if(this.patientId == null || this.patientId === undefined) return;
     this.treatmentPlansService.getCompletedTreatmentPlans(Number(this.patientId)).subscribe(res => {

@@ -29,7 +29,19 @@ export class InvoiceComponent implements OnInit {
   currentInvoiceKey: any;
   uniqueCode: string | null | undefined;
   paymentFilter: string = 'all';
-  
+
+  hasInvoicesForDate(date: string): boolean {
+  const invoiceGroups = Object.values(this.invoices[date] || {});
+  return invoiceGroups.some(group =>
+    group.length > 0 &&
+    (this.paymentFilter === 'all' || this.paymentFilter === group[0].payment_status)
+  );
+}
+
+hasAnyInvoices(): boolean {
+  return this.getSortedDates().some(date => this.hasInvoicesForDate(date));
+}
+
   constructor(private treatmentPlansService: TreatmentPlansService, 
               private patientDataService: PatientDataService,
     private router: Router, private route: ActivatedRoute){}
