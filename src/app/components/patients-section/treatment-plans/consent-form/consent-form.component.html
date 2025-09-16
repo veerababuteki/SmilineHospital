@@ -166,7 +166,7 @@
         <div class="file-list">
           <div *ngFor="let file of uploadedForms; let i = index" class="file-item">
             <div class="file-info">
-              <span class="file-name">{{ file.name }}</span>
+              <span class="file-name" [title]="file.name">{{ file.name.length > 30 ? (file.name | slice:0:30) + '...' : file.name }}</span>
               <span class="upload-date">{{ file.uploadDate | date:'short' }}</span>
               <span class="file-status" *ngIf="file.isExisting">✓ Uploaded</span>
             </div>
