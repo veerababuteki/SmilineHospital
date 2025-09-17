@@ -1,11 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SfcService } from '../../../../services/sfc.service';
-import { MessageService } from 'primeng/api';
+import { MessageService } from '../../../../services/message.service';
 import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { SfcFormComponent } from '../../../../features/sfc/components/sfc-form/sfc-form.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sfc-list',
@@ -26,7 +27,8 @@ export class SfcListComponent implements OnInit {
 
   constructor(
     private sfcService: SfcService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -74,5 +76,10 @@ export class SfcListComponent implements OnInit {
 
   getStatusText(status: string): string {
     return status === 'Y' ? 'Smiline Patient' : 'Non-Smiline Patient';
+  }
+
+  navigateToProfile(patientId: number, uniqueCode: string) {
+    this.messageService.sendMessage(patientId.toString(), uniqueCode);
+    this.router.navigate(['/patients', patientId, 'profile', uniqueCode]);
   }
 }
