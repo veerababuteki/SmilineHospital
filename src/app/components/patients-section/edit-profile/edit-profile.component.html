@@ -6,7 +6,7 @@
     <div class="actions">
       <!-- <button class="btn-secondary">Delete Patient</button> -->
       <button class="btn-secondary" (click)="cancel()">Cancel</button>
-      <button class="btn-primary" [disabled]="!formValid || !isDobAgeMismatch" (click)="onSubmit()">
+      <button class="btn-primary" [title]="getInvalidFieldMessage()" [disabled]="!formValid || !isDobAgeMismatch" (click)="onSubmit()">
         Update Patient Profile
       </button>
     </div>
