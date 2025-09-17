@@ -475,11 +475,29 @@ private updatePatientProfile(patientDetails: any, historyDetails: any) {
 
   isDobAgeMismatch(): boolean {
     const dob = this.patientForm.get('dateOfBirth')?.value;
-    const age = this.patientForm.get('age')?.value;
-    if (dob && age !== null && age !== undefined) {
+    const ageValue = this.patientForm.get('age')?.value;
+
+    //converting age to number for comparison
+    const age = ageValue !== null && ageValue !== undefined && ageValue !== '' ? Number(ageValue) : null;
+
+    if (dob && age !== null && !isNaN(age)) {
       const calculatedAge = this.calculateAge(dob);
       return calculatedAge !== age;
     }
     return false;
+  }
+
+  getInvalidFieldMessage(): string {
+    if (!this.patientForm) return "Form invalid due to: Unknown error";
+    for (const key in this.patientForm.controls) {
+      const control = this.patientForm.get(key);
+      if (control && control.invalid) {
+        return `Form invalid due to: ${key}`;
+      }
+    }
+    if (this.isDobAgeMismatch()) {
+      return "Form invalid due to: Date of Birth and Age mismatch";
+    }
+    return "";
   }
 }
