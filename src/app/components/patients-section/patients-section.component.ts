@@ -94,11 +94,11 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     this.currentUrl = this.router.url;
-
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         this.currentUrl = event.urlAfterRedirects;
+        window.location.reload();
       });
 
     this.router.events

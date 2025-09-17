@@ -33,7 +33,7 @@
       <div *ngIf="sfcMembers.length > 0" class="members-list">
         <div *ngFor="let member of sfcMembers" class="member-card referral-made">
           <div class="member-header">
-            <h4>{{ member.patient_name }}</h4>
+            <h4 (click)="navigateToProfile(member.user_id, member.unique_code)">{{ member.patient_name }}</h4>
             <span [class]="getStatusBadgeClass(member.smiline_patient)" class="status-badge">
               {{ getStatusText(member.smiline_patient) }}
             </span>
@@ -83,7 +83,7 @@
       <div *ngIf="referralsReceived.length > 0" class="members-list">
         <div *ngFor="let referral of referralsReceived" class="member-card referral-received">
           <div class="member-header">
-            <h4>Referred by: {{ referral.referred_by }}</h4>
+            <h4 (click)="navigateToProfile(referral.user_id, referral.unique_code)">Referred by: {{ referral.first_name }} {{referral.last_name}}</h4>
             <span [class]="getStatusBadgeClass(referral.smiline_patient)" class="status-badge">
               {{ getStatusText(referral.smiline_patient) }}
             </span>
@@ -95,9 +95,11 @@
               <span class="value">{{ referral.age }}</span>
             </div>
             
-            <div class="detail-row" *ngIf="referral.occupation">
+            <div class="detail-row">
               <span class="label">Occupation:</span>
-              <span class="value">{{ referral.occupation }}</span>
+              <span class="value" *ngIf="referral.occupation">{{ referral.occupation }}</span>
+              <span class="value" *ngIf="referral.profession">{{ referral.profession }}</span>
+              <span class="value" *ngIf="!referral.occupation && !referral.profession">N/A</span>
             </div>
             
             <div class="detail-row" *ngIf="referral.doctor_front_office_comment">
