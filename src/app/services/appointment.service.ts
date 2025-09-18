@@ -109,6 +109,7 @@ getAppointmentsByDateAndTimeRange(date: string, fromTime: string, toTime: string
             duration: appointment.duration,
             planned_procedure: appointment.planned_procedure,
             notes: appointment.notes,
+            isFollowUpAppointment: appointment.isFollowUpAppointment,
         }, 
         {headers}).pipe(
         catchError(this.handleError)
@@ -168,7 +169,10 @@ createBlockCalendar(blockData: any) {
             duration: appointment.duration,
             planned_procedure: appointment.planned_procedure,
             notes: appointment.notes,
-            branch_id: this.selectedPractice.branch_id
+            branch_id: this.selectedPractice.branch_id,
+            time_of_arrival: appointment.time_of_arrival,
+            treatment_started_time: appointment.treatment_started_time,
+            isFollowUpAppointment: appointment.isFollowUpAppointment,
         }, 
         {headers}).pipe(
         catchError(this.handleError)
