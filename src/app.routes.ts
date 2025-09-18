@@ -28,6 +28,9 @@ import { ImportComponent } from './app/components/import/import.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
+    // Public, standalone patient profile routes (no auth, no layout)
+    { path: 'public/profile/:id/:source', component: ProfileComponent },
+    { path: 'public/edit-profile/:id/:source', component: EditProfileComponent },
     {
       path: '', 
       component: HomeComponent,

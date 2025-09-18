@@ -89,6 +89,9 @@ export class EditProfileComponent implements OnInit {
 
   });
     this.route.paramMap.subscribe(params => {
+      if(this.patientId == null) {
+        this.patientId = params.get('id');
+      }
       if(this.uniqueCode == null) {
         this.uniqueCode = params.get('source');
       }
@@ -470,7 +473,12 @@ private updatePatientProfile(patientDetails: any, historyDetails: any) {
     })
   }
   cancel(){
-    this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode])
+    const isPublic = this.router.url.includes('/public/');
+    if (isPublic) {
+      this.router.navigate(['/public', 'profile', this.patientDetails.user_id, this.uniqueCode]);
+    } else {
+      this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode]);
+    }
   }
 
   isDobAgeMismatch(): boolean {
