@@ -383,6 +383,7 @@ private updatePatientProfile(patientDetails: any, historyDetails: any) {
       : '',
     family: null,
     gender: patientDetails.gender,
+    primary_mobile: patientDetails.primaryMobile,
     secondary_mobile: patientDetails.secondaryMobile,
     land_line: patientDetails.landLine,
     street_address: patientDetails.streetAddress,
