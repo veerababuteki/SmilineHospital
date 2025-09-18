@@ -81,5 +81,8 @@ export class SfcListComponent implements OnInit {
   navigateToProfile(patientId: number, uniqueCode: string) {
     this.messageService.sendMessage(patientId.toString(), uniqueCode);
     this.router.navigate(['/patients', patientId, 'profile', uniqueCode]);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   }
 }

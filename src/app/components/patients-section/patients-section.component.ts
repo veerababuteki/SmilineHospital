@@ -98,7 +98,6 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         this.currentUrl = event.urlAfterRedirects;
-        window.location.reload();
       });
 
     this.router.events
