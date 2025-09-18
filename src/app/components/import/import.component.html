@@ -171,14 +171,26 @@
           </mat-expansion-panel-header>
 
           <div class="excel-data-grid">
-            <div class="grid-header">Excel Data</div>
-            <div class="grid-content">
-              <div class="grid-row" *ngFor="let field of getOriginalDataFields(item.originalData)">
-                <div class="field-name">{{field.key}}:</div>
-                <div class="field-value">{{field.value || 'Not provided'}}</div>
-              </div>
-            </div>
+  <div class="grid-header">Excel Data payment</div>
+  <div class="grid-content">
+    <div class="grid-row" *ngFor="let field of getOriginalDataFields(item.originalData)">
+      <div class="field-name">{{ field.key }}:</div>
+      <div class="field-value">
+        <!-- If value is object -->
+        <ng-container *ngIf="isObject(field.value); else normalValue">
+          <div *ngFor="let entry of (field.value | keyvalue)">
+            <strong>{{ entry.key }}:</strong> {{ entry.value || 'Not provided' }}
           </div>
+        </ng-container>
+
+        <!-- If value is string/number/array -->
+        <ng-template #normalValue>
+          {{ field.value || 'Not provided' }}
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
 
           <div class="created-data-grid" *ngIf="item.details">
             <div class="grid-header">Created Record Details</div>

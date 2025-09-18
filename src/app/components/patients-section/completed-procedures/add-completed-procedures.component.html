@@ -311,8 +311,36 @@
           >
         </div>
       </div>
-    </div>
+<!-- Keep appointment hidden until triggered -->
+<app-appointment
+  #appointmentDialog
+  [patientCode]="uniqueCode"
+  [editAppointment]="false"
+  [fromPatientsection]="true"
+  [data]="'appointment'"
+  [followUpMode]="true"
+  [currentUser]="currentUser"
+  [isDoctor]="true"
+  [doctors]="doctors"
+  [categories]="categories"
+>
+</app-appointment>
 
+<style>
+  ::ng-deep app-appointment .add-btn {
+    background-color: #6c757d !important;
+    color: #fff !important;
+    font-weight: 500 !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    border: none !important;
+  }
+
+  ::ng-deep app-appointment .add-btn::after {
+    content: " Follow-up Appointment" !important;
+  }
+</style>
+    </div>
     <div class="procedures-section">
       <div class="procedures-header">
         <span>Procedures ( in INR )</span>

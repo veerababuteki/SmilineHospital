@@ -26,13 +26,19 @@
   <div class="appointment-form">
     <!-- Tabs -->
     <div class="tab-container">
-      <div class="tab" *ngIf="data === 'appointment'" [class.active]="activeTab === 'appointment'" (click)="setActiveTab('appointment')">Appointment</div>
+<div 
+  class="tab" 
+  *ngIf="data === 'appointment'" 
+  [class.active]="activeTab === 'appointment'" 
+  (click)="setActiveTab('appointment')">
+  {{ followUpMode ? 'Follow-up Appointment' : 'Appointment' }}
+</div>
       <!-- <div class="tab" *ngIf="isDoctor  && !this.editAppointment" [class.active]="activeTab === 'reminder'" (click)="setActiveTab('reminder')">Reminder</div> -->
       <div class="tab" *ngIf="data === 'blockCalendar'" [class.active]="activeTab === 'blockCalendar'" (click)="setActiveTab('blockCalendar')">Block Calendar</div>
     </div>
 
     <form *ngIf="activeTab === 'appointment'" [formGroup]="appointmentForm" (ngSubmit)="onSubmit()" class="form-content">
-      <div class="form-row" *ngIf="isDoctor && !this.editAppointment">
+      <div class="form-row" *ngIf="isDoctor && !this.editAppointment && !followUpMode">
         <label class="required">Patient ID or Mobile Number</label>
         <div class="input-with-button">
           <input type="text" pInputText formControlName="patientId"
@@ -113,6 +119,50 @@
                        [filter]="true" filterBy="name" [ngClass]="{'ng-invalid': appointmentForm.get('category')?.invalid && appointmentForm.get('category')?.touched}"></p-dropdown>
             <small class="error-message" *ngIf="appointmentForm.get('category')?.invalid && appointmentForm.get('category')?.touched">Category is required</small>
           </div>
+          <!-- New Time of Arrival field -->
+<!-- Time of Arrival -->
+<div class="form-row" *ngIf="followUpMode">
+  <label class="required">Time of Arrival</label>
+  <p-calendar 
+    formControlName="timeOfArrival" 
+    [timeOnly]="true" 
+    [showIcon]="false" 
+    hourFormat="12" 
+    appendTo="body"
+    [ngClass]="{
+      'ng-invalid': appointmentForm.get('timeOfArrival')?.invalid && 
+                    appointmentForm.get('timeOfArrival')?.touched
+    }">
+  </p-calendar>
+
+  <small class="error-message" 
+         *ngIf="appointmentForm.get('timeOfArrival')?.invalid && appointmentForm.get('timeOfArrival')?.touched">
+    Time of Arrival is required
+  </small>
+</div>
+
+<!-- Treatment Started Time -->
+<div class="form-row" *ngIf="followUpMode">
+  <label class="required">Treatment Started Time</label>
+  <p-calendar 
+    formControlName="treatmentStartedTime" 
+    [timeOnly]="true" 
+    [showIcon]="false" 
+    hourFormat="12" 
+    appendTo="body"
+    [ngClass]="{
+      'ng-invalid': appointmentForm.get('treatmentStartedTime')?.invalid && 
+                    appointmentForm.get('treatmentStartedTime')?.touched
+    }">
+  </p-calendar>
+
+  <small class="error-message" 
+         *ngIf="appointmentForm.get('treatmentStartedTime')?.invalid && appointmentForm.get('treatmentStartedTime')?.touched">
+    Treatment Started Time is required
+  </small>
+</div>
+
+
         </div>
       </div>
 
@@ -120,21 +170,35 @@
 <!-- Add this section after the schedule-row in your appointment form -->
 
 <div class="form-row schedule-row">
-  <label class="required">Scheduled On</label>
+<label class="required">
+  {{ followUpMode ? 'Recalled Date / Time' : 'Scheduled On' }}
+</label>
   <div class="schedule-inputs">
-    <p-calendar formControlName="scheduledDate" 
-                [showIcon]="true" 
-                dateFormat="dd-mm-yy" 
-                appendTo="body" 
-                [ngClass]="{'ng-invalid': appointmentForm.get('scheduledDate')?.invalid && appointmentForm.get('scheduledDate')?.touched}">
-    </p-calendar>
+   <p-calendar 
+  formControlName="scheduledDate" 
+  [showIcon]="true" 
+  dateFormat="dd-mm-yy" 
+  appendTo="body" 
+  [minDate]="followUpMode ? today : null"
+  [ngClass]="{
+    'ng-invalid': appointmentForm.get('scheduledDate')?.invalid 
+                  && appointmentForm.get('scheduledDate')?.touched
+  }">
+</p-calendar>
+
     <span>at</span>
-    <p-calendar formControlName="scheduledTime" 
-                [timeOnly]="true" 
-                [showIcon]="false" 
-                hourFormat="12" 
-                [ngClass]="{'ng-invalid': appointmentForm.get('scheduledTime')?.invalid && appointmentForm.get('scheduledTime')?.touched}">
-    </p-calendar>
+    <p-calendar 
+  formControlName="scheduledTime" 
+  [timeOnly]="true" 
+  [showIcon]="false" 
+  hourFormat="12" 
+  [minDate]="followUpMode ? now : null"
+  [ngClass]="{
+    'ng-invalid': appointmentForm.get('scheduledTime')?.invalid && 
+                  appointmentForm.get('scheduledTime')?.touched
+  }">
+</p-calendar>
+
     <span>for</span>
     <p-dropdown formControlName="duration"
                 [options]="durations"

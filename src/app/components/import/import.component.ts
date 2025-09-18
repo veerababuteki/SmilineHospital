@@ -722,6 +722,10 @@ export class ImportComponent implements OnInit {
     }
   }
 
+isObject(value: any): boolean {
+  return value && typeof value === 'object' && !Array.isArray(value);
+}
+
   // Clean up on component destroy
   ngOnDestroy() {
     this.stopProgressTracking();

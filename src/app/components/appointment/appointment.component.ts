@@ -65,6 +65,7 @@ export class AppointmentComponent implements OnInit {
   appointmentStatus: string[] = ['None', 'Waiting', 'Engaged', 'Done'];
   showScheduleWarning: boolean = false;
   public selectedDate: any;
+  now: Date = new Date();
   multiplePatients: any[] = [];
   showPatientDropdown: boolean = false;
   @Input() data!: 'appointment' | 'reminder' | 'blockCalendar';
@@ -78,6 +79,8 @@ export class AppointmentComponent implements OnInit {
   appointementId!: number;
   appointment: any;
   @Input() patientCode: any;
+  @Input() followUpMode: boolean = false;
+
   @Output() closeDialog: EventEmitter<any> = new EventEmitter<any>();
   paitentNotFound: boolean = false;
   messages: Message[] = [
@@ -718,6 +721,8 @@ atLeastOneBlockTypeValidator() {
       category: [''],
       scheduledDate: [scheduledDate, Validators.required],
       scheduledTime: [scheduledDate, Validators.required],
+      timeOfArrival: ['', this.followUpMode ? Validators.required : []],
+      treatmentStartedTime: ['', this.followUpMode ? Validators.required : []],
       duration: [15],
       bookingType: ['', Validators.required],
       plannedProcedures: [''],
@@ -1030,6 +1035,7 @@ atLeastOneBlockTypeValidator() {
 onSubmit() { 
   if (this.appointmentForm.valid) { 
     const value = this.appointmentForm.value; 
+
     if (!this.editAppointment) { 
       this.loaderService.show(); 
       this.appointmentService.createAppointment({ 
@@ -1043,7 +1049,13 @@ onSubmit() {
         appointment_time: format(new Date(value.scheduledTime), 'hh:mm a'), 
         duration: value.duration, 
         planned_procedure: value.plannedProcedures, 
-        notes: value.notes, 
+        notes: value.notes,
+        isFollowUpAppointment: "false",
+          ...(this.followUpMode && {
+        time_of_arrival: format(new Date(value.timeOfArrival), 'hh:mm a'),
+        treatment_started_time: format(new Date(value.treatmentStartedTime), 'hh:mm a'),
+        isFollowUpAppointment: "true"
+    })
       }).subscribe(res => { 
         this.initAppointmentForm(); 
         this.display = false; 
@@ -1094,7 +1106,8 @@ onSubmit() {
         appointment_time: format(new Date(value.scheduledTime), 'hh:mm a'), 
         duration: value.duration, 
         planned_procedure: value.plannedProcedures, 
-        notes: value.notes, 
+        notes: value.notes,
+        isFollowUpAppointment: "false", 
       }).subscribe(res => { 
         this.display = false; 
         this.editAppointment = false; 

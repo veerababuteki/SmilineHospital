@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Procedure, TreatmentForm } from '../treatment-plans/treatment.interface';
@@ -7,17 +7,19 @@ import { UserService } from '../../../services/user.service';
 import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, finalize, of } from 'rxjs';
+import { catchError, finalize, forkJoin, of } from 'rxjs';
 import { format } from 'date-fns';
 import { MessageService } from '../../../services/message.service';
 import { PatientDataService } from '../../../services/patient-data.service';
+import { AppointmentComponent } from '../../appointment/appointment.component';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-add-completed-procedures',
   templateUrl: './add-completed-procedures.component.html',
   styleUrls: ['./add-completed-procedures.component.scss'],
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule, FormsModule, DropdownModule, CalendarModule  ]
+  imports: [ CommonModule, ReactiveFormsModule, FormsModule, DropdownModule, CalendarModule, AppointmentComponent  ]
 })
 export class AddCompletedProceduresComponent implements OnInit {
   treatmentForm!: FormGroup;
@@ -39,12 +41,19 @@ export class AddCompletedProceduresComponent implements OnInit {
   isLoading: boolean = false;
   isEditMode: boolean = false;
   editProcedureData: any = null;
+  categories: any[] = [];
+  isDataLoaded: boolean = false;
+  editAppointment: boolean = false;
+  currentUser: any;
+  patientAppointments: any[] = [];
+  minDate: Date = new Date();
 
   constructor(private messageService: MessageService,private fb: FormBuilder, 
     private userService: UserService,
     private treatmentPlansService: TreatmentPlansService,
     private router:Router,
     private route: ActivatedRoute,
+    private authService: AuthService,
     private patientDataService: PatientDataService,
   ) {
     this.initForm();
@@ -59,39 +68,65 @@ export class AddCompletedProceduresComponent implements OnInit {
   }
 
   ngOnInit() {
-    
+
     this.route.parent?.paramMap.subscribe(params => {
-      if(this.patientId == null) {
-        this.patientId = params.get('id');
-        this.treatmentPlansService.getTreatmentPlans(Number(this.patientId)).subscribe(res => {
-            this.plannedTreatmentPlans = res.data.rows.filter((p: any) => p.status.toLowerCase() == 'none');
+    if(!this.patientId) {
+      this.patientId = params.get('id');
+      this.treatmentPlansService.getTreatmentPlans(Number(this.patientId))
+        .subscribe(res => {
+          this.plannedTreatmentPlans = res.data.rows.filter((p:any) => p.status.toLowerCase() === 'none');
         });
+    }
+  });
+  this.route.paramMap.subscribe(params => {
+    if(!this.uniqueCode) {
+      this.uniqueCode = params.get('source');
+      if(this.uniqueCode) {
+        this.messageService.sendMessage(this.patientId || '', this.uniqueCode || '');
+      
       }
-    });
-    this.route.paramMap.subscribe(params => {
-      if(this.uniqueCode == null) {
-        this.uniqueCode = params.get('source');
-        if (this.uniqueCode) {
-          this.messageService.sendMessage(this.patientId ? this.patientId : '', this.uniqueCode ? this.uniqueCode : '');
-  
-        }
-      }
-    });
-    this.getProcedures();
-    this.userService.getDoctors('bce9f008-d447-4fe2-a29e-d58d579534f0').subscribe(res => {
-      res.data.forEach((doc: { first_name: string; last_name: string; user_id: any; }) => {
-        this.doctors.push({
-          name: doc.first_name+" "+doc.last_name,
-          user_id: doc.user_id
-        });
-        this.doctor = this.doctors[0];
-      });
-      if (this.isEditMode && this.editProcedureData && this.treatments.length === 0) {
+    }
+  });
+  this.getProcedures();
+  forkJoin({
+    doctors: this.userService.getDoctors('bce9f008-d447-4fe2-a29e-d58d579534f0'),
+    categories: this.userService.getCategories(),
+    currentUser: this.authService.getUser()
+  }).subscribe({
+    next: ({ doctors, categories, currentUser }) => {
+      this.doctors = doctors.data.map((doc: any) => ({
+        name: doc.first_name + " " + doc.last_name,
+        user_id: doc.user_id,
+        label: doc.first_name + " " + doc.last_name,
+        value: doc.user_id
+      }));
+
+      this.categories = categories.data.rows.map((cat: any) => ({
+        ...cat,
+        label: cat.name,
+        value: cat.category_id
+      }));
+
+      this.currentUser = currentUser.data;
+
+      if(this.doctors.length) this.doctor = this.doctors[0];
+
+      if(this.isEditMode && this.editProcedureData && this.treatments.length === 0) {
         this.populateFormWithProcedure(this.editProcedureData);
       }
-    });
-    
+    },
+    error: err => {
+      console.error('Error fetching appointment data:', err);
+    }
+  });
+}
+  @ViewChild('appointmentDialog', { static: false })
+appointmentDialog!: AppointmentComponent;
+openFollowUpAppointment() {
+  if (this.appointmentDialog) {
+    this.appointmentDialog.showDialog(false); // false → open in Add mode
   }
+}
   
   populateFormWithProcedure(procedure: any) {
     if (!procedure) return;
