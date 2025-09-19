@@ -86,7 +86,7 @@
       placeholder="Search Patient ID..."
       (input)="onPatientIdInput($event)"
       (focus)="showPatientSearch = true"
-      [class.invalid-field]="isFieldInvalid('patientId')"
+      [class.invalid-field]="isFieldInvalid('patientId') || (patientSearchResults.length === 0 && newEntry.patientId.trim().length >= 2)"
     />
     
     <!-- Patient Search Dropdown -->

@@ -135,7 +135,8 @@ export class SfcFormComponent implements OnDestroy {
   selectPatient(patient: any) {
     this.newEntry.patientId = patient.manual_unique_code || patient.id;
     this.newEntry.name = patient.name;
-    this.patientSearchResults = [];
+    //Commenting out this line to prevent clearing results once patient is selected to validate the field as a valid patient.
+    // this.patientSearchResults = [];
     this.showPatientSearch = false;
   }
 
