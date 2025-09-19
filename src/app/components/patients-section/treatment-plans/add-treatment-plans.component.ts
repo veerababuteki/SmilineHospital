@@ -178,8 +178,9 @@ export class AddTreatmentPlansComponent implements OnInit {
       this.treatments.removeAt(0);
     }
     
-    // Add each treatment procedure to the form
-    for (const treatment of treatmentData) {
+    // Sorting by id DESC typically restores the user-selected order when backend inserts concurrently.
+    const sortedByIdDesc = [...treatmentData].sort((a: any, b: any) => Number(b.id) - Number(a.id));
+    for (const treatment of sortedByIdDesc) {
       // Find the procedure in our procedures list
       let procedureMatch = this.procedures.find(p => p.id === treatment.procedure_id);
       
@@ -516,9 +517,7 @@ export class AddTreatmentPlansComponent implements OnInit {
             doctor_id: this.doctor.user_id.toString(),
           });
         });
-        
-        procedureLists.reverse();
-        
+                
         const treatment = {
           patient_id: this.patientId,
           grand_total: this.calculateGrandTotal().toString(),
