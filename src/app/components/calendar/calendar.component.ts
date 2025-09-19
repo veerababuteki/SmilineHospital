@@ -828,7 +828,7 @@ export class CalendarComponent implements OnInit {
               'block-all-day',
               block.doctor_id ? 'doctor-specific' : 'all-doctors'
             ],
-            color: block.doctor_id ? '#ff9800' : '#f44336', // Orange for specific doctor, red for all doctors
+            color: block.doctor_id ? '#ff9800' : '#666666', // Orange for specific doctor, red for all doctors
             textColor: 'white'
           });
           

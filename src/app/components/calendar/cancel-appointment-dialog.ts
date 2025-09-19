@@ -129,13 +129,13 @@ import { AppointmentService } from '../../services/appointment.service';
     }
     
     :host ::ng-deep .p-button-danger {
-      background-color: #ff9800;
-      border-color: #ff9800;
+      background-color: #007bff;
+      border-color: #007bff;
     }
     
     :host ::ng-deep .p-button-danger:hover {
-      background-color: #f57c00;
-      border-color: #f57c00;
+      background-color: #3B82F6;
+      border-color: #3B82F6;
     }
   `]
 })
