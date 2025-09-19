@@ -146,7 +146,7 @@
                             class="amount" 
                             *ngIf="invoiceGroup.value[0].due_amount > 0"
                             [ngClass]="{ 'red': invoiceGroup.value[0].due_amount > 0 }">
-                            {{ invoiceGroup.value[0].due_amount | number:'1.2-2' }}
+{{ invoiceTotals[invoiceGroup.key].due_amount | number:'1.2-2' }}
                           </div>
                         </td>
                       </tr>
@@ -154,7 +154,7 @@
                         <td>
                           <div>Total</div>
                           <div class="amount">
-                            {{ getTotalCost(invoiceGroup.value) | number:'1.2-2' }}
+{{ invoiceTotals[invoiceGroup.key].total_amount | number:'1.2-2' }}
                           </div>
                         </td>
                         <td>
@@ -163,8 +163,7 @@
                             class="amount"
                             *ngIf="invoiceGroup.value[0].payment_status !== 'Pending'"
                           >
-                            {{ invoiceGroup.value[0].treatment_plans.grand_total - invoiceGroup.value[0].due_amount | number:'1.2-2' }}
-                          </div>
+{{ invoiceTotals[invoiceGroup.key].total_amount - invoiceTotals[invoiceGroup.key].due_amount | number:'1.2-2' }}                           </div>
                           <div
                             class="amount"
                             *ngIf="invoiceGroup.value[0].payment_status === 'Pending'"

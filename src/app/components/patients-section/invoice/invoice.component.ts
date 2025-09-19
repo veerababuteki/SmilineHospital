@@ -29,43 +29,47 @@ export class InvoiceComponent implements OnInit {
   currentInvoiceKey: any;
   uniqueCode: string | null | undefined;
   paymentFilter: string = 'all';
+  invoiceTotals: Record<string, { total_amount: number; amount_paid: number; due_amount: number }> = {};
+
   
   constructor(private treatmentPlansService: TreatmentPlansService, 
               private patientDataService: PatientDataService,
     private router: Router, private route: ActivatedRoute){}
 
     ngOnInit(): void {
-      this.items = [
-        {
-          label: 'Edit',
-          icon: 'pi pi-pencil',
-          command: (event) => this.editInvoice(event)
-        },
-        {
-          label: 'Cancel',
-          icon: 'pi pi-times',
-          command: (event) => this.cancelInvoice(event)
-        }
-      ];
-      this.patientDataService.data$.subscribe((data) => {
-        const invoices = data?.invoices?.data?.rows || [];
-        this.invoices = this.groupByDate(invoices)
-      });
-      this.route.parent?.paramMap.subscribe(params => {
-        if(this.patientId == null) {
-          this.patientId = params.get('id');
-        }
-        if (this.patientId) {
-        }
-      });
-      this.route.paramMap.subscribe(params => {
-        if(this.uniqueCode == null) {
-          this.uniqueCode = params.get('source');
-        }
-        if(this.uniqueCode !== null){
-        }
-      });
+  this.items = [
+    { label: 'Edit', icon: 'pi pi-pencil', command: (event) => this.editInvoice(event) },
+    { label: 'Cancel', icon: 'pi pi-times', command: (event) => this.cancelInvoice(event) }
+  ];
+  this.patientDataService.data$.subscribe((data) => {
+    const invoices = data?.invoices?.data?.rows || [];
+    this.invoices = this.groupByDate(invoices);
+
+    // 🔹 precompute totals per invoice_id
+    this.invoiceTotals = {};
+    invoices.forEach((row: any) => {
+      if (!this.invoiceTotals[row.invoice_id]) {
+        this.invoiceTotals[row.invoice_id] = { total_amount: 0, amount_paid: 0, due_amount: 0 };
+      }
+      this.invoiceTotals[row.invoice_id].total_amount += Number(row.total_amount || 0);
+      this.invoiceTotals[row.invoice_id].amount_paid += Number(row.amount_paid || 0);
+      this.invoiceTotals[row.invoice_id].due_amount += Number(row.due_amount || 0);
+    });
+
+  });
+
+  this.route.parent?.paramMap.subscribe(params => {
+    if (this.patientId == null) {
+      this.patientId = params.get('id');
     }
+  });
+  // 🔹 Initialize uniqueCode from current route
+  this.route.paramMap.subscribe(params => {
+    if (this.uniqueCode == null) {
+      this.uniqueCode = params.get('source');
+    }
+  });
+}
 
     editInvoice(invoiceKey: any): void {
       // Find the invoice data and pass it to the add-invoice component
@@ -125,7 +129,7 @@ export class InvoiceComponent implements OnInit {
           ...existingData,
           invoices: res
         };
-        this.patientDataService.setData(updatedData);
+        this.patientDataService.setData(updatedData); 
       })
     }
 
