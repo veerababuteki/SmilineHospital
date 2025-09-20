@@ -16,7 +16,7 @@
     />
   </div>
   <div class="sfc-action-buttons">
-  <button type="submit" class="btn-primary" (click)="addEntry()">
+  <button type="submit" class="btn-primary" [ngClass]="{'disabled': !isSFCFormValid}" (click)="addEntry()" [disabled]="!isSFCFormValid">
     <i 
       [ngClass]="editingIndex !== null ? 'fa-solid fa-pen-to-square' : 'fa-solid fa-plus'" 
       style="margin-right: 6px;">
@@ -59,7 +59,7 @@
   <app-custom-calendar
     [selectedDate]="newEntry.date"
     [isInvalid]="isFieldInvalid('date')"
-    (dateSelected)="onDateSelected($event)"
+    (dateSelected)="onDateSelected($event); onFormTouched()"
   ></app-custom-calendar>
 </div>
             <div *ngIf="isFieldInvalid('date')" class="error-msg"></div>
@@ -68,6 +68,7 @@
 
 <input
   [(ngModel)]="newEntry.name"
+  (ngModelChange)="onFormTouched()"
   name="name"
   maxlength="150"
   required
@@ -81,12 +82,13 @@
 <td>
   <div class="patient-search-container" *ngIf="editingIndex === null">
     <input
-      [(ngModel)]="newEntry.patientId"
+  [(ngModel)]="newEntry.patientId"
+  (ngModelChange)="onFormTouched()"
       name="patientId"
       placeholder="Search Patient ID..."
       (input)="onPatientIdInput($event)"
       (focus)="showPatientSearch = true"
-      [class.invalid-field]="isFieldInvalid('patientId')"
+      [class.invalid-field]="isFieldInvalid('patientId') || (patientSearchResults.length === 0 && newEntry.patientId.trim().length >= 2)"
     />
     
     <!-- Patient Search Dropdown -->
@@ -142,7 +144,8 @@
 <td>
   <input
     type="number"
-    [(ngModel)]="newEntry.ageRelation"
+  [(ngModel)]="newEntry.ageRelation"
+  (ngModelChange)="onFormTouched()"
     name="ageRelation"
     max="200"
     min="0"
@@ -157,7 +160,8 @@
           </td>
           <td>
             <input
-              [(ngModel)]="newEntry.profileOccupation"
+            [(ngModel)]="newEntry.profileOccupation"
+            (ngModelChange)="onFormTouched()"
               name="profileOccupation"
               required
               [class.invalid-field]="isFieldInvalid('profileOccupation')"
@@ -169,6 +173,7 @@
           <td>
             <select
   [(ngModel)]="newEntry.smilinePatient"
+  (ngModelChange)="onFormTouched()"
   name="smilinePatient"
   required
   [class.invalid-field]="isFieldInvalid('smilinePatient')"
@@ -185,7 +190,8 @@
           </td>
           <td>
             <input
-              [(ngModel)]="newEntry.doctorFrontOfficeComment"
+            [(ngModel)]="newEntry.doctorFrontOfficeComment"
+            (ngModelChange)="onFormTouched()"
               name="doctorFrontOfficeComment"
               maxlength="150"
               [class.invalid-field]="isFieldInvalid('doctorFrontOfficeComment')"
@@ -199,7 +205,8 @@
           </td>
           <td>
             <input
-              [(ngModel)]="newEntry.doctorAdvice"
+            [(ngModel)]="newEntry.doctorAdvice"
+            (ngModelChange)="onFormTouched()"
               name="doctorAdvice"
               maxlength="150"
               [class.invalid-field]="isFieldInvalid('doctorAdvice')"
@@ -210,7 +217,8 @@
           </td>
           <td>
             <input
-              [(ngModel)]="newEntry.frontOfficeRemarks"
+            [(ngModel)]="newEntry.frontOfficeRemarks"
+            (ngModelChange)="onFormTouched()"
               name="newEntry.frontOfficeRemarks"
               [class.invalid-field]="isFieldInvalid('frontOfficeRemarks')"
             />

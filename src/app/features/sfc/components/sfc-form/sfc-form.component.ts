@@ -26,6 +26,7 @@ export class SfcFormComponent implements OnDestroy {
   patientSearchResults: any[] = [];
   showPatientSearch: boolean = false;
   isSearchingPatients: boolean = false;
+  isSFCFormValid: boolean = false;
   patientSearchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
@@ -59,6 +60,21 @@ export class SfcFormComponent implements OnDestroy {
     referredBy: ''
   };
 
+  //having to setup a proxy to watch for changes to recheck validity
+  private newEntryProxy: any;
+
+  setupNewEntryWatcher() {
+    const handler = {
+      set: (obj: any, prop: string, value: any) => {
+        obj[prop] = value;
+        this.isSFCFormValid = this.isFormValid();
+        return true;
+      }
+    };
+    this.newEntryProxy = new Proxy(this.newEntry, handler);
+    this.newEntry = this.newEntryProxy;
+  }
+
   // Add property to track open dropdown
   openDropdownIndex: number | null = null;
 
@@ -77,8 +93,14 @@ export class SfcFormComponent implements OnDestroy {
   submitted: boolean = false;
 
   ngOnInit() {
-        this.getSfcEntries();
-    }
+    this.getSfcEntries();
+    // Setup proxy to watch for changes
+    this.setupNewEntryWatcher();
+  }
+
+  onFormTouched() {
+    this.isSFCFormValid = this.isFormValid();
+  }
 
   setupPatientSearch() {
     this.patientSearchSubject.pipe(
@@ -135,7 +157,8 @@ export class SfcFormComponent implements OnDestroy {
   selectPatient(patient: any) {
     this.newEntry.patientId = patient.manual_unique_code || patient.id;
     this.newEntry.name = patient.name;
-    this.patientSearchResults = [];
+    //Commenting out this line to prevent clearing results once patient is selected to validate the field as a valid patient.
+    // this.patientSearchResults = [];
     this.showPatientSearch = false;
   }
 
@@ -203,22 +226,29 @@ export class SfcFormComponent implements OnDestroy {
     }
   }
 
+  //updated to ensure validity is rechecked on reset
   resetForm() {
-  this.newEntry = {
-    date: '',
-    name: '',
-    patientId: '',
-    ageRelation: '',
-    profileOccupation: '',
-    smilinePatient: 'Y',
-    doctorFrontOfficeComment: '',
-    doctorAdvice: '',
-    frontOfficeRemarks: '',
-    referredBy: ''
-  };
-  this.editingIndex = null;
-  this.editId = null;
-  this.submitted = false;
+    this.newEntry = new Proxy({
+      date: '',
+      name: '',
+      patientId: '',
+      ageRelation: '',
+      profileOccupation: '',
+      smilinePatient: 'Y',
+      doctorFrontOfficeComment: '',
+      doctorAdvice: '',
+      frontOfficeRemarks: '',
+      referredBy: ''
+    }, {
+      set: (obj: any, prop: string, value: any) => {
+        obj[prop] = value;
+        this.isSFCFormValid = this.isFormValid();
+        return true;
+      }
+    });
+    this.editingIndex = null;
+    this.editId = null;
+    this.submitted = false;
 }
 
 
@@ -471,6 +501,21 @@ toggleDropdown(i: number, event: MouseEvent) {
   isFieldInvalid(field: string): boolean {
     return this.submitted && (!this.newEntry[field] || this.newEntry[field].toString().trim() === '');
   }
+
+  isFormValid(): boolean {
+    const formValidity = !this.isFieldInvalid('date') 
+    && !this.isFieldInvalid('name') 
+    && !(this.isFieldInvalid('patientId') || (this.patientSearchResults.length === 0 && this.newEntry.patientId.trim().length >= 2))
+    && !this.isFieldInvalid('ageRelation')
+    && !this.isFieldInvalid('profileOccupation')
+    && !this.isFieldInvalid('smilinePatient')
+    && !this.isFieldInvalid('doctorFrontOfficeComment')
+    && !this.isFieldInvalid('doctorAdvice')
+    && !this.isFieldInvalid('frontOfficeRemarks');
+    console.log('Form validity:', formValidity);
+    return formValidity;
+  }
+
 }
 
 // ========================================
