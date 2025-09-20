@@ -16,6 +16,39 @@
         Upload Form
       </button>
     </div>
+    <!-- Uploaded Files List -->
+      <div class="uploaded-files" *ngIf="uploadedForms.length > 0 && !shouldShowNoConsentMessage()">
+        <h4 *ngIf="!viewOnly">Consent Forms:</h4>
+        <div class="file-list">
+          <div *ngFor="let file of uploadedForms; let i = index" class="file-item">
+            <div class="file-info">
+              <span class="file-name" [title]="file.name">{{ file.name.length > 30 ? (file.name | slice:0:30) + '...' : file.name }}</span>
+              <span class="upload-date">{{ file.uploadDate | date:'short' }}</span>
+              <span class="file-status" *ngIf="file.isExisting">✓ Uploaded</span>
+            </div>
+            <div class="file-actions">
+              <button 
+                class="btn btn-primary btn-sm" 
+                *ngIf="file.file_path"
+                (click)="downloadConsentForm(file.file_path, file.name)">
+                Download
+              </button>
+              <button 
+                class="btn btn-danger btn-sm" 
+                *ngIf="!file.isExisting"
+                (click)="removeUploadedForm(i)">
+                Remove
+              </button>
+              <button 
+                class="btn btn-danger btn-sm" 
+                *ngIf="file.isExisting && !viewOnly"
+                (click)="deleteConsentForm(file.id)">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
   </div>
 
   <!-- Download Mode -->

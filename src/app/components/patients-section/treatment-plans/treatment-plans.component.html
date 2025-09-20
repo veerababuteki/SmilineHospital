@@ -170,7 +170,8 @@
     [modal]="true"
     [closable]="true"
     [style]="{ width: '50vw' }"
+    (onHide)="onConsentFormDialogClosed()"
   >
-    <app-consent-form [treatment]="selectedConsentTreatment"></app-consent-form>
+    <app-consent-form [treatment]="selectedConsentTreatment" #consentForm></app-consent-form>
   </p-dialog>
 </div>
