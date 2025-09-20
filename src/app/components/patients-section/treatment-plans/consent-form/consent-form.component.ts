@@ -65,6 +65,10 @@ export class ConsentFormComponent implements OnInit {
 
   @Output() closeDialog = new EventEmitter<void>();
 
+  onDialogClosed() {
+    this.uploadedForms = [];
+  }
+
   consentForm!: FormGroup;
   selectedMode: string | null = null;
   uploadedForms: any[] = [];
