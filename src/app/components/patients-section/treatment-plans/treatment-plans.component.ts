@@ -236,7 +236,10 @@ export class TreatmentPlansComponent implements OnInit {
     rows: any,
     treatmentKey: any
   ) {
-    return rows.filter((row: any) => row.treatment_unique_id === treatmentKey);
+    // Empirically, the first-selected often receives the higher id. Sorting by id DESC restores the UI order.
+    return rows
+      .filter((row: any) => row.treatment_unique_id === treatmentKey)
+      .sort((a: any, b: any) => Number(b.id) - Number(a.id));
   }
 
 
