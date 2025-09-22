@@ -49,9 +49,16 @@ export class ProfileComponent implements OnInit {
   }
 
   loadPatientData(patientId: string){
-    this.userService.getUserProfile(patientId).subscribe(res =>{
-      this.patientDetails = res.data;
-    })
+    const isPublic = this.router.url.includes('/public/');
+    if (isPublic) {
+      this.userService.getPublicUserProfile(patientId).subscribe(res =>{
+        this.patientDetails = res.data;
+      })
+    } else {
+      this.userService.getUserProfile(patientId).subscribe(res =>{
+        this.patientDetails = res.data;
+      })
+    }
   }
   sendMessage() {
     if(this.patientId !== null && this.patientId !== undefined){

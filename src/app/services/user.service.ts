@@ -155,6 +155,13 @@ export class UserService {
     );
   }
 
+  // Public methods for patient access without authentication
+  getPublicUserProfile(code: string){
+    return this.http.get<any>(`${this.baseUrl}/auth/user/public/getProfile/${code}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   updateUserProfile(patientDetails: any){
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({
@@ -192,6 +199,43 @@ export class UserService {
         groups_list: patientDetails.groups_list,
         other_history: patientDetails.other_history,
     }, {headers}).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // Public method for updating profile without authentication
+  updatePublicUserProfile(patientDetails: any){
+    return this.http.post<any>(`${this.baseUrl}/auth/user/public/updateProfile`, {
+      id: patientDetails.id,
+        first_name: patientDetails.first_name,
+        last_name: patientDetails.last_name,
+        manual_unique_code: patientDetails.manual_unique_code,
+        date_of_birth: patientDetails.date_of_birth,
+        address: patientDetails.address,
+        aadhaar_id: patientDetails.aadhaar_id,
+        abhi_id: null,
+        age: patientDetails.age,
+        anniversary: null,
+        referred_by: patientDetails.referred_by,
+        referred_name: patientDetails.referred_name,
+        referred_mobile: patientDetails.referred_mobile,
+        blood_group: patientDetails.blood_group,
+        family: null,
+        gender: patientDetails.gender,
+        phone: patientDetails.primary_mobile,
+        secondary_mobile: patientDetails.secondary_mobile,
+        langugae: patientDetails.langugae,
+        land_line: patientDetails.land_line,
+        street_address: patientDetails.street_address,
+        locality: patientDetails.locality,
+        city: patientDetails.city,
+        pin_code: patientDetails.pin_code,
+        profile: null,
+        user_id: patientDetails.user_id,
+        medical_history: patientDetails.medical_history,
+        groups_list: patientDetails.groups_list,
+        other_history: patientDetails.other_history,
+    }).pipe(
       catchError(this.handleError)
     );
   }
