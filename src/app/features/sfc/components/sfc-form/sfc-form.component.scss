@@ -291,7 +291,7 @@
     padding: 8px 12px 8px 36px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 1rem;
     background-color: #fff;
 
     &:focus {
@@ -605,7 +605,7 @@ td.action-column {
       }
 
       i {
-        font-size: 12px;
+        font-size: 16px;
         color: #6b7280;
         transition: transform 0.2s;
       }
@@ -676,7 +676,7 @@ td.action-column {
         i {
           margin-right: 12px;
           width: 16px;
-          font-size: 14px;
+          font-size: 16px;
         }
 
         &.edit-item:hover {
