@@ -88,7 +88,7 @@ export class CalendarComponent implements OnInit {
   isDataLoaded: boolean = false;
   private overlayRef: OverlayRef | null = null;
   activeTab!: 'all' | 'waiting' | 'engaged' | 'done';
-  activeTabType!: 'all' | 'online' | 'offline';
+  activeTabType!: 'all' | 'Online' | 'Offline';
   allAppointments: number = 0;
   waitingAppointemts: number = 0;
   engagedAppointemts: number = 0;
@@ -683,7 +683,7 @@ export class CalendarComponent implements OnInit {
     this.activeTab = counterType;
   }
 
-  filterDayAppointments(counter: 'all' | 'online' | 'offline') {
+  filterDayAppointments(counter: 'all' | 'Online' | 'Offline') {
     if (counter === 'all') {
       this.dayCounterAppoinments = this.dayAppoinments;
     }

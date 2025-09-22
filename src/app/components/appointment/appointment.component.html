@@ -121,8 +121,8 @@
           </div>
           <!-- New Time of Arrival field -->
 <!-- Time of Arrival -->
-<div class="form-row" *ngIf="followUpMode">
-  <label class="required">Time of Arrival</label>
+<div class="form-row">
+  <label>Time of Arrival</label>
   <p-calendar 
     formControlName="timeOfArrival" 
     [timeOnly]="true" 
@@ -142,8 +142,8 @@
 </div>
 
 <!-- Treatment Started Time -->
-<div class="form-row" *ngIf="followUpMode">
-  <label class="required">Treatment Started Time</label>
+<div class="form-row">
+  <label>Treatment Started Time</label>
   <p-calendar 
     formControlName="treatmentStartedTime" 
     [timeOnly]="true" 
