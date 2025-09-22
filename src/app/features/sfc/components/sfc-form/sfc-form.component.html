@@ -23,6 +23,12 @@
     </i>
     {{ editingIndex !== null ? 'Update Members to SFC' : 'Add Members to SFC' }}
   </button>
+  <button 
+      type="button" 
+      class="cancel-btn" 
+      (click)="cancelEdit()">
+      Cancel
+    </button>
 </div>
 </div>
 
@@ -257,7 +263,7 @@
                   (click)="editEntry(entry)"
                   type="button"
                 >
-                  <i class="fa-solid fa-pen-to-square"></i>
+                  <i class="pi pi-pencil"></i>
                   <span>Edit</span>
                 </button>
                 <button 
@@ -265,7 +271,7 @@
                   (click)="removeEntry(entry)"
                   type="button"
                 >
-                  <i class="fa-solid fa-trash"></i>
+                  <i class="pi pi-trash"></i>
                   <span>Delete</span>
                 </button>
               </div>
