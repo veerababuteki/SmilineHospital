@@ -264,7 +264,6 @@ export class SfcFormComponent implements OnDestroy {
 addEntry() {
   this.submitted = true;
 
-
   const requiredFields = [
     this.newEntry.date,
     this.newEntry.name,
@@ -306,7 +305,6 @@ addEntry() {
     return;
   }
 
-
   this.userService.getPatient(this.newEntry.patientId).subscribe({
     next: (response) => {
       const patient = response.data?.[0];
@@ -316,7 +314,7 @@ addEntry() {
         if (!this.newEntry.name || this.newEntry.name.trim() === '') {
           this.newEntry.name = `${patient.first_name} ${patient.last_name}`.trim();
         }
-        
+
         this.messageService.add({
           severity: 'success',
           summary: 'Patient Found',
@@ -338,11 +336,23 @@ addEntry() {
       } else {
         console.error('Unexpected error checking patient:', error);
       }
-      
+
       // Always proceed to add SFC entry
       this.addSfcEntry();
     }
   });
+}
+
+cancelEdit() {
+  // Fully restore form to Add mode
+  this.resetForm();                  // clears newEntry, editId, editingIndex, and validation state
+  this.searchTerm = '';              // clear search field
+  this.showPatientSearch = false;    // hide patient search dropdown
+  this.patientSearchResults = [];    // clear any search results
+  this.openDropdownIndex = null;     // ensure action dropdowns are closed
+  this.submitted = false;            // reset validation error display
+  // Optional user feedback
+  // this.messageService.add({ severity: 'info', summary: 'Cancelled', detail: 'Edit cancelled.' });
 }
 
 // Separate function to add/update SFC entry
@@ -450,7 +460,7 @@ toggleDropdown(i: number, event: MouseEvent) {
     if (dropdown) {
       dropdown.style.position = 'fixed';
       dropdown.style.top = `${trigger.bottom + 8}px`;   // 8px gap
-      dropdown.style.left = `${trigger.left - 110}px`;   // shifted left by 80px
+      dropdown.style.left = `${trigger.left - 150}px`;   // shifted left by 80px
     }
   }
 }
@@ -460,6 +470,15 @@ toggleDropdown(i: number, event: MouseEvent) {
   closeDropdown() :void {
     this.openDropdownIndex = null;
   }
+
+    @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    const clickedInside = (event.target as HTMLElement).closest('.dropdown');
+    if (!clickedInside) {
+      this.closeDropdown();
+    }
+  }
+  
 
   editWorkField() {
     alert('Edit Work Field button clicked!');

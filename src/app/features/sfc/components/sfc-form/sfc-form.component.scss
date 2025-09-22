@@ -4,7 +4,7 @@
   border-radius: 20px;
   font-size: 14px;
   border: 1px solid #e0e0e0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family:  var(--font-family);
   background: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 
@@ -121,7 +121,7 @@
 
               .patient-phone {
                 color: #666;
-                font-family: monospace;
+                font-family:  var(--font-family);
               }
             }
           }
@@ -238,6 +238,7 @@
   flex-direction: column;
   gap: 0.25rem;
   align-items: flex-start;
+  font-family:  var(--font-family) !important;
 }
 
 .sfc-header {
@@ -254,7 +255,7 @@
     color: #333;
     margin: 0;
     padding: 10px 10px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family:  var(--font-family);
   }
 }
 
@@ -308,6 +309,15 @@
   padding-left: 12px;
 }
 
+.cancel-btn {
+        padding: 6px 12px;
+        background: #f5f5f5 !important;
+        border: 1px solid #ddd !important;
+        color:#000 !important;
+        border-radius: 3px;
+        cursor: pointer;
+        font-weight: 600;
+      }
 .btn-primary {
   padding: 8px 16px;
   background-color: #3b82f6;
@@ -605,8 +615,9 @@ td.action-column {
       position: fixed; // Changed from absolute to fixed
       right: 20px;
       top: auto;
+      color: #3b5563;
       margin-top: 8px;
-      width: 160px;
+      width: 200px;
       background: white;
       border-radius: 8px;
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -645,10 +656,14 @@ td.action-column {
         text-align: left;
         display: flex;
         align-items: center;
-        font-size: 14px;
-        color: #374151;
+        font-size: 1rem;
+        color: #4b5563;;
         cursor: pointer;
         transition: all 0.15s;
+        span{
+          font-family:  var(--font-family);
+          font-size: 1rem;
+        }
 
         &:first-child {
           border-radius: 8px 8px 0 0;
