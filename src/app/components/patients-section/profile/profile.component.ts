@@ -31,7 +31,11 @@ export class ProfileComponent implements OnInit {
         //this.loadPatientData(this.patientId);
       }
     });
+    // Support public route where id and source are on the same segment
     this.route.paramMap.subscribe(params => {
+      if (this.patientId == null) {
+        this.patientId = params.get('id');
+      }
       if(this.uniqueCode == null) {
         this.uniqueCode = params.get('source');
       }
@@ -45,14 +49,26 @@ export class ProfileComponent implements OnInit {
   }
 
   loadPatientData(patientId: string){
-    this.userService.getUserProfile(patientId).subscribe(res =>{
-      this.patientDetails = res.data;
-    })
+    const isPublic = this.router.url.includes('/public/');
+    if (isPublic) {
+      this.userService.getPublicUserProfile(patientId).subscribe(res =>{
+        this.patientDetails = res.data;
+      })
+    } else {
+      this.userService.getUserProfile(patientId).subscribe(res =>{
+        this.patientDetails = res.data;
+      })
+    }
   }
   sendMessage() {
     if(this.patientId !== null && this.patientId !== undefined){
       this.messageService.sendMessage(this.patientId);
-      this.router.navigate(['/patients', this.patientId, 'edit-profile', this.uniqueCode]);
+      const isPublic = this.router.url.includes('/public/');
+      if (isPublic) {
+        this.router.navigate(['/public', 'edit-profile', this.patientId, this.uniqueCode]);
+      } else {
+        this.router.navigate(['/patients', this.patientId, 'edit-profile', this.uniqueCode]);
+      }
     }
   }
 }

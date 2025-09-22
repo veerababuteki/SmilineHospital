@@ -57,8 +57,11 @@ export class EditProfileComponent implements OnInit {
   form: any;
   manualUniqueCode: string | null | undefined
   age: number | null = null;
+  isPublicRoute: boolean = false;
 
   ngOnInit(): void {
+    // Check if this is a public route
+    this.isPublicRoute = this.router.url.includes('/public/');
 
     this.initiateForm()
     this.patientForm.statusChanges.subscribe(() => {
@@ -89,6 +92,9 @@ export class EditProfileComponent implements OnInit {
 
   });
     this.route.paramMap.subscribe(params => {
+      if(this.patientId == null) {
+        this.patientId = params.get('id');
+      }
       if(this.uniqueCode == null) {
         this.uniqueCode = params.get('source');
       }
@@ -137,8 +143,9 @@ export class EditProfileComponent implements OnInit {
   }
 
   loadPatientData(patientId: string){
-    this.userService.getUserProfile(patientId).subscribe(res =>{
-      this.patientDetails = res.data;
+    if (this.isPublicRoute) {
+      this.userService.getPublicUserProfile(patientId).subscribe(res =>{
+        this.patientDetails = res.data;
       this.patientForm.patchValue({
         firstName: this.patientDetails.first_name,
         customId: this.patientDetails.user_details.manual_unique_code,
@@ -194,6 +201,65 @@ export class EditProfileComponent implements OnInit {
         });
       })
     })
+    } else {
+      this.userService.getUserProfile(patientId).subscribe(res =>{
+        this.patientDetails = res.data;
+      this.patientForm.patchValue({
+        firstName: this.patientDetails.first_name,
+        customId: this.patientDetails.user_details.manual_unique_code,
+        aadhaarId: this.patientDetails.aadhaar_id,
+        gender: this.patientDetails.gender,
+        dateOfBirth: this.patientDetails.date_of_birth !== '' ? new Date(this.patientDetails.date_of_birth) : '',
+        referredBy: this.patientDetails.referred_by,
+        referredByName: this.patientDetails.referred_name,
+        referredByMobile: this.patientDetails.referred_mobile,
+        age: this.patientDetails.age,
+        bloodGroup: this.bloodGroups.find(b => b.label == this.patientDetails.blood_group),
+        primaryMobile: this.patientDetails.user_details.phone,
+        secondaryMobile: this.patientDetails.secondary_mobile,
+        languagePreference: this.languages.find(b => b.label == this.patientDetails.langugae),
+        landLine: this.patientDetails.land_line,
+        email: this.patientDetails.user_details.email,
+        streetAddress: this.patientDetails.street_address,
+        locality: this.patientDetails.locality,
+        city: this.patientDetails.city,
+        pincode: this.patientDetails.pin_code,
+      });
+      this.manualUniqueCode=this.patientDetails.user_details.manual_unique_code
+      this.userService.getMedicalHistories().subscribe(res =>{
+        this.medicalConditions = res.data.rows;
+        let conditionControls: ConditionControls  = {};
+        this.medicalConditions.forEach(condition => {
+          const his = this.patientDetails.medical_history.find((c: any) => c.id == condition.id);
+          conditionControls[condition.id] =  his !== undefined ? [true] : [false];
+        });
+
+        this.medicalHistoryForm = this.fb.group({
+          searchHistory: [''],
+          otherHistory: [this.patientDetails.other_history],
+          conditions: this.fb.group(conditionControls)
+        });
+
+        this.filteredMedicalConditions = this.medicalConditions
+        this.medicalHistoryForm.get('searchHistory')?.valueChanges.subscribe(value => {
+          this.filterMedicalConditions(value);
+        });
+      })
+      this.userService.getInsuranceGroups().subscribe(res => {
+        this.insuranceGroups = res.data.rows
+        let conditionControls: ConditionControls  = {};
+
+        this.insuranceGroups.forEach(condition => {
+          const his = this.patientDetails.groups.find((c: any) => c.id == condition.id);
+          conditionControls[condition.id] = his !== undefined ? [true] : [false];
+        });
+
+        this.groupsForm  = this.fb.group({
+          groups: this.fb.group(conditionControls)
+        });
+      })
+    })
+    }
   }
   patientForm!: FormGroup;
 
@@ -365,7 +431,11 @@ private updatePatientProfile(patientDetails: any, historyDetails: any) {
       .filter(id => this.groupsForm.value.groups[id]);
   }
 
-  this.userService.updateUserProfile({
+  const updateMethod = this.isPublicRoute ? 
+    this.userService.updatePublicUserProfile.bind(this.userService) : 
+    this.userService.updateUserProfile.bind(this.userService);
+  
+  updateMethod({
     id: this.patientDetails.id,
     first_name: patientDetails.firstName,
     manual_unique_code: patientDetails.customId,
@@ -403,7 +473,11 @@ private updatePatientProfile(patientDetails: any, historyDetails: any) {
         detail: 'Patient profile updated successfully'
       });
       setTimeout(() => {
-        this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode]);
+        if (this.isPublicRoute) {
+          this.router.navigate(['/public', 'profile', this.patientDetails.user_id, this.uniqueCode]);
+        } else {
+          this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode]);
+        }
       }, 1000);
     },
     error: () => {
@@ -471,7 +545,12 @@ private updatePatientProfile(patientDetails: any, historyDetails: any) {
     })
   }
   cancel(){
-    this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode])
+    const isPublic = this.router.url.includes('/public/');
+    if (isPublic) {
+      this.router.navigate(['/public', 'profile', this.patientDetails.user_id, this.uniqueCode]);
+    } else {
+      this.router.navigate(['patients', this.patientDetails.user_id, 'profile', this.uniqueCode]);
+    }
   }
 
   isDobAgeMismatch(): boolean {
