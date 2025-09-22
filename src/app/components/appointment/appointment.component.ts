@@ -721,8 +721,8 @@ atLeastOneBlockTypeValidator() {
       category: [''],
       scheduledDate: [scheduledDate, Validators.required],
       scheduledTime: [scheduledDate, Validators.required],
-      timeOfArrival: ['', this.followUpMode ? Validators.required : []],
-      treatmentStartedTime: ['', this.followUpMode ? Validators.required : []],
+      timeOfArrival: [''],
+      treatmentStartedTime: [''],
       duration: [15],
       bookingType: ['', Validators.required],
       plannedProcedures: [''],
@@ -766,6 +766,8 @@ atLeastOneBlockTypeValidator() {
       notes: [this.appointment.notes],
       status: [{ value: this.appointment.status, disabled: !this.editAppointment }],
       appointmentStatus: [{ value: this.appointment.appointment_status, disabled: !this.editAppointment }],
+      timeOfArrival: [this.appointment.time_of_arrival ? new Date(this.appointment.appointment_date + 'T' + this.convertTo24Hour(this.appointment.time_of_arrival)) : ''],
+      treatmentStartedTime: [this.appointment.treatment_started_time ? new Date(this.appointment.appointment_date + 'T' + this.convertTo24Hour(this.appointment.treatment_started_time)) : ''],
     });
   }
   else {
