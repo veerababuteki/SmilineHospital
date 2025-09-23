@@ -32,6 +32,7 @@ import { AppointmentService } from '../../services/appointment.service';
       [draggable]="false" 
       [resizable]="false"
       styleClass="cancel-appointment-dialog"
+      (onHide)="onClose()"
     >
       <div class="cancel-form">
         <div class="form-group">
