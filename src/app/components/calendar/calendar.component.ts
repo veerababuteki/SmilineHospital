@@ -110,13 +110,12 @@ export class CalendarComponent implements OnInit {
       this.handleDateClick(info);
     },
     eventClassNames: (arg: any) => {
-      const doctorId = arg.event.extendedProps?.doctorId || arg.event.extendedProps?.doctor_id || arg.event.extendedProps?.doctor;
-      const colorClass = doctorId ? `doctor-bg-${this.getDoctorColor(doctorId)}` : '';
       let viewClass = '';
       if (this.currentView === 'dayGridMonth') viewClass = 'month-view';
       else if (this.currentView === 'timeGridWeek') viewClass = 'week-view';
       else viewClass = 'day-view';
-      return [`status-${arg.event.extendedProps.status}`, colorClass, viewClass];
+      // Color classes are already assigned when creating events via className
+      return [`status-${arg.event.extendedProps.status}`, viewClass];
     },
     moreLinkContent: (args: any) => {
       return `+${args.num} more`;
