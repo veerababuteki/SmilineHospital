@@ -99,6 +99,7 @@ export class SfcFormComponent implements OnDestroy {
     this.getSfcEntries();
     // Setup proxy to watch for changes
     this.setupNewEntryWatcher();
+    this.newEntry.smilinePatient = 'Y'; // default value
   }
 
   onFormTouched() {
@@ -127,6 +128,8 @@ export class SfcFormComponent implements OnDestroy {
           this.patientSearchResults = response.data.map((patient: any) => ({
             id: patient.unique_code,
             userId: patient.user_id,
+            age: patient.age,
+            profession: patient.profession,
             name: patient.first_name + ' ' + patient.last_name,
             email: patient.email,
             phone: patient.phone,
@@ -160,6 +163,8 @@ export class SfcFormComponent implements OnDestroy {
   selectPatient(patient: any) {
     this.newEntry.patientId = patient.manual_unique_code || patient.id;
     this.newEntry.name = patient.name;
+    this.newEntry.ageRelation = patient.age || '';
+    this.newEntry.profileOccupation = patient.profession || '';
     //Commenting out this line to prevent clearing results once patient is selected to validate the field as a valid patient.
     // this.patientSearchResults = [];
     this.showPatientSearch = false;
