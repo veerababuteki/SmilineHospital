@@ -98,7 +98,7 @@ export class EditProfileComponent implements OnInit {
 
     });
   }
-
+  
   checkFormValidity(): void {
     // Check if patient form is valid (which includes all required fields)
     this.formValid = this.patientForm.valid;
@@ -139,11 +139,15 @@ export class EditProfileComponent implements OnInit {
   loadPatientData(patientId: string){
     this.userService.getUserProfile(patientId).subscribe(res =>{
       this.patientDetails = res.data;
+
+      let genderValue = this.patientDetails.gender;
+    if (genderValue === 'M') genderValue = 'Male';
+    if (genderValue === 'F') genderValue = 'Female';
       this.patientForm.patchValue({
         firstName: this.patientDetails.first_name,
         customId: this.patientDetails.user_details.manual_unique_code,
         aadhaarId: this.patientDetails.aadhaar_id,
-        gender: this.patientDetails.gender,
+        gender: genderValue,
         dateOfBirth: this.patientDetails.date_of_birth !== '' ? new Date(this.patientDetails.date_of_birth) : '',
         referredBy: this.patientDetails.referred_by,
         referredByName: this.patientDetails.referred_name,
@@ -295,6 +299,7 @@ export class EditProfileComponent implements OnInit {
     ],
   });
 }
+
   
   get aadhaarId() {
     return this.form.get('aadhaarId');

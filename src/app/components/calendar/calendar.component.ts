@@ -372,6 +372,11 @@ export class CalendarComponent implements OnInit {
     );
   }
 
+  cleanDoctorName(name: string): string {
+  if (!name) return '';
+  return name.replace(/^Dr\.?\s*/i, '').trim();
+}
+
   filteredCategories() {
     return this.categories.filter(category =>
       category.name.toLowerCase().includes(this.searchCategory.toLowerCase())

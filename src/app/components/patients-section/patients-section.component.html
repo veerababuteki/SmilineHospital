@@ -43,7 +43,14 @@
         <div class="patient-info" *ngIf="patientDetails">
             <span class="name">{{patientDetails.gender === 'Male' ? 'Mr. ' : 'Mrs. '}} {{patientDetails?.first_name || ''}} {{patientDetails?.last_name || ''}}</span>
             <span class="separator">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <span class="gender">{{patientDetails?.gender || ''}}</span>
+            <span class="gender">
+  {{
+    patientDetails?.gender === 'M' ? 'Male' :
+    patientDetails?.gender === 'F' ? 'Female' :
+    patientDetails?.gender || ''
+  }}
+</span>
+
             <span class="separator" *ngIf="patientDetails?.gender">,</span>
             <span class="age" *ngIf="patientDetails?.age">{{patientDetails?.age}} Years&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <span class="id" *ngIf="patientDetails?.user_details?.manual_unique_code">(ID: {{patientDetails?.user_details?.manual_unique_code}})</span>

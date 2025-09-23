@@ -115,8 +115,10 @@
             <div class="doctor-item" *ngFor="let doctor of filteredDoctors()"
               [ngClass]="{'doctor-active': selectedDoctor === doctor.user_id}" (click)="selectDoctor(doctor)">
               <span class="status-dot" [ngClass]="doctor.colorClass"></span>
-              <span class="doctor-name">Dr. {{doctor.first_name}}&nbsp;{{doctor.last_name}}</span>
-              <!-- <span class="count">197</span> -->
+              <span class="doctor-name">
+  Dr. {{ cleanDoctorName(doctor.first_name) }}&nbsp;{{ cleanDoctorName(doctor.last_name) }}
+</span>
+
             </div>
           </div>
         </div>
