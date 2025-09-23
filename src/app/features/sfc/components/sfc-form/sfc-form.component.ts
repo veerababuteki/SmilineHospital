@@ -269,11 +269,11 @@ addEntry() {
     this.newEntry.name,
     this.newEntry.patientId,
     this.newEntry.ageRelation,
-    this.newEntry.profileOccupation,
-    this.newEntry.smilinePatient,
-    this.newEntry.doctorFrontOfficeComment,
-    this.newEntry.doctorAdvice,
-    this.newEntry.frontOfficeRemarks
+    // this.newEntry.profileOccupation,
+    // this.newEntry.smilinePatient,
+    // this.newEntry.doctorFrontOfficeComment,
+    // this.newEntry.doctorAdvice,
+    // this.newEntry.frontOfficeRemarks
   ];
 
   const isEmpty = requiredFields.some(field => !field || field.toString().trim() === '');

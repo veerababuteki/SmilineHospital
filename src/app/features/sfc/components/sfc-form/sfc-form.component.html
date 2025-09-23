@@ -155,8 +155,6 @@
     name="ageRelation"
     max="200"
     min="0"
-    required
-    [class.invalid-field]="isFieldInvalid('ageRelation')"
     [readonly]="editingIndex !== null"
     [class.readonly-field]="editingIndex !== null"
 />
@@ -169,8 +167,6 @@
             [(ngModel)]="newEntry.profileOccupation"
             (ngModelChange)="onFormTouched()"
               name="profileOccupation"
-              required
-              [class.invalid-field]="isFieldInvalid('profileOccupation')"
             />
             <div *ngIf="isFieldInvalid('profileOccupation')" class="error-msg">
               
@@ -181,8 +177,8 @@
   [(ngModel)]="newEntry.smilinePatient"
   (ngModelChange)="onFormTouched()"
   name="smilinePatient"
-  required
-  [class.invalid-field]="isFieldInvalid('smilinePatient')"
+
+  
   [disabled]="editingIndex !== null"
   [class.readonly-field]="editingIndex !== null"
 >
@@ -200,7 +196,7 @@
             (ngModelChange)="onFormTouched()"
               name="doctorFrontOfficeComment"
               maxlength="150"
-              [class.invalid-field]="isFieldInvalid('doctorFrontOfficeComment')"
+              
             />
             <div
               *ngIf="isFieldInvalid('doctorFrontOfficeComment')"
@@ -215,7 +211,7 @@
             (ngModelChange)="onFormTouched()"
               name="doctorAdvice"
               maxlength="150"
-              [class.invalid-field]="isFieldInvalid('doctorAdvice')"
+             
             />
             <div *ngIf="isFieldInvalid('doctorAdvice')" class="error-msg">
               
@@ -226,7 +222,7 @@
             [(ngModel)]="newEntry.frontOfficeRemarks"
             (ngModelChange)="onFormTouched()"
               name="newEntry.frontOfficeRemarks"
-              [class.invalid-field]="isFieldInvalid('frontOfficeRemarks')"
+             
             />
             <div *ngIf="isFieldInvalid('frontOfficeRemarks')" class="error-msg">
               
