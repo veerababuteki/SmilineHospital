@@ -14,7 +14,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
+import { TableModule, Table } from 'primeng/table';
 import { CardModule } from 'primeng/card';
 import { ReportsService } from "../../services/reports.service";
 
@@ -62,6 +62,7 @@ export class ReportsComponent implements OnInit {
 
     @ViewChild('dropdownTrigger', { read: ElementRef }) dropdownTrigger!: ElementRef;
     @ViewChild('dropdownPanel', { read: ElementRef }) dropdownPanel!: ElementRef;
+    @ViewChild('dt') table!: Table;
 
     @HostListener('document:click', ['$event'])
     onDocumentClick(event: MouseEvent) {
@@ -177,20 +178,26 @@ export class ReportsComponent implements OnInit {
     }
 
     onReportCategoryChange() {
+        if (this.table) {
+            this.table.reset();
+        }
         this.loadReportData();
     }
 
     onDateChange() {
-  if (this.fromDate) {
-    this.fromDate.setHours(0, 0, 0, 0); // Start of day
-  }
+        if (this.fromDate) {
+            this.fromDate.setHours(0, 0, 0, 0); // Start of day
+        }
 
-  if (this.toDate) {
-    this.toDate.setHours(23, 59, 59, 999); // End of day
-  }
+        if (this.toDate) {
+            this.toDate.setHours(23, 59, 59, 999); // End of day
+        }
+        if (this.table) {
+            this.table.reset();
+        }
 
-  this.loadReportData();
-}
+        this.loadReportData();
+    }
 
     showDatePickers(): boolean {
         return this.selectedReportCategory?.value !== 'amount_due';
