@@ -4,7 +4,7 @@
   border-radius: 20px;
   font-size: 14px;
   border: 1px solid #e0e0e0;
-  font-family:  var(--font-family);
+  font-family: var(--font-family);
   background: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 
@@ -18,7 +18,7 @@
   }
 
   th {
-    background: #f5f7fa;
+    background: #e9ecef;
     color: #495057;
     font-size: 12px;
     font-weight: bold;
@@ -74,7 +74,7 @@
         justify-content: center;
         gap: 10px;
         font-size: 14px;
-        
+
         i {
           font-size: 18px;
         }
@@ -121,14 +121,15 @@
 
               .patient-phone {
                 color: #666;
-                font-family:  var(--font-family);
+                font-family: var(--font-family);
               }
             }
           }
         }
       }
 
-      .no-results, .search-hint {
+      .no-results,
+      .search-hint {
         padding: 20px;
         text-align: center;
         color: #666;
@@ -180,17 +181,18 @@
   button:last-child {
     margin-right: 0;
   }
-   /* Hide arrows in Chrome, Safari, Edge, Opera */
-      input[type=number]::-webkit-inner-spin-button,
-      input[type=number]::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
 
-      /* Hide arrows in Firefox */
-      input[type=number] {
-        -moz-appearance: textfield;
-      }
+  /* Hide arrows in Chrome, Safari, Edge, Opera */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Hide arrows in Firefox */
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
 }
 
 @media (max-width: 900px) {
@@ -203,6 +205,23 @@
   .sfc-table tr {
     display: block;
   }
+
+  .sfc-table th,
+  .sfc-table .sfc-form-row td {
+    position: sticky;
+    top: 0;
+    /* for header */
+    background: #fff;
+    z-index: 2;
+  }
+
+  .sfc-table .sfc-form-row td {
+    top: 40px;
+    /* height of header row */
+    z-index: 1;
+  }
+
+
 
   .sfc-table thead tr {
     display: none;
@@ -238,7 +257,7 @@
   flex-direction: column;
   gap: 0.25rem;
   align-items: flex-start;
-  font-family:  var(--font-family) !important;
+  font-family: var(--font-family) !important;
 }
 
 .sfc-header {
@@ -255,7 +274,7 @@
     color: #333;
     margin: 0;
     padding: 10px 10px;
-    font-family:  var(--font-family);
+    font-family: var(--font-family);
   }
 }
 
@@ -310,14 +329,15 @@
 }
 
 .cancel-btn {
-        padding: 6px 12px;
-        background: #f5f5f5 !important;
-        border: 1px solid #ddd !important;
-        color:#000 !important;
-        border-radius: 3px;
-        cursor: pointer;
-        font-weight: 600;
-      }
+  padding: 6px 12px;
+  background: #f5f5f5 !important;
+  border: 1px solid #ddd !important;
+  color: #000 !important;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
 .btn-primary {
   padding: 8px 16px;
   background-color: #3b82f6;
@@ -382,8 +402,9 @@
     background: #fff;
   }
 }
+
 .sfc-scrollbar {
-max-height: 350px;
+  max-height: 350px;
   overflow-y: auto;
 }
 
@@ -417,11 +438,34 @@ max-height: 350px;
   margin-top: 0.5rem;
 }
 
+.sfc-table tbody tr.editing-row {
+  background-color: #fffbe6; /* light yellow */
+  transition: background-color 0.2s ease;
+}
+
+.sfc-table tbody tr.editing-row td {
+  background-color: #fffbe6; /* ensure full-width highlight across cells */
+}
+
+.sfc-table tbody tr.editing-row::before {
+  
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #f59e0b; /* amber accent */
+}
+
 .readonly-field {
-  background-color: #797979;   /* light gray background */
-  color: rgb(165, 165, 165);                 /* dim text color */
-  border: 1px solid #ccc;      /* subtle border */
-  cursor: not-allowed;         /* make it obvious it's readonly */
+  background-color: #797979;
+  /* light gray background */
+  color: rgb(165, 165, 165);
+  /* dim text color */
+  border: 1px solid #ccc;
+  /* subtle border */
+  cursor: not-allowed;
+  /* make it obvious it's readonly */
 }
 
 
@@ -455,18 +499,21 @@ max-height: 350px;
 
 /* First button (Add/Update) */
 .sfc-action-bar button:nth-child(1) {
-  background: #007bff; /* green */
+  background: #007bff;
+  /* green */
 }
 
 /* Second button (Edit) */
 .sfc-action-bar button:nth-child(2) {
-  background: #007bff; /* yellow */
+  background: #007bff;
+  /* yellow */
   color: #fff;
 }
 
 /* Third button (Remove) */
 .sfc-action-bar button:nth-child(3) {
-  background: #dc3545; /* red */
+  background: #dc3545;
+  /* red */
 }
 
 /* Hover effect override */
@@ -582,7 +629,7 @@ td.action-column {
 // Solution 2: Enhanced action column with dynamic positioning
 .action-column {
   position: relative; // Ensure proper stacking context
-  
+
   .action-dropdown {
     position: relative;
     display: inline-block;
@@ -657,11 +704,13 @@ td.action-column {
         display: flex;
         align-items: center;
         font-size: 1rem;
-        color: #4b5563;;
+        color: #4b5563;
+        ;
         cursor: pointer;
         transition: all 0.15s;
-        span{
-          font-family:  var(--font-family);
+
+        span {
+          font-family: var(--font-family);
           font-size: 1rem;
         }
 
@@ -700,7 +749,7 @@ td.action-column {
   height: 100vh;
   pointer-events: none;
   z-index: 999999;
-  
+
   .dropdown-menu {
     position: absolute;
     top: 100%;

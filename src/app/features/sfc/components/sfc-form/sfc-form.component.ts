@@ -1,5 +1,5 @@
 // Updated sfc-form.component.ts - Modified methods for row-specific actions
-import { Component, Input, Output, EventEmitter, OnDestroy, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, Validators } from '@angular/forms';
 import { CustomCalendarComponent } from './custom-calendar/custom-calendar.component';
@@ -77,6 +77,9 @@ export class SfcFormComponent implements OnDestroy {
 
   // Add property to track open dropdown
   openDropdownIndex: number | null = null;
+
+  // Anchor to scroll to the top of the form
+  @ViewChild('sfcFormTop') sfcFormTop!: ElementRef<HTMLDivElement>;
 
   // Add this method to handle date selection
   onDateSelected(date: string) {
@@ -251,13 +254,19 @@ export class SfcFormComponent implements OnDestroy {
     this.submitted = false;
 }
 
-
+  // Enter edit mode for a specific entry without replacing the Proxy
   editEntry(entry: any) {
     this.editingIndex = this.entries.indexOf(entry);
     this.editId = entry.id;
-    console.log(entry)
-    this.newEntry = { ...entry };
+    console.log(entry);
+    // Preserve the Proxy so that setter keeps recomputing isSFCFormValid
+    Object.assign(this.newEntry, entry);
+    // Recompute validity once after loading the entry
+    this.isSFCFormValid = this.isFormValid();
     this.openDropdownIndex = null; // Close dropdown after action
+
+    // Smoothly scroll to the form top when entering edit mode (after DOM updates)
+    setTimeout(() => this.sfcFormTop?.nativeElement?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
   }
 
   
@@ -268,12 +277,12 @@ addEntry() {
     this.newEntry.date,
     this.newEntry.name,
     this.newEntry.patientId,
-    this.newEntry.ageRelation,
-    this.newEntry.profileOccupation,
-    this.newEntry.smilinePatient,
-    this.newEntry.doctorFrontOfficeComment,
-    this.newEntry.doctorAdvice,
-    this.newEntry.frontOfficeRemarks
+    // this.newEntry.ageRelation,
+    // this.newEntry.profileOccupation,
+    // this.newEntry.smilinePatient,
+    // this.newEntry.doctorFrontOfficeComment,
+    // this.newEntry.doctorAdvice,
+    // this.newEntry.frontOfficeRemarks
   ];
 
   const isEmpty = requiredFields.some(field => !field || field.toString().trim() === '');
@@ -522,9 +531,13 @@ toggleDropdown(i: number, event: MouseEvent) {
   }
 
   isFormValid(): boolean {
+    const requirePatientSearch = this.editId === null; // only in add mode
+    const patientIdInvalid = this.isFieldInvalid('patientId');
+    const patientSearchInvalid = requirePatientSearch && (this.patientSearchResults.length === 0 && this.newEntry.patientId.trim().length >= 2);
+
     const formValidity = !this.isFieldInvalid('date') 
     && !this.isFieldInvalid('name') 
-    && !(this.isFieldInvalid('patientId') || (this.patientSearchResults.length === 0 && this.newEntry.patientId.trim().length >= 2))
+    && !(patientIdInvalid || patientSearchInvalid)
     && !this.isFieldInvalid('ageRelation')
     && !this.isFieldInvalid('profileOccupation')
     && !this.isFieldInvalid('smilinePatient')

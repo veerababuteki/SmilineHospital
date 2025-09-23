@@ -255,13 +255,35 @@ export class FilesComponent implements OnInit {
     }
     
     deleteFiles(): void {
+      // Guard: must select at least one
+      if (this.selectedFileIds.length === 0) {
+        alert('Please select at least one file to delete.');
+        return;
+      }
+
+      // Confirm with user
+      const ok = confirm('Do you want to delete the selected file(s)?');
+      if (!ok) return;
+
+      // Delete all selected, then reload once all are done
+      let remaining = this.selectedFileIds.length;
       this.selectedFileIds.forEach(id => {
-        this.fileService.deleteFile(id).subscribe((res: any) => {
-          if(this.patientId){
-            this.loadPatientData(this.patientId);
+        this.fileService.deleteFile(id).subscribe({
+          next: () => {
+            if (this.patientId) {
+              this.loadPatientData(this.patientId);
+            }
+          },
+          error: () => {
+            // even on error, continue countdown so UI isn't stuck
+          },
+          complete: () => {
+            remaining -= 1;
+            if (remaining === 0) {
+              window.location.reload();
+            }
           }
         });
-        window.location.reload();
       });
     }
     
