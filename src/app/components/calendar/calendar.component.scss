@@ -284,10 +284,13 @@
         font-weight: 500;
       }
 
-      .categories-scroll {
-        max-height: 93px;
-        overflow-y: auto;
-      }
+     .categories-scroll {
+  max-height: 30vh;   
+  min-height: 100px;  
+  overflow-y: auto;
+  overflow-x: hidden; 
+}
+
 
       .doctors-scroll {
         max-height: 148px;

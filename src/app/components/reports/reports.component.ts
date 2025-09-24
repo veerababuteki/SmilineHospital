@@ -448,49 +448,66 @@ export class ReportsComponent implements OnInit {
         });
     }
 
-    private loadAmountDueData() {
-    this.reportsService.getAmountDue(this.selectedPractice.branch_id).subscribe(res => {
-        const summary = res.data.summary;
-        const data = res.data.data;
+  private loadAmountDueData() {
+  this.reportsService.getAmountDue(this.selectedPractice.branch_id).subscribe(res => {
+    const summary = res.data.summary;
+    const data = res.data.data;
 
-        this.summaryData = {
-            totalAmountDue: summary.total_due,
-        };
+    this.summaryData = {
+      totalAmountDue: summary.total_due,
+    };
 
-        this.detailsColumns = [
-            { field: 'sNo', header: 'S.No.' },
-            { field: 'name', header: 'Name' },
-            { field: 'amountDue', header: 'Amount Due (INR)' },
-            { field: 'lastPayment', header: 'Last Payment (INR)' },
-            { field: 'lastInvoiceDate', header: 'Last Invoice Date' },
-        ];
+    this.detailsColumns = [
+      { field: 'sNo', header: 'S.No.' },
+      { field: 'name', header: 'Name' },
+      { field: 'amountDue', header: 'Amount Due (INR)' },
+      { field: 'lastPayment', header: 'Last Payment (INR)' },
+      { field: 'lastInvoiceDate', header: 'Last Invoice Date' },
+    ];
 
-        this.detailsData = [];
+    this.detailsData = [];
 
-        if (!data || data.length === 0) {
-            return;
-        }
+    if (!data || data.length === 0) {
+      return;
+    }
 
-        data.forEach((app: any, index: number) => {
-            let invoiceDate: string | null = '-';
-            let paymentAmount: number | null = null;
+    data.forEach((app: any, index: number) => {
+      let lastInvoiceDate: string = '-';
+      if (app.last_invoice && app.last_invoice.includes(' on ')) {
+        const [amount, date] = app.last_invoice.split(' on ');
+        lastInvoiceDate = `₹${parseFloat(amount.replace(/,/g, '')).toFixed(2)} on ${date}`;
+      } else if (app.last_invoice) {
+        lastInvoiceDate = `₹${parseFloat(app.last_invoice.replace(/,/g, '')).toFixed(2)}`;
+      }
 
-            if (app.last_invoice && app.last_invoice.includes(" on ")) {
-                const [amount, date] = app.last_invoice.split(" on ");
-                paymentAmount = parseFloat(amount.replace(/,/g, '')) || null; // fix here
-                invoiceDate = date || '-';
-            }
+let lastPaymentDisplay: string = 'Not found';
+let lastPaymentAmount: number | null = null;
 
-            this.detailsData.push({
-                sNo: index + 1,
-                name: app.patient_name,
-                amountDue: parseFloat((app.amount_due || '0').toString().replace(/,/g, '')),
-                lastPayment: paymentAmount,
-                lastInvoiceDate: invoiceDate,
-            });
-        });
-    });
+if (app.last_payment && app.last_payment.includes(' on ')) {
+    const [amount, date] = app.last_payment.split(' on ');
+    lastPaymentAmount = parseFloat(amount.replace(/,/g, ''));
+    lastPaymentDisplay = `₹${lastPaymentAmount.toFixed(2)} on ${date}`;
+} else if (app.last_payment) {
+    lastPaymentAmount = parseFloat(app.last_payment.replace(/,/g, '')) || null;
+    lastPaymentDisplay = lastPaymentAmount !== null 
+        ? `₹${lastPaymentAmount.toFixed(2)}`
+        : 'Not found';
+} else {
+    lastPaymentDisplay = 'Not found';
 }
+
+      this.detailsData.push({
+        sNo: index + 1,
+        name: app.patient_name,
+        amountDue: parseFloat((app.amount_due || '0').toString().replace(/,/g, '')),
+        lastPaymentAmount: lastPaymentAmount,
+        lastPaymentDisplay: lastPaymentDisplay,
+        lastInvoiceDate: lastInvoiceDate,
+      });
+    });
+  });
+}
+
     
    private loadPatientsData() {
   this.reportsService

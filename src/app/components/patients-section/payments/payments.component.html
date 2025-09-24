@@ -2,42 +2,34 @@
 <div class="appointments-container">
   <div class="appointments-header">
     <h2>PAYMENTS</h2>
-<ng-container *ngIf="payments && (payments | keyvalue).length > 0; else noPayments">
-      <div class="filter-options"
-           style="display: inline-flex; gap: 16px; margin-right: 380px; align-items: center; font-size: 14px;">
-        <label style="cursor: pointer;">
-          <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="all" checked>
-          All
-        </label>
-        <label style="cursor: pointer;">
-          <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="advance">
-          Advance Payments
-        </label>
-        <label style="cursor: pointer;">
-          <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="invoice">
-          Invoices
-        </label>
-      </div>
-    </ng-container>
+    <div class="filter-options"
+         style="display: inline-flex; gap: 16px; margin-right: 380px; align-items: center; font-size: 14px;">
+      <label style="cursor: pointer;">
+        <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="all" checked>
+        All
+      </label>
+      <label style="cursor: pointer;">
+        <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="advance">
+        Advance Payments
+      </label>
+      <label style="cursor: pointer;">
+        <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="invoice">
+        Invoices
+      </label>
+    </div>
 
-    <ng-template #noPayments>
-  <div style="text-align:center; color:#777; font-size:14px; padding:20px;">
-    No payments to show.
-  </div>
-</ng-template>
     <div>
       <button class="add-btn" (click)="navigateToAddPayment()">+ Add</button>
     </div>
   </div>
-  <div>
-    <div *ngFor="let date of getSortedDates()">
+
+  <!-- Show when no payments match current filter -->
+  <ng-container *ngIf="filteredDates.length > 0; else noPayments">
+    <div *ngFor="let date of filteredDates">
       <div class="appointment-date">{{ date | date: 'dd MMM, yyyy'}}</div>
 
-      <div class="treatment-plan" *ngFor="let payment of payments[date]">
-        <table class="completed-procedures"
-               *ngIf="paymentFilter === 'all' 
-                       || (paymentFilter === 'advance' && payment.towards === 'Advance Payment') 
-                       || (paymentFilter === 'invoice' && payment.towards === 'Invoice Payment')">
+      <div class="treatment-plan" *ngFor="let payment of getFilteredPaymentsByDate(date)">
+        <table class="completed-procedures">
           <thead>
             <tr>
               <th class="procedure-col">RECEIPT NUMBER</th>
@@ -50,12 +42,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="procedure-row" >
+            <tr class="procedure-row">
               <td class="reference-col">{{payment.receipt_id}}</td>
               <td class="reference-col">{{ payment.reference_number || 'N/A' }}</td>
               <td class="cost-col">{{ payment.amount_paid | number:'1.2-2' }}</td>
               <td class="discount-col">
-                <ng-container  *ngIf="payment?.invoice_id; else noInvoice">
+                <ng-container *ngIf="payment?.invoice_id; else noInvoice">
                   <div *ngFor="let inv of payment.invoice_id.split(',,')">
                     {{ inv.trim() }}
                   </div>
@@ -64,49 +56,52 @@
               </td>
               <td class="total-col">{{payment.towards}}</td>
               <td class="notes-col">{{payment.payment_method}}</td>
-
               <td class="metadata-col">
-  <button type="button" 
-          class="p-button p-button-text p-button-rounded" 
-          (click)="openInvoiceMetadata(payment.invoices_data)"
-          style="padding:4px; min-width:30px;">
-    <i class="pi pi-eye" style="font-size: 1.2rem;"></i>
-  </button>
-</td>
+                <button type="button"
+                        class="p-button p-button-text p-button-rounded"
+                        (click)="openInvoiceMetadata(payment.invoices_data)"
+                        style="padding:4px; min-width:30px;">
+                  <i class="pi pi-eye" style="font-size: 1.2rem;"></i>
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-  </div>
+  </ng-container>
+
+  <ng-template #noPayments>
+     <div class="no-payment-container" style="text-align:center; margin:20px;">
+        <img class="icon" src="assets/payments.png" />
+        <h3>No payments to show.</h3>
+    </div>
+  </ng-template>
 </div>
 
 <p-dialog
-    [(visible)]="showInvoiceDialog" 
-    [modal]="true" 
-    [closable]="true" 
-    [style]="{width:'420px'}" 
+    [(visible)]="showInvoiceDialog"
+    [modal]="true"
+    [closable]="true"
+    [style]="{width:'420px'}"
     (onHide)="closeInvoiceDialog()"
 >
   <ng-container *ngIf="selectedInvoiceData?.length">
-    <div *ngFor="let invoice of selectedInvoiceData" 
+    <div *ngFor="let invoice of selectedInvoiceData"
          style="margin-bottom:20px; padding:15px; border-radius:8px; border:1px solid #e0e0e0; background-color:#fafafa;">
       <div style="font-size:16px; font-weight:600; margin-bottom:5px; color:#333;">
         Invoice ID: {{invoice.invoice_id}}
       </div>
       <div style="margin-bottom:10px; color:#555;">
-        Amount Applied: <strong>{{invoice.amount_applied | number:'1.2-2'}}</strong>
+        Amount Applied: <strong>{{ getTotalAmountApplied(invoice) | number:'1.2-2' }}</strong>
       </div>
 
       <div style="margin-left:10px;">
-        <div *ngFor="let t of invoice.treatments" 
+        <div *ngFor="let t of invoice.treatments"
              style="padding:8px; margin-bottom:8px; border-left:3px solid #4caf50; background-color:#f9f9f9; border-radius:4px;">
           <div style="color:#444; font-size:14px; margin-bottom:2px;">
             <strong>Treatment Name:</strong> {{t.treatment_name}}
           </div>
-          <!-- <div style="color:#444; font-size:14px; margin-bottom:2px;">
-            <strong>Treatment Unique ID:</strong> {{t.treatment_unique_id}}
-          </div> -->
           <div style="color:#444; font-size:14px; margin-bottom:2px;">
             <strong>From Advance:</strong> {{t.from_advance}}
           </div>

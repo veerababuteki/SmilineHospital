@@ -2,33 +2,33 @@
   <div class="appointments-header">
     <h2>INVOICES</h2>
 
-<div 
-  class="filter-options" 
-  style="
-    display: inline-flex; 
-    gap: 16px; 
-    align-items: center; 
-    font-size: 14px; 
-    position: absolute;      /* fix position */
-    top: 50%;                /* center vertically in header */
-    left: 28%;               /* start from center horizontally */
-    transform: translate(-50%, -50%); /* truly center */
-    white-space: nowrap;     /* prevent wrapping */
-  "
->
-  <label style="cursor:pointer;">
-    <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="all" checked> All
-  </label>
-  <label style="cursor:pointer;">
-    <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="Paid"> Paid
-  </label>
-  <label style="cursor:pointer;">
-    <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="Partial"> Partial
-  </label>
-  <label style="cursor:pointer;">
-    <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="Pending"> Pending
-  </label>
-</div>
+    <div 
+      class="filter-options" 
+      style="
+        display: inline-flex; 
+        gap: 16px; 
+        align-items: center; 
+        font-size: 14px; 
+        position: absolute;      /* fix position */
+        top: 50%;                /* center vertically in header */
+        left: 28%;               /* start from center horizontally */
+        transform: translate(-50%, -50%); /* truly center */
+        white-space: nowrap;     /* prevent wrapping */
+      "
+    >
+      <label style="cursor:pointer;">
+        <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="all" checked> All
+      </label>
+      <label style="cursor:pointer;">
+        <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="Paid"> Paid
+      </label>
+      <label style="cursor:pointer;">
+        <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="Partial"> Partial
+      </label>
+      <label style="cursor:pointer;">
+        <input type="radio" name="paymentFilter" [(ngModel)]="paymentFilter" value="Pending"> Pending
+      </label>
+    </div>
 
     <div>
       <button class="mark-btn" *ngIf="selectedInvoiceList.length == 0">
@@ -45,208 +45,214 @@
     </div>
   </div>
 
-  <div *ngFor="let date of getSortedDates()">
-    <div class="appointment-date">{{ date | date : "dd MMM, yyyy" }}</div>
+  <ng-container *ngIf="hasFilteredInvoices(); else noInvoices">
+    <div *ngFor="let date of getSortedDates()">
+      <ng-container *ngIf="hasInvoicesForDate(date)">
+        <div class="appointment-date">{{ date | date : "dd MMM, yyyy" }}</div>
 
-    <div *ngFor="let invoiceGroup of invoices[date] | keyvalue">
-      <!-- Use ng-container for filtering -->
-      <ng-container *ngIf="paymentFilter === 'all' || paymentFilter === invoiceGroup.value[0].payment_status">
-        <div
-          class="treatment-plan"
-          [ngClass]="{ 'selected-invoice': invoiceGroup.value[0].isChecked }"
-        >
-          <table class="invoice-table table-condensed">
-            <thead class="border-bottom">
-              <tr>
-                <th class="invoice-header">
-                  <div class="payment-status"
-                    [ngClass]="{
-                      'paid': invoiceGroup.value[0].payment_status === 'Paid',
-                      'partial': invoiceGroup.value[0].payment_status === 'Partial',
-                      'pending': invoiceGroup.value[0].payment_status === 'Pending'
-                    }">
-                    {{ invoiceGroup.value[0].payment_status }}
-                  </div>
+        <div *ngFor="let invoiceGroup of invoices[date] | keyvalue">
+          <!-- Use ng-container for filtering -->
+          <ng-container *ngIf="paymentFilter === 'all' || paymentFilter === invoiceGroup.value[0].payment_status">
+            <div
+              class="treatment-plan"
+              [ngClass]="{ 'selected-invoice': invoiceGroup.value[0].isChecked }"
+            >
+              <table class="invoice-table table-condensed">
+                <thead class="border-bottom">
+                  <tr>
+                    <th class="invoice-header">
+                      <div class="payment-status"
+                        [ngClass]="{
+                          'paid': invoiceGroup.value[0].payment_status === 'Paid',
+                          'partial': invoiceGroup.value[0].payment_status === 'Partial',
+                          'pending': invoiceGroup.value[0].payment_status === 'Pending'
+                        }">
+                        {{ invoiceGroup.value[0].payment_status }}
+                      </div>
 
-                  <input
-                    type="checkbox"
-                    *ngIf="['Partial', 'Pending'].includes(invoiceGroup.value[0].payment_status)"
-                    [(ngModel)]="invoiceGroup.value[0].isChecked"
-                    (change)="onCheckboxChange(invoiceGroup.value, invoiceGroup.key)"
-                    style="
-                      transform: scale(1.15);
-                      margin-right: 10px;
-                      vertical-align: middle;
-                      float: left;
-                    "
-                  />
-                  Invoice Number
-                </th>
-                <th width="70%">
-                  <table class="full-table">
-                    <thead>
-                      <tr>
-                        <th class="name" style="width: 25%">Treatments & Products</th>
-                        <th class="teeth_set" style="width: 10%">Teeth</th>
-                        <th class="notes" style="width: 25%">Notes</th>
-                        <th class="amount" style="width: 10%">Cost</th>
-                        <th class="amount" style="width: 10%">Discount</th>
-                        <th class="amount" style="width: 10%">Tax</th>
-                        <th class="amount" style="width: 10%">Total</th>
-                      </tr>
-                    </thead>
-                  </table>
-                </th>
-
-                <th width="65">
-                  <div class="actions">
-                    <app-invoice-print [invoice]="invoiceGroup"></app-invoice-print>
-                    <div
-                      *ngIf="invoiceGroup.value[0].payment_status === 'Pending'"
-                      class="action-menu"
-                    >
-                      <button
-                        #menuButton
-                        type="button"
-                        pButton
-                        icon="pi pi-chevron-down"
-                        class="edit-btn border-right-radius p-button-text"
-                        (click)="
-                          invoiceMenu.toggle($event);
-                          setCurrentInvoice(invoiceGroup.key)
+                      <input
+                        type="checkbox"
+                        *ngIf="['Partial', 'Pending'].includes(invoiceGroup.value[0].payment_status)"
+                        [(ngModel)]="invoiceGroup.value[0].isChecked"
+                        (change)="onCheckboxChange(invoiceGroup.value, invoiceGroup.key)"
+                        style="
+                          transform: scale(1.15);
+                          margin-right: 10px;
+                          vertical-align: middle;
+                          float: left;
                         "
-                        style="position: relative; top: -10px; left: -15px;"
-                      ></button>
+                      />
+                      Invoice Number
+                    </th>
+                    <th width="70%">
+                      <table class="full-table">
+                        <thead>
+                          <tr>
+                            <th class="name" style="width: 25%">Treatments & Products</th>
+                            <th class="teeth_set" style="width: 10%">Teeth</th>
+                            <th class="notes" style="width: 25%">Notes</th>
+                            <th class="amount" style="width: 10%">Cost</th>
+                            <th class="amount" style="width: 10%">Discount</th>
+                            <th class="amount" style="width: 10%">Tax</th>
+                            <th class="amount" style="width: 10%">Total</th>
+                          </tr>
+                        </thead>
+                      </table>
+                    </th>
 
-                      <p-menu #invoiceMenu [popup]="true" [model]="items"></p-menu>
-                    </div>
-                  </div>
-                </th>
-              </tr>
-            </thead>
+                    <th width="65">
+                      <div class="actions">
+                        <app-invoice-print [invoice]="invoiceGroup"></app-invoice-print>
+                        <div
+                          *ngIf="invoiceGroup.value[0].payment_status === 'Pending'"
+                          class="action-menu"
+                        >
+                          <button
+                            #menuButton
+                            type="button"
+                            pButton
+                            icon="pi pi-chevron-down"
+                            class="edit-btn border-right-radius p-button-text"
+                            (click)="
+                              invoiceMenu.toggle($event);
+                              setCurrentInvoice(invoiceGroup.key)
+                            "
+                            style="position: relative; top: -10px; left: -15px;"
+                          ></button>
 
-            <tbody>
-              <tr>
-                <td class="invoice-number-cell">
-                  <label class="invoice-label">
-                    <i
-                      *ngIf="invoiceGroup.value[0].payment_status !== 'Pending'"
-                      class="pi pi-indian-rupee"
-                      style="font-size: 12px; vertical-align: middle; margin-top: 2px; font-weight: bold;"
-                    ></i>
-                    <a class="invoice-link">{{ invoiceGroup.key }}</a>
-                  </label>
+                          <p-menu #invoiceMenu [popup]="true" [model]="items"></p-menu>
+                        </div>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
 
-                  <table class="invoice-details">
-                    <tbody>
-                      <tr>
-                        <td colspan="2">
-                          <div *ngIf="invoiceGroup.value[0].due_amount > 0">Due</div>
-                          <div 
-                            class="amount" 
-                            *ngIf="invoiceGroup.value[0].due_amount > 0"
-                            [ngClass]="{ 'red': invoiceGroup.value[0].due_amount > 0 }">
-{{ invoiceTotals[invoiceGroup.key].due_amount | number:'1.2-2' }}
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div>Total</div>
-                          <div class="amount">
-{{ invoiceTotals[invoiceGroup.key].total_amount | number:'1.2-2' }}
-                          </div>
-                        </td>
-                        <td>
-                          <div>Paid</div>
-                          <div
-                            class="amount"
-                            *ngIf="invoiceGroup.value[0].payment_status !== 'Pending'"
-                          >
-{{ invoiceTotals[invoiceGroup.key].total_amount - invoiceTotals[invoiceGroup.key].due_amount | number:'1.2-2' }}                           </div>
-                          <div
-                            class="amount"
-                            *ngIf="invoiceGroup.value[0].payment_status === 'Pending'"
-                          >
-                            0
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </td>
+                <tbody>
+                  <tr>
+                    <td class="invoice-number-cell">
+                      <label class="invoice-label">
+                        <i
+                          *ngIf="invoiceGroup.value[0].payment_status !== 'Pending'"
+                          class="pi pi-indian-rupee"
+                          style="font-size: 12px; vertical-align: middle; margin-top: 2px; font-weight: bold;"
+                        ></i>
+                        <a class="invoice-link">{{ invoiceGroup.key }}</a>
+                      </label>
 
-                <td class="treatments-cell">
-                  <table class="treatments-table" style="width: 100%">
-                    <tbody *ngFor="let invc of getInvoiceGroupValues(invoiceGroup)">
-                      <tr>
-                        <td class="name" style="width: 25%">
-                          <a
-                            class="treatment-link"
-                            [routerLink]="[
-                              '/patients',
-                              invc.treatment_plans.patient_details_treat.patient_id,
-                              'completed-procedures',
-                              invc.treatment_plans.patient_details_treat.unique_code
-                            ]"
-                          >
-                            {{ invc.treatment_plans.procedure_details.name }}
-                          </a>
-                        </td>
-                        <td class="teeth_set" style="width: 10%">
-                          <div class="teeth-hover-container">
-                            <span class="initial-teeth">{{
-                              getInitialTeeth(invc.treatment_plans.teeth_set)
-                            }}</span>
-                            <span class="hover-teeth">{{
-                              invc.treatment_plans.teeth_set
-                            }}</span>
-                          </div>
-                        </td>
-                        <td class="notes" style="width: 25%">
-                          {{ invc.treatment_plans.notes }}
-                        </td>
-                        <td class="amount" style="width: 10%">
-                          {{ invc.treatment_plans.cost }}
-                        </td>
-                        <td class="amount" style="width: 10%">
-                          {{
-                            invc.treatment_plans.discount +
-                              " " +
-                              invc.treatment_plans.discount_formate
-                          }}
-                        </td>
-                        <td class="amount" style="width: 10%">0.00</td>
-                        <td class="amount" style="width: 10%">
-                          {{ invc.treatment_plans.total_cost }}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colspan="7">
-                         <p class="completed-by">
-  <span>Completed by</span>
-  <strong>
-    {{
-      (invc.treatment_plans.doctor_details_treat.user_profile_details[0].first_name?.toLowerCase().startsWith('dr')
-        ? ''
-        : 'Dr. ')
-      + (invc.treatment_plans.doctor_details_treat.user_profile_details[0].first_name || '')
-      + ' '
-      + (invc.treatment_plans.doctor_details_treat.user_profile_details[0].last_name || '')
-    }}
-  </strong>
-</p>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
+                      <table class="invoice-details">
+                        <tbody>
+                          <tr>
+                            <td colspan="2">
+                              <div *ngIf="invoiceGroup.value[0].due_amount > 0">Due</div>
+                              <div 
+                                class="amount" 
+                                *ngIf="invoiceGroup.value[0].due_amount > 0"
+                                [ngClass]="{ 'red': invoiceGroup.value[0].due_amount > 0 }">
+                                {{ invoiceTotals[invoiceGroup.key].due_amount | number:'1.2-2' }}
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div>Total</div>
+                              <div class="amount">
+                                {{ invoiceTotals[invoiceGroup.key].total_amount | number:'1.2-2' }}
+                              </div>
+                            </td>
+                            <td>
+                              <div>Paid</div>
+                              <div
+                                class="amount"
+                                *ngIf="invoiceGroup.value[0].payment_status !== 'Pending'">
+                                {{ invoiceTotals[invoiceGroup.key].total_amount - invoiceTotals[invoiceGroup.key].due_amount | number:'1.2-2' }}
+                              </div>
+                              <div
+                                class="amount"
+                                *ngIf="invoiceGroup.value[0].payment_status === 'Pending'">
+                                0
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+
+                    <td class="treatments-cell">
+                      <table class="treatments-table" style="width: 100%">
+                        <tbody *ngFor="let invc of getInvoiceGroupValues(invoiceGroup)">
+                          <tr>
+                            <td class="name" style="width: 25%">
+                              <a
+                                class="treatment-link"
+                                [routerLink]="[
+                                  '/patients',
+                                  invc.treatment_plans.patient_details_treat.patient_id,
+                                  'completed-procedures',
+                                  invc.treatment_plans.patient_details_treat.unique_code
+                                ]"
+                              >
+                                {{ invc.treatment_plans.procedure_details.name }}
+                              </a>
+                            </td>
+                            <td class="teeth_set" style="width: 10%">
+                              <div class="teeth-hover-container">
+                                <span class="initial-teeth">
+                                  {{ getInitialTeeth(invc.treatment_plans.teeth_set) }}
+                                </span>
+                                <span class="hover-teeth">
+                                  {{ invc.treatment_plans.teeth_set }}
+                                </span>
+                              </div>
+                            </td>
+                            <td class="notes" style="width: 25%">
+                              {{ invc.treatment_plans.notes }}
+                            </td>
+                            <td class="amount" style="width: 10%">
+                              {{ invc.treatment_plans.cost }}
+                            </td>
+                            <td class="amount" style="width: 10%">
+                              {{ invc.treatment_plans.discount + " " + invc.treatment_plans.discount_formate }}
+                            </td>
+                            <td class="amount" style="width: 10%">0.00</td>
+                            <td class="amount" style="width: 10%">
+                              {{ invc.treatment_plans.total_cost }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colspan="7">
+                              <p class="completed-by">
+                                <span>Completed by</span>
+                                <strong>
+                                  {{
+                                    (invc.treatment_plans.doctor_details_treat.user_profile_details[0].first_name?.toLowerCase().startsWith('dr')
+                                      ? ''
+                                      : 'Dr. ')
+                                    + (invc.treatment_plans.doctor_details_treat.user_profile_details[0].first_name || '')
+                                    + ' '
+                                    + (invc.treatment_plans.doctor_details_treat.user_profile_details[0].last_name || '')
+                                  }}
+                                </strong>
+                              </p>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </ng-container>
         </div>
       </ng-container>
     </div>
-  </div>
+  </ng-container>
+
+  <ng-template #noInvoices>
+     <div class="no-invoice-container" style="text-align:center; margin:20px;">
+        <img class="icon" src="assets/invoices.png" />
+        <h3> No invoices available.</h3>
+    </div>
+  </ng-template>
 </div>
