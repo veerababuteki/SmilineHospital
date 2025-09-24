@@ -13,6 +13,7 @@ import { MessageService } from '../../../services/message.service';
 import { PatientDataService } from '../../../services/patient-data.service';
 import { AppointmentComponent } from '../../appointment/appointment.component';
 import { AuthService } from '../../../services/auth.service';
+import { DoctorNameService } from '../../../services/doctor-name.service';
 
 @Component({
   selector: 'app-add-completed-procedures',
@@ -55,6 +56,7 @@ export class AddCompletedProceduresComponent implements OnInit {
     private route: ActivatedRoute,
     private authService: AuthService,
     private patientDataService: PatientDataService,
+    private doctorNameService: DoctorNameService,
   ) {
     this.initForm();
     const navigation = this.router.getCurrentNavigation();
@@ -94,11 +96,19 @@ export class AddCompletedProceduresComponent implements OnInit {
     currentUser: this.authService.getUser()
   }).subscribe({
     next: ({ doctors, categories, currentUser }) => {
-      this.doctors = doctors.data.map((doc: any) => ({
-        name: doc.first_name + " " + doc.last_name,
-        user_id: doc.user_id,
-        label: doc.first_name + " " + doc.last_name,
-        value: doc.user_id
+      const mapped: Array<{ name: string; user_id: any }> = doctors.data.map((doc: any) => ({
+        name: `${doc.first_name} ${doc.last_name}`.trim(),
+        user_id: doc.user_id
+      }));
+      // Format with Dr. and sort by name while preserving user_id
+      const formatted: Array<{ name: string; user_id: any }> = mapped
+        .map((d: { name: string; user_id: any }) => ({ ...d, name: this.doctorNameService.formatDoctorName(d.name) }))
+        .sort((a: { name: string; user_id: any }, b: { name: string; user_id: any }) => a.name.localeCompare(b.name));
+      this.doctors = formatted.map((d: { name: string; user_id: any }) => ({
+        name: d.name,
+        user_id: d.user_id,
+        label: d.name,
+        value: d.user_id
       }));
 
       this.categories = categories.data.rows.map((cat: any) => ({

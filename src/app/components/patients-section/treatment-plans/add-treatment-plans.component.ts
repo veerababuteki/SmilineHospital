@@ -11,6 +11,8 @@ import { format } from 'date-fns';
 import { MessageService } from '../../../services/message.service';
 import { PatientDataService } from '../../../services/patient-data.service';
 import { forkJoin } from 'rxjs';
+import { DoctorNameService } from '../../../services/doctor-name.service';
+
 
 @Component({
   selector: 'app-add-treatment-plans',
@@ -54,7 +56,8 @@ export class AddTreatmentPlansComponent implements OnInit {
     private patientDataService: PatientDataService,
     private treatmentPlansService: TreatmentPlansService,
     private router:Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private doctorNameService: DoctorNameService
   ) {
     this.initForm();
     const navigation = this.router.getCurrentNavigation();
@@ -91,28 +94,40 @@ export class AddTreatmentPlansComponent implements OnInit {
     }).subscribe({
       next: (results) => {
         // Process procedures
-        this.procedures = results.procedures.data.rows.map((r: any) => ({
-          name: r.name,
-          id: r.procedure_id,
-          price: r.cost
-        })).sort((a: Procedure, b: Procedure) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
-        
+        this.procedures = results.procedures.data.rows
+          .map((r: any) => ({
+            name: r.name,
+            id: r.procedure_id,
+            price: r.cost
+          }))
+          .sort((a: Procedure, b: Procedure) =>
+            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+          );
+  
         this.filteredProcedures = [...this.procedures];
-
-        // Process doctors
-        this.doctors = [];
-        results.doctors.data.forEach((doc: { first_name: string; last_name: string; user_id: any; }) => {
-          this.doctors.push({
-            name: doc.first_name + " " + doc.last_name,
+  
+        // Process doctors (with mapping, formatting, sorting)
+        const mapped = results.doctors.data.map(
+          (doc: { first_name: string; last_name: string; user_id: any }) => ({
+            name: `${doc.first_name} ${doc.last_name}`.trim(),
             user_id: doc.user_id
-          });
-        });
-
+          })
+        );
+  
+        this.doctors = mapped
+          .map((d: { name: string; user_id: any }) => ({
+            ...d,
+            name: this.doctorNameService.formatDoctorName(d.name)
+          }))
+          .sort((a: { name: string }, b: { name: string }) =>
+            a.name.localeCompare(b.name)
+          );
+  
         // Set default doctor if available
         if (this.doctors.length > 0) {
           this.doctor = this.doctors[0];
         }
-
+  
         // Now populate form if in edit mode (after both doctors and procedures are loaded)
         if (this.isEditMode && this.editTreatmentData) {
           this.populateFormWithTreatment(this.editTreatmentData);
@@ -126,6 +141,7 @@ export class AddTreatmentPlansComponent implements OnInit {
       }
     });
   }
+  
 
   private getDoctors() {
     this.userService.getDoctors('bce9f008-d447-4fe2-a29e-d58d579534f0').subscribe(res => {

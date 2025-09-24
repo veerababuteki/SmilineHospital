@@ -31,6 +31,7 @@ import { AddProfileComponent } from '../patients-section/edit-profile/add-profil
 import { AppointmentsPrintComponent } from "./appointments-print/appointments-print.component";
 import { HostListener } from '@angular/core';
 import { DoctorColorService } from '../../services/doctor-color.service';
+import { DoctorNameService } from '../../services/doctor-name.service';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 interface Doctor {
@@ -259,7 +260,7 @@ export class CalendarComponent implements OnInit {
   displayPrintAppointment = false;
   doctorColorMap: { [doctorId: string]: string } = {};
   constructor(private dialogService: DialogService, private overlay: Overlay, private datePipe: DatePipe, private elementRef: ElementRef,
-    private authService: AuthService, private confirmationService: ConfirmationService, private messageService: MessageService, private userService: UserService,  private doctorColorService: DoctorColorService, private appointmentService: AppointmentService) {
+    private authService: AuthService, private confirmationService: ConfirmationService, private messageService: MessageService, private userService: UserService,  private doctorColorService: DoctorColorService, private appointmentService: AppointmentService, private doctorNameService: DoctorNameService) {
 
   }
 
@@ -399,8 +400,7 @@ export class CalendarComponent implements OnInit {
       const doctor = this.doctorsList.find(d => d.user_id === a.doctor_details?.doctor_id);
       const colorClass = doctor ? doctor.colorClass : this.doctorColorMap[a.doctor_details?.doctor_id];
       events.push({
-        title: this.isDoctor || this.isAdmin ? a.patient_details.user_profile_details[0].first_name
-          //+ a.patient_details.user_profile_details[0].last_name 
+        title: this.isDoctor || this.isAdmin ? a.patient_details.user_profile_details[0].first_name 
           : a.doctor_details?.user_profile_details[0].first_name,
         start: startDateTime,
         allDay: false,
@@ -411,7 +411,7 @@ export class CalendarComponent implements OnInit {
           patientName: a.patient_details.user_profile_details[0].first_name + ' ' + a.patient_details.user_profile_details[0].last_name,
           phone: '+91 ' + a.patient_details.phone,
           email: a.patient_details.email,
-          doctor: doctor.name,
+          doctor: this.doctorNameService.formatDoctorName(a.doctor_details ? (a.doctor_details?.user_profile_details[0].first_name + ' ' + a.doctor_details?.user_profile_details[0].last_name) : null),
           duration: a.duration + ' mins',
           appointmentTime: a.appointment_time,
           bookingType: a.booking_type === 'Offline' ? 'In-Clinic' : 'Online',
@@ -439,9 +439,8 @@ export class CalendarComponent implements OnInit {
       const doctor = this.doctorsList.find(d => d.user_id === a.doctor_details?.doctor_id);
       const colorClass = doctor ? doctor.colorClass : this.doctorColorMap[a.doctor_details?.doctor_id];
       events.push({
-        title: this.isDoctor || this.isAdmin ? a.patient_details.user_profile_details[0].first_name
-          //+ a.patient_details.user_profile_details[0].last_name 
-          : a.doctor_details?.user_profile_details[0].first_name,
+        title: this.isDoctor || this.isAdmin ? this.doctorNameService.formatDoctorName(a.patient_details.user_profile_details[0].first_name + ' ' + a.patient_details.user_profile_details[0].last_name) 
+          : this.doctorNameService.formatDoctorName(a.doctor_details?.user_profile_details[0].first_name + ' ' + a.doctor_details?.user_profile_details[0].last_name),
         //+ a.doctor_details.user_profile_details[0].last_name,
         start: startDateTime,
         allDay: false,
@@ -452,7 +451,7 @@ export class CalendarComponent implements OnInit {
           patientName: a.patient_details.user_profile_details[0].first_name + ' ' + a.patient_details.user_profile_details[0].last_name,
           phone: '+91 ' + a.patient_details.phone,
           email: a.patient_details.email,
-          doctor: a.doctor_details ? (a.doctor_details?.user_profile_details[0].first_name + ' ' + a.doctor_details?.user_profile_details[0].last_name) : null,
+          doctor: this.doctorNameService.formatDoctorName(a.doctor_details ? (a.doctor_details?.user_profile_details[0].first_name + ' ' + a.doctor_details?.user_profile_details[0].last_name) : null),
           duration: a.duration + ' mins',
           appointmentTime: a.appointment_time,
           bookingType: a.booking_type === 'Offline' ? 'In-Clinic' : 'Online',
@@ -525,7 +524,7 @@ export class CalendarComponent implements OnInit {
         this.patients = patients.data;
         this.doctorsList.forEach(doc => {
           this.doctors.push({
-            name: doc.first_name + " " + doc.last_name,
+            name: this.doctorNameService.formatDoctorName(`${doc.first_name} ${doc.last_name}`),
             user_id: doc.user_id,
             colorClass: doc.colorClass
           });
@@ -707,7 +706,7 @@ export class CalendarComponent implements OnInit {
         appointmentId: a.id,
         appointmentTime: a.appointment_time,
         patientName: a.patient_details.user_profile_details[0].first_name + ' ' + a.patient_details.user_profile_details[0].last_name,
-        doctor: a.doctor_details ? (a.doctor_details?.user_profile_details[0].first_name + ' ' + a.doctor_details?.user_profile_details[0].last_name) : null,
+        doctor: a.doctor_details ? this.doctorNameService.formatDoctorName(a.doctor_details?.user_profile_details[0].first_name + ' ' + a.doctor_details?.user_profile_details[0].last_name) : null,
         booking_type: a.booking_type,
         appointment_status: a.appointment_status,
         notes: a.notes
@@ -768,8 +767,10 @@ export class CalendarComponent implements OnInit {
         phone: '+91 ' + a.patient_details.phone,
         email: a.patient_details.email,
         doctor: a.doctor_details
-          ? (a.doctor_details?.user_profile_details[0].first_name + ' ' +
-             a.doctor_details?.user_profile_details[0].last_name)
+          ? this.doctorNameService.formatDoctorName(
+              a.doctor_details?.user_profile_details[0].first_name + ' ' +
+              a.doctor_details?.user_profile_details[0].last_name
+            )
           : null,
         duration: a.duration + ' mins',
         appointmentTime: a.appointment_time,

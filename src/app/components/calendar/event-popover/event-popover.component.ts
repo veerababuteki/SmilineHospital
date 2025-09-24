@@ -131,7 +131,7 @@ import { Router } from '@angular/router';
           <i class="pi pi-calendar"></i>
           <div class="appointment-details">
             <div>In-Clinic Appointment</div>
-            <div class="doctor-info" *ngIf="event.extendedProps?.doctor">with Dr.{{ event.extendedProps?.doctor}}</div>
+            <div class="doctor-info" *ngIf="event.extendedProps?.doctor">with {{ event.extendedProps?.doctor}}</div>
             <div class="time-info">
               at {{ event.extendedProps?.appointmentTime }}
               <ng-container *ngIf="getValidDuration() as dur">
