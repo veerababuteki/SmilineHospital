@@ -12,6 +12,7 @@ import { MessageService } from '../../../services/message.service';
 import { PatientDataService } from '../../../services/patient-data.service';
 import { MessageService as Toaster } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { DoctorNameService } from '../../../services/doctor-name.service';
 
 @Component({
   selector: 'app-add-invoice',
@@ -55,7 +56,8 @@ export class AddInvoiceComponent implements OnInit {
     private treatmentPlansService: TreatmentPlansService,
     private router: Router,
     private route: ActivatedRoute,
-    private toaster: Toaster
+    private toaster: Toaster,
+    private doctorNameService: DoctorNameService
   ) {
     this.initForm();
     
@@ -89,13 +91,15 @@ export class AddInvoiceComponent implements OnInit {
     return new Promise((resolve, reject) => {
       this.userService.getDoctors('bce9f008-d447-4fe2-a29e-d58d579534f0').subscribe({
         next: (res) => {
-          this.doctors = [];
-          res.data.forEach((doc: { first_name: string; last_name: string; user_id: any; }) => {
-            this.doctors.push({
-              name: doc.first_name + " " + doc.last_name,
-              user_id: doc.user_id
-            });
-          });
+          // Map to objects with name and id
+          const mapped = res.data.map((doc: { first_name: string; last_name: string; user_id: any; }) => ({
+            name: `${doc.first_name} ${doc.last_name}`.trim(),
+            user_id: doc.user_id
+          }));
+          // Format with Dr. and sort by name
+          this.doctors = mapped
+            .map((d: { name: string; user_id: any }) => ({ ...d, name: this.doctorNameService.formatDoctorName(d.name) }))
+            .sort((a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name));
           
           // Set default doctor
           if (this.doctors.length > 0) {

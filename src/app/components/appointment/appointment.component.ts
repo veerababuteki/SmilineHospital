@@ -21,9 +21,9 @@ import { Message, MessageService } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { LoaderService } from '../../services/loader.service';
 import { ToastModule } from 'primeng/toast';
-import { AddProfileComponent } from "../patients-section/edit-profile/add-profile.component";
+import { AddProfileComponent } from "../patients-section/edit-profile/add-profile.compon
+import { DoctorNameService } from '../../services/doctor-name.service';
 import { PatientDataService } from '../../services/patient-data.service';
-
 
 @Component({
   selector: 'app-appointment',
@@ -43,7 +43,7 @@ import { PatientDataService } from '../../services/patient-data.service';
     MessagesModule,
     ToastModule,
     AddProfileComponent
-],
+  ],
   providers: [MessageService]
 })
 export class AppointmentComponent implements OnInit {
@@ -123,7 +123,8 @@ export class AppointmentComponent implements OnInit {
     private patientDataService: PatientDataService,
     private appointmentService: AppointmentService, 
     private loaderService: LoaderService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private doctorNameService: DoctorNameService
   ) {}
 
   ngOnInit() {
@@ -157,12 +158,10 @@ export class AppointmentComponent implements OnInit {
 
   formatDoctorsList(){
     if (this.doctors && this.doctors.length > 0) {
-      // Sort doctors by name and add Dr. prefix
-      this.doctors = this.doctors.sort((a, b) => a.name.localeCompare(b.name))
-        .map(doctor => ({
-          ...doctor,
-          name: doctor.name.startsWith('Dr.') ? doctor.name : `Dr. ${doctor.name}`
-        }));
+      // Delegate to DoctorNameService to format and sort
+      this.doctors = this.doctorNameService
+        .formatDoctorsList(this.doctors)
+        .map(d => ({ ...d }));
     }
   }
 
