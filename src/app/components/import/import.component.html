@@ -163,10 +163,23 @@
               {{item.patientNumber || item.manual_unique_code || item.treatmentName || 'N/A'}}
             </mat-panel-title>
             <mat-panel-description>
-              Successfully Created
-              <span class="doctor-created-badge" *ngIf="item.doctorCreated" title="Doctor was auto-created">
-                <i class="pi pi-user-plus"></i> New Doctor
-              </span>
+              <ng-container *ngIf="currentImportType === 'procedure_catalog'">
+                {{item.action === 'updated' ? 'Updated' : 'Created'}}
+                <span *ngIf="item.changes" class="changes-badge">
+                  <i class="pi pi-info-circle"></i>
+                  <span class="changes-tooltip">
+                    {{item.changes.cost ? 'Cost Updated' : ''}}
+                    {{item.changes.cost && item.changes.notes ? ' & ' : ''}}
+                    {{item.changes.notes ? 'Notes Updated' : ''}}
+                  </span>
+                </span>
+              </ng-container>
+              <ng-container *ngIf="currentImportType !== 'procedure_catalog'">
+                Successfully Created
+                <span class="doctor-created-badge" *ngIf="item.doctorCreated" title="Doctor was auto-created">
+                  <i class="pi pi-user-plus"></i> New Doctor
+                </span>
+              </ng-container>
             </mat-panel-description>
           </mat-expansion-panel-header>
 

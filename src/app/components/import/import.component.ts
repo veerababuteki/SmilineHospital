@@ -580,7 +580,8 @@ export class ImportComponent implements OnInit {
         "Treatment Name",
         "Treatment Cost",
         "Treatment Notes",
-        "Locale"
+        "Status",
+        "Action"
       ]
     };
 
