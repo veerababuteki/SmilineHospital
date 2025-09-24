@@ -4,7 +4,7 @@
         <div>
             <button class="mark-btn" *ngIf="selectedFileIds.length == 0">Delete</button>
             <button class="mark-btn-active" (click)="deleteFiles()" *ngIf="selectedFileIds.length > 0">Delete</button>
-            <button class="mark-btn">Email</button>
+            <!-- <button class="mark-btn">Email</button> -->
             <input type="file" #fileInput (change)="onFileSelected($event)" multiple accept="image/*" style="display: none;">
             <button class="add-btn" (click)="fileInput.click()">+ Add</button>
         </div>

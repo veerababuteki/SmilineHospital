@@ -132,7 +132,12 @@ import { Router } from '@angular/router';
           <div class="appointment-details">
             <div>In-Clinic Appointment</div>
             <div class="doctor-info" *ngIf="event.extendedProps?.doctor">with Dr.{{ event.extendedProps?.doctor}}</div>
-            <div class="time-info">at {{ event.extendedProps?.appointmentTime }} for {{ event.extendedProps?.duration || '1 hr 30 mins' }}</div>
+            <div class="time-info">
+              at {{ event.extendedProps?.appointmentTime }}
+              <ng-container *ngIf="getValidDuration() as dur">
+                <span> for {{ dur }}</span>
+              </ng-container>
+            </div>
           </div>
           <!--  <button pButton label="No Show" class="p-button-outlined"></button> -->
         </div>
@@ -523,6 +528,33 @@ export class EventPopoverComponent {
       .join('')
       .toUpperCase()
       .slice(0, 2);
+  }
+
+  getValidDuration(): string | null {
+    const raw = this.event?.extendedProps?.duration;
+    if (raw === undefined || raw === null) {
+      return null;
+    }
+    const str = String(raw).trim();
+    if (!str) {
+      return null;
+    }
+    const lower = str.toLowerCase();
+    // Filter out common invalid representations
+    const invalidValues = new Set([
+      'null',
+      'null mins',
+      'undefined',
+      'n/a',
+      'na',
+      '0',
+      '0 min',
+      '0 mins'
+    ]);
+    if (invalidValues.has(lower)) {
+      return null;
+    }
+    return str;
   }
 
   editEvent() {

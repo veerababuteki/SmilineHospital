@@ -14,7 +14,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
+import { TableModule, Table } from 'primeng/table';
 import { CardModule } from 'primeng/card';
 import { ReportsService } from "../../services/reports.service";
 
@@ -62,6 +62,7 @@ export class ReportsComponent implements OnInit {
 
     @ViewChild('dropdownTrigger', { read: ElementRef }) dropdownTrigger!: ElementRef;
     @ViewChild('dropdownPanel', { read: ElementRef }) dropdownPanel!: ElementRef;
+    @ViewChild('dt') table!: Table;
 
     @HostListener('document:click', ['$event'])
     onDocumentClick(event: MouseEvent) {
@@ -177,20 +178,26 @@ export class ReportsComponent implements OnInit {
     }
 
     onReportCategoryChange() {
+        if (this.table) {
+            this.table.reset();
+        }
         this.loadReportData();
     }
 
     onDateChange() {
-  if (this.fromDate) {
-    this.fromDate.setHours(0, 0, 0, 0); // Start of day
-  }
+        if (this.fromDate) {
+            this.fromDate.setHours(0, 0, 0, 0); // Start of day
+        }
 
-  if (this.toDate) {
-    this.toDate.setHours(23, 59, 59, 999); // End of day
-  }
+        if (this.toDate) {
+            this.toDate.setHours(23, 59, 59, 999); // End of day
+        }
+        if (this.table) {
+            this.table.reset();
+        }
 
-  this.loadReportData();
-}
+        this.loadReportData();
+    }
 
     showDatePickers(): boolean {
         return this.selectedReportCategory?.value !== 'amount_due';
@@ -642,9 +649,9 @@ if (app.last_payment && app.last_payment.includes(' on ')) {
         printWindow.close();
         }, 250);
     };
-    }
+}
 
-    private generatePrintContent(): string {
+private generatePrintContent(): string {
     const currentDate = new Date().toLocaleDateString('en-GB', {
         day: '2-digit',
         month: 'short',
@@ -659,30 +666,62 @@ if (app.last_payment && app.last_payment.includes(' on ')) {
     let summaryHtml = this.generateSummaryHtml();
     let detailsHtml = this.generateDetailsHtml();
 
+    const clinic = this.getClinicInfo();
+
     return `
         <div class="print-header">
-        <h1>Reports</h1>
-        <div class="report-info">
-            <p><strong>Practice:</strong> ${this.selectedPractice?.branch_name || 'N/A'}</p>
-            <p><strong>Report Type:</strong> ${this.selectedReportCategory?.label || 'N/A'}</p>
-            ${dateRange ? `<p><strong>Period:</strong> ${dateRange}</p>` : ''}
-            <p><strong>Generated on:</strong> ${currentDate}</p>
-        </div>
+          <h2 class="clinic-name">${clinic.name}</h2>
+          ${clinic.address ? `<p class="clinic-address">${clinic.address}</p>` : ''}
+          ${clinic.phone ? `<p class="clinic-phone">Phone: ${clinic.phone}</p>` : ''}
+          <hr />
+          <div class="report-info" style="display: flex; align-items: left; flex-direction: column;">
+              <p><strong>Practice:</strong> ${this.selectedPractice?.branch_name || 'N/A'}</p>
+              <p><strong>Report Type:</strong> ${this.selectedReportCategory?.label || 'N/A'}</p>
+              ${dateRange ? `<p><strong>Period:</strong> ${dateRange}</p>` : ''}
+              <p><strong>Generated on:</strong> ${currentDate}</p>
+          </div>
         </div>
 
         <div class="print-summary">
-        <h2>Summary</h2>
-        ${summaryHtml}
+          <h2>Summary</h2>
+          ${summaryHtml}
         </div>
 
         <div class="print-details">
-        <h2>Details</h2>
-        ${detailsHtml}
+          <h2>Details</h2>
+          ${detailsHtml}
         </div>
     `;
-    }
+}
 
-    private generateSummaryHtml(): string {
+private getClinicInfo(): { name: string; address: string; phone: string } {
+    const name = 'SMILINE DENTAL HOSPITALS';
+    const branchId = this.selectedPractice?.branch_id;
+    switch (branchId) {
+        case 1:
+            return {
+                name,
+                address: '#8-3-952/10/2&2/1, Smiline House, Srinagar Colony, Panjagutta, Hyderabad-500073',
+                phone: '040 4200 0024'
+            };
+        case 2:
+            return {
+                name,
+                address: 'Matha Bhuvaneswari Society, Plot No. 4, Opp. CGS India Pvt Ltd, Siddhi Vinayak Nagar, Madhapur, Khanammet, Hyderabad, Telangana 500081',
+                phone: '040 2980 4422'
+            };
+        case 3:
+            return {
+                name,
+                address: '6th Floor, Pavani Encore Survey 342/P, Narsing Nanakramguda Service Rd, Khajaguda, Hyderabad, Telangana 500075',
+                phone: '088899 98353'
+            };
+        default:
+            return { name, address: '', phone: '' };
+    }
+}
+
+private generateSummaryHtml(): string {
     const categoryValue = this.selectedReportCategory?.value;
     
     switch (categoryValue) {

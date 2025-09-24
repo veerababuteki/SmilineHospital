@@ -9,10 +9,9 @@
 
     <div class="profile-content">
         <div class="main-content">
-            <div class="profile-image-section">
+            <!-- <div class="profile-image-section">
                 <img src="assets/user.webp" alt="Profile" class="profile-image">
-                <!-- <a href="#" class="change-photo-link">Change Photo</a> -->
-            </div>
+            </div> -->
 
             <div class="details-section" *ngIf="patientDetails">
                 <div class="info-grid">
@@ -119,7 +118,12 @@
                     <h3>Medical History</h3>
                     <!-- <button class="edit-btn">Edit</button> -->
                 </div>
-                <div class="condition" *ngFor="let history of patientDetails.medical_history">{{history.name}}</div>
+                <div *ngIf="patientDetails.medical_history && patientDetails.medical_history.length > 0">
+                    <div class="condition" *ngFor="let history of patientDetails.medical_history">{{history.name}}</div>
+                </div>
+                <div *ngIf="!patientDetails.medical_history || patientDetails.medical_history.length === 0">
+                    <div class="condition">No medical history available.</div>
+                </div>
             </div>
 
             <div class="groups">
@@ -127,7 +131,12 @@
                     <h3>Groups</h3>
                     <!-- <button class="edit-btn">Edit</button> -->
                 </div>
-                <div class="condition" *ngFor="let history of patientDetails.groups">{{history.name}}</div>
+                <div *ngIf="patientDetails.groups && patientDetails.groups.length > 0">
+                    <div class="condition" *ngFor="let history of patientDetails.groups">{{history.name}}</div>
+                </div>
+                <div *ngIf="!patientDetails.groups || patientDetails.groups.length === 0">
+                    <div class="condition">No groups available.</div>
+                </div>
             </div>
 
             <div class="memberships">
@@ -135,7 +144,12 @@
                     <h3>Other History</h3>
                     <!-- <button class="edit-btn">Edit</button> -->
                 </div>
-                <div class="condition">{{patientDetails.other_history}}</div>
+                <div *ngIf="patientDetails.other_history && patientDetails.other_history.length > 0">
+                    <div class="condition">{{patientDetails.other_history}}</div>
+                </div>
+                <div *ngIf="!patientDetails.other_history || patientDetails.other_history.length === 0">
+                    <div class="condition">No other history available.</div>
+                </div>
             </div>
         </div>
     </div>

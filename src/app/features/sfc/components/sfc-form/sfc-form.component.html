@@ -16,16 +16,34 @@
     />
   </div>
   <div class="sfc-action-buttons">
-  <button type="submit" class="btn-primary" (click)="addEntry()">
-    <i 
-      [ngClass]="editingIndex !== null ? 'fa-solid fa-pen-to-square' : 'fa-solid fa-plus'" 
-      style="margin-right: 6px;">
-    </i>
-    {{ editingIndex !== null ? 'Update Members to SFC' : 'Add Members to SFC' }}
-  </button>
-</div>
+    <button
+      type="submit"
+      class="btn-primary"
+      [ngClass]="{ disabled: !isSFCFormValid }"
+      (click)="addEntry()"
+      [disabled]="!isSFCFormValid"
+    >
+      <i
+        [ngClass]="
+          editingIndex !== null
+            ? 'fa-solid fa-pen-to-square'
+            : 'fa-solid fa-plus'
+        "
+        style="margin-right: 6px"
+      >
+      </i>
+      {{
+        editingIndex !== null ? "Update Members to SFC" : "Add Members to SFC"
+      }}
+    </button>
+    <!-- <button type="button" class="cancel-btn" (click)="cancelEdit()">
+      Cancel
+    </button> -->
+  </div>
 </div>
 
+<!-- Anchor to scroll to the form top -->
+<div #sfcFormTop></div>
 
 <form (ngSubmit)="addEntry()">
   <div
@@ -33,248 +51,325 @@
   ></div>
   <div class="sfc-table-scroll">
     <div class="sfc-scrollbar">
-    <table class="sfc-table">
-      <thead class="sfc-header-static">
-        <tr>
-          <th>Date</th>
-          <th>Patient Name</th>
-          <th>Patient Id</th>
-          <th>Age</th>
-          <th>Occupation</th>
-          <th>Smiline Patient (Y/N)</th>
-          <th>Doctors & Front Office Comment on Previous Work</th>
-          <th>Doctor Advice for Lead Generation</th>
-          <th>Front Office Remarks</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Row for new entry -->
-        <tr>
-          <td>
-           <div 
-  class="date-input-container" 
-  [ngStyle]="editingIndex !== null ? {'pointer-events': 'none', 'opacity': '0.7', 'cursor': 'not-allowed'} : {}"
->
-  <app-custom-calendar
-    [selectedDate]="newEntry.date"
-    [isInvalid]="isFieldInvalid('date')"
-    (dateSelected)="onDateSelected($event)"
-  ></app-custom-calendar>
-</div>
-            <div *ngIf="isFieldInvalid('date')" class="error-msg"></div>
-          </td>
-          <td>
-
-<input
-  [(ngModel)]="newEntry.name"
-  name="name"
-  maxlength="150"
-  required
-  [required]="editingIndex === null"
-  [readonly]="editingIndex !== null"
-  [class.invalid-field]="isFieldInvalid('name')"
-  [class.readonly-field]="editingIndex !== null"
-/>
-<div *ngIf="isFieldInvalid('name')" class="error-msg"></div>
-
-<td>
-  <div class="patient-search-container" *ngIf="editingIndex === null">
-    <input
-      [(ngModel)]="newEntry.patientId"
-      name="patientId"
-      placeholder="Search Patient ID..."
-      (input)="onPatientIdInput($event)"
-      (focus)="showPatientSearch = true"
-      [class.invalid-field]="isFieldInvalid('patientId')"
-    />
-    
-    <!-- Patient Search Dropdown -->
-    <div class="patient-search-dropdown" *ngIf="showPatientSearch && newEntry.patientId.trim().length > 0">
-      <!-- Loading indicator -->
-      <div class="search-loading" *ngIf="isSearchingPatients">
-        <i class="pi pi-spinner pi-spin"></i>
-        <span>Searching patients...</span>
-      </div>
-      
-      <!-- Search results -->
-      <div class="search-results" *ngIf="!isSearchingPatients && patientSearchResults.length > 0">
-        <div *ngFor="let patient of patientSearchResults" 
-             class="search-result-item" 
-             (click)="selectPatient(patient)">
-          <div class="patient-info">
-            <div class="patient-name">{{ patient.name }}</div>
-            <div class="patient-details">
-              <span class="patient-id">ID: {{ patient.manual_unique_code || patient.id }}</span>
-              <span class="patient-phone">{{ patient.phone }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- No results found -->
-      <div class="no-results" *ngIf="!isSearchingPatients && patientSearchResults.length === 0 && newEntry.patientId.trim().length >= 2">
-        <i class="pi pi-search"></i>
-        <span>No patients found</span>
-      </div>
-      
-      <!-- Minimum character requirement -->
-      <div class="search-hint" *ngIf="!isSearchingPatients && newEntry.patientId.trim().length > 0 && newEntry.patientId.trim().length < 2">
-        <i class="pi pi-info-circle"></i>
-        <span>Type at least 2 characters to search</span>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Readonly input for editing mode -->
-  <input
-    *ngIf="editingIndex !== null"
-    [(ngModel)]="newEntry.patientId"
-    name="patientId"
-    [class.invalid-field]="isFieldInvalid('patientId')"
-    [readonly]="true"
-    [class.readonly-field]="true"
-  />
-  
-  <div *ngIf="isFieldInvalid('patientId')" class="error-msg"></div>
-</td>
-
-<td>
-  <input
-    type="number"
-    [(ngModel)]="newEntry.ageRelation"
-    name="ageRelation"
-    max="200"
-    min="0"
-    required
-    [class.invalid-field]="isFieldInvalid('ageRelation')"
-    [readonly]="editingIndex !== null"
-    [class.readonly-field]="editingIndex !== null"
-/>
-            <div *ngIf="isFieldInvalid('ageRelation')" class="error-msg">
-              
-            </div>
-          </td>
-          <td>
-            <input
-              [(ngModel)]="newEntry.profileOccupation"
-              name="profileOccupation"
-              required
-              [class.invalid-field]="isFieldInvalid('profileOccupation')"
-            />
-            <div *ngIf="isFieldInvalid('profileOccupation')" class="error-msg">
-              
-            </div>
-          </td>
-          <td>
-            <select
-  [(ngModel)]="newEntry.smilinePatient"
-  name="smilinePatient"
-  required
-  [class.invalid-field]="isFieldInvalid('smilinePatient')"
-  [disabled]="editingIndex !== null"
-  [class.readonly-field]="editingIndex !== null"
->
-  <option value="Y">Y</option>
-  <option value="N">N</option>
-</select>
-<div *ngIf="isFieldInvalid('smilinePatient')" class="error-msg">
-  <!-- error message here -->
-</div>
-
-          </td>
-          <td>
-            <input
-              [(ngModel)]="newEntry.doctorFrontOfficeComment"
-              name="doctorFrontOfficeComment"
-              maxlength="150"
-              [class.invalid-field]="isFieldInvalid('doctorFrontOfficeComment')"
-            />
-            <div
-              *ngIf="isFieldInvalid('doctorFrontOfficeComment')"
-              class="error-msg"
-            >
-            
-            </div>
-          </td>
-          <td>
-            <input
-              [(ngModel)]="newEntry.doctorAdvice"
-              name="doctorAdvice"
-              maxlength="150"
-              [class.invalid-field]="isFieldInvalid('doctorAdvice')"
-            />
-            <div *ngIf="isFieldInvalid('doctorAdvice')" class="error-msg">
-              
-            </div>
-          </td>
-          <td>
-            <input
-              [(ngModel)]="newEntry.frontOfficeRemarks"
-              name="newEntry.frontOfficeRemarks"
-              [class.invalid-field]="isFieldInvalid('frontOfficeRemarks')"
-            />
-            <div *ngIf="isFieldInvalid('frontOfficeRemarks')" class="error-msg">
-              
-            </div>
-          </td>
-          <td></td>
-        </tr>
-        <!-- Existing entries with search and pagination -->
-        <tr *ngFor="let entry of paginatedEntries(); let i = index">
-          <td>{{ entry.date }}</td>
-          <td>{{ entry.name }}</td>
-          <td>{{ entry.patientId }}</td>
-          <td>{{ entry.ageRelation }}</td>
-          <td>{{ entry.profileOccupation }}</td>
-          <td>{{ entry.smilinePatient }}</td>
-          <td>{{ entry.doctorFrontOfficeComment }}</td>
-          <td>{{ entry.doctorAdvice }}</td>
-          <td>{{ entry.frontOfficeRemarks }}</td>
-          <td class="action-column">
-            <div class="action-dropdown" (click)="$event.stopPropagation()">
-              <button 
-                class="action-trigger" 
-               (click)="toggleDropdown(i, $event)"
-                type="button"
+      <table class="sfc-table">
+        <thead class="sfc-header-static">
+          <tr>
+            <th>Date</th>
+            <th>Patient Id</th>
+            <th>Patient Name</th>
+            <th>Age</th>
+            <th>Occupation</th>
+            <!-- <th>Smiline Patient (Y/N)</th> -->
+            <th>Doctors & Front Office Comment on Previous Work</th>
+            <th>Doctor Advice for Lead Generation</th>
+            <th>Front Office Remarks</th>
+            <th>Action</th>
+          </tr>
+          <tr class="sfc-form-row">
+            <td>
+              <div
+                class="date-input-container"
+                [ngStyle]="
+                  editingIndex !== null
+                    ? {
+                        'pointer-events': 'none',
+                        opacity: '0.7',
+                        cursor: 'not-allowed'
+                      }
+                    : {}
+                "
               >
-                <i [class]="openDropdownIndex === i ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"></i>
-              </button>
-              <div 
-                class="dropdown-menu" 
-                [class.show]="openDropdownIndex === i"
-              >
-                <button 
-                  class="dropdown-item edit-item" 
-                  (click)="editEntry(entry)"
-                  type="button"
-                >
-                  <i class="fa-solid fa-pen-to-square"></i>
-                  <span>Edit</span>
-                </button>
-                <button 
-                  class="dropdown-item delete-item" 
-                  (click)="removeEntry(entry)"
-                  type="button"
-                >
-                  <i class="fa-solid fa-trash"></i>
-                  <span>Delete</span>
-                </button>
+                <app-custom-calendar
+                  [selectedDate]="newEntry.date"
+                  [isInvalid]="isFieldInvalid('date')"
+                  (dateSelected)="onDateSelected($event); onFormTouched()"
+                ></app-custom-calendar>
               </div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+              <div *ngIf="isFieldInvalid('date')" class="error-msg"></div>
+            </td>
+
+            <td>
+              <div
+                class="patient-search-container"
+                *ngIf="editingIndex === null"
+              >
+                <input
+                  [(ngModel)]="newEntry.patientId"
+                  (ngModelChange)="onFormTouched()"
+                  name="patientId"
+                  placeholder="Search Patient ID..."
+                  (input)="onPatientIdInput($event)"
+                  (focus)="showPatientSearch = true"
+                  [class.invalid-field]="
+                    isFieldInvalid('patientId') ||
+                    (patientSearchResults.length === 0 &&
+                      newEntry.patientId.trim().length >= 2)
+                  "
+                />
+
+                <!-- Patient Search Dropdown -->
+                <div
+                  class="patient-search-dropdown"
+                  *ngIf="
+                    showPatientSearch && newEntry.patientId.trim().length > 0
+                  "
+                >
+                  <!-- Loading indicator -->
+                  <div class="search-loading" *ngIf="isSearchingPatients">
+                    <i class="pi pi-spinner pi-spin"></i>
+                    <span>Searching patients...</span>
+                  </div>
+
+                  <!-- Search results -->
+                  <div
+                    class="search-results"
+                    *ngIf="
+                      !isSearchingPatients && patientSearchResults.length > 0
+                    "
+                  >
+                    <div
+                      *ngFor="let patient of patientSearchResults"
+                      class="search-result-item"
+                      (click)="selectPatient(patient)"
+                    >
+                      <div class="patient-info">
+                        <div class="patient-name">{{ patient.name }}</div>
+                        <div class="patient-details">
+                          <span class="patient-id"
+                            >ID:
+                            {{ patient.manual_unique_code || patient.id }}</span
+                          >
+                          <span class="patient-phone">{{ patient.phone }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- No results found -->
+                  <div
+                    class="no-results"
+                    *ngIf="
+                      !isSearchingPatients &&
+                      patientSearchResults.length === 0 &&
+                      newEntry.patientId.trim().length >= 2
+                    "
+                  >
+                    <i class="pi pi-search"></i>
+                    <span>No patients found</span>
+                  </div>
+
+                  <!-- Minimum character requirement -->
+                  <div
+                    class="search-hint"
+                    *ngIf="
+                      !isSearchingPatients &&
+                      newEntry.patientId.trim().length > 0 &&
+                      newEntry.patientId.trim().length < 2
+                    "
+                  >
+                    <i class="pi pi-info-circle"></i>
+                    <span>Type at least 2 characters to search</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Readonly input for editing mode -->
+              <input
+                *ngIf="editingIndex !== null"
+                [(ngModel)]="newEntry.patientId"
+                name="patientId"
+                [class.invalid-field]="isFieldInvalid('patientId')"
+                [readonly]="true"
+                [class.readonly-field]="true"
+              />
+
+              <div *ngIf="isFieldInvalid('patientId')" class="error-msg"></div>
+            </td>
+
+            <td>
+              <input
+                class="non-editable"
+                title="Cannot Edit Name"
+                [(ngModel)]="newEntry.name"
+                (ngModelChange)="onFormTouched()"
+                name="name"
+                maxlength="150"
+                required
+                [required]="editingIndex === null"
+                [readonly]="editingIndex !== null"
+                [class.invalid-field]="isFieldInvalid('name')"
+                [class.readonly-field]="editingIndex !== null"
+                [disabled]="true"
+              />
+              <div *ngIf="isFieldInvalid('name')" class="error-msg"></div>
+            </td>
+
+            <td>
+              <input
+                type="number"
+                [(ngModel)]="newEntry.ageRelation"
+                [disabled]="true"
+                class="non-editable"
+                title="Cannot Edit Age"
+                (ngModelChange)="onFormTouched()"
+                name="ageRelation"
+                max="200"
+                min="0"
+                
+                [readonly]="editingIndex !== null"
+                [class.readonly-field]="editingIndex !== null"
+              />
+              <div
+                *ngIf="isFieldInvalid('ageRelation')"
+                class="error-msg"
+              ></div>
+            </td>
+            <td>
+              <input
+                [(ngModel)]="newEntry.profileOccupation"
+                (ngModelChange)="onFormTouched()"
+                name="profileOccupation"
+                
+              />
+              <div
+                *ngIf="isFieldInvalid('profileOccupation')"
+                class="error-msg"
+              ></div>
+            </td>
+            <!-- <td>
+              <select
+                [(ngModel)]="newEntry.smilinePatient"
+                (ngModelChange)="onFormTouched()"
+                name="smilinePatient"
+                
+                [disabled]="editingIndex !== null"
+                [class.readonly-field]="editingIndex !== null"
+              >
+                <option value="Y">Y</option>
+                <option value="N">N</option>
+              </select>
+              <div *ngIf="isFieldInvalid('smilinePatient')" class="error-msg">
+              </div>
+            </td> -->
+            <td>
+              <input
+                [(ngModel)]="newEntry.doctorFrontOfficeComment"
+                (ngModelChange)="onFormTouched()"
+                name="doctorFrontOfficeComment"
+                maxlength="150"
+                
+              />
+              <div
+                *ngIf="isFieldInvalid('doctorFrontOfficeComment')"
+                class="error-msg"
+              ></div>
+            </td>
+            <td>
+              <input
+                [(ngModel)]="newEntry.doctorAdvice"
+                (ngModelChange)="onFormTouched()"
+                name="doctorAdvice"
+                maxlength="150"
+               
+              />
+              <div
+                *ngIf="isFieldInvalid('doctorAdvice')"
+                class="error-msg"
+              ></div>
+            </td>
+            <td>
+              <input
+                [(ngModel)]="newEntry.frontOfficeRemarks"
+                (ngModelChange)="onFormTouched()"
+                name="newEntry.frontOfficeRemarks"
+              
+              />
+              <div
+                *ngIf="isFieldInvalid('frontOfficeRemarks')"
+                class="error-msg"
+              ></div>
+            </td>
+            <td class="sfc-action">
+              <button class="action-trigger" [disabled]="!isSFCFormValid" (click)="addEntry()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="#4CAF50" />
+                </svg>
+              </button>
+              <button class="action-trigger" (click)="cancelEdit()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"
+                    fill="#F44336" />
+                </svg>
+              </button>
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Row for new entry -->
+
+          <!-- Existing entries with search and pagination -->
+          <tr *ngFor="let entry of paginatedEntries(); let i = index" [class.editing-row]="editId === entry.id">
+            <td>{{ entry.date }}</td>
+            <td>{{ entry.patientId }}</td>
+            <td>{{ entry.name }}</td>
+            <td>{{ entry.ageRelation }}</td>
+            <td>{{ entry.profileOccupation }}</td>
+            <!-- <td>{{ entry.smilinePatient }}</td> -->
+            <td>{{ entry.doctorFrontOfficeComment }}</td>
+            <td>{{ entry.doctorAdvice }}</td>
+            <td>{{ entry.frontOfficeRemarks }}</td>
+            <td class="action-column">
+              <div class="action-dropdown" (click)="$event.stopPropagation()">
+                <button
+                  class="action-trigger"
+                  (click)="toggleDropdown(i, $event)"
+                  type="button"
+                >
+                  <i
+                    [class]="
+                      openDropdownIndex === i
+                        ? 'fa-solid fa-chevron-up'
+                        : 'fa-solid fa-chevron-down'
+                    "
+                  ></i>
+                </button>
+                <div
+                  class="dropdown-menu"
+                  [class.show]="openDropdownIndex === i"
+                >
+                  <button
+                    class="dropdown-item edit-item"
+                    (click)="editEntry(entry)"
+                    type="button"
+                  >
+                    <i class="pi pi-pencil"></i>
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    class="dropdown-item delete-item"
+                    (click)="removeEntry(entry)"
+                    type="button"
+                  >
+                    <i class="pi pi-trash"></i>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </form>
 
 <!-- Add click listener to close dropdown when clicking outside -->
-<div class="dropdown-overlay" 
-     *ngIf="openDropdownIndex !== null" 
-     (click)="closeDropdown()">
-</div>
+<div
+  class="dropdown-overlay"
+  *ngIf="openDropdownIndex !== null"
+  (click)="closeDropdown()"
+></div>
 
 <div class="sfc-pagination">
   <span class="pagination-info">

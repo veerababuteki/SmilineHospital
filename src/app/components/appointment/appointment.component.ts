@@ -117,6 +117,7 @@ export class AppointmentComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.formatDoctorsList();
     this.activeTab = this.data;
     this.initAppointmentForm();
     this.initBlockCalendarForm();
@@ -127,6 +128,17 @@ export class AppointmentComponent implements OnInit {
       this.onDateSelectionChange();
     }
   });
+  }
+
+  formatDoctorsList(){
+    if (this.doctors && this.doctors.length > 0) {
+      // Sort doctors by name and add Dr. prefix
+      this.doctors = this.doctors.sort((a, b) => a.name.localeCompare(b.name))
+        .map(doctor => ({
+          ...doctor,
+          name: doctor.name.startsWith('Dr.') ? doctor.name : `Dr. ${doctor.name}`
+        }));
+    }
   }
 
   initAppointmentForm() {
@@ -721,8 +733,8 @@ atLeastOneBlockTypeValidator() {
       category: [''],
       scheduledDate: [scheduledDate, Validators.required],
       scheduledTime: [scheduledDate, Validators.required],
-      timeOfArrival: ['', this.followUpMode ? Validators.required : []],
-      treatmentStartedTime: ['', this.followUpMode ? Validators.required : []],
+      timeOfArrival: [scheduledDate],
+      treatmentStartedTime: [scheduledDate],
       duration: [15],
       bookingType: ['', Validators.required],
       plannedProcedures: [''],
@@ -766,6 +778,8 @@ atLeastOneBlockTypeValidator() {
       notes: [this.appointment.notes],
       status: [{ value: this.appointment.status, disabled: !this.editAppointment }],
       appointmentStatus: [{ value: this.appointment.appointment_status, disabled: !this.editAppointment }],
+      timeOfArrival: [this.appointment.time_of_arrival ? new Date(this.appointment.appointment_date + 'T' + this.convertTo24Hour(this.appointment.time_of_arrival)) : ''],
+      treatmentStartedTime: [this.appointment.treatment_started_time ? new Date(this.appointment.appointment_date + 'T' + this.convertTo24Hour(this.appointment.treatment_started_time)) : ''],
     });
   }
   else {

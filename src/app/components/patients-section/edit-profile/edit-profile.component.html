@@ -53,7 +53,7 @@
           <div class="form-row">
             <div class="form-label required">Patient Id :</div>
             <div class="form-field">
-              <input pInputText type="text" formControlName="customId" />
+              <input pInputText type="text" formControlName="customId" [disabled]="isPublicRoute" />
               <div
                 class="validation-error"
                 *ngIf="

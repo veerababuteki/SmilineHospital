@@ -1,5 +1,5 @@
 // Updated sfc-form.component.ts - Modified methods for row-specific actions
-import { Component, Input, Output, EventEmitter, OnDestroy, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, Validators } from '@angular/forms';
 import { CustomCalendarComponent } from './custom-calendar/custom-calendar.component';
@@ -26,6 +26,7 @@ export class SfcFormComponent implements OnDestroy {
   patientSearchResults: any[] = [];
   showPatientSearch: boolean = false;
   isSearchingPatients: boolean = false;
+  isSFCFormValid: boolean = false;
   patientSearchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
@@ -59,8 +60,26 @@ export class SfcFormComponent implements OnDestroy {
     referredBy: ''
   };
 
+  //having to setup a proxy to watch for changes to recheck validity
+  private newEntryProxy: any;
+
+  setupNewEntryWatcher() {
+    const handler = {
+      set: (obj: any, prop: string, value: any) => {
+        obj[prop] = value;
+        this.isSFCFormValid = this.isFormValid();
+        return true;
+      }
+    };
+    this.newEntryProxy = new Proxy(this.newEntry, handler);
+    this.newEntry = this.newEntryProxy;
+  }
+
   // Add property to track open dropdown
   openDropdownIndex: number | null = null;
+
+  // Anchor to scroll to the top of the form
+  @ViewChild('sfcFormTop') sfcFormTop!: ElementRef<HTMLDivElement>;
 
   // Add this method to handle date selection
   onDateSelected(date: string) {
@@ -77,8 +96,15 @@ export class SfcFormComponent implements OnDestroy {
   submitted: boolean = false;
 
   ngOnInit() {
-        this.getSfcEntries();
-    }
+    this.getSfcEntries();
+    // Setup proxy to watch for changes
+    this.setupNewEntryWatcher();
+    this.newEntry.smilinePatient = 'Y'; // default value
+  }
+
+  onFormTouched() {
+    this.isSFCFormValid = this.isFormValid();
+  }
 
   setupPatientSearch() {
     this.patientSearchSubject.pipe(
@@ -102,6 +128,8 @@ export class SfcFormComponent implements OnDestroy {
           this.patientSearchResults = response.data.map((patient: any) => ({
             id: patient.unique_code,
             userId: patient.user_id,
+            age: patient.age,
+            profession: patient.profession,
             name: patient.first_name + ' ' + patient.last_name,
             email: patient.email,
             phone: patient.phone,
@@ -135,7 +163,10 @@ export class SfcFormComponent implements OnDestroy {
   selectPatient(patient: any) {
     this.newEntry.patientId = patient.manual_unique_code || patient.id;
     this.newEntry.name = patient.name;
-    this.patientSearchResults = [];
+    this.newEntry.ageRelation = patient.age || '';
+    this.newEntry.profileOccupation = patient.profession || '';
+    //Commenting out this line to prevent clearing results once patient is selected to validate the field as a valid patient.
+    // this.patientSearchResults = [];
     this.showPatientSearch = false;
   }
 
@@ -203,48 +234,60 @@ export class SfcFormComponent implements OnDestroy {
     }
   }
 
+  //updated to ensure validity is rechecked on reset
   resetForm() {
-  this.newEntry = {
-    date: '',
-    name: '',
-    patientId: '',
-    ageRelation: '',
-    profileOccupation: '',
-    smilinePatient: 'Y',
-    doctorFrontOfficeComment: '',
-    doctorAdvice: '',
-    frontOfficeRemarks: '',
-    referredBy: ''
-  };
-  this.editingIndex = null;
-  this.editId = null;
-  this.submitted = false;
+    this.newEntry = new Proxy({
+      date: '',
+      name: '',
+      patientId: '',
+      ageRelation: '',
+      profileOccupation: '',
+      smilinePatient: 'Y',
+      doctorFrontOfficeComment: '',
+      doctorAdvice: '',
+      frontOfficeRemarks: '',
+      referredBy: ''
+    }, {
+      set: (obj: any, prop: string, value: any) => {
+        obj[prop] = value;
+        this.isSFCFormValid = this.isFormValid();
+        return true;
+      }
+    });
+    this.editingIndex = null;
+    this.editId = null;
+    this.submitted = false;
 }
 
-
+  // Enter edit mode for a specific entry without replacing the Proxy
   editEntry(entry: any) {
     this.editingIndex = this.entries.indexOf(entry);
     this.editId = entry.id;
-    console.log(entry)
-    this.newEntry = { ...entry };
+    console.log(entry);
+    // Preserve the Proxy so that setter keeps recomputing isSFCFormValid
+    Object.assign(this.newEntry, entry);
+    // Recompute validity once after loading the entry
+    this.isSFCFormValid = this.isFormValid();
     this.openDropdownIndex = null; // Close dropdown after action
+
+    // Smoothly scroll to the form top when entering edit mode (after DOM updates)
+    setTimeout(() => this.sfcFormTop?.nativeElement?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
   }
 
   
 addEntry() {
   this.submitted = true;
 
-
   const requiredFields = [
     this.newEntry.date,
     this.newEntry.name,
     this.newEntry.patientId,
-    this.newEntry.ageRelation,
-    this.newEntry.profileOccupation,
-    this.newEntry.smilinePatient,
-    this.newEntry.doctorFrontOfficeComment,
-    this.newEntry.doctorAdvice,
-    this.newEntry.frontOfficeRemarks
+    // this.newEntry.ageRelation,
+    // this.newEntry.profileOccupation,
+    // this.newEntry.smilinePatient,
+    // this.newEntry.doctorFrontOfficeComment,
+    // this.newEntry.doctorAdvice,
+    // this.newEntry.frontOfficeRemarks
   ];
 
   const isEmpty = requiredFields.some(field => !field || field.toString().trim() === '');
@@ -276,7 +319,6 @@ addEntry() {
     return;
   }
 
-
   this.userService.getPatient(this.newEntry.patientId).subscribe({
     next: (response) => {
       const patient = response.data?.[0];
@@ -286,7 +328,7 @@ addEntry() {
         if (!this.newEntry.name || this.newEntry.name.trim() === '') {
           this.newEntry.name = `${patient.first_name} ${patient.last_name}`.trim();
         }
-        
+
         this.messageService.add({
           severity: 'success',
           summary: 'Patient Found',
@@ -308,11 +350,23 @@ addEntry() {
       } else {
         console.error('Unexpected error checking patient:', error);
       }
-      
+
       // Always proceed to add SFC entry
       this.addSfcEntry();
     }
   });
+}
+
+cancelEdit() {
+  // Fully restore form to Add mode
+  this.resetForm();                  // clears newEntry, editId, editingIndex, and validation state
+  this.searchTerm = '';              // clear search field
+  this.showPatientSearch = false;    // hide patient search dropdown
+  this.patientSearchResults = [];    // clear any search results
+  this.openDropdownIndex = null;     // ensure action dropdowns are closed
+  this.submitted = false;            // reset validation error display
+  // Optional user feedback
+  // this.messageService.add({ severity: 'info', summary: 'Cancelled', detail: 'Edit cancelled.' });
 }
 
 // Separate function to add/update SFC entry
@@ -420,7 +474,7 @@ toggleDropdown(i: number, event: MouseEvent) {
     if (dropdown) {
       dropdown.style.position = 'fixed';
       dropdown.style.top = `${trigger.bottom + 8}px`;   // 8px gap
-      dropdown.style.left = `${trigger.left - 110}px`;   // shifted left by 80px
+      dropdown.style.left = `${trigger.left - 150}px`;   // shifted left by 80px
     }
   }
 }
@@ -430,6 +484,15 @@ toggleDropdown(i: number, event: MouseEvent) {
   closeDropdown() :void {
     this.openDropdownIndex = null;
   }
+
+    @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    const clickedInside = (event.target as HTMLElement).closest('.dropdown');
+    if (!clickedInside) {
+      this.closeDropdown();
+    }
+  }
+  
 
   editWorkField() {
     alert('Edit Work Field button clicked!');
@@ -471,6 +534,25 @@ toggleDropdown(i: number, event: MouseEvent) {
   isFieldInvalid(field: string): boolean {
     return this.submitted && (!this.newEntry[field] || this.newEntry[field].toString().trim() === '');
   }
+
+  isFormValid(): boolean {
+    const requirePatientSearch = this.editId === null; // only in add mode
+    const patientIdInvalid = this.isFieldInvalid('patientId');
+    const patientSearchInvalid = requirePatientSearch && (this.patientSearchResults.length === 0 && this.newEntry.patientId.trim().length >= 2);
+
+    const formValidity = !this.isFieldInvalid('date') 
+    && !this.isFieldInvalid('name') 
+    && !(patientIdInvalid || patientSearchInvalid)
+    && !this.isFieldInvalid('ageRelation')
+    && !this.isFieldInvalid('profileOccupation')
+    && !this.isFieldInvalid('smilinePatient')
+    && !this.isFieldInvalid('doctorFrontOfficeComment')
+    && !this.isFieldInvalid('doctorAdvice')
+    && !this.isFieldInvalid('frontOfficeRemarks');
+    console.log('Form validity:', formValidity);
+    return formValidity;
+  }
+
 }
 
 // ========================================

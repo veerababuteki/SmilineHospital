@@ -113,6 +113,11 @@ export class DoctorColorService {
         .status-bg.${name} {
           background-color: ${def.background};
         }
+        /* Ensure calendar events use the exact same color system */
+        ::ng-deep .fc-event.doctor-bg-${name} {
+          background-color: ${def.background} !important;
+          border-left-color: ${def.color} !important;
+        }
       `;
     });
 
@@ -128,3 +133,4 @@ export class DoctorColorService {
     return this.colorDefinitions[colorName]?.background || '#ffffff';
   }
 }
+
