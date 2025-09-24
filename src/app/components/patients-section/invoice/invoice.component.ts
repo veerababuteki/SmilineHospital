@@ -133,6 +133,20 @@ export class InvoiceComponent implements OnInit {
       })
     }
 
+    hasFilteredInvoices(): boolean {
+  return this.getSortedDates().some(date => this.hasInvoicesForDate(date));
+}
+
+hasInvoicesForDate(date: string): boolean {
+  const groups = this.invoices[date];
+  if (!groups) return false;
+
+  return Object.values(groups).some((invoiceArray: any[]) =>
+    this.paymentFilter === 'all' || invoiceArray[0].payment_status === this.paymentFilter
+  );
+}
+
+
     getTotalCost(invoiceGroup: unknown): number {
       if (!Array.isArray(invoiceGroup)) {
         return 0; // Return 0 if the value is not an array

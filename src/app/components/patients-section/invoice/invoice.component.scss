@@ -403,3 +403,16 @@
   color: #721c24;
   background: #f8d7da;
 }
+
+.no-invoice-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: center;
+    margin-top: 100px;
+    .icon {
+        height: 50px;
+        width: 50px;
+    }
+}
