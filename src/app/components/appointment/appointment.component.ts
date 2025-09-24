@@ -22,6 +22,7 @@ import { MessagesModule } from 'primeng/messages';
 import { LoaderService } from '../../services/loader.service';
 import { ToastModule } from 'primeng/toast';
 import { AddProfileComponent } from "../patients-section/edit-profile/add-profile.component";
+import { PatientDataService } from '../../services/patient-data.service';
 
 
 @Component({
@@ -102,6 +103,14 @@ export class AppointmentComponent implements OnInit {
   doctorAvailabilityStatus: 'available' | 'partially-blocked' | 'fully-blocked' | 'unknown' = 'unknown';
   availabilityMessage: string = '';
 
+  allAppointments: any[] = []; // for comparison, includes branch id.
+  isPatientBlocked: boolean = false;
+  blockingDate: Date | null = null;
+  blockingTime: string | null = null;
+  blockingDuration: number | null = null;
+  blockingBranchId: number | null = null;
+  branches: any[] = [];
+
   // Computed property for minToDate
   get minToDate(): Date {
     return this.today;
@@ -111,6 +120,7 @@ export class AppointmentComponent implements OnInit {
     private fb: FormBuilder, 
     private router: Router, 
     private userService: UserService, 
+    private patientDataService: PatientDataService,
     private appointmentService: AppointmentService, 
     private loaderService: LoaderService,
     private messageService: MessageService
@@ -121,13 +131,28 @@ export class AppointmentComponent implements OnInit {
     this.activeTab = this.data;
     this.initAppointmentForm();
     this.initBlockCalendarForm();
-     this.blockCalendarForm.get('blockType')?.valueChanges.subscribe((selectedValue) => {
-    if (selectedValue === 'allDay') {
-      this.onDateSelectionChange();
-    } else if (selectedValue === 'blockSlot') {
-      this.onDateSelectionChange();
-    }
-  });
+    this.blockCalendarForm.get('blockType')?.valueChanges.subscribe((selectedValue) => {
+      if (selectedValue === 'allDay') {
+        this.onDateSelectionChange();
+      } else if (selectedValue === 'blockSlot') {
+        this.onDateSelectionChange();
+      }
+    });
+
+    this.patientDataService.data$.subscribe((res) => {
+      const appointments = res?.appointments?.data?.rows || [];
+      this.allAppointments = appointments;
+    });
+
+    this.userService.getBranches().subscribe(res=>{
+      this.branches = res.data;
+    });
+
+    this.determinePatientBlocker();
+  }
+
+  getBranchById(branchId: number): any {
+    return this.branches.find(branch => branch.branch_id === branchId);
   }
 
   formatDoctorsList(){
@@ -166,6 +191,7 @@ export class AppointmentComponent implements OnInit {
       }
     });
 
+
     // Watch for date changes
     this.appointmentForm.get('scheduledDate')?.valueChanges.subscribe(date => {
       console.log('Date changed:', date);
@@ -176,6 +202,7 @@ export class AppointmentComponent implements OnInit {
         console.log('Doctor or date missing, clearing warnings');
         this.clearBlockWarnings();
       }
+      this.determinePatientBlocker();
     });
 
     // Watch for time changes to check slot conflicts
@@ -184,6 +211,11 @@ export class AppointmentComponent implements OnInit {
       if (time && this.appointmentForm.get('doctor')?.value && this.appointmentForm.get('scheduledDate')?.value) {
         this.checkTimeSlotConflict();
       }
+      this.determinePatientBlocker();
+    });
+
+    this.appointmentForm.get('duration')?.valueChanges.subscribe(duration => {
+      this.determinePatientBlocker();
     });
 
     // Watch for booking type changes (for all doctors blocks)
@@ -631,6 +663,120 @@ onDateSelectionChange() {
       this.validateTimeRange();
     });
   }
+
+  // Determine Patient blocker
+  determinePatientBlocker(): void {
+    const scheduledDate = this.appointmentForm.get('scheduledDate')?.value;
+    const scheduledTime = this.appointmentForm.get('scheduledTime')?.value;
+    const duration = this.appointmentForm.get('duration')?.value || 15;
+
+    if (!scheduledDate || !scheduledTime) {
+      this.isPatientBlocked = false;
+      return;
+    }
+
+    // Format scheduled date for comparison (yyyy-MM-dd)
+    const scheduledDateStr = this.formatDateToString(scheduledDate);
+
+    // Get scheduled start and end time in minutes
+    const scheduledStartMinutes = this.getTimeInMinutes(scheduledTime);
+    const scheduledEndMinutes = scheduledStartMinutes + Number(duration);
+
+    // Check all appointments for conflicts
+    for (const appt of this.allAppointments) {
+      // Compare date first
+      const apptDateStr = this.formatDateToString(appt.appointment_date);
+
+      if (apptDateStr !== scheduledDateStr) {
+        continue; // Different date, skip
+      }
+
+      // Get appointment time in minutes
+      const apptStartMinutes = this.parseAppointmentTime(appt.appointment_time);
+      if (apptStartMinutes === null) {
+        console.log('Could not parse appointment time:', appt.appointment_time);
+        continue;
+      }
+
+      const apptDuration = Number(appt.duration) || 15;
+      const apptEndMinutes = apptStartMinutes + apptDuration;
+
+      // Check for ANY overlap using a simple overlap formula
+      // Two time slots overlap if: start1 < end2 AND start2 < end1
+      if (scheduledStartMinutes < apptEndMinutes && apptStartMinutes < scheduledEndMinutes) {
+        this.isPatientBlocked = true;
+        this.blockingDate = appt.appointment_date ? new Date(appt.appointment_date) : null;
+        this.blockingTime = appt.appointment_time || null;
+        this.blockingDuration = appt.duration || null;
+        this.blockingBranchId = appt.branch_id || null;
+
+        this.appointmentForm.get('scheduledTime')?.setErrors({
+          ...this.appointmentForm.get('scheduledTime')?.errors,
+          patientBlocked: true
+        });
+        return;
+      }
+    }
+
+    // No conflicts found
+    this.isPatientBlocked = false;
+    this.blockingDate = null;
+    this.blockingTime = null;
+    this.blockingDuration = null;
+    this.blockingBranchId = null;
+  }
+
+  // Helper method to format date consistently (handles timezone properly)
+  private formatDateToString(date: any): string {
+    if (typeof date === 'string') {
+      // If it's already in YYYY-MM-DD format, return as is
+      if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        return date;
+      }
+    }
+
+    let dateObj: Date;
+
+    if (date instanceof Date) {
+      dateObj = date;
+    } else {
+      dateObj = new Date(date);
+    }
+
+    // Use local date components to avoid timezone conversion issues
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
+  // Helper method to get time in minutes from Date object
+  private getTimeInMinutes(time: Date): number {
+    return time.getHours() * 60 + time.getMinutes();
+  }
+
+  // Helper method to parse appointment time string
+  private parseAppointmentTime(timeStr: string): number | null {
+    if (!timeStr) return null;
+
+    // Handle both 12-hour and 24-hour formats
+    const timeParts = timeStr.match(/(\d{1,2}):(\d{2})\s*([APap][Mm])?/);
+    if (!timeParts) return null;
+
+    let hours = parseInt(timeParts[1], 10);
+    const minutes = parseInt(timeParts[2], 10);
+
+    // Convert to 24-hour format if AM/PM is present
+    if (timeParts[3]) {
+      const ampm = timeParts[3].toLowerCase();
+      if (ampm === 'pm' && hours < 12) hours += 12;
+      if (ampm === 'am' && hours === 12) hours = 0;
+    }
+
+    return hours * 60 + minutes;
+  }
+
   // Update your existing validateTimeRange method
   validateTimeRange() {
     const blockType = this.blockCalendarForm.get('blockType')?.value;
