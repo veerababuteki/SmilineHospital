@@ -21,7 +21,7 @@ import { Message, MessageService } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { LoaderService } from '../../services/loader.service';
 import { ToastModule } from 'primeng/toast';
-import { AddProfileComponent } from "../patients-section/edit-profile/add-profile.compon
+import { AddProfileComponent } from "../patients-section/edit-profile/add-profile.component";
 import { DoctorNameService } from '../../services/doctor-name.service';
 import { PatientDataService } from '../../services/patient-data.service';
 
