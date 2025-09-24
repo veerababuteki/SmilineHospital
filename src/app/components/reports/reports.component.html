@@ -290,6 +290,10 @@
             >
               {{ rowData[col.field] }}
             </span>
+            <span *ngIf="col.field === 'lastPayment'">
+  {{ rowData.lastPaymentDisplay }}
+</span>
+
           </td>
         </tr>
       </ng-template>

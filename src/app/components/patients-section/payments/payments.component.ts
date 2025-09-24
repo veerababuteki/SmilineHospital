@@ -69,6 +69,28 @@ export class PaymentsComponent implements OnInit {
         }
       });
     }
+
+    getTotalAmountApplied(invoice: any): number {
+  const invoiceApplied = Number(invoice.amount_applied) || 0;
+  const fromAdvance = invoice.treatments
+    ? invoice.treatments.reduce((sum: number, t: any) => sum + Number(t.from_advance || 0), 0)
+    : 0;
+  return invoiceApplied + fromAdvance;
+}
+
+ getFilteredPaymentsByDate(date: string) {
+    const paymentsForDate = this.payments[date] || [];
+    return paymentsForDate.filter((p: any) => {
+      if (this.paymentFilter === 'all') return true;
+      if (this.paymentFilter === 'advance') return p.towards === 'Advance Payment';
+      if (this.paymentFilter === 'invoice') return p.towards === 'Invoice Payment';
+      return true;
+    });
+  }
+
+   get filteredDates(): string[] {
+    return this.getSortedDates().filter(date => this.getFilteredPaymentsByDate(date).length > 0);
+  }
     
 openInvoiceMetadata(data: any) {
   try {

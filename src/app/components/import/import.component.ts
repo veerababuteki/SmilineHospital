@@ -631,7 +631,7 @@ export class ImportComponent implements OnInit {
     if (fields.includes('DoctorName') && fields.includes('Status')) {
       return 'appointments';
     }
-    if (fields.includes('Patient Name') && fields.includes('Mobile Number')) {
+    if (fields.includes('Patient Name')) {
       return 'patients';
     }
     if (fields.includes('Type') && fields.includes('Description')) {

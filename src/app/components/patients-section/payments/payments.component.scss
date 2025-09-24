@@ -238,3 +238,16 @@
 thead{
     border: 1px solid #e0e0e0;
 }
+
+.no-payment-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: center;
+    margin-top: 100px;
+    .icon {
+        height: 50px;
+        width: 50px;
+    }
+}
