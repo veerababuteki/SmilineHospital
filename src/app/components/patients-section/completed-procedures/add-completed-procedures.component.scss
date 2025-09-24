@@ -8,6 +8,7 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
+      width: 73vw;
 
       .title {
         font-size: 16px;
@@ -72,6 +73,7 @@
 
     .treatments-section {
       flex: 1;
+      width: 47vw;
       form {
         max-height: 70vh; /* Adjust this value as needed */
         overflow-y: auto;

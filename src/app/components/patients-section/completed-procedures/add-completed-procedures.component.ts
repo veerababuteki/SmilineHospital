@@ -39,6 +39,18 @@ export class AddCompletedProceduresComponent implements OnInit {
   plannedTreatmentPlans: any[] = [];
   generateInvoiceList: any[] = [];
   isLoading: boolean = false;
+
+  allTeethInOrder = [
+    // Adult upper
+    18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28,
+    // Adult lower
+    48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38,
+    // Child upper
+    55, 54, 53, 52, 51, 61, 62, 63, 64, 65,
+    // Child lower
+    85, 84, 83, 82, 81, 71, 72, 73, 74, 75
+  ];
+  
   isEditMode: boolean = false;
   editProcedureData: any = null;
   categories: any[] = [];
@@ -589,6 +601,23 @@ updateTreatmentPlans(){
     }
   }); 
     }
+  }
+
+  onFullMouthChange(treatmentIndex: number): void {
+    if (treatmentIndex === null || treatmentIndex >= this.treatments.length) return;
+    const treatment = this.treatments.at(treatmentIndex);
+    if (!treatment) return;
+    const fullMouth = treatment.get('fullMouth')?.value;
+    if (fullMouth) {
+      treatment.get('selectedTeeth')?.setValue(this.allTeethInOrder);
+      treatment.get('showAdultTeeth')?.setValue(true);
+    } else {
+      treatment.get('selectedTeeth')?.setValue([]);
+    }
+    if (treatment.get('multiplyCost')?.value) {
+      treatment.get('quantity')?.setValue(treatment.get('selectedTeeth')?.value.length || 0);
+    }
+    this.calculateTotal(treatmentIndex);
   }
   
   calculateGrandTotal(): number {
