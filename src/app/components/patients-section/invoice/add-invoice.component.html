@@ -111,14 +111,14 @@
               </tbody>
             </table>
             <div class="footer procedure-footer">
-              <span class="padding-span">by Dr.</span>
+              <span class="padding-span">by</span>
               <p-dropdown
                 appendTo="body"
                 [formControlName]="'doctorObj'"
                 [options]="doctors"
                 optionLabel="name"
                 showIcon="false"
-                class="doctor-name no-icon-dropdown no-border-dropdown"
+                class="doctor-name"
                 [style]="{ width: '100%' }"
                 [placeholder]="'Select Doctor'"
                 (onChange)="updateDoctorId(i, $event.value)"

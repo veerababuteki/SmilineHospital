@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { MessageService } from '../../../services/message.service';
 import { PatientDataService } from '../../../services/patient-data.service';
+import { DoctorNameService } from '../../../services/doctor-name.service';
 
 interface Category {
   name: string;
@@ -78,7 +79,8 @@ export class AddClinicalNotesComponent implements OnInit {
     private router: Router,
     private clinicalNotesService: ClinicalNotesService,
     private route: ActivatedRoute,
-    private patientDataService: PatientDataService
+    private patientDataService: PatientDataService,
+    private doctorNameService: DoctorNameService
   ) {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras.state) {
@@ -196,10 +198,13 @@ export class AddClinicalNotesComponent implements OnInit {
 
   private loadDoctors() {
     this.userService.getDoctors('bce9f008-d447-4fe2-a29e-d58d579534f0').subscribe(res => {
-      this.doctors = res.data.map((doc: any) => ({
-        name: `${doc.first_name} ${doc.last_name}`,
+      const mapped = res.data.map((doc: any) => ({
+        name: `${doc.first_name} ${doc.last_name}`.trim(),
         user_id: doc.user_id
       }));
+      this.doctors = this.doctorNameService
+        .formatDoctorsList(mapped)
+        .map((d: any) => ({ name: d.name, user_id: d.user_id }));
       this.doctor = this.doctors[0];
       if (this.isEditMode) {
         this.populateFormWithNote(this.editNoteData);
