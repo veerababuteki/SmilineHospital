@@ -219,13 +219,16 @@
   <small class="error-message" *ngIf="appointmentForm.get('scheduledTime')?.hasError('timeBlocked')">
     Selected time conflicts with blocked calendar
   </small>
+  <small class="error-message" *ngIf="appointmentForm.get('scheduledTime')?.hasError('patientBlocked')">
+    Selected time conflicts with another appointment for this patient
+  </small>
   <!-- <small class="valid-message" *ngIf="appointmentUnblocked()">
     Doctor is available at the selected time
   </small> -->
 </div>
 
 <!-- NEW: Doctor Availability Section -->
-<div class="doctor-availability-section" *ngIf="appointmentForm.get('doctor')?.value && appointmentForm.get('scheduledDate')?.value && !appointmentUnblocked()">
+<div class="doctor-availability-section" *ngIf="appointmentForm.get('doctor')?.value && appointmentForm.get('scheduledDate')?.value && !appointmentUnblocked() || isPatientBlocked">
   <!-- Loading indicator -->
   <div class="checking-availability" *ngIf="isCheckingBlocks">
     <div class="loading-indicator">
@@ -235,10 +238,37 @@
   </div>
 
   <!-- Availability Status -->
-  <div class="availability-status" *ngIf="!isCheckingBlocks" [ngClass]="getAvailabilityStatusClass()">
+  <div class="availability-status" *ngIf="!isCheckingBlocks && !isPatientBlocked" [ngClass]="getAvailabilityStatusClass()">
     <div class="status-header">
       <i class="pi" [ngClass]="getAvailabilityStatusIcon()"></i>
       <strong>{{ appointmentForm.get('doctor')?.value?.name }} - {{ availabilityMessage }}</strong>
+    </div>
+  </div>
+
+  <div class="block-calendar-details" *ngIf="isPatientBlocked">
+    <div class="details-header">
+      <h4>
+        <i class="pi pi-calendar"></i>
+        Calendar Overlap for {{ appointmentForm.get('scheduledDate')?.value | date:'mediumDate' }}
+      </h4>
+    </div>
+
+    <div class="block-section" *ngIf="isPatientBlocked">
+      <h5 class="section-title">
+        <!-- <i class="pi pi-user-md"></i> -->
+        Patient is scheduled for an appointment at
+      {{ blockingTime }},
+      {{ blockingDate | date:'d/M/yy' }}
+       <span *ngIf="blockingBranchId">at branch {{ getBranchById(blockingBranchId)?.branch_name }},</span>
+      for {{ blockingDuration }} min
+      </h5>
+    </div>
+
+    <div class="booking-blocked-warning" *ngIf="isPatientBlocked">
+      <div class="warning-content">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>Patient is already scheduled for another appointment during this time.</span>
+      </div>
     </div>
   </div>
 
@@ -342,7 +372,7 @@
   </div>
 
   <!-- No Blocks Found -->
-  <div class="no-blocks-message" *ngIf="!isCheckingBlocks && specificDoctorBlocks.length === 0 && allDoctorBlocks.length === 0">
+  <div class="no-blocks-message" *ngIf="!isCheckingBlocks && specificDoctorBlocks.length === 0 && allDoctorBlocks.length === 0  && !isPatientBlocked">
     <div class="success-content">
       <i class="pi pi-check-circle"></i>
       <span>No calendar blocks found. Doctor is available for appointments.</span>
@@ -350,7 +380,7 @@
   </div>
 
   <!-- Action buttons -->
-  <div class="availability-actions" *ngIf="!isCheckingBlocks">
+  <div class="availability-actions" *ngIf="!isCheckingBlocks && !isPatientBlocked">
     <button type="button" 
             class="action-btn secondary" 
             (click)="clearBlockWarnings()">
