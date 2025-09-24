@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Procedure, TreatmentForm } from './treatment.interface';
@@ -57,9 +57,15 @@ export class TreatmentPlansComponent implements OnInit {
   savedPractice: any;
   consentFormVisible: boolean = false;
   selectedConsentTreatment: any;
+  @ViewChild('consentForm') consentForm!: ConsentFormComponent;
 
+  onConsentFormDialogClosed() {
+    if (this.consentForm) {
+      this.consentForm.onDialogClosed();
+    }
+  }
 
-consentform(plan: any): void {
+  consentform(plan: any): void {
   console.log('Consent form plan data:', plan);
   console.log('Treatment unique ID:', plan?.treatment_unique_id);
   console.log('Patient details:', plan?.patient_details_treat);
@@ -230,7 +236,10 @@ consentform(plan: any): void {
     rows: any,
     treatmentKey: any
   ) {
-    return rows.filter((row: any) => row.treatment_unique_id === treatmentKey);
+    // Empirically, the first-selected often receives the higher id. Sorting by id DESC restores the UI order.
+    return rows
+      .filter((row: any) => row.treatment_unique_id === treatmentKey)
+      .sort((a: any, b: any) => Number(b.id) - Number(a.id));
   }
 
 

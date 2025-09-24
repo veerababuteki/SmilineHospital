@@ -88,7 +88,7 @@ export class CalendarComponent implements OnInit {
   isDataLoaded: boolean = false;
   private overlayRef: OverlayRef | null = null;
   activeTab!: 'all' | 'waiting' | 'engaged' | 'done';
-  activeTabType!: 'all' | 'online' | 'offline';
+  activeTabType!: 'all' | 'Online' | 'Offline';
   allAppointments: number = 0;
   waitingAppointemts: number = 0;
   engagedAppointemts: number = 0;
@@ -110,13 +110,12 @@ export class CalendarComponent implements OnInit {
       this.handleDateClick(info);
     },
     eventClassNames: (arg: any) => {
-      const doctorId = arg.event.extendedProps?.doctorId || arg.event.extendedProps?.doctor_id || arg.event.extendedProps?.doctor;
-      const colorClass = doctorId ? `doctor-bg-${this.getDoctorColor(doctorId)}` : '';
       let viewClass = '';
       if (this.currentView === 'dayGridMonth') viewClass = 'month-view';
       else if (this.currentView === 'timeGridWeek') viewClass = 'week-view';
       else viewClass = 'day-view';
-      return [`status-${arg.event.extendedProps.status}`, colorClass, viewClass];
+      // Color classes are already assigned when creating events via className
+      return [`status-${arg.event.extendedProps.status}`, viewClass];
     },
     moreLinkContent: (args: any) => {
       return `+${args.num} more`;
@@ -688,7 +687,7 @@ export class CalendarComponent implements OnInit {
     this.activeTab = counterType;
   }
 
-  filterDayAppointments(counter: 'all' | 'online' | 'offline') {
+  filterDayAppointments(counter: 'all' | 'Online' | 'Offline') {
     if (counter === 'all') {
       this.dayCounterAppoinments = this.dayAppoinments;
     }
@@ -833,7 +832,7 @@ export class CalendarComponent implements OnInit {
               'block-all-day',
               block.doctor_id ? 'doctor-specific' : 'all-doctors'
             ],
-            color: block.doctor_id ? '#ff9800' : '#f44336', // Orange for specific doctor, red for all doctors
+            color: block.doctor_id ? '#ff9800' : '#666666', // Orange for specific doctor, red for all doctors
             textColor: 'white'
           });
           
