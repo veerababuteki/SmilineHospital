@@ -1,26 +1,27 @@
 import { Component, ElementRef, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CalendarModule } from 'primeng/calendar';
 import { DropdownModule } from 'primeng/dropdown';
 import { ButtonModule } from 'primeng/button';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ActivatedRoute, NavigationEnd, Router, RouterModule, RouterOutlet } from '@angular/router';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ToastModule } from 'primeng/toast';
+import { MessageService as Toaster } from 'primeng/api';
+
+import { forkJoin, Subscription, of } from 'rxjs';
+import { catchError, filter } from 'rxjs/operators';
+
 import { MessageService } from '../../services/message.service';
 import { AuthService } from '../../services/auth.service';
 import { AppointmentService } from '../../services/appointment.service';
 import { UserService } from '../../services/user.service';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { forkJoin, Subscription } from 'rxjs';
-import { catchError, filter } from 'rxjs/operators';
-import { of } from 'rxjs';
 import { ClinicalNotesService } from '../../services/clinical-notes.service';
 import { TreatmentPlansService } from '../../services/treatment-plans.service';
 import { FileService } from '../../services/file.service';
 import { PatientDataService } from '../../services/patient-data.service';
-import { ToastModule } from 'primeng/toast';
-import { MessageService as Toaster } from 'primeng/api';
 
 @Component({
   selector: 'app-patients-section',
@@ -43,11 +44,10 @@ import { MessageService as Toaster } from 'primeng/api';
   ],
   providers: [Toaster]
 })
-
 export class PatientsSectionComponent implements OnInit, OnDestroy {
   patientId: string | null | undefined;
   appointments: any;
-    uniqueCode:  string | null | undefined;
+  uniqueCode: string | null | undefined;
   patientDetails: any;
   availableAdvance: number = 0;
   practices: any[] = [];
@@ -63,10 +63,10 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
   userPrivileges: any[] = [];
   patient: any;
 
-  // Subscriptions to manage
   private messageSubscription!: Subscription;
   private userSubscription!: Subscription;
   private branchesSubscription!: Subscription;
+
   clinicalNotes: any;
   completedProcedures: any[] = [];
   invoices: any[] = [];
@@ -92,19 +92,14 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-
+    // ✅ FIXED subscription with type guard
     this.currentUrl = this.router.url;
     this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event) => {
         this.currentUrl = event.urlAfterRedirects;
-      });
 
-    this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
         const state = history.state as { message?: string };
-
         if (state?.message) {
           setTimeout(() => {
             this.toaster.add({
@@ -114,7 +109,6 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
             });
           }, 500);
         }
-        console.log("TOASTER", state);
       });
 
     this.treatmentPlansService.getInvoices(Number(this.uniqueCode))
@@ -125,7 +119,7 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe(res => {
-        if (res) { // Only process if invoices were successfully fetched
+        if (res) {
           const existingData = this.patientDataService.getSnapshot();
           const updatedData = {
             ...existingData,
@@ -198,16 +192,9 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Clean up subscriptions
-    if (this.messageSubscription) {
-      this.messageSubscription.unsubscribe();
-    }
-    if (this.userSubscription) {
-      this.userSubscription.unsubscribe();
-    }
-    if (this.branchesSubscription) {
-      this.branchesSubscription.unsubscribe();
-    }
+    if (this.messageSubscription) this.messageSubscription.unsubscribe();
+    if (this.userSubscription) this.userSubscription.unsubscribe();
+    if (this.branchesSubscription) this.branchesSubscription.unsubscribe();
   }
 
   private loadSavedPractice(): void {
@@ -226,7 +213,7 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
   }
 
   private loadPatientProfile(): void {
-      if(this.uniqueCode === null ||this.uniqueCode === undefined) return;
+    if (this.uniqueCode === null || this.uniqueCode === undefined) return;
     forkJoin({
       patientDetails: this.userService.getUserProfile(this.uniqueCode),
       appointments: this.appointmentService.getAppointmentsByPatientID(this.uniqueCode),
@@ -253,9 +240,7 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
         this.files = res.files.data.rows.filter((f: any) => f.status !== 'Deleted');
 
         this.patientDataService.setData(res);
-
         this.availableAdvance = res.advanceAmount.data.available_advance;
-
       },
       error: (err) => {
         console.error('Error fetching data:', err);
@@ -289,8 +274,6 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
     if (this.showPracticesDropdown) {
       this.practiceSearchText = '';
       this.filteredPractices = [...this.practices];
-
-      // Focus on the search input after a short delay
       setTimeout(() => {
         const searchInput = this.elementRef.nativeElement.querySelector('.practice-search');
         if (searchInput) {
@@ -300,12 +283,9 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Select a practice and save to localStorage
   selectPractice(practice: any) {
     this.selectedPractice = practice;
     this.showPracticesDropdown = false;
-
-    // Save to localStorage
     localStorage.setItem('selectedPractice', JSON.stringify(practice));
     this.router.navigate(['/patients/patient-directory']);
     setTimeout(() => {
@@ -313,13 +293,11 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
     }, 250);
   }
 
-  // Filter practices based on search text
   filterPractices() {
     if (!this.practiceSearchText.trim()) {
       this.filteredPractices = [...this.practices];
       return;
     }
-
     const searchTerm = this.practiceSearchText.toLowerCase().trim();
     this.filteredPractices = this.practices.filter(practice =>
       practice.branch_name.toLowerCase().includes(searchTerm) ||
@@ -332,12 +310,9 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
       this.showPatientSelectionWarning();
       return;
     }
-
-    // Navigate to the correct route
     this.router.navigate(['/patients', this.patientId, route.substring(1), this.uniqueCode]);
   }
 
-  // Close dropdown when clicking outside
   @HostListener('document:click', ['$event'])
   handleDocumentClick(event: MouseEvent) {
     if (this.showPracticesDropdown &&
@@ -376,7 +351,7 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
     return this.currentUrl.includes('/patient-directory');
   }
 
-  isUrlActive(url: string){
+  isUrlActive(url: string) {
     return this.currentUrl.includes(url);
   }
 }

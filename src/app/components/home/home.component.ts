@@ -7,6 +7,7 @@ import { CommonModule } from "@angular/common";
 
 @Component({
   selector: 'app-home',
+  standalone: true,
   imports: [RouterOutlet, SideTopNavComponent, CommonModule],
   template: `
       <app-side-top-nav></app-side-top-nav>

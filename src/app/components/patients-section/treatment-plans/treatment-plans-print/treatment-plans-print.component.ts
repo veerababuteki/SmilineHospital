@@ -5,7 +5,8 @@ import { Component, Input } from '@angular/core';
   selector: 'app-treatment-plans-print',
   imports: [CommonModule],
   templateUrl: './treatment-plans-print.component.html',
-  styleUrl: './treatment-plans-print.component.scss'
+  styleUrl: './treatment-plans-print.component.scss',
+  standalone: true,
 })
 export class TreatmentPlansPrintComponent {
   @Input() treatmentPlan: any;

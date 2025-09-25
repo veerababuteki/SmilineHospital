@@ -5,7 +5,8 @@ import { Component, Input } from '@angular/core';
   selector: 'app-clinical-notes-print',
   imports: [CommonModule],
   templateUrl: './clinical-notes-print.component.html',
-  styleUrl: './clinical-notes-print.component.scss'
+  styleUrl: './clinical-notes-print.component.scss',
+  standalone:true,
 })
 export class ClinicalNotesPrintComponent{
   @Input() clinicalNotes: any;

@@ -28,7 +28,8 @@ interface DateGroup {
   templateUrl: './appointments-print.component.html',
   styleUrls: ['./appointments-print.component.scss'],
   standalone: true,
-  imports: [CommonModule, CheckboxModule, DropdownModule, FormsModule, ButtonModule, CalendarModule]
+  imports: [CommonModule, CheckboxModule, DropdownModule, FormsModule, ButtonModule, CalendarModule],
+
 })
 export class AppointmentsPrintComponent implements OnInit, OnDestroy {
   @Input() appointments: any[] = [];

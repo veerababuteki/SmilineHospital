@@ -6,6 +6,7 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { EventPopoverComponent } from '../event-popover/event-popover.component';
 @Component({
   selector: 'app-event-list',
+  standalone: true,
   imports:[CommonModule],
   template: `
     <div class="event-list">

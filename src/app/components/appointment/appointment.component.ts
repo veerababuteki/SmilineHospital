@@ -29,6 +29,7 @@ import { PatientDataService } from '../../services/patient-data.service';
   selector: 'app-appointment',
   templateUrl: './appointment.component.html',
   styleUrls: ['./appointment.component.scss'],
+  standalone: true,
   imports: [
     DialogModule,
     ButtonModule,

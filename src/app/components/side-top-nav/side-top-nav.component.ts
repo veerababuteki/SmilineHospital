@@ -29,6 +29,7 @@ interface NavItem {
   selector: 'app-side-top-nav',
   templateUrl: './side-top-nav.component.html',
   styleUrl: './side-top-nav.component.scss',
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule,

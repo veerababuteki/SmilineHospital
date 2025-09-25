@@ -20,6 +20,7 @@ export interface Patient {
   selector: 'app-patient-directory',
   templateUrl: './patient-directory.component.html',
   styleUrls: ['./patient-directory.component.scss'],
+  standalone: true,
   imports: [FormsModule, CommonModule, DialogModule, AddProfileComponent]
 })
 export class PatientDirectoryComponent implements OnInit {

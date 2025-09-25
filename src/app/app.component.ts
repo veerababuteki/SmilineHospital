@@ -29,6 +29,7 @@ interface NavItem {
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
+  standalone: true,
   imports: [
     RouterOutlet,
     CommonModule,

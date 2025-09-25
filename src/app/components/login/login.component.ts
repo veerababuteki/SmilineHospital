@@ -13,6 +13,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
   imports: [CommonModule, 
     ReactiveFormsModule, 
     CalendarModule, 

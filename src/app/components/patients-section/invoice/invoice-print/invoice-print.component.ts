@@ -6,7 +6,8 @@ import { Component, Input } from '@angular/core';
   selector: 'app-invoice-print',
   imports: [CommonModule],
   templateUrl: './invoice-print.component.html',
-  styleUrl: './invoice-print.component.scss'
+  styleUrl: './invoice-print.component.scss',
+  standalone: true,
 })
 export class InvoicePrintComponent {
 
