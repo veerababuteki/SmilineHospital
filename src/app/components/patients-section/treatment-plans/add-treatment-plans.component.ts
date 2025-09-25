@@ -166,9 +166,11 @@ export class AddTreatmentPlansComponent implements OnInit {
 
   private setDoctorFromEditData() {
     if (this.editTreatmentData && this.editTreatmentData.length > 0) {
-      const doctorId = this.editTreatmentData[0].doctor_id;
+    const doctorId = this.editTreatmentData[0].doctor_details_treat?.doctor_id; // ✅ use doctor_details_treat
       if (doctorId && this.doctors.length > 0) {
-        const foundDoctor = this.doctors.find(doc => doc.user_id.toString() === doctorId.toString());
+      const foundDoctor = this.doctors.find(
+        doc => doc.user_id.toString() === doctorId.toString()
+      );
         if (foundDoctor) {
           this.doctor = foundDoctor;
         }
@@ -219,7 +221,7 @@ export class AddTreatmentPlansComponent implements OnInit {
         discount: [parseFloat(treatment.discount)],
         discountType: [treatment.discount_formate || '%'],
         total: [parseFloat(treatment.total_cost)],
-        selectedTeeth: [this.parseTeethSet(treatment.teeth_set)],
+        selectedTeeth: [this.parseTeeths(treatment.teeth_set)],
         multiplyCost: [true],
         fullMouth: [false],
         showAdultTeeth: [false],
@@ -246,6 +248,15 @@ export class AddTreatmentPlansComponent implements OnInit {
       .filter(tooth => tooth !== '')
       .map(tooth => parseInt(tooth, 10))
       .filter(tooth => !isNaN(tooth));
+  }
+
+  parseTeeths(teethSet: string | number[] | null): number[] {
+  if (!teethSet) return [];
+  if (Array.isArray(teethSet)) return teethSet.map(Number); // already array
+  if (typeof teethSet === 'string') {
+    return teethSet.split('|').map(t => Number(t));
+  }
+  return [];
   }
 
   filterProcedures() {
