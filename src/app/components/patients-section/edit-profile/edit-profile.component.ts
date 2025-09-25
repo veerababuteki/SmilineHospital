@@ -463,6 +463,7 @@ private updatePatientProfile(patientDetails: any, historyDetails: any) {
     primary_mobile: patientDetails.primaryMobile,
     secondary_mobile: patientDetails.secondaryMobile,
     land_line: patientDetails.landLine,
+    email:patientDetails.email,
     street_address: patientDetails.streetAddress,
     locality: patientDetails.locality,
     city: patientDetails.city,

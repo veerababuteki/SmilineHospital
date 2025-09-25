@@ -413,6 +413,7 @@ private registerPatient(patientDetails: any, historyDetails: any) {
     return age;
   }
   cancel() {
+    this.patientForm.reset();
     this.onCancel.emit();
   }
 
