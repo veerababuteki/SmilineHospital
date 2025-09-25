@@ -276,6 +276,7 @@ export class SfcFormComponent implements OnDestroy {
 
   
 addEntry() {
+  console.log('Add entry triggered');
   this.submitted = true;
 
   const requiredFields = [
@@ -294,14 +295,14 @@ addEntry() {
   if (isEmpty) return;
 
   // Character-only validation for name
-  if (!/^[A-Za-z ]+$/.test(this.newEntry.name)) {
-    this.messageService.add({
-      severity: 'error',
-      summary: 'Invalid Name',
-      detail: 'Name should contain characters only.'
-    });
-    return;
-  }
+  // if (!/^[A-Za-z ]+$/.test(this.newEntry.name)) {
+  //   this.messageService.add({
+  //     severity: 'error',
+  //     summary: 'Invalid Name',
+  //     detail: 'Name should contain characters only.'
+  //   });
+  //   return;
+  // }
 
   // Check for negative ageRelation
   if (Number(this.newEntry.ageRelation) < 0) {
@@ -319,42 +320,44 @@ addEntry() {
     return;
   }
 
-  this.userService.getPatient(this.newEntry.patientId).subscribe({
-    next: (response) => {
-      const patient = response.data?.[0];
+  // this.userService.getPatient(this.newEntry.patientId).subscribe({
+  //   next: (response) => {
+  //     const patient = response.data?.[0];
 
-      if (patient && String(this.newEntry.patientId) === String(patient.manual_unique_code)) {
-        // Patient exists - this is good! Auto-populate name and proceed
-        if (!this.newEntry.name || this.newEntry.name.trim() === '') {
-          this.newEntry.name = `${patient.first_name} ${patient.last_name}`.trim();
-        }
+  //     if (patient && String(this.newEntry.patientId) === String(patient.manual_unique_code)) {
+  //       // Patient exists - this is good! Auto-populate name and proceed
+  //       if (!this.newEntry.name || this.newEntry.name.trim() === '') {
+  //         this.newEntry.name = `${patient.first_name} ${patient.last_name}`.trim();
+  //       }
 
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Patient Found',
-          detail: `Patient "${this.newEntry.name}" found. Proceeding to add SFC entry.`
-        });
-      }
+  //       this.messageService.add({
+  //         severity: 'success',
+  //         summary: 'Patient Found',
+  //         detail: `Patient "${this.newEntry.name}" found. Proceeding to add SFC entry.`
+  //       });
+  //     }
 
-      // Always proceed to add SFC entry (whether patient exists or not)
-      this.addSfcEntry();
-    },
-    error: (error) => {
-      // If patient doesn't exist (400/404), still allow adding SFC entry
-      if (error.status === 400 || error.status === 404) {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'New Patient',
-          detail: 'Patient not found in system. Adding as new SFC entry.'
-        });
-      } else {
-        console.error('Unexpected error checking patient:', error);
-      }
+  //     // Always proceed to add SFC entry (whether patient exists or not)
+  //     this.addSfcEntry();
+  //   },
+  //   error: (error) => {
+  //     // If patient doesn't exist (400/404), still allow adding SFC entry
+  //     if (error.status === 400 || error.status === 404) {
+  //       this.messageService.add({
+  //         severity: 'info',
+  //         summary: 'New Patient',
+  //         detail: 'Patient not found in system. Adding as new SFC entry.'
+  //       });
+  //     } else {
+  //       console.error('Unexpected error checking patient:', error);
+  //     }
 
-      // Always proceed to add SFC entry
-      this.addSfcEntry();
-    }
-  });
+  //     // Always proceed to add SFC entry
+  //     this.addSfcEntry();
+  //   }
+  // });
+
+  this.addSfcEntry();
 }
 
 cancelEdit() {
@@ -422,25 +425,26 @@ private addSfcEntry() {
 
 
 removeEntry(entry: any) {
-  this.userService.getPatient(entry.patientId).subscribe({
-    next: (response) => {
-      const patient = response.data?.[0];
-      if (patient && String(entry.patientId) === String(patient.manual_unique_code)) {
-        // If patient exists in backend → do not delete
-        this.messageService.add({
-          severity: 'warn',
-          summary: 'Action Not Allowed',
-          detail: 'This record belongs to an existing patient and cannot be removed.'
-        });
-        return;
-      }
-      this.confirmAndDelete(entry);
-    },
-    error: () => {
-      // If getPatient fails (like 400), still allow deletion
-      this.confirmAndDelete(entry);
-    }
-  });
+  // this.userService.getPatient(entry.patientId).subscribe({
+  //   next: (response) => {
+  //     const patient = response.data?.[0];
+  //     if (patient && String(entry.patientId) === String(patient.manual_unique_code)) {
+  //       // If patient exists in backend → do not delete
+  //       this.messageService.add({
+  //         severity: 'warn',
+  //         summary: 'Action Not Allowed',
+  //         detail: 'This record belongs to an existing patient and cannot be removed.'
+  //       });
+  //       return;
+  //     }
+  //     this.confirmAndDelete(entry);
+  //   },
+  //   error: () => {
+  //     // If getPatient fails (like 400), still allow deletion
+  //     this.confirmAndDelete(entry);
+  //   }
+  // });
+  this.confirmAndDelete(entry);
 }
 
 confirmAndDelete(entry: any) {
@@ -544,11 +548,11 @@ toggleDropdown(i: number, event: MouseEvent) {
     && !this.isFieldInvalid('name') 
     && !(patientIdInvalid || patientSearchInvalid)
     && !this.isFieldInvalid('ageRelation')
-    && !this.isFieldInvalid('profileOccupation')
-    && !this.isFieldInvalid('smilinePatient')
-    && !this.isFieldInvalid('doctorFrontOfficeComment')
-    && !this.isFieldInvalid('doctorAdvice')
-    && !this.isFieldInvalid('frontOfficeRemarks');
+    // && !this.isFieldInvalid('profileOccupation')
+    // && !this.isFieldInvalid('smilinePatient')
+    // && !this.isFieldInvalid('doctorFrontOfficeComment')
+    // && !this.isFieldInvalid('doctorAdvice')
+    // && !this.isFieldInvalid('frontOfficeRemarks');
     console.log('Form validity:', formValidity);
     return formValidity;
   }
