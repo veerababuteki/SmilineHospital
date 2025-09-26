@@ -110,6 +110,7 @@ export class AppointmentComponent implements OnInit {
   blockingDuration: number | null = null;
   blockingBranchId: number | null = null;
   branches: any[] = [];
+  patientId: string = '';
 
   // Computed property for minToDate
   get minToDate(): Date {
@@ -1049,12 +1050,21 @@ atLeastOneBlockTypeValidator() {
   private handlePatientResponse(patients: any[]) {
     if (patients.length === 1) {
       this.selectPatient(patients[0]);
+      this.getAppointments(this.patient.unique_code);
     } else if (patients.length > 1) {
       this.multiplePatients = patients;
       this.showPatientDropdown = true;
     } else {
       this.handleNoPatientFound();
     }
+  }
+
+  getAppointments(patientId: string) {
+    this.appointmentService.getAppointmentsByPatientID(patientId).subscribe({
+      next: (response) => {
+        this.allAppointments = response.data.rows || [];
+      }
+    });
   }
 
   private handleNoPatientFound() {
@@ -1076,6 +1086,7 @@ atLeastOneBlockTypeValidator() {
 
   selectPatient(patient: any) {
     this.patient = patient;
+    this.patientId = patient.manual_unique_code;
 
     // Check which data structure we're dealing with
     if (patient.profile) {
