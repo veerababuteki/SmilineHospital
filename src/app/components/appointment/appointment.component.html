@@ -213,7 +213,7 @@
   <small class="error-message" *ngIf="appointmentForm.get('scheduledDate')?.invalid && appointmentForm.get('scheduledDate')?.touched">
     Scheduled Date is required
   </small>
-  <small class="error-message" *ngIf="appointmentForm.get('scheduledTime')?.invalid && appointmentForm.get('scheduledTime')?.touched">
+  <small class="error-message" *ngIf="appointmentForm.get('scheduledTime')?.invalid && appointmentForm.get('scheduledTime')?.touched && !appointmentForm.get('scheduledTime')?.hasError('timeBlocked') && !appointmentForm.get('scheduledTime')?.hasError('patientBlocked')">
     Scheduled Time is required
   </small>
   <small class="error-message" *ngIf="appointmentForm.get('scheduledTime')?.hasError('timeBlocked')">
