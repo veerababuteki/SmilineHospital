@@ -8,6 +8,7 @@ import { HttpEvent, HttpEventType } from '@angular/common/http';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { environment } from '../../Env/environment';
+import { EmailValidator } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root',
@@ -189,6 +190,7 @@ export class UserService {
         secondary_mobile: patientDetails.secondary_mobile,
         langugae: patientDetails.langugae,
         land_line: patientDetails.land_line,
+        email:patientDetails.email,
         street_address: patientDetails.street_address,
         locality: patientDetails.locality,
         city: patientDetails.city,
@@ -226,6 +228,7 @@ export class UserService {
         secondary_mobile: patientDetails.secondary_mobile,
         langugae: patientDetails.langugae,
         land_line: patientDetails.land_line,
+        email:patientDetails.email,
         street_address: patientDetails.street_address,
         locality: patientDetails.locality,
         city: patientDetails.city,
