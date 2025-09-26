@@ -49,10 +49,16 @@ export class ReportsService {
 
   // 3. Patients Report
   getPatients(from_date: any, to_date: any, branch_id: number): Observable<any> {
-    const params = new HttpParams()
-      .set('from_date', new Date(from_date).toISOString().split('T')[0])
-      .set('to_date', new Date(to_date).toISOString().split('T')[0])
-      .set('branch_id', branch_id);
+    const fromDateTime = new Date(from_date);
+  fromDateTime.setHours(0, 0, 0, 0);
+
+  const toDateTime = new Date(to_date);
+  toDateTime.setHours(23, 59, 59, 999);
+
+  const params = new HttpParams()
+    .set('from_date', fromDateTime.toISOString().slice(0, 19).replace('T', ' '))
+    .set('to_date', toDateTime.toISOString().slice(0, 19).replace('T', ' '))
+    .set('branch_id', branch_id);
     return this.http.get(`${this.baseUrl}/report/patients`, { headers: this.getAuthHeaders(), params })
       .pipe(catchError(this.handleError));
   }
