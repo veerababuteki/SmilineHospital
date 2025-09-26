@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "arun" ]
   pull_request:
-    branches: [ "arun" ]
+    branches: [ "main" ]
 
 jobs:
   deploy:
