@@ -375,8 +375,8 @@ export class AddTreatmentPlansComponent implements OnInit {
     if(teethType === 'both'){
       treatment.get('showAdultTeeth')?.setValue(false);
       treatment.get('showChildTeeth')?.setValue(false);
-      treatment.get('fullMouth')?.setValue(false);
-      treatment.get('selectedTeeth')?.setValue([]);
+      // treatment.get('fullMouth')?.setValue(false);
+      // treatment.get('selectedTeeth')?.setValue([]);
       this.calculateTotal(treatmentIndex);
     }
     else if (teethType === 'adult') {

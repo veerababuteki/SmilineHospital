@@ -392,7 +392,7 @@ export class AddInvoiceComponent implements OnInit {
         treatment.get('selectedTeeth')?.setValue(allTeeth);
       } else {
         // When unchecking Full Mouth, clear all selections
-        treatment.get('selectedTeeth')?.setValue([]);
+        // treatment.get('selectedTeeth')?.setValue([]);
       }
       
       this.calculateTotal(treatmentIndex);
