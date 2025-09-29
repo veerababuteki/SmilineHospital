@@ -251,12 +251,20 @@ export class AddTreatmentPlansComponent implements OnInit {
   }
 
   parseTeeths(teethSet: string | number[] | null): number[] {
-  if (!teethSet) return [];
-  if (Array.isArray(teethSet)) return teethSet.map(Number); // already array
-  if (typeof teethSet === 'string') {
-    return teethSet.split('|').map(t => Number(t));
-  }
-  return [];
+    if (!teethSet) {
+      return [];
+    }
+    if (Array.isArray(teethSet)) {
+      return teethSet.map(Number);
+    }
+    if (typeof teethSet === 'string') {
+      // Support both '|' and ',' as delimiters
+      let delimiter = '|';
+      if (teethSet.includes(',')) delimiter = ',';
+      const split = teethSet.split(delimiter).map(s => s.trim()).filter(Boolean);
+      return split.map(t => Number(t));
+    }
+    return [];
   }
 
   filterProcedures() {
