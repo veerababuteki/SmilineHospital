@@ -89,12 +89,11 @@
             [options]="doctors" 
             optionLabel="name" 
             showIcon="false" 
-            class="doctor-name"
-            [style]="{'width':'100%'}" 
+            class="doctor-name" 
             [placeholder]="'Select Doctor'">
           </p-dropdown>
           <span class="padding-span">on</span>
-          <p-calendar [(ngModel)]="date" dateFormat="dd-mm-yy"></p-calendar>
+          <p-calendar [(ngModel)]="date" dateFormat="dd-mm-yy" appendTo="body"></p-calendar>
         </div>
       </div>
 

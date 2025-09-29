@@ -93,9 +93,15 @@
         border: 1px solid #ddd !important;
         border-radius: 4px;
         margin-left: 10px;
-        width: 100px;
+        width: 120px;
+        // Calendar popup
+        ::ng-deep .p-datepicker {
+          z-index: 9999 !important;
+          position: fixed !important;
+          top: auto !important;
+          left: 0 !important;
+        }
       }
-
       .action-links {
         display: flex;
         gap: 10px;
@@ -120,6 +126,7 @@
       color: #666;
       font-size: 14px;
       display: flex;
+      align-items: center;
       gap: 10px;
 
       .doctor-name,
@@ -128,8 +135,12 @@
         border-radius: 4px;
       }
 
+      .doctor-name {
+        min-width: 180px;
+      }
+
       p-calendar {
-        width: 100px;
+        width: 120px;
         display: flex;
       }
     }
