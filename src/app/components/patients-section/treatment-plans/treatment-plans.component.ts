@@ -66,10 +66,7 @@ export class TreatmentPlansComponent implements OnInit {
   }
 
   consentform(plan: any): void {
-  console.log('Consent form plan data:', plan);
-  console.log('Treatment unique ID:', plan?.treatment_unique_id);
-  console.log('Patient details:', plan?.patient_details_treat);
-  console.log('Doctor details:', plan?.doctor_details_treat);
+    console.log('triggered consent from click');
   
   this.selectedConsentTreatment = {
     patientName: plan?.patient_details_treat?.user_profile_details[0]?.first_name + ' ' +
@@ -77,10 +74,11 @@ export class TreatmentPlansComponent implements OnInit {
     doctorName: 'Dr. ' + plan?.doctor_details_treat?.user_profile_details[0]?.first_name + ' ' +
                          plan?.doctor_details_treat?.user_profile_details[0]?.last_name,
     date: plan?.date ? plan.date.split('T')[0] : new Date().toISOString().split('T')[0],
-    treatmentUniqueId: plan?.treatment_unique_id
+    treatmentUniqueId: plan?.treatment_unique_id,
+    treatmentId: plan?.id
   };
   
-  console.log('Selected consent treatment:', this.selectedConsentTreatment);
+  // console.log('Selected consent treatment:', this.selectedConsentTreatment);
   this.consentFormVisible = true;
 }
 
@@ -125,20 +123,7 @@ export class TreatmentPlansComponent implements OnInit {
     const activeTreatmentPlans = treatments.filter((_: any) => _.status !== 'Completed');
     this.treatmentPlans = this.groupByDate(activeTreatmentPlans);
   });
-
-  this.items = [
-    {
-      label: 'Edit',
-      icon: 'pi pi-pencil',
-      command: (event) => this.updateTreatmentPlans(event)
-    },
-    {
-      label: 'Consent Form',
-      icon: 'pi pi-file',
-      command: (event) => this.consentform(event)
-    }
-  ];
-}
+  }
 
   updateTreatmentPlans(treatmentPlan: any): void {
     this.router.navigate(['patients', this.patientId, 'add-treatment-plan', this.uniqueCode], {
@@ -148,25 +133,14 @@ export class TreatmentPlansComponent implements OnInit {
 
   setCurrentTreatmentPlan(rows: any,
   treatmentKey: any): void {
-    console.log('setCurrentTreatmentPlan called with rows:', rows);
-    console.log('treatmentKey:', treatmentKey);
+    // console.log('setCurrentTreatmentPlan called with rows:', rows);
+    // console.log('treatmentKey:', treatmentKey);
     
     // Update menu items with the current invoice key as data
     this.currentTreatmentPlan = rows.filter((row: any) => row.treatment_unique_id === treatmentKey)
-    console.log('Filtered currentTreatmentPlan:', this.currentTreatmentPlan);
-    
-    this.items = [
-      {
-        label: 'Edit',
-        icon: 'pi pi-pencil',
-        command: () => this.updateTreatmentPlans(this.currentTreatmentPlan)
-      },
-      {
-      label: 'Consent Form',
-      icon: 'pi pi-file',
-        command: () => this.consentform(this.currentTreatmentPlan[0]) // Pass the first treatment plan
-    }
-    ];
+    // console.log('Filtered currentTreatmentPlan:', this.currentTreatmentPlan);
+    // The items array will be set dynamically per row in the template
+    // so we no longer set it here
   }
 
   loadPatientData(patientId: string) {
@@ -473,5 +447,20 @@ handleKeyboardEvent(event: KeyboardEvent) {
     if (!teethSet) return false;
     const teeth = teethSet.split(',').map(t => t.trim());
     return teeth.length > 2;
+  }
+
+  setMenuItemsForTreatment(treatment: any) {
+    this.items = [
+      {
+        label: 'Edit',
+        icon: 'pi pi-pencil',
+        command: () => this.updateTreatmentPlans(treatment)
+      },
+      {
+        label: 'Consent Form',
+        icon: 'pi pi-file',
+        command: () => this.consentform(treatment)
+      }
+    ];
   }
 }

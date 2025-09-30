@@ -26,11 +26,14 @@ export class FileUploadService {
   }
 
   // Upload single consent form for treatment
-  uploadConsentForm(file: File, userId: string, treatmentUniqueId: string): Observable<any> {
+  uploadConsentForm(file: File, userId: string, treatmentUniqueId: string, treatmentId?: string): Observable<any> {
     const formData = new FormData();
     formData.append('image', file);
     formData.append('user_id', userId);
     formData.append('treatment_unique_id', treatmentUniqueId);
+    if (treatmentId) {
+      formData.append('treatment_id', treatmentId);
+    }
 
     return this.http.post(
       `${this.baseUrl}/file/addTreatmentFile`,
