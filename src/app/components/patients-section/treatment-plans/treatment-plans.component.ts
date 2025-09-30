@@ -66,7 +66,6 @@ export class TreatmentPlansComponent implements OnInit {
   }
 
   consentform(plan: any): void {
-    console.log('triggered consent from click');
   
   this.selectedConsentTreatment = {
     patientName: plan?.patient_details_treat?.user_profile_details[0]?.first_name + ' ' +
@@ -78,7 +77,6 @@ export class TreatmentPlansComponent implements OnInit {
     treatmentId: plan?.id
   };
   
-  // console.log('Selected consent treatment:', this.selectedConsentTreatment);
   this.consentFormVisible = true;
 }
 
@@ -133,12 +131,10 @@ export class TreatmentPlansComponent implements OnInit {
 
   setCurrentTreatmentPlan(rows: any,
   treatmentKey: any): void {
-    // console.log('setCurrentTreatmentPlan called with rows:', rows);
-    // console.log('treatmentKey:', treatmentKey);
+
     
     // Update menu items with the current invoice key as data
     this.currentTreatmentPlan = rows.filter((row: any) => row.treatment_unique_id === treatmentKey)
-    // console.log('Filtered currentTreatmentPlan:', this.currentTreatmentPlan);
     // The items array will be set dynamically per row in the template
     // so we no longer set it here
   }

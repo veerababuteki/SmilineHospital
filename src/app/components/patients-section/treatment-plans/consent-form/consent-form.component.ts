@@ -318,14 +318,12 @@ export class ConsentFormComponent implements OnInit {
       return;
     }
 
-    console.log('Uploading with userId:', this.userId, 'treatmentUniqueId:', this.treatmentUniqueId, 'treatmentId: ', this.treatmentId);
 
     this.isLoading = true;
     try {
       const files = newFiles.map(form => form.file);
       
       if (files.length === 1) {
-        console.log('sending treatment id: ', this.treatmentId);
         await firstValueFrom(this.fileUploadService.uploadConsentForm(
           files[0], 
           this.userId, 
@@ -366,7 +364,6 @@ export class ConsentFormComponent implements OnInit {
       return;
     }
 
-    console.log('Calling API to get consent forms for treatment:', this.treatmentUniqueId, this.treatmentId);
     this.isLoadingExistingForms = true;
     this.fileUploadService.getConsentFormsByTreatment(this.treatmentUniqueId)
       .subscribe({
