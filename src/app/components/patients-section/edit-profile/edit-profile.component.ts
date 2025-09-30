@@ -149,9 +149,10 @@ export class EditProfileComponent implements OnInit {
       this.userService.getPublicUserProfile(patientId).subscribe(res =>{
          this.patientDetails = res.data;
 
-      let genderValue = this.patientDetails.gender;
-    if (genderValue === 'M') genderValue = 'Male';
-    if (genderValue === 'F') genderValue = 'Female';
+      this.patientDetails.gender = 
+        this.patientDetails.gender === 'M' ? 'Male' : 
+        this.patientDetails.gender === 'F' ? 'Female' : this.patientDetails.gender;
+
         this.patientDetails = res.data;
       this.patientForm.patchValue({
         firstName: this.patientDetails.first_name,
@@ -211,6 +212,9 @@ export class EditProfileComponent implements OnInit {
     } else {
       this.userService.getUserProfile(patientId).subscribe(res =>{
         this.patientDetails = res.data;
+         this.patientDetails.gender = 
+          this.patientDetails.gender === 'M' ? 'Male' : 
+          this.patientDetails.gender === 'F' ? 'Female' : this.patientDetails.gender;
       this.patientForm.patchValue({
         firstName: this.patientDetails.first_name,
         customId: this.patientDetails.user_details.manual_unique_code,

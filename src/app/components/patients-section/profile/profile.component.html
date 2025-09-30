@@ -17,7 +17,16 @@
                 <div class="info-grid">
                     <div class="info-row">
                         <span class="label">Patient name :</span>
-                        <span class="value">{{patientDetails.gender === 'Male' ? 'Mr. ' : 'Mrs. '}}{{patientDetails.first_name +' '+ patientDetails.last_name}}</span>
+<span class="value">
+  {{
+    (patientDetails.gender === 'Male' || patientDetails.gender === 'M')
+      ? 'Mr. '
+      : (patientDetails.gender === 'Female' || patientDetails.gender === 'F')
+        ? 'Mrs. '
+        : ''
+  }}
+  {{ patientDetails.first_name + ' ' + patientDetails.last_name }}
+</span>
                     </div>
                     <!-- <div class="info-row">
                         <span class="label">Patient ID :</span>
@@ -38,10 +47,13 @@
                             <a class="add-link">Add ABHA Id</a>
                         </span>
                     </div> -->
-                    <div class="info-row">
-                        <span class="label">Gender :</span>
-                        <span class="value" *ngIf="patientDetails.gender">{{patientDetails.gender}}</span>
-                    </div>
+                   <div class="info-row">
+  <span class="label">Gender :</span>
+  <span class="value" *ngIf="patientDetails.gender">
+    {{ patientDetails.gender === 'M' ? 'Male' : patientDetails.gender === 'F' ? 'Female' : patientDetails.gender }}
+  </span>
+</div>
+
                     <div class="info-row">
                         <span class="label">Age :</span>
                         <span class="value" *ngIf="patientDetails.age">{{patientDetails.age}}</span>
