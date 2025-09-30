@@ -46,7 +46,6 @@ interface SignatureData {
 })
 export class ConsentFormComponent implements OnInit {
   @Input() set treatment(value: any) {
-    console.log('Treatment input setter called with:', value);
     this._treatment = value;
     if (value) {
       this.patchFormWithTreatmentData(value);
@@ -73,6 +72,7 @@ export class ConsentFormComponent implements OnInit {
   selectedMode: string | null = null;
   uploadedForms: any[] = [];
   treatmentUniqueId: string = '';
+  treatmentId: string = '';
   userId: string = '';
   isLoading: boolean = false;
   isLoadingExistingForms: boolean = false; // New property to track loading state
@@ -140,7 +140,6 @@ export class ConsentFormComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('Consent form ngOnInit - treatment input:', this.treatment);
     this.createConsentForm();
     // Initialize uploadedForms as empty array
     this.uploadedForms = [];
@@ -157,7 +156,6 @@ export class ConsentFormComponent implements OnInit {
   }
 
   patchFormWithTreatmentData(treatment: any): void {
-    console.log('Patching form with treatment data:', treatment);
     
     this.consentForm.patchValue({
       patientName: treatment?.patientName || '',
@@ -167,17 +165,14 @@ export class ConsentFormComponent implements OnInit {
     
     // Set the treatment unique ID for file uploads
     this.treatmentUniqueId = treatment?.treatmentUniqueId || '';
-    console.log('Set treatmentUniqueId to:', this.treatmentUniqueId);
+    this.treatmentId = treatment?.treatmentId || '';
   }
 
   loadCurrentUser(): void {
-    console.log('Loading current user...');
     this.authService.getUser().subscribe({
       next: (response) => {
-        console.log('User response:', response);
         if (response && response.data && response.data.user_id) {
           this.userId = response.data.user_id;
-          console.log('Set userId to:', this.userId);
           // Load existing consent forms if treatment data is already available
           if (this.treatmentUniqueId) {
             this.loadExistingConsentForms();
@@ -305,10 +300,6 @@ export class ConsentFormComponent implements OnInit {
       return;
     }
 
-    console.log('Current userId:', this.userId);
-    console.log('Current treatmentUniqueId:', this.treatmentUniqueId);
-    console.log('Current treatment data:', this.treatment);
-
     if (!this.userId) {
       this.messageService.add({
         severity: 'error',
@@ -327,7 +318,6 @@ export class ConsentFormComponent implements OnInit {
       return;
     }
 
-    console.log('Uploading with userId:', this.userId, 'treatmentUniqueId:', this.treatmentUniqueId);
 
     this.isLoading = true;
     try {
@@ -337,7 +327,8 @@ export class ConsentFormComponent implements OnInit {
         await firstValueFrom(this.fileUploadService.uploadConsentForm(
           files[0], 
           this.userId, 
-          this.treatmentUniqueId
+          this.treatmentUniqueId,
+          this.treatmentId
         ));
       } else if (files.length > 1) {
         await firstValueFrom(this.fileUploadService.uploadMultipleConsentForms(
@@ -368,14 +359,11 @@ export class ConsentFormComponent implements OnInit {
   }
 
   loadExistingConsentForms(): void {
-    console.log('loadExistingConsentForms called with treatmentUniqueId:', this.treatmentUniqueId);
     if (!this.treatmentUniqueId) {
-      console.log('No treatmentUniqueId available, skipping load');
       this.hasLoadedExistingForms = true; // Mark as attempted even if no ID
       return;
     }
 
-    console.log('Calling API to get consent forms for treatment:', this.treatmentUniqueId);
     this.isLoadingExistingForms = true;
     this.fileUploadService.getConsentFormsByTreatment(this.treatmentUniqueId)
       .subscribe({
@@ -387,13 +375,15 @@ export class ConsentFormComponent implements OnInit {
               name: file.file_path ? file.file_path.split('/').pop() || 'Unknown file' : 'Unknown file',
               file_path: file.file_path,
               uploadDate: new Date(file.created_at),
-              isExisting: true
+              isExisting: true,
+              treatmentId: file.treatment_id
             }));
-            console.log('Mapped existing files:', existingFiles);
+            //Filter exisiting files by Treatment ID, if not null:
+            const filteredFiles = existingFiles.filter((x: { treatmentId: string; }) => x.treatmentId ? x.treatmentId == this.treatmentId : x)
+
             // Merge with any new files that haven't been uploaded yet
             const newFiles = this.uploadedForms.filter(f => !f.isExisting);
-            this.uploadedForms = [...existingFiles, ...newFiles];
-            console.log('Final uploadedForms array:', this.uploadedForms);
+            this.uploadedForms = [...filteredFiles, ...newFiles];
           } else {
             console.log('No existing files found in response');
             this.uploadedForms = this.uploadedForms.filter(f => !f.isExisting);

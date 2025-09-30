@@ -102,13 +102,7 @@
                     pButton
                     icon="pi pi-chevron-down"
                     class="edit-btn border-right-radius p-button-text"
-                    (click)="
-                      invoiceMenu.toggle($event);
-                      setCurrentTreatmentPlan(
-                        treatmentPlans[date],
-                        treatmentkey.value
-                      )
-                    "
+                    (click)="setMenuItemsForTreatment(treatment); invoiceMenu.toggle($event)"
                   ></button>
                   <p-menu #invoiceMenu [popup]="true" [model]="items"></p-menu>
                 </td>
