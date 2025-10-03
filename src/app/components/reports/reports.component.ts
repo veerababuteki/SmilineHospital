@@ -498,9 +498,9 @@ if (app.last_payment && app.last_payment.includes(' on ')) {
     lastPaymentAmount = parseFloat(app.last_payment.replace(/,/g, '')) || null;
     lastPaymentDisplay = lastPaymentAmount !== null 
         ? `₹${lastPaymentAmount.toFixed(2)}`
-        : 'Not found';
+        : '₹0.00';
 } else {
-    lastPaymentDisplay = 'Not found';
+lastPaymentDisplay = '₹0.00';
 }
 
       this.detailsData.push({
