@@ -28,6 +28,7 @@ export class SfcFormComponent implements OnDestroy {
   isSearchingPatients: boolean = false;
   isSFCFormValid: boolean = false;
   patientSearchSubject = new Subject<string>();
+  patientIdFieldTitle: string = '';
   private destroy$ = new Subject<void>();
 
   constructor(private sfcService: SfcService, private userService: UserService, private messageService: MessageService) {
@@ -263,7 +264,6 @@ export class SfcFormComponent implements OnDestroy {
   editEntry(entry: any) {
     this.editingIndex = this.entries.indexOf(entry);
     this.editId = entry.id;
-    console.log(entry);
     // Preserve the Proxy so that setter keeps recomputing isSFCFormValid
     Object.assign(this.newEntry, entry);
     // Recompute validity once after loading the entry
@@ -536,6 +536,22 @@ toggleDropdown(i: number, event: MouseEvent) {
   }
 
   isFieldInvalid(field: string): boolean {
+    if (field === 'patientId') {
+      if (this.patientId && String(this.patientId) === String(this.newEntry.patientId)) {
+        this.patientIdFieldTitle = 'Patient cannot refer themselves. Please refer other patient.';
+        return true;
+      }
+
+      const otherEntries = this.entries.filter(e => e.id !== this.editId);
+      const entryIds = otherEntries.map(x => String(x.patientId));
+      if (entryIds.includes(String(this.newEntry.patientId))) {
+        this.patientIdFieldTitle = 'This patient has already been referred.';
+        return true;
+      }
+
+      return this.submitted && (!this.newEntry.patientId || this.newEntry.patientId.toString().trim() === '');
+    }
+
     return this.submitted && (!this.newEntry[field] || this.newEntry[field].toString().trim() === '');
   }
 
@@ -553,7 +569,6 @@ toggleDropdown(i: number, event: MouseEvent) {
     // && !this.isFieldInvalid('doctorFrontOfficeComment')
     // && !this.isFieldInvalid('doctorAdvice')
     // && !this.isFieldInvalid('frontOfficeRemarks');
-    console.log('Form validity:', formValidity);
     return formValidity;
   }
 
