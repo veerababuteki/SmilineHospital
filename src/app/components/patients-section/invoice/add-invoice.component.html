@@ -203,7 +203,21 @@
                   [class.active]="treatment.get('showAdultTeeth')?.value"
                   (click)="toggleTeethVisibility(i, 'adult')"
                 >
-                  Show Teeth
+                  <ng-container
+                        *ngIf="
+                          treatment.get('selectedTeeth')?.value?.length > 0
+                        "
+                        >Teeth:
+                        {{
+                          treatment.get("selectedTeeth")?.value
+                        }}</ng-container
+                      >
+                      <ng-container
+                        *ngIf="
+                          treatment.get('selectedTeeth')?.value.length == 0
+                        "
+                        >Show Teeth</ng-container
+                      >
                 </button>
               </div>
               <!-- Upper Adult Teeth -->
