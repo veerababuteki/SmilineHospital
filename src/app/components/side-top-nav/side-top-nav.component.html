@@ -99,7 +99,8 @@
     [style]="{width: '100vw'}"
     [modal]="true"
     [draggable]="false"
-    [resizable]="false">
+    [resizable]="false"
+    (onHide)="dialogClose()">
 
     <app-add-profile (onSave)="savePatient($event)"
     (onCancel)="hideAddPatientDialog()"></app-add-profile>

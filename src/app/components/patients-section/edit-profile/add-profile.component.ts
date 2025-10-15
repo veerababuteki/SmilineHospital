@@ -417,6 +417,22 @@ private registerPatient(patientDetails: any, historyDetails: any) {
     this.onCancel.emit();
   }
 
+  // Resets all forms when dialog is closed from parent
+  public resetAllForms(): void {
+    if (this.patientForm) {
+      this.patientForm.reset();
+    }
+    if (this.medicalHistoryForm) {
+      this.medicalHistoryForm.reset();
+    }
+    if (this.groupsForm) {
+      this.groupsForm.reset();
+    }
+    this.age = null;
+  }
+
+  
+
   isDobAgeMismatch(): boolean {
     const dob = this.patientForm.get('dateOfBirth')?.value;
     const age = this.patientForm.get('age')?.value;

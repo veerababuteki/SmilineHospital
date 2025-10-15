@@ -10,6 +10,7 @@ import { TagModule } from 'primeng/tag';
 import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';  // Change this line
 import { DialogModule } from 'primeng/dialog';
 import { CalendarOptions, EventInput } from '@fullcalendar/core';
+import { switchMap } from 'rxjs';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
@@ -1092,16 +1093,23 @@ export class CalendarComponent implements OnInit {
       console.log(`${severity}: ${summary} - ${detail}`);
     }
   }
-  saveCategory() {
-    if (this.newCategory.trim()) {
-      this.userService.addCategory(this.newCategory).subscribe(res => {
-        this.userService.getCategories().subscribe(categories => {
-          this.categories = categories.data;
-        })
+ saveCategory() {
+  const newCat = this.newCategory.trim();
+  if (!newCat) return;
+
+  this.userService.addCategory(newCat)
+    .pipe(switchMap(() => this.userService.getCategories()))
+    .subscribe({
+      next: (categories) => {
+        this.categories = categories.data.rows;
         this.toggleAddCategory();
-      })
-    }
-  }
+        this.newCategory = '';
+        console.log(categories);
+      },
+      error: (err) => console.error('Error:', err)
+    });
+}
+
 
   showEventList(date: Date, events: any[]) {
     const ref = this.dialogService.open(EventListComponent, {

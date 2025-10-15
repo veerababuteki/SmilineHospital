@@ -79,7 +79,7 @@
         </div>
         <div class="follow-up">
           <span>Next follow-up on</span>
-          <p-calendar [(ngModel)]="followupDate" dateFormat="dd-mm-yy"></p-calendar>
+          <p-calendar [(ngModel)]="followupDate" dateFormat="dd-mm-yy" appendTo="body"></p-calendar>
         </div>
   
         <div class="noted-by">
@@ -93,7 +93,7 @@
             [placeholder]="'Select Doctor'">
           </p-dropdown>
           <span class="padding-span">on</span>
-          <p-calendar [(ngModel)]="date" dateFormat="dd-mm-yy" appendTo="body"></p-calendar>
+          <p-calendar styleClass="calendar-override" class="" [(ngModel)]="date" dateFormat="dd-mm-yy" appendTo="body"></p-calendar>
         </div>
       </div>
 

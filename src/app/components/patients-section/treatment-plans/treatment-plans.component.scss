@@ -258,3 +258,24 @@ tbody{
   white-space: normal;
   word-break: break-word;
 }
+
+.notes {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .notes:hover {
+    -webkit-line-clamp: unset;
+    overflow: visible;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border-radius: 6px;
+    padding: 4px 8px;
+    position: relative;
+    z-index: 10;
+  }
+  

@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -44,6 +44,7 @@ interface NavItem {
   providers: [MessageService]
 })
 export class SideTopNavComponent implements OnDestroy {
+  @ViewChild(AddProfileComponent) addProfileComp?: AddProfileComponent;
   allPatients: any[] = [];
   patients: any[] = [];
   filteredPatients: any[] = [];
@@ -177,6 +178,11 @@ export class SideTopNavComponent implements OnDestroy {
     this.displayAddPatientDialog = false;
     this.getPatients();
     this.router.navigate(['patients', $event.user_id, 'profile', $event.unique_code]);
+  }
+
+  dialogClose() {
+    console.log("closed");
+    this.addProfileComp?.resetAllForms();
   }
 
   hideAddPatientDialog() {
