@@ -71,7 +71,7 @@ export class AppointmentsComponent implements OnInit {
   });
     
     forkJoin({
-      doctors: this.userService.getDoctors('bce9f008-d447-4fe2-a29e-d58d579534f0'),
+      doctors: this.userService.getAllDoctors('bce9f008-d447-4fe2-a29e-d58d579534f0'),
       categories: this.userService.getCategories(),
       currentUser: this.authService.getUser()
     }).subscribe({

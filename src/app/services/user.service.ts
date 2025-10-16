@@ -47,6 +47,17 @@ export class UserService {
       );
   }
 
+  getAllDoctors(docRoleID: any) {
+    const token = this.authService.getAccessToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get<any>(`${this.baseUrl}/auth/user/getExistingUser/${docRoleID}`, {headers}).pipe(
+        catchError(this.handleError)
+      );
+  }
+
   getPatient(code: any) {
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({
