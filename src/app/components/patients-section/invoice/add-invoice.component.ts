@@ -493,6 +493,7 @@ export class AddInvoiceComponent implements OnInit {
     }
     
     selectedTeethControl.setValue(selectedTeeth);
+    treatment.patchValue({ quantity: selectedTeeth.length });
     this.calculateTotal(treatmentIndex);
   }
 
@@ -503,10 +504,11 @@ export class AddInvoiceComponent implements OnInit {
     const values = treatment.value;
     // Convert negative cost to positive
     const cost = Math.abs(Math.floor(values.cost));
-    let total = cost * values.quantity;
-
-    if (values.multiplyCost && values.selectedTeeth.length > 0) {
-      total *= values.selectedTeeth.length;
+    let total;
+    if (values.multiplyCost) {
+      total = cost * values.quantity;
+    } else {
+      total = cost;
     }
 
     if (values.discount > 0) {
@@ -650,14 +652,13 @@ export class AddInvoiceComponent implements OnInit {
     
     this.treatments.controls.forEach(treatment => {
       const values = treatment.value;
-      let cost = values.cost * values.quantity;
-      
-      if (values.multiplyCost && values.selectedTeeth.length > 0) {
-        cost *= values.selectedTeeth.length;
+      let cost;
+      if (values.multiplyCost) {
+        cost = values.cost * values.quantity;
+      } else {
+        cost = values.cost;
       }
-      
       totalCost += cost;
-      
       if (values.discount > 0) {
         if (values.discountType === '%') {
           totalDiscount += cost * (values.discount / 100);
@@ -666,7 +667,6 @@ export class AddInvoiceComponent implements OnInit {
         }
       }
     });
-
     return totalCost - totalDiscount;
   }
 
