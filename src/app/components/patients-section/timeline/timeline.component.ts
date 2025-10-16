@@ -28,7 +28,8 @@ export class TimelineComponent implements OnInit {
     TreatmentPlan: true,
     Procedure: true,
     Invoice: true,
-    Payment: true
+    Payment: true,
+    CompletedProcedures: true
   };
 
   constructor(private route: ActivatedRoute, private timelineService: TimelineService) {}
@@ -45,7 +46,7 @@ export class TimelineComponent implements OnInit {
   }
 
   loadPatientData(patientId: string) {
-    this.timelineService.getPatientTimeline(Number(patientId)).subscribe(res => {
+    this.timelineService.getPatientTimeline(Number(patientId)).subscribe((res: any) => {
       this.allTimelineData = res.data; // Store all data
       this.applyFilters(); // Apply initial filters
     });
@@ -99,8 +100,11 @@ export class TimelineComponent implements OnInit {
       if(row.type === 'Appointment'){
         dateKey = row.appointment_date;
       }
+      else if (row.type === 'CompletedProcedures') {
+        dateKey = row.performed_on;
+      }
       else{
-        dateKey = row.created_at.split('T')[0];
+        dateKey = row.created_at?.split('T')[0];
       }
       if (!acc[dateKey]) {
         acc[dateKey] = [];
@@ -124,19 +128,17 @@ export class TimelineComponent implements OnInit {
     );
   }
 
-  // Check if timeline has events
   hasEvents(): boolean {
     return Object.keys(this.timeline).length > 0;
   }
 
-
   hasAnyClinicalData(item: any): boolean {
-  return (
-    (item.chief_complaints && item.chief_complaints.trim()) ||
-    (item.observations && item.observations.trim()) ||
-    (item.investigations && item.investigations.trim()) ||
-    (item.diagnoses && item.diagnoses.trim()) ||
-    (item.notes && item.notes.trim())
-  );
-}
+    return (
+      (item.chief_complaints && item.chief_complaints.trim()) ||
+      (item.observations && item.observations.trim()) ||
+      (item.investigations && item.investigations.trim()) ||
+      (item.diagnoses && item.diagnoses.trim()) ||
+      (item.notes && item.notes.trim())
+    );
+  }
 }
