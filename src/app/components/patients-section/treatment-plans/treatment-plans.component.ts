@@ -47,6 +47,7 @@ export class TreatmentPlansComponent implements OnInit {
   doctors: any[] = [];
   doctor: any;
   date: Date = new Date()
+  rawTreatmentPlans: any[] = [];
   treatmentPlans: Record<string, any[]> = {};
   grandTotal: number = 0;
   markCompleteList: { id: number, treatment_unique_id: string }[] = []
@@ -117,7 +118,7 @@ export class TreatmentPlansComponent implements OnInit {
   // Subscribe to shared data
   this.patientDataService.data$.subscribe((data) => {
     const treatments = data?.treatmentPlans?.data?.rows || [];
-
+    this.rawTreatmentPlans = treatments;
     const activeTreatmentPlans = treatments.filter((_: any) => _.status !== 'Completed');
     this.treatmentPlans = this.groupByDate(activeTreatmentPlans);
   });
@@ -129,14 +130,9 @@ export class TreatmentPlansComponent implements OnInit {
     });
   }
 
-  setCurrentTreatmentPlan(rows: any,
-  treatmentKey: any): void {
-
-    
-    // Update menu items with the current invoice key as data
+  getCurrentTreatmentPlan(rows: any, treatmentKey: any) {
     this.currentTreatmentPlan = rows.filter((row: any) => row.treatment_unique_id === treatmentKey)
-    // The items array will be set dynamically per row in the template
-    // so we no longer set it here
+    return this.currentTreatmentPlan;
   }
 
   loadPatientData(patientId: string) {
@@ -450,7 +446,7 @@ handleKeyboardEvent(event: KeyboardEvent) {
       {
         label: 'Edit',
         icon: 'pi pi-pencil',
-        command: () => this.updateTreatmentPlans(treatment)
+        command: () => this.updateTreatmentPlans(this.getCurrentTreatmentPlan(this.rawTreatmentPlans, treatment.treatment_unique_id))
       },
       {
         label: 'Consent Form',

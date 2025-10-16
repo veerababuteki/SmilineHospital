@@ -99,6 +99,7 @@
                   name="patientId"
                   placeholder="Search Patient ID..."
                   (input)="onPatientIdInput($event)"
+                  [title]="patientIdFieldTitle"
                   (focus)="showPatientSearch = true"
                   [class.invalid-field]="
                     isFieldInvalid('patientId') ||
