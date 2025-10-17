@@ -438,20 +438,22 @@ export class ReportsComponent implements OnInit {
                 (a: any, b: any) => new Date(b.appointment_date).getTime() - new Date(a.appointment_date).getTime()
             );
 
-            sortedData.forEach((app: any, index: number) => {
-                this.detailsData.push({
-                    sNo: index + 1,
-                    date: new Date(app.appointment_date).toLocaleDateString('en-GB', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric'
-                    }),
-                    time: app.appointment_time,
-                    patient: app.patient_name,
-                    doctor: app.doctor_name !== undefined && app.doctor_name !== null && app.doctor_name !== '' ? 'Dr. ' + app.doctor_name: '',
-                    category: app.category_name
-                });
-            })
+           sortedData.forEach((app: any, index: number) => {
+    this.detailsData.push({
+        sNo: index + 1,
+        date: new Date(app.appointment_date).toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        }),
+        time: app.appointment_time,
+        patient: app.patient_name,
+        doctor: app.doctor_name
+            ? 'Dr. ' + app.doctor_name.replace(/^\s*(Dr\.?|dr\.?)\s*/i, '')
+            : '',
+        category: app.category_name
+    });
+});
         });
     }
 
@@ -734,7 +736,7 @@ private generateSummaryHtml(): string {
             </div>
             <div class="summary-row">
                 <span class="label">Discount (INR):</span>
-                <span class="value">${this.formatCurrency(this.summaryData.discount)}</span>
+                <span class="value">${this.formatCurrency(this.summaryData.discount) }}</span>
             </div>
             <div class="summary-row">
                 <span class="label">Income after Discount (INR):</span>
@@ -854,17 +856,25 @@ private generateSummaryHtml(): string {
     return currencyFields.includes(fieldName);
     }
 
-    private formatCurrency(value: any): string {
-    if (value === null || value === undefined || value === '') {
-        return '₹0.00';
-    }
-    return new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    }).format(Number(value));
-    }
+  private formatCurrency(value: any): string {
+  if (value === null || value === undefined || value === '') {
+    return '₹0.00';
+  }
+
+  // Clean up any ₹ symbol, commas, or spaces
+  const numericValue = parseFloat(String(value).replace(/[₹,\s]/g, ''));
+
+  if (isNaN(numericValue)) {
+    return '₹0.00';
+  }
+
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(numericValue);
+}
 
     private getPrintStyles(): string {
     return `
