@@ -734,7 +734,7 @@ private generateSummaryHtml(): string {
             </div>
             <div class="summary-row">
                 <span class="label">Discount (INR):</span>
-                <span class="value">${this.formatCurrency(this.summaryData.discount)}</span>
+                <span class="value">${this.formatCurrency(this.summaryData.discount) }}</span>
             </div>
             <div class="summary-row">
                 <span class="label">Income after Discount (INR):</span>
@@ -854,17 +854,25 @@ private generateSummaryHtml(): string {
     return currencyFields.includes(fieldName);
     }
 
-    private formatCurrency(value: any): string {
-    if (value === null || value === undefined || value === '') {
-        return '₹0.00';
-    }
-    return new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    }).format(Number(value));
-    }
+  private formatCurrency(value: any): string {
+  if (value === null || value === undefined || value === '') {
+    return '₹0.00';
+  }
+
+  // Clean up any ₹ symbol, commas, or spaces
+  const numericValue = parseFloat(String(value).replace(/[₹,\s]/g, ''));
+
+  if (isNaN(numericValue)) {
+    return '₹0.00';
+  }
+
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(numericValue);
+}
 
     private getPrintStyles(): string {
     return `

@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { MessageService } from '../../../services/message.service';
 import { DialogModule } from 'primeng/dialog';
 import { AddProfileComponent } from '../edit-profile/add-profile.component';
+import { debounceTime, Subject } from 'rxjs';
 
 export interface Patient {
     id: string;
@@ -34,9 +35,42 @@ export class PatientDirectoryComponent implements OnInit {
         })
     }
 
+    private searchSubject = new Subject<string>();
+
     ngOnInit() {
-        this.getPatients();
-    }
+  this.getPatients();
+
+  this.searchSubject.pipe(
+    debounceTime(0) 
+  ).subscribe((searchText) => {
+    this.applyFilter(searchText);
+  });
+}
+
+onSearchChange(searchText: string) {
+  this.searchSubject.next(searchText);
+}
+
+
+applyFilter(searchText: string) {
+  const searchLower = searchText.trim().toLowerCase();
+
+  if (!searchLower) {
+    this.filteredPatients = [...this.patients];
+    return;
+  }
+
+  this.filteredPatients = this.patients.filter(p => {
+    return (
+      (p.name && p.name.toLowerCase().includes(searchLower)) ||
+      (p.email && p.email.toLowerCase().includes(searchLower)) ||
+      (p.id && p.id.toLowerCase().includes(searchLower)) ||
+      (p.phone && p.phone.toLowerCase().includes(searchLower)) ||
+      (p.manual_unique_code && p.manual_unique_code.toLowerCase().includes(searchLower))
+    );
+  });
+}
+
 
     filteredPatients: any[] = [];
     searchText: string = '';
