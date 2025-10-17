@@ -438,20 +438,22 @@ export class ReportsComponent implements OnInit {
                 (a: any, b: any) => new Date(b.appointment_date).getTime() - new Date(a.appointment_date).getTime()
             );
 
-            sortedData.forEach((app: any, index: number) => {
-                this.detailsData.push({
-                    sNo: index + 1,
-                    date: new Date(app.appointment_date).toLocaleDateString('en-GB', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric'
-                    }),
-                    time: app.appointment_time,
-                    patient: app.patient_name,
-                    doctor: app.doctor_name !== undefined && app.doctor_name !== null && app.doctor_name !== '' ? 'Dr. ' + app.doctor_name: '',
-                    category: app.category_name
-                });
-            })
+           sortedData.forEach((app: any, index: number) => {
+    this.detailsData.push({
+        sNo: index + 1,
+        date: new Date(app.appointment_date).toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        }),
+        time: app.appointment_time,
+        patient: app.patient_name,
+        doctor: app.doctor_name
+            ? 'Dr. ' + app.doctor_name.replace(/^\s*(Dr\.?|dr\.?)\s*/i, '')
+            : '',
+        category: app.category_name
+    });
+});
         });
     }
 
