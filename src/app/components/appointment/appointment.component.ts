@@ -81,6 +81,7 @@ export class AppointmentComponent implements OnInit {
   appointment: any;
   @Input() patientCode: any;
   @Input() followUpMode: boolean = false;
+  blockDoctorList: any[] = [];
 
   @Output() closeDialog: EventEmitter<any> = new EventEmitter<any>();
   paitentNotFound: boolean = false;
@@ -495,54 +496,56 @@ onDateSelectionChange() {
   }
 
   // Check for specific time slot conflicts
-  checkTimeSlotConflict() {
-    if (!this.appointmentForm.get('scheduledTime')?.value) {
-      return;
+ checkTimeSlotConflict() {
+  const scheduledValue = this.appointmentForm.get('scheduledTime')?.value;
+  if (!scheduledValue) {
+    return;
+  }
+
+  const selectedDateTime = new Date(scheduledValue);
+  selectedDateTime.setMinutes(selectedDateTime.getMinutes() + 1);
+  const selectedTime = format(selectedDateTime, 'HH:mm');
+
+  const bookingType = this.appointmentForm.get('bookingType')?.value;
+
+  console.log('Checking time slot conflict for:', selectedTime, 'booking type:', bookingType);
+
+  const allBlocks = [...this.specificDoctorBlocks, ...this.allDoctorBlocks];
+  const conflictingSlots = allBlocks.filter(block => {
+    if (block.block_type === 'allDay') return true;
+
+    if (block.block_type === 'blockSlot') {
+      const startTime = block.start_time;
+      const endTime = block.end_time;
+      return selectedTime >= startTime && selectedTime <= endTime;
     }
 
-    const selectedTime = format(new Date(this.appointmentForm.get('scheduledTime')?.value), 'HH:mm');
-    const bookingType = this.appointmentForm.get('bookingType')?.value;
+    // Check all doctor blocks for booking type conflicts
+    if (!block.doctor_details?.user_id && !block.doctor_id) {
+      return (bookingType === 'online' && block.block_video_appointments) ||
+             (bookingType === 'offline' && block.block_in_clinic_appointments);
+    }
 
-    console.log('Checking time slot conflict for:', selectedTime, 'booking type:', bookingType);
+    return false;
+  });
 
-    const allBlocks = [...this.specificDoctorBlocks, ...this.allDoctorBlocks];
-    const conflictingSlots = allBlocks.filter(block => {
-      if (block.block_type === 'allDay') return true;
-      
-      if (block.block_type === 'blockSlot') {
-        const startTime = block.start_time;
-        const endTime = block.end_time;
-        return selectedTime >= startTime && selectedTime <= endTime;
-      }
+  console.log('Conflicting slots:', conflictingSlots);
 
-      // Check all doctor blocks for booking type conflicts
-      if (!block.doctor_details?.user_id && !block.doctor_id) {
-        return (bookingType === 'online' && block.block_video_appointments) ||
-               (bookingType === 'offline' && block.block_in_clinic_appointments);
-      }
-
-      return false;
+  if (conflictingSlots.length > 0) {
+    this.hasBlockConflicts = true;
+    this.appointmentForm.get('scheduledTime')?.setErrors({ 
+      ...this.appointmentForm.get('scheduledTime')?.errors,
+      timeBlocked: true 
     });
-
-    console.log('Conflicting slots:', conflictingSlots);
-
-    if (conflictingSlots.length > 0) {
-      this.hasBlockConflicts = true;
-      // Update the form with validation error
-      this.appointmentForm.get('scheduledTime')?.setErrors({ 
-        ...this.appointmentForm.get('scheduledTime')?.errors,
-        timeBlocked: true 
-      });
-    } else {
-      // Clear time block error if no conflicts
-      const errors = this.appointmentForm.get('scheduledTime')?.errors;
-      if (errors && errors['timeBlocked']) {
-        delete errors['timeBlocked'];
-        const hasOtherErrors = Object.keys(errors).length > 0;
-        this.appointmentForm.get('scheduledTime')?.setErrors(hasOtherErrors ? errors : null);
-      }
+  } else {
+    const errors = this.appointmentForm.get('scheduledTime')?.errors;
+    if (errors && errors['timeBlocked']) {
+      delete errors['timeBlocked'];
+      const hasOtherErrors = Object.keys(errors).length > 0;
+      this.appointmentForm.get('scheduledTime')?.setErrors(hasOtherErrors ? errors : null);
     }
   }
+}
 
   // Clear all block warnings and availability data
   clearBlockWarnings() {
@@ -602,14 +605,17 @@ onDateSelectionChange() {
 
   // Enhanced appointment.component.ts - Block Calendar specific methods
   initBlockCalendarForm() {
-  // Add 'All Doctors' option to the doctors array if it doesn't exist
-  if (this.doctors && this.doctors.length > 0 && this.doctors[0]?.id !== 'all') {
-    this.doctors = [{ id: 'all', name: 'All Doctors' }, ...this.doctors];
+  // Create a separate doctor list for Block Calendar only
+  let blockDoctorList = [...(this.doctors || [])];
+
+  // Add 'All Doctors' option only in this context
+  if (blockDoctorList.length > 0 && blockDoctorList[0]?.id !== 'all') {
+    blockDoctorList = [{ id: 'all', name: 'All Doctors' }, ...blockDoctorList];
   }
 
   this.blockCalendarForm = this.fb.group({
     leaveDetails: ['', [Validators.required, Validators.minLength(10)]],
-    doctor: [this.doctors && this.doctors.length > 0 ? this.doctors[0] : null, Validators.required],
+    doctor: [blockDoctorList.length > 0 ? blockDoctorList[0] : null, Validators.required],
     blockType: ['allDay', Validators.required],
     fromDate: [new Date(), Validators.required],
     toDate: [new Date(), Validators.required],
@@ -620,49 +626,44 @@ onDateSelectionChange() {
     blockInClinic: [false]
   }, { validators: this.atLeastOneBlockTypeValidator() });
 
-    // Watch for changes in fromDate
-    this.blockCalendarForm.get('fromDate')?.valueChanges.subscribe((fromDate) => {
-      const toDate = this.blockCalendarForm.get('toDate')?.value;
-      if (fromDate && toDate && new Date(toDate) < new Date(fromDate)) {
-        this.blockCalendarForm.get('toDate')?.setValue(fromDate);
-      }
-      setTimeout(() => this.validateDateRange(), 100);
-    });
+  this.blockDoctorList = blockDoctorList;
 
-    // Watch for changes in toDate
-    this.blockCalendarForm.get('toDate')?.valueChanges.subscribe(() => {
-      setTimeout(() => this.validateDateRange(), 100);
-    });
+  this.blockCalendarForm.get('fromDate')?.valueChanges.subscribe((fromDate) => {
+    const toDate = this.blockCalendarForm.get('toDate')?.value;
+    if (fromDate && toDate && new Date(toDate) < new Date(fromDate)) {
+      this.blockCalendarForm.get('toDate')?.setValue(fromDate);
+    }
+    setTimeout(() => this.validateDateRange(), 100);
+  });
 
-    // Watch for doctor changes
-    this.blockCalendarForm.get('doctor')?.valueChanges.subscribe(doctorValue => {
-      if (doctorValue === null) {
-        // All Doctors selected - ensure validator is set
-        this.blockCalendarForm.setValidators([this.atLeastOneBlockTypeValidator()]);
-      } else {
-        // Specific doctor selected - remove validator
-        this.blockCalendarForm.clearValidators();
-      }
-      this.blockCalendarForm.updateValueAndValidity();
-    });
+  this.blockCalendarForm.get('toDate')?.valueChanges.subscribe(() => {
+    setTimeout(() => this.validateDateRange(), 100);
+  });
 
-    // Watch for block type changes to re-validate
-    this.blockCalendarForm.get('blockVideo')?.valueChanges.subscribe(() => {
-      this.blockCalendarForm.updateValueAndValidity();
-    });
+  this.blockCalendarForm.get('doctor')?.valueChanges.subscribe(doctorValue => {
+    if (doctorValue?.id === 'all') {
+      this.blockCalendarForm.setValidators([this.atLeastOneBlockTypeValidator()]);
+    } else {
+      this.blockCalendarForm.clearValidators();
+    }
+    this.blockCalendarForm.updateValueAndValidity();
+  });
 
-    this.blockCalendarForm.get('blockInClinic')?.valueChanges.subscribe(() => {
-      this.blockCalendarForm.updateValueAndValidity();
-    });
+  this.blockCalendarForm.get('blockVideo')?.valueChanges.subscribe(() => {
+    this.blockCalendarForm.updateValueAndValidity();
+  });
 
-    // Time validation
-    this.blockCalendarForm.get('startTime')?.valueChanges.subscribe(() => {
-      this.validateTimeRange();
-    });
-    this.blockCalendarForm.get('endTime')?.valueChanges.subscribe(() => {
-      this.validateTimeRange();
-    });
-  }
+  this.blockCalendarForm.get('blockInClinic')?.valueChanges.subscribe(() => {
+    this.blockCalendarForm.updateValueAndValidity();
+  });
+
+  this.blockCalendarForm.get('startTime')?.valueChanges.subscribe(() => {
+    this.validateTimeRange();
+  });
+  this.blockCalendarForm.get('endTime')?.valueChanges.subscribe(() => {
+    this.validateTimeRange();
+  });
+}
 
   // Determine Patient blocker
   determinePatientBlocker(): void {

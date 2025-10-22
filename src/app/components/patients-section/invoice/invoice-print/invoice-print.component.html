@@ -77,7 +77,7 @@
             <div class="summary">
               <p><strong>Total Cost:</strong> {{ getTotalCost(invoice.value) }} INR</p>
               <p><strong>Grand Total:</strong> {{ getTotalCost(invoice.value) }} INR</p>
-              <p><strong>Amount Received:</strong> {{ invoice.value[0].payment_status === 'Pending' ? '0.00' : getTotalCost(invoice.value) }} INR</p>
+              <p><strong>Amount Received:</strong> {{ getTotalAmountPaid(invoice.value) }}  INR</p>
             </div>
           </div>
 

@@ -24,8 +24,22 @@ export class InvoicePrintComponent {
   }
 
   getTotalCost(invoices: any[]): number {
-    return invoices.reduce((total, invc) => +total + +invc.treatment_plans.total_cost, 0);
+    const totalCost = invoices.reduce((total, invc) => +total + +invc.treatment_plans.total_cost, 0);
+    return totalCost.toFixed(2);
   }
+
+  getTotalAmountPaid(invoices: any[]): string {
+  if (!invoices || invoices.length === 0) return "0.00";
+
+  const totalPaid = invoices.reduce((total, invoice) => {
+    const totalAmount = parseFloat(invoice.total_amount || "0");
+    const dueAmount = parseFloat(invoice.due_amount || "0");
+    return total + (totalAmount - dueAmount);
+  }, 0);
+
+  return totalPaid.toFixed(2);
+}
+
 
   getInvoiceGroupValues(invoiceGroup: any): any[] {
     return invoiceGroup.value;
