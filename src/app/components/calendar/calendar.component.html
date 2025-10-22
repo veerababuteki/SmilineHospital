@@ -112,15 +112,14 @@
           </div> -->
           <!-- Replace the doctor-item div in the doctors-scroll section with this -->
           <div class="doctors-scroll">
-            <div class="doctor-item" *ngFor="let doctor of filteredDoctors()"
-              [ngClass]="{'doctor-active': selectedDoctor === doctor.user_id}" (click)="selectDoctor(doctor)">
-              <span class="status-dot" [ngClass]="doctor.colorClass"></span>
-              <span class="doctor-name">
-  Dr. {{ cleanDoctorName(doctor.first_name) }}&nbsp;{{ cleanDoctorName(doctor.last_name) }}
-</span>
+  <div class="doctor-item" *ngFor="let doctor of filteredDoctors()"
+       [ngClass]="{'doctor-active': selectedDoctor === doctor.user_id}"
+       (click)="selectDoctor(doctor)">
+    <span class="status-dot" [ngClass]="doctor.colorClass"></span>
+    <span class="doctor-name">{{ doctor.displayName }}</span>
+  </div>
+</div>
 
-            </div>
-          </div>
         </div>
       </div>
 
@@ -159,7 +158,11 @@
       <full-calendar #calendar [options]="calendarOptions" class="custom-calendar">
         <ng-template #eventContent let-arg>
           <div class="custom-event-content">
-            <span class="event-title" [title]="arg.event.title">{{ arg.event.title }}</span>
+            <span class="event-title"
+      [title]="normalizeDoctorTitle(arg.event.title)">
+  {{ normalizeDoctorTitle(arg.event.title) }}
+</span>
+
           </div>
         </ng-template>
       </full-calendar>

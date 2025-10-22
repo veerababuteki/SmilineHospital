@@ -14,6 +14,7 @@ import { PatientDataService } from '../../../services/patient-data.service';
 import { AppointmentComponent } from '../../appointment/appointment.component';
 import { AuthService } from '../../../services/auth.service';
 import { DoctorNameService } from '../../../services/doctor-name.service';
+import { NormalizationService } from '../../normalization/normalization';
 
 @Component({
   selector: 'app-add-completed-procedures',
@@ -69,6 +70,7 @@ export class AddCompletedProceduresComponent implements OnInit {
     private authService: AuthService,
     private patientDataService: PatientDataService,
     private doctorNameService: DoctorNameService,
+    private normalizationService: NormalizationService
   ) {
     this.initForm();
     const navigation = this.router.getCurrentNavigation();
@@ -116,12 +118,19 @@ export class AddCompletedProceduresComponent implements OnInit {
       const formatted: Array<{ name: string; user_id: any }> = mapped
         .map((d: { name: string; user_id: any }) => ({ ...d, name: this.doctorNameService.formatDoctorName(d.name) }))
         .sort((a: { name: string; user_id: any }, b: { name: string; user_id: any }) => a.name.localeCompare(b.name));
-      this.doctors = formatted.map((d: { name: string; user_id: any }) => ({
-        name: d.name,
-        user_id: d.user_id,
-        label: d.name,
-        value: d.user_id
-      }));
+      this.doctors = formatted.map((d: { name: string; user_id: any }) => {
+  const displayName = this.normalizationService.getDoctorDisplayName(d.name);
+  return {
+    name: displayName,
+    user_id: d.user_id,
+    label: displayName,  // ✅ Use formatted display name (e.g., "Dr. Akhila (Prostho)")
+    value: d.user_id
+  };
+});
+
+this.doctors = this.normalizationService.formatDoctors(this.doctors);
+  this.doctors = this.normalizationService.sortDoctorsAlphabetically(this.doctors);
+
 
       this.categories = categories.data.rows.map((cat: any) => ({
         ...cat,

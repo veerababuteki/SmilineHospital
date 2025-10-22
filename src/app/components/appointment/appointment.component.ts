@@ -24,6 +24,7 @@ import { ToastModule } from 'primeng/toast';
 import { AddProfileComponent } from "../patients-section/edit-profile/add-profile.component";
 import { DoctorNameService } from '../../services/doctor-name.service';
 import { PatientDataService } from '../../services/patient-data.service';
+import { NormalizationService } from '../normalization/normalization';
 
 @Component({
   selector: 'app-appointment',
@@ -125,7 +126,8 @@ export class AppointmentComponent implements OnInit {
     private appointmentService: AppointmentService, 
     private loaderService: LoaderService,
     private messageService: MessageService,
-    private doctorNameService: DoctorNameService
+    private doctorNameService: DoctorNameService,
+    private normalizationService: NormalizationService
   ) {}
 
   ngOnInit() {
@@ -157,14 +159,21 @@ export class AppointmentComponent implements OnInit {
     return this.branches.find(branch => branch.branch_id === branchId);
   }
 
-  formatDoctorsList(){
-    if (this.doctors && this.doctors.length > 0) {
-      // Delegate to DoctorNameService to format and sort
-      this.doctors = this.doctorNameService
-        .formatDoctorsList(this.doctors)
-        .map(d => ({ ...d }));
-    }
+formatDoctorsList() {
+  if (this.doctors && this.doctors.length > 0) {
+    this.doctors = this.doctorNameService
+      .formatDoctorsList(this.doctors)
+      .filter(d => d.name && d.name.trim() !== '') // ✅ remove empty names
+      .map(d => ({
+        ...d,
+        name: this.normalizationService.getDoctorDisplayName(d.name)
+      }));
+      this.normalizationService.formatDoctors(this.doctors);
   }
+  this.doctors = this.normalizationService.formatDoctors(this.doctors);
+  this.doctors = this.normalizationService.sortDoctorsAlphabetically(this.doctors);
+}
+
 
   initAppointmentForm() {
     this.initForm();

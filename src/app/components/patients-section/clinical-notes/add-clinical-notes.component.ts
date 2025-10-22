@@ -10,6 +10,7 @@ import { forkJoin } from 'rxjs';
 import { MessageService } from '../../../services/message.service';
 import { PatientDataService } from '../../../services/patient-data.service';
 import { DoctorNameService } from '../../../services/doctor-name.service';
+import { NormalizationService } from '../../normalization/normalization';
 
 interface Category {
   name: string;
@@ -80,7 +81,8 @@ export class AddClinicalNotesComponent implements OnInit {
     private clinicalNotesService: ClinicalNotesService,
     private route: ActivatedRoute,
     private patientDataService: PatientDataService,
-    private doctorNameService: DoctorNameService
+    private doctorNameService: DoctorNameService,
+    private normalizationService: NormalizationService
   ) {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras.state) {
@@ -196,21 +198,30 @@ export class AddClinicalNotesComponent implements OnInit {
     this.selectedCategory = this.categories[0];
   }
 
-  private loadDoctors() {
-    this.userService.getDoctors('bce9f008-d447-4fe2-a29e-d58d579534f0').subscribe(res => {
-      const mapped = res.data.map((doc: any) => ({
-        name: `${doc.first_name} ${doc.last_name}`.trim(),
-        user_id: doc.user_id
-      }));
-      this.doctors = this.doctorNameService
-        .formatDoctorsList(mapped)
-        .map((d: any) => ({ name: d.name, user_id: d.user_id }));
-      this.doctor = this.doctors[0];
-      if (this.isEditMode) {
-        this.populateFormWithNote(this.editNoteData);
-      }
-    });
-  }
+ private loadDoctors() {
+  this.userService.getDoctors('bce9f008-d447-4fe2-a29e-d58d579534f0').subscribe(res => {
+    const mapped = res.data.map((doc: any) => ({
+      name: `${doc.first_name} ${doc.last_name}`.trim(),
+      user_id: doc.user_id
+    }));
+
+    // Use DoctorNameService to get the proper display name
+    this.doctors = mapped.map((d: any) => ({
+      name: d.name,
+      user_id: d.user_id,
+      displayName: this.normalizationService.getDoctorDisplayName(d.name) // <-- reuse here
+    }));
+
+    this.doctors = this.normalizationService.formatDoctors(this.doctors)
+  this.doctors = this.normalizationService.sortDoctorsAlphabetically(this.doctors);
+
+    // Optionally, set the first doctor as selected
+    this.doctor = this.doctors[0];
+    if (this.isEditMode) {
+      this.populateFormWithNote(this.editNoteData);
+    }
+  });
+}
 
   hasEmptyComplaint(): boolean {
     return this.selectedComplaints.some(c => !c.value.trim());

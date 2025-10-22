@@ -12,6 +12,7 @@ import { MessageService } from '../../../services/message.service';
 import { PatientDataService } from '../../../services/patient-data.service';
 import { forkJoin } from 'rxjs';
 import { DoctorNameService } from '../../../services/doctor-name.service';
+import { NormalizationService } from '../../normalization/normalization';
 
 
 @Component({
@@ -57,7 +58,8 @@ export class AddTreatmentPlansComponent implements OnInit {
     private treatmentPlansService: TreatmentPlansService,
     private router:Router,
     private route: ActivatedRoute,
-    private doctorNameService: DoctorNameService
+    private doctorNameService: DoctorNameService,
+    private normalizationService: NormalizationService
   ) {
     this.initForm();
     const navigation = this.router.getCurrentNavigation();
@@ -107,12 +109,20 @@ export class AddTreatmentPlansComponent implements OnInit {
         this.filteredProcedures = [...this.procedures];
   
         // Process doctors (with mapping, formatting, sorting)
-        const mapped = results.doctors.data.map(
-          (doc: { first_name: string; last_name: string; user_id: any }) => ({
-            name: `${doc.first_name} ${doc.last_name}`.trim(),
-            user_id: doc.user_id
-          })
-        );
+        const mappedRaw = results.doctors.data.map(
+  (doc: { first_name: string; last_name: string; user_id: any }) => {
+    const fullName = `${doc.first_name} ${doc.last_name}`.trim();
+    return {
+      name: fullName,
+      user_id: doc.user_id,
+      displayName: this.normalizationService.getDoctorDisplayName(fullName) // reuse service
+    };
+  }
+);
+
+const mappedFormattedDoctors = this.normalizationService.formatDoctors(mappedRaw);
+  const mapped = this.normalizationService.sortDoctorsAlphabetically(mappedFormattedDoctors);
+
   
         this.doctors = mapped
           .map((d: { name: string; user_id: any }) => ({

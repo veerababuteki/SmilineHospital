@@ -223,15 +223,14 @@
                               <p class="completed-by">
                                 <span>Completed by</span>
                                 <strong>
-                                  {{
-                                    (invc.treatment_plans.doctor_details_treat.user_profile_details[0].first_name?.toLowerCase().startsWith('dr')
-                                      ? ''
-                                      : 'Dr. ')
-                                    + (invc.treatment_plans.doctor_details_treat.user_profile_details[0].first_name || '')
-                                    + ' '
-                                    + (invc.treatment_plans.doctor_details_treat.user_profile_details[0].last_name || '')
-                                  }}
-                                </strong>
+  {{
+    normalizationService.getDoctorDisplayName(
+      (invc?.treatment_plans?.doctor_details_treat?.user_profile_details?.[0]?.first_name || '') + ' ' +
+      (invc?.treatment_plans?.doctor_details_treat?.user_profile_details?.[0]?.last_name || '')
+    )
+  }}
+</strong>
+
                               </p>
                             </td>
                           </tr>

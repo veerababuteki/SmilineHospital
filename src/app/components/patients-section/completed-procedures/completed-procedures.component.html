@@ -72,16 +72,14 @@
                         <div class="planned-by">
   Completed by
   <span class="doctor-name">
-    {{
-      (treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].first_name?.toLowerCase().startsWith('dr')
-        ? ''
-        : 'Dr. ')
-      +
-      (treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].first_name || '')
-      + ' ' +
+  {{
+    normalizationService.getDoctorDisplayName(
+      (treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].first_name || '') + ' ' +
       (treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].last_name || '')
-    }}
-  </span>
+    )
+  }}
+</span>
+
 </div>
 
                         <div class="estimated-amount">

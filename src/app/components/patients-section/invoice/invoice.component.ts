@@ -9,6 +9,7 @@ import { ButtonModule } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
 import { MessageService } from '../../../services/message.service';
 import { PatientDataService } from '../../../services/patient-data.service';
+import { NormalizationService } from '../../normalization/normalization';
 
 @Component({
   selector: 'app-invoice',
@@ -34,6 +35,7 @@ export class InvoiceComponent implements OnInit {
   
   constructor(private treatmentPlansService: TreatmentPlansService, 
               private patientDataService: PatientDataService,
+              public normalizationService: NormalizationService,
     private router: Router, private route: ActivatedRoute){}
 
     ngOnInit(): void {

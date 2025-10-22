@@ -13,6 +13,7 @@ import { PatientDataService } from '../../../services/patient-data.service';
 import { MessageService as Toaster } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { DoctorNameService } from '../../../services/doctor-name.service';
+import { NormalizationService } from '../../normalization/normalization';
 
 @Component({
   selector: 'app-add-invoice',
@@ -57,7 +58,8 @@ export class AddInvoiceComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private toaster: Toaster,
-    private doctorNameService: DoctorNameService
+    private doctorNameService: DoctorNameService,
+    private normalizationService: NormalizationService
   ) {
     this.initForm();
     
@@ -97,10 +99,16 @@ export class AddInvoiceComponent implements OnInit {
             user_id: doc.user_id
           }));
           // Format with Dr. and sort by name
-          this.doctors = mapped
-            .map((d: { name: string; user_id: any }) => ({ ...d, name: this.doctorNameService.formatDoctorName(d.name) }))
-            .sort((a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name));
-          
+this.doctors = mapped
+  .map((d: { name: string; user_id: any }) => ({
+    ...d,
+    name: this.normalizationService.getDoctorDisplayName(d.name) // ✅ use getDoctorDisplayName here
+  }))
+  .sort((a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name));
+
+  this.doctors = this.normalizationService.formatDoctors(this.doctors);
+  this.doctors = this.normalizationService.sortDoctorsAlphabetically(this.doctors);
+
           // Set default doctor
           if (this.doctors.length > 0) {
             this.doctor = this.doctors[0];

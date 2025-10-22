@@ -34,6 +34,7 @@ import { DoctorColorService } from '../../services/doctor-color.service';
 import { DoctorNameService } from '../../services/doctor-name.service';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
+import { NormalizationService } from '../normalization/normalization';
 interface Doctor {
   id: string;
   name: string;
@@ -260,7 +261,7 @@ export class CalendarComponent implements OnInit {
   displayPrintAppointment = false;
   doctorColorMap: { [doctorId: string]: string } = {};
   constructor(private dialogService: DialogService, private overlay: Overlay, private datePipe: DatePipe, private elementRef: ElementRef,
-    private authService: AuthService, private confirmationService: ConfirmationService, private messageService: MessageService, private userService: UserService,  private doctorColorService: DoctorColorService, private appointmentService: AppointmentService, private doctorNameService: DoctorNameService) {
+    private authService: AuthService, private confirmationService: ConfirmationService, private messageService: MessageService, private userService: UserService,  private doctorColorService: DoctorColorService, private appointmentService: AppointmentService, private doctorNameService: DoctorNameService, private normalizationService: NormalizationService) {
 
   }
 
@@ -366,11 +367,34 @@ export class CalendarComponent implements OnInit {
     this.myButton.showDialog(false);
   }
 
-  filteredDoctors() {
-    return this.doctorsList.filter(doctor =>
-      `${doctor.first_name} ${doctor.last_name}`.toLowerCase().includes(this.searchText.toLowerCase())
-    );
+filteredDoctors(): { first_name: string; last_name: string; user_id: any; colorClass?: string; displayName?: string }[] {
+  const seen = new Set<number | string>();
+
+  // Remove duplicates and attach displayName using getDoctorDisplayName
+  const uniqueDoctors = this.doctorsList
+    .filter(doc => {
+      if (seen.has(doc.user_id)) return false;
+      seen.add(doc.user_id);
+      return true;
+    })
+    .map(doc => ({
+      ...doc,
+      displayName: this.normalizationService.getDoctorDisplayName(`${doc.first_name} ${doc.last_name}`)
+    }));
+
+  // Filter by search text
+  let filtered = uniqueDoctors;
+  if (this.searchText && this.searchText.trim() !== '') {
+    const searchLower = this.searchText.toLowerCase();
+    filtered = uniqueDoctors.filter(doc => doc.displayName?.toLowerCase().includes(searchLower));
   }
+
+  // Sort alphabetically by displayName
+  filtered.sort((a, b) => (a.displayName || '').toLowerCase().localeCompare((b.displayName || '').toLowerCase()));
+
+  return filtered;
+}
+
 
   cleanDoctorName(name: string): string {
   if (!name) return '';
@@ -484,6 +508,8 @@ export class CalendarComponent implements OnInit {
         localStorage.setItem('selectedPractice', JSON.stringify(this.selectedPractice));
       }
       this.loadComponentData()
+      this.doctors = this.normalizationService.formatDoctors(this.doctors);
+      this.doctors = this.normalizationService.sortDoctorsAlphabetically(this.doctors);
     })
   }
 
@@ -544,6 +570,8 @@ export class CalendarComponent implements OnInit {
         this.addAppointmentsToCalendar(appointments);
         this.changeDate(0);
         this.isDataLoaded = true
+
+      
       },
       error: (err) => {
         console.error('Error fetching data:', err);
@@ -1221,4 +1249,10 @@ export class CalendarComponent implements OnInit {
   showPrintAppointment() {
     this.displayPrintAppointment = true;
   }
+
+  normalizeDoctorTitle(title: string): string {
+  if (!title) return '';
+  return title.replace(/^🚫\s*Dr\.?\s*Dr\.?\s*/i, '🚫 Dr. ');
+}
+
 }

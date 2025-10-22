@@ -11,6 +11,7 @@ import { MessageService } from '../../../services/message.service';
 import { PatientDataService } from '../../../services/patient-data.service';
 import { ConsentFormComponent } from '../treatment-plans/consent-form/consent-form.component';
 import { AuthService } from '../../../services/auth.service'; // Add this
+import { NormalizationService } from '../../normalization/normalization';
 
 @Component({
   selector: 'app-completed-procedures',
@@ -62,7 +63,8 @@ export class CompletedProceduresComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService, // Inject here
-    private messageService: MessageService // Inject this too for error alerts
+    private messageService: MessageService,
+    public normalizationService: NormalizationService // Inject this too for error alerts
   ) {
     const selectedPractice = localStorage.getItem('selectedPractice');
     if (selectedPractice) {

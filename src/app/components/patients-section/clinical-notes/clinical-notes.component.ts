@@ -9,6 +9,7 @@ import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from '../../../services/message.service';
 import { PatientDataService } from '../../../services/patient-data.service';
+import { NormalizationService } from '../../normalization/normalization';
 
 @Component({
   selector: 'app-clinical-notes',
@@ -28,7 +29,7 @@ export class ClinicalNotesComponent implements OnInit {
   constructor(private messageService: MessageService, private clinicalNotesService: ClinicalNotesService, 
     private router: Router,
     private route: ActivatedRoute, private patientDataService: PatientDataService,
-    
+    public normalizationService: NormalizationService
   ){
     
   }  
@@ -113,6 +114,15 @@ export class ClinicalNotesComponent implements OnInit {
       return []; // Return empty array on error
     }
   }
+
+  normalizeDoctorName(firstName: string, lastName: string): string {
+  if (!firstName && !lastName) return '';
+
+  const fullName = `${firstName || ''} ${lastName || ''}`.trim();
+  // Remove any existing "Dr." prefix
+  const normalized = fullName.replace(/^Dr\.?\s*/i, '');
+  return `Dr. ${normalized}`;
+}
   
 
   // modify this function for sorting a data according to latest date

@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { Router } from '@angular/router';
+import { NormalizationService } from '../../normalization/normalization';
 
 @Component({
   selector: 'app-event-popover',
@@ -131,7 +132,9 @@ import { Router } from '@angular/router';
           <i class="pi pi-calendar"></i>
           <div class="appointment-details">
             <div>In-Clinic Appointment</div>
-            <div class="doctor-info" *ngIf="event.extendedProps?.doctor">with {{ event.extendedProps?.doctor}}</div>
+<div class="doctor-info" *ngIf="event.extendedProps?.doctor">
+  with {{ normalizationService.getDoctorDisplayName(event.extendedProps?.doctor) }}
+</div>
             <div class="time-info">
               at {{ event.extendedProps?.appointmentTime }}
               <ng-container *ngIf="getValidDuration() as dur">
@@ -450,7 +453,7 @@ export class EventPopoverComponent {
   @Output() editBlock = new EventEmitter<any>();
   @Output() deleteBlock = new EventEmitter<any>();
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, public normalizationService: NormalizationService) {}
 
   get isBlockCalendarEvent(): boolean {
     return this.event?.extendedProps?.type === 'block_calendar';
@@ -463,11 +466,16 @@ export class EventPopoverComponent {
   }
 
   getBlockTitle(): string {
-    if (this.event.extendedProps.doctorName && this.event.extendedProps.doctorName !== 'All Doctors') {
-      return `Dr. ${this.event.extendedProps.doctorName} - Blocked`;
-    }
-    return 'Calendar Blocked';
+  const name = this.event.extendedProps.doctorName;
+
+  if (name && name !== 'All Doctors') {
+    const normalizedName = name.replace(/^Dr\.?\s*/i, '').trim();
+    return `Dr. ${normalizedName} - Blocked`;
   }
+
+  return 'Calendar Blocked';
+}
+
 
   getBlockTypeLabel(): string {
     if (this.event.extendedProps.blockType === 'allDay') {
@@ -479,11 +487,15 @@ export class EventPopoverComponent {
   }
 
   getDoctorName(): string {
-    if (this.event.extendedProps.doctorName && this.event.extendedProps.doctorName !== 'All Doctors') {
-      return `Dr. ${this.event.extendedProps.doctorName}`;
-    }
-    return 'All Doctors';
+  const name = this.event.extendedProps.doctorName;
+
+  if (name && name !== 'All Doctors') {
+    // Normalize name — remove any existing "Dr." or "Dr " prefix (case-insensitive)
+    const normalizedName = name.replace(/^Dr\.?\s*/i, '').trim();
+    return `Dr. ${normalizedName}`;
   }
+  return 'All Doctors';
+}
 
   getDateTimeInfo(): string {
     if (this.event.extendedProps.blockType === 'allDay') {
