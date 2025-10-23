@@ -135,9 +135,10 @@ export class PatientsSectionComponent implements OnInit, OnDestroy {
         }
       });
 
-      this.patientDataService.data$.subscribe(data => {
-      this.completedProcedures = data?.completedProcedures?.data?.rows || [];
-      });
+    this.patientDataService.data$.subscribe(data => {
+    this.invoices = data?.invoices?.data?.rows ? [...data.invoices.data.rows] : [];
+    this.completedProcedures = data?.completedProcedures?.data?.rows ? [...data.completedProcedures.data.rows] : [];
+  });
 
     this.branchesSubscription = this.userService.getBranches()
       .pipe(
