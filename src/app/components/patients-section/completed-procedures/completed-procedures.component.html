@@ -4,10 +4,10 @@
         <h2>Completed Procedures</h2>
         <div>
 
-            <button class="mark-btn" *ngIf="generateInvoiceList.length == 0" >Invoice Selected Procedure</button>
-            <button class="mark-btn-active" *ngIf="generateInvoiceList.length > 0" (click)="generateInvoice()" >Invoice
+            <button class="mark-btn" *ngIf="generateInvoiceList.length == 0">Invoice Selected Procedure</button>
+            <button class="mark-btn-active" *ngIf="generateInvoiceList.length > 0" (click)="generateInvoice()">Invoice
                 Selected Procedure</button>
-            <button class="add-btn" (click)="navigateToAddPage()" >+ Add</button>
+            <button class="add-btn" (click)="navigateToAddPage()">+ Add</button>
 
 
         </div>
@@ -24,12 +24,12 @@
                             <thead>
                                 <tr>
                                     <th class="checkbox-col"></th>
-                                    <th class="procedure-col  "  style="text-align: right;">PROCEDURE</th>
-                                    <th class="cost-col  "  style="text-align: right;">COST</th>
-                                    <th class="quantity-col  "  style="text-align: right;">QUANTITY</th>
-                                    <th class="discount-col  "  style="text-align: right;">DISCOUNT</th>
-                                    <th class="total-col  "  style="text-align: right;">TOTAL</th>
-                                    <th class="notes-col  " >NOTES</th>
+                                    <th class="procedure-col  " style="text-align: right;">PROCEDURE</th>
+                                    <th class="cost-col  " style="text-align: right;">COST</th>
+                                    <th class="quantity-col  " style="text-align: right;">QUANTITY</th>
+                                    <th class="discount-col  " style="text-align: right;">DISCOUNT</th>
+                                    <th class="total-col  " style="text-align: right;">TOTAL</th>
+                                    <th class="notes-col  ">NOTES</th>
                                     <th class="actions-col    hide-on-print" style="text-align: right;"></th>
                                 </tr>
                             </thead>
@@ -48,11 +48,18 @@
                                     </td>
                                     <td class="cost-col  amount">{{treatment.cost}}</td>
                                     <td class="quantity-col  amount">{{treatment.quantity}}</td>
-                                    <td class="discount-col  discount">{{treatment.discount+" "+treatment.discount_formate}}</td>
+                                    <td class="discount-col  discount">{{treatment.discount+"
+                                        "+treatment.discount_formate}}</td>
                                     <td class="total-col  amount">{{treatment.total_cost | number }}</td>
                                     <td class="notes-col ">
                                         <div>Teeth: <span class="teeth-number">{{treatment.teeth_set}}</span></div>
-                                        <div class="truncate-text notes-text" [title]="treatment.notes">{{treatment.notes}}</div>
+                                        <div class="truncate-text notes-text" [title]="treatment.notes">Notes: 
+                                            <span [pTooltip]="getFullNotes(treatment.notes)">
+                                                {{getShortNotes(treatment.notes)}}
+                                                <span *ngIf="hasMoreNotes(treatment.notes)">...</span>
+                                         
+                                            </span>
+                                        </div>
                                     </td>
                                     <td class="actions ">
                                         <div class="action-menu">
@@ -70,19 +77,21 @@
 
                     <div class="plan-footer">
                         <div class="planned-by">
-  Completed by
-  <span class="doctor-name">
-    {{
-      (treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].first_name?.toLowerCase().startsWith('dr')
-        ? ''
-        : 'Dr. ')
-      +
-      (treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].first_name || '')
-      + ' ' +
-      (treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].last_name || '')
-    }}
-  </span>
-</div>
+                            Completed by
+                            <span class="doctor-name">
+                                {{
+                                (treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].first_name?.toLowerCase().startsWith('dr')
+                                ? ''
+                                : 'Dr. ')
+                                +
+                                (treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].first_name
+                                || '')
+                                + ' ' +
+                                (treatmentDoctorGroup?.treatments[0]?.doctor_details_treat?.user_profile_details[0].last_name
+                                || '')
+                                }}
+                            </span>
+                        </div>
 
                         <div class="estimated-amount">
                             Estimated amount: <span class="amount">{{getTotalCost(treatmentDoctorGroup.treatments) |
@@ -101,16 +110,9 @@
 </div>
 
 <!-- Consent Form Dialog -->
-<p-dialog 
-    [(visible)]="showConsentFormDialog" 
-    [modal]="true" 
-    [style]="{width: '90vw', maxWidth: '1200px'}" 
-    [draggable]="false" 
-    [resizable]="false"
-    styleClass="consent-form-dialog">
-    <app-consent-form 
-        [treatment]="selectedConsentTreatment"
-        [viewOnly]="true"
+<p-dialog [(visible)]="showConsentFormDialog" [modal]="true" [style]="{width: '90vw', maxWidth: '1200px'}"
+    [draggable]="false" [resizable]="false" styleClass="consent-form-dialog">
+    <app-consent-form [treatment]="selectedConsentTreatment" [viewOnly]="true"
         (closeDialog)="showConsentFormDialog = false">
     </app-consent-form>
 </p-dialog>

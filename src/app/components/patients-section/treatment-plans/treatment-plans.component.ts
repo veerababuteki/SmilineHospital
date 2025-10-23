@@ -18,19 +18,20 @@ import { ConsentFormComponent } from './consent-form/consent-form.component';
 import { DialogModule } from 'primeng/dialog'; // ✅ Add this import at the top
 import { set } from 'date-fns';
 
+
 @Component({
   selector: 'app-treatment-plans',
   templateUrl: './treatment-plans.component.html',
   styleUrls: ['./treatment-plans.component.scss'],
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    FormsModule, 
-    DropdownModule, 
-    CalendarModule, 
-    MenuModule, 
-    ButtonModule, 
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    DropdownModule,
+    CalendarModule,
+    MenuModule,
+    ButtonModule,
     TreatmentPlansPrintComponent,
     TooltipModule,
     ConsentFormComponent,
@@ -67,19 +68,19 @@ export class TreatmentPlansComponent implements OnInit {
   }
 
   consentform(plan: any): void {
-  
-  this.selectedConsentTreatment = {
-    patientName: plan?.patient_details_treat?.user_profile_details[0]?.first_name + ' ' +
-                 plan?.patient_details_treat?.user_profile_details[0]?.last_name,
-    doctorName: 'Dr. ' + plan?.doctor_details_treat?.user_profile_details[0]?.first_name + ' ' +
-                         plan?.doctor_details_treat?.user_profile_details[0]?.last_name,
-    date: plan?.date ? plan.date.split('T')[0] : new Date().toISOString().split('T')[0],
-    treatmentUniqueId: plan?.treatment_unique_id,
-    treatmentId: plan?.id
-  };
-  
-  this.consentFormVisible = true;
-}
+
+    this.selectedConsentTreatment = {
+      patientName: plan?.patient_details_treat?.user_profile_details[0]?.first_name + ' ' +
+        plan?.patient_details_treat?.user_profile_details[0]?.last_name,
+      doctorName: 'Dr. ' + plan?.doctor_details_treat?.user_profile_details[0]?.first_name + ' ' +
+        plan?.doctor_details_treat?.user_profile_details[0]?.last_name,
+      date: plan?.date ? plan.date.split('T')[0] : new Date().toISOString().split('T')[0],
+      treatmentUniqueId: plan?.treatment_unique_id,
+      treatmentId: plan?.id
+    };
+
+    this.consentFormVisible = true;
+  }
 
 
   constructor(private fb: FormBuilder,
@@ -87,41 +88,41 @@ export class TreatmentPlansComponent implements OnInit {
     private treatmentPlansService: TreatmentPlansService,
     private router: Router,
     private route: ActivatedRoute,
-      private patientDataService: PatientDataService
+    private patientDataService: PatientDataService
 
   ) {
     const selectedPractice = localStorage.getItem('selectedPractice');
-        if(selectedPractice){
-          this.savedPractice = JSON.parse(selectedPractice);
-        }
+    if (selectedPractice) {
+      this.savedPractice = JSON.parse(selectedPractice);
+    }
   }
 
   groupedData: { [key: string]: any[] } = {};
   items: MenuItem[] = [];
 
   ngOnInit() {
-  const routeId = this.route.parent?.snapshot.paramMap.get('id');
-  const source = this.route.snapshot.paramMap.get('source');
+    const routeId = this.route.parent?.snapshot.paramMap.get('id');
+    const source = this.route.snapshot.paramMap.get('source');
 
-  if (routeId && source) {
-    this.patientId = routeId;
-    this.uniqueCode = source;
-  } else {
-    const cached = localStorage.getItem('patientContext');
-    if (cached) {
-      const context = JSON.parse(cached);
-      this.patientId = context.patientId;
-      this.uniqueCode = context.uniqueCode;
+    if (routeId && source) {
+      this.patientId = routeId;
+      this.uniqueCode = source;
+    } else {
+      const cached = localStorage.getItem('patientContext');
+      if (cached) {
+        const context = JSON.parse(cached);
+        this.patientId = context.patientId;
+        this.uniqueCode = context.uniqueCode;
+      }
     }
-  }
 
-  // Subscribe to shared data
-  this.patientDataService.data$.subscribe((data) => {
-    const treatments = data?.treatmentPlans?.data?.rows || [];
-    this.rawTreatmentPlans = treatments;
-    const activeTreatmentPlans = treatments.filter((_: any) => _.status !== 'Completed');
-    this.treatmentPlans = this.groupByDate(activeTreatmentPlans);
-  });
+    // Subscribe to shared data
+    this.patientDataService.data$.subscribe((data) => {
+      const treatments = data?.treatmentPlans?.data?.rows || [];
+      this.rawTreatmentPlans = treatments;
+      const activeTreatmentPlans = treatments.filter((_: any) => _.status !== 'Completed');
+      this.treatmentPlans = this.groupByDate(activeTreatmentPlans);
+    });
   }
 
   updateTreatmentPlans(treatmentPlan: any): void {
@@ -162,16 +163,16 @@ export class TreatmentPlansComponent implements OnInit {
       );
     }
   }
-  
+
   groupByDate(rows: any[]) {
     rows.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
     const groupedByDate = rows.reduce((acc, row) => {
       const newDate = new Date(row.date)
-        const options = { timeZone: 'Asia/Kolkata' };
-        const istDateStr = newDate.toLocaleDateString('en-CA', options); // en-CA gives YYYY-MM-DD format
-    
-        // Use IST date as the key
-        const dateKey = istDateStr;
+      const options = { timeZone: 'Asia/Kolkata' };
+      const istDateStr = newDate.toLocaleDateString('en-CA', options); // en-CA gives YYYY-MM-DD format
+
+      // Use IST date as the key
+      const dateKey = istDateStr;
 
       const treatmentKey = row.date;
       if (!acc[dateKey]) {
@@ -234,89 +235,89 @@ export class TreatmentPlansComponent implements OnInit {
     return Object.keys(this.treatmentPlans).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
   }
 
-getGroupTotal(treatmentGroup: any[]): number {
-  const total = treatmentGroup.reduce((acc, t) => acc + Number(t.total_cost || 0), 0);
-  const roundTotal =  parseFloat(total.toFixed(3)); // keeps only 2 decimals
-  this.grandTotal = roundTotal;
-  return roundTotal;
-}
+  getGroupTotal(treatmentGroup: any[]): number {
+    const total = treatmentGroup.reduce((acc, t) => acc + Number(t.total_cost || 0), 0);
+    const roundTotal = parseFloat(total.toFixed(3)); // keeps only 2 decimals
+    this.grandTotal = roundTotal;
+    return roundTotal;
+  }
 
 
-// getDiscountedTotal(): number {
-// const treatment = this.treatments.at(treatmentIndex);
-//     if (!treatment) return;
+  // getDiscountedTotal(): number {
+  // const treatment = this.treatments.at(treatmentIndex);
+  //     if (!treatment) return;
 
-//     const values = treatment.value;
-//     let total = values.cost * values.quantity;
+  //     const values = treatment.value;
+  //     let total = values.cost * values.quantity;
 
-//     if (values.discount > 0) {
-//       if (values.discountType === '%') {
-//         total *= (1 - values.discount / 100);
-//       } else {
-//         total -= values.discount;
-//       }
-//     }
-//     return total;
-//   }
+  //     if (values.discount > 0) {
+  //       if (values.discountType === '%') {
+  //         total *= (1 - values.discount / 100);
+  //       } else {
+  //         total -= values.discount;
+  //       }
+  //     }
+  //     return total;
+  //   }
 
   printTreatmentPlans() {
     // Save the current body content
     const originalContent = document.body.innerHTML;
-    
+
     // Get only the treatment plans container
     const treatmentPlansElement = document.getElementById('treatment-plans-container');
-    
+
     if (!treatmentPlansElement) {
       console.error('Treatment plans container not found');
       return;
     }
     let patientName = 'Patient Name';
-  let patientId = 'Patient ID';
-  
-  // Find first available treatment plan with patient data
-  const dates = this.getSortedDates();
-  if (dates.length > 0) {
-    const firstDate = dates[0];
-    const plans = this.treatmentPlans[firstDate];
-    if (plans && plans.length > 0) {
-      const firstPlan = plans[0];
-      if (firstPlan.patient_details_treat) {
-        const patientDetails = firstPlan.patient_details_treat;
-        
-        // Get patient name
-        if (patientDetails.user_profile_details && patientDetails.user_profile_details.length > 0) {
-          const profile = patientDetails.user_profile_details[0];
-          patientName = `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+    let patientId = 'Patient ID';
+
+    // Find first available treatment plan with patient data
+    const dates = this.getSortedDates();
+    if (dates.length > 0) {
+      const firstDate = dates[0];
+      const plans = this.treatmentPlans[firstDate];
+      if (plans && plans.length > 0) {
+        const firstPlan = plans[0];
+        if (firstPlan.patient_details_treat) {
+          const patientDetails = firstPlan.patient_details_treat;
+
+          // Get patient name
+          if (patientDetails.user_profile_details && patientDetails.user_profile_details.length > 0) {
+            const profile = patientDetails.user_profile_details[0];
+            patientName = `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+          }
+
+          // Get patient ID/code
+          patientId = patientDetails.manual_unique_code || patientId;
         }
-        
-        // Get patient ID/code
-        patientId = patientDetails.manual_unique_code || patientId;
       }
     }
-  }
-  let clinicAddress = '';
-  let clinicPhone = '';
-  
-  if (this.savedPractice) {
-    // Default address in case no branch matches
-    clinicAddress = "#8-3-952/10/2&2/1, Smiline House, Srinagar Colony, Panjagutta, Hyderabad-500073";
-    clinicPhone = "Phone: 040 4200 0024";
-    
-    switch (this.savedPractice.branch_id) {
-      case 1:
-        clinicAddress = "#8-3-952/10/2&2/1, Smiline House, Srinagar Colony, Panjagutta, Hyderabad-500073";
-        clinicPhone = "Phone: 040 4200 0024";
-        break;
-      case 2:
-        clinicAddress = "Matha Bhuvaneswari society, Matha Bhuvaneswari Society, Plot No. 4, opp. Computer Generated Solutions India Private Limited, Siddhi Vinayak Nagar, Madhapur, Khanammet, Hyderabad, Telangana 500081";
-        clinicPhone = "Phone: 040 29804422";
-        break;
-      case 3:
-        clinicAddress = "6th Floor, Pavani Encore Survey, 342/P, Narsing Nanakramguda Service Rd, Khajaguda, Hyderabad, Telangana 500075";
-        clinicPhone = "Phone: 08889998353";
-        break;
+    let clinicAddress = '';
+    let clinicPhone = '';
+
+    if (this.savedPractice) {
+      // Default address in case no branch matches
+      clinicAddress = "#8-3-952/10/2&2/1, Smiline House, Srinagar Colony, Panjagutta, Hyderabad-500073";
+      clinicPhone = "Phone: 040 4200 0024";
+
+      switch (this.savedPractice.branch_id) {
+        case 1:
+          clinicAddress = "#8-3-952/10/2&2/1, Smiline House, Srinagar Colony, Panjagutta, Hyderabad-500073";
+          clinicPhone = "Phone: 040 4200 0024";
+          break;
+        case 2:
+          clinicAddress = "Matha Bhuvaneswari society, Matha Bhuvaneswari Society, Plot No. 4, opp. Computer Generated Solutions India Private Limited, Siddhi Vinayak Nagar, Madhapur, Khanammet, Hyderabad, Telangana 500081";
+          clinicPhone = "Phone: 040 29804422";
+          break;
+        case 3:
+          clinicAddress = "6th Floor, Pavani Encore Survey, 342/P, Narsing Nanakramguda Service Rd, Khajaguda, Hyderabad, Telangana 500075";
+          clinicPhone = "Phone: 08889998353";
+          break;
+      }
     }
-  }
     // Create a styled version for printing
     const printContent = `
       <style>
@@ -396,13 +397,13 @@ getGroupTotal(treatmentGroup: any[]): number {
         <p>Powered by iDental</p>
       </div>
     `;
-    
+
     // Replace the body content with our print content
     document.body.innerHTML = printContent;
-    
+
     // Trigger the print dialog
     window.print();
-    
+
     // Restore the original content after printing
     setTimeout(() => {
       document.body.innerHTML = originalContent;
@@ -412,17 +413,17 @@ getGroupTotal(treatmentGroup: any[]): number {
   }
 
   @HostListener('document:keydown', ['$event'])
-handleKeyboardEvent(event: KeyboardEvent) {
-  // Check if Ctrl+P was pressed
-  if (event.ctrlKey && event.key === 'p') {
-    // Prevent default browser print
-    event.preventDefault();
-    if(Object.keys(this.treatmentPlans).length > 0){
-      this.printTreatmentPlans();
+  handleKeyboardEvent(event: KeyboardEvent) {
+    // Check if Ctrl+P was pressed
+    if (event.ctrlKey && event.key === 'p') {
+      // Prevent default browser print
+      event.preventDefault();
+      if (Object.keys(this.treatmentPlans).length > 0) {
+        this.printTreatmentPlans();
+      }
+      // Call your custom print function
     }
-    // Call your custom print function
   }
-}
 
   getShortTeethNumbers(teethSet: string): string {
     if (!teethSet) return '';
@@ -435,11 +436,28 @@ handleKeyboardEvent(event: KeyboardEvent) {
     return teethSet;
   }
 
+
   hasMoreTeeth(teethSet: string): boolean {
     if (!teethSet) return false;
     const teeth = teethSet.split(',').map(t => t.trim());
     return teeth.length > 2;
   }
+
+  getFullNotes(notes: string): string {
+    if (!notes) return '';
+    return notes.trim();
+  }
+
+  getShortNotes(notes: string, limit: number = 20): string {
+    if (!notes) return '';
+    return notes.length > limit ? notes.substring(0, limit) : notes;
+  }
+
+  hasMoreNotes(notes: string, limit: number = 30): boolean {
+    if (!notes) return false;
+    return notes.length > limit;
+  }
+
 
   setMenuItemsForTreatment(treatment: any) {
     this.items = [

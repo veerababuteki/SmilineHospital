@@ -1248,21 +1248,20 @@ onSubmit() {
  
       }); 
     } else { 
-      // Check if appointment is being updated without status change
       const originalStatus = this.appointment.status;
       const newStatus = value.status;
       const isStatusUnchanged = originalStatus === newStatus;
-      
-      // Check if other fields have been modified
-      const isOtherFieldsModified = this.hasOtherFieldsChanged(value);
-      
-      // Show warning message if status is unchanged but other fields are modified
-      if (isStatusUnchanged && isOtherFieldsModified) {
+      const dateChanged = format(new Date(value.scheduledDate), 'yyyy-MM-dd') !==
+                          format(new Date(this.appointment.appointment_date), 'yyyy-MM-dd');
+      const timeChanged = format(new Date(value.scheduledTime), 'hh:mm a') !== this.appointment.appointment_time;
+
+      if (isStatusUnchanged && (dateChanged || timeChanged)) {
         this.messageService.add({
           severity: 'warn',
-          summary: 'Please review and update the status field if needed.',
-          detail: 'Update the status field to reflect appointment changes.'
+          summary: 'Status update required',
+          detail: 'You changed the appointment date/time. Please update the Status field before saving.'
         });
+        return; // prevent submission
       }
       
       this.appointmentService.updateAppointment({ 
@@ -1438,6 +1437,16 @@ get hasBlockTypeError(): boolean {
 }
 get isAllDay(): boolean {
   return this.blockCalendarForm.get('blockType')?.value === 'allDay';
+}
+
+get timeChangedStatusUnchanged(): boolean {
+  if (!this.editAppointment || !this.appointmentForm || !this.appointment) return false;
+  const value = this.appointmentForm.value;
+  const isStatusUnchanged = this.appointment.status === value.status;
+  const dateChanged = format(new Date(value.scheduledDate), 'yyyy-MM-dd') !==
+                      format(new Date(this.appointment.appointment_date), 'yyyy-MM-dd');
+  const timeChanged = format(new Date(value.scheduledTime), 'hh:mm a') !== this.appointment.appointment_time;
+  return isStatusUnchanged && (dateChanged || timeChanged);
 }
 
 // openPatientDialog(){

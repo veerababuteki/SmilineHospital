@@ -222,6 +222,9 @@
   <small class="error-message" *ngIf="appointmentForm.get('scheduledTime')?.hasError('patientBlocked')">
     Selected time conflicts with another appointment for this patient
   </small>
+  <small class="error-message" *ngIf="editAppointment && timeChangedStatusUnchanged">
+    You changed the appointment date/time. Please update the Status field before saving.
+  </small>
   <!-- <small class="valid-message" *ngIf="appointmentUnblocked()">
     Doctor is available at the selected time
   </small> -->
@@ -428,7 +431,7 @@
       <!-- Action Buttons -->
       <div class="button-row">
         <button type="button" pButton label="Cancel" (click)="cancelAppointment()" class="p-button-secondary"></button>
-        <button type="submit" pButton label="Save" class="p-button-primary"></button>
+        <button type="submit" pButton label="Save" class="p-button-primary" [disabled]="editAppointment && timeChangedStatusUnchanged"></button>
       </div>
     </form>
     <!-- MINIMAL FIX - Replace your blockCalendar form section with this -->

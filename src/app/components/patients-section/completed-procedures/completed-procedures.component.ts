@@ -165,6 +165,21 @@ export class CompletedProceduresComponent implements OnInit {
       }
     );
   }
+// notes short
+ getFullNotes(notes: string): string {
+    if (!notes) return '';
+    return notes.trim();
+  }
+
+  getShortNotes(notes: string, limit: number = 20): string {
+    if (!notes) return '';
+    return notes.length > limit ? notes.substring(0, limit) : notes;
+  }
+
+  hasMoreNotes(notes: string, limit: number = 30): boolean {
+    if (!notes) return false;
+    return notes.length > limit;
+  }
 
 updateTreatmentPlans(treatmentPlan: any): void {
   // Check if procedure already has invoice generated (shows dollar icon)
