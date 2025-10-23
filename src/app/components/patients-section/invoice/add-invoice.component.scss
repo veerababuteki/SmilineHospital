@@ -518,3 +518,22 @@
   border: none;
   opacity: 1;
 }
+
+
+
+    .selected-teeth-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 6px;
+
+      .tooth-item {
+        background: #e3f2fd;
+        border: 1px solid #2196f3;
+        color: #0d47a1;
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-size: 12px;
+      }
+    }

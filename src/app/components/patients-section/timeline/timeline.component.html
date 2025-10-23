@@ -85,10 +85,10 @@
           <label class="filter-option">
             <input
               type="checkbox"
-              [(ngModel)]="filterTypes.CompletedProcedures"
+              [(ngModel)]="filterTypes.CompletedProcedure"
               (change)="applyFilters()"
             />
-            <span>completed procedures </span>
+            <span>Completed Procedures </span>
           </label>
         </div>
       </div>
@@ -156,7 +156,7 @@
               </div>
 
               <!-- Completed Procedures Card -->
-              <div class="event-card" *ngIf="item.type === 'CompletedProcedures'">
+              <div class="event-card" *ngIf="item.type === 'CompletedProcedure'">
                 <div class="event-header">
                   <div class="event-type">
                     <i class="icon-procedure"></i>

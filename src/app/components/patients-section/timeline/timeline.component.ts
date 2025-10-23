@@ -29,7 +29,7 @@ export class TimelineComponent implements OnInit {
     Procedure: true,
     Invoice: true,
     Payment: true,
-    CompletedProcedures: true
+    CompletedProcedure: true
   };
 
   constructor(private route: ActivatedRoute, private timelineService: TimelineService) {}
@@ -100,7 +100,7 @@ export class TimelineComponent implements OnInit {
       if(row.type === 'Appointment'){
         dateKey = row.appointment_date;
       }
-      else if (row.type === 'CompletedProcedures') {
+      else if (row.type === 'CompletedProcedure') {
         dateKey = row.performed_on;
       }
       else{

@@ -208,9 +208,11 @@
                           treatment.get('selectedTeeth')?.value?.length > 0
                         "
                         >Teeth:
-                        {{
-                          treatment.get("selectedTeeth")?.value
-                        }}</ng-container
+                        <div class="selected-teeth-list">
+                          <span class="tooth-item" *ngFor="let t of treatment.get('selectedTeeth')?.value">{{ t
+                            }}</span>
+                        </div>
+                        </ng-container
                       >
                       <ng-container
                         *ngIf="

@@ -156,6 +156,7 @@ hasInvoicesForDate(date: string): boolean {
 
     getInvoiceGroupValues(invoiceGroup: any): any[] {
       return Array.isArray(invoiceGroup.value) ? invoiceGroup.value : [];
+     
     }
 
     onCheckboxChange(invoice: any, invoice_id: any){

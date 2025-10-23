@@ -11,6 +11,7 @@ import { MessageService } from '../../../services/message.service';
 import { PatientDataService } from '../../../services/patient-data.service';
 import { ConsentFormComponent } from '../treatment-plans/consent-form/consent-form.component';
 import { AuthService } from '../../../services/auth.service'; // Add this
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-completed-procedures',
@@ -61,6 +62,7 @@ export class CompletedProceduresComponent implements OnInit {
     private patientDataService: PatientDataService,
     private route: ActivatedRoute,
     private router: Router,
+    private cd: ChangeDetectorRef, 
     private authService: AuthService, // Inject here
     private messageService: MessageService // Inject this too for error alerts
   ) {
@@ -108,6 +110,7 @@ export class CompletedProceduresComponent implements OnInit {
       this.formattedData = this.getFormattedData();
     });
 
+    
     // Initialize menu items
     this.initializeMenuItems();
 
@@ -164,6 +167,21 @@ export class CompletedProceduresComponent implements OnInit {
         command: (event) => this.openConsentForm(event)
       }
     );
+  }
+// notes short
+ getFullNotes(notes: string): string {
+    if (!notes) return '';
+    return notes.trim();
+  }
+
+  getShortNotes(notes: string, limit: number = 20): string {
+    if (!notes) return '';
+    return notes.length > limit ? notes.substring(0, limit) : notes;
+  }
+
+  hasMoreNotes(notes: string, limit: number = 30): boolean {
+    if (!notes) return false;
+    return notes.length > limit;
   }
 
 updateTreatmentPlans(treatmentPlan: any): void {
@@ -275,6 +293,7 @@ updateTreatmentPlans(treatmentPlan: any): void {
     this.treatmentPlanService.getCompletedTreatmentPlans(Number(patientId)).subscribe(res => {
       this.treatmentPlans = this.groupByDate(res.data.rows);
       this.formattedData = this.getFormattedData();
+      this.cd.detectChanges();
     });
   }
   navigateToAddPage() {
