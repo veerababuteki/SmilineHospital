@@ -62,7 +62,8 @@ export class CompletedProceduresComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService, // Inject here
-    private messageService: MessageService // Inject this too for error alerts
+    private messageService: MessageService,
+    private treatmentPlansService: TreatmentPlansService 
   ) {
     const selectedPractice = localStorage.getItem('selectedPractice');
     if (selectedPractice) {
@@ -372,6 +373,21 @@ updateTreatmentPlans(treatmentPlan: any): void {
     }));
   }
 
+  refreshInvoices() {
+  if (!this.patientId) return;
+
+  this.treatmentPlansService.getInvoices(Number(this.patientId)).subscribe(res => {
+    if (res) {
+      const existingData = this.patientDataService.getSnapshot() || {};
+      const updatedData = {
+        ...existingData,
+        invoices: res
+      };
+      this.patientDataService.setData(updatedData); // triggers sidebar update
+    }
+  });
+}
+
 
   generateInvoice() {
     // Check if user has access to invoicing
@@ -395,6 +411,7 @@ updateTreatmentPlans(treatmentPlan: any): void {
         }
       }
     );
+    this.refreshInvoices();
   }
 
   getTotalCost(treatmentGroup: any[]): number {

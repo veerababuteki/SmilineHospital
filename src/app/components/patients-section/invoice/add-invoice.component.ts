@@ -528,69 +528,87 @@ export class AddInvoiceComponent implements OnInit {
     this.calculateGrandTotal();
   }
 
-  onSubmit() {
-    if (!this.treatmentForm.valid) return;
-    
-    const procedureLists: any[] = [];
-    const treatment = {
-      patient_id: this.patientId,
-      grand_total: this.calculateGrandTotal().toString(),
-      procedures_list: procedureLists
-    };
+ onSubmit() {
+  if (!this.treatmentForm.valid) return;
 
-    if (this.isEditMode) {
-      this.treatmentForm.value.treatments.forEach((t: any) => {
-        treatment.procedures_list.push({
-          procedure_id: t.procedureId,
-          treatment_id: t.id,
-          treatment_unique_id: t.unique_id,
-          doctor_id: t.doctorId,
-          quantity: t.quantity,
-          cost: t.cost,
-          discount: t.discount.toString(),
-          discount_formate: t.discountType,
-          teeth_set: t.selectedTeeth.toString(),
-          status: "Completed",
-          date: t.procedureDate,
-          total_cost: t.total,
-          total_discount: t.discount.toString(),
-          notes: t.notes,
-          action: 'Update'
-        });
+  const procedureLists: any[] = [];
+  const treatment = {
+    patient_id: this.patientId,
+    grand_total: this.calculateGrandTotal().toString(),
+    procedures_list: procedureLists
+  };
+
+  if (this.isEditMode) {
+    this.treatmentForm.value.treatments.forEach((t: any) => {
+      treatment.procedures_list.push({
+        procedure_id: t.procedureId,
+        treatment_id: t.id,
+        treatment_unique_id: t.unique_id,
+        doctor_id: t.doctorId,
+        quantity: t.quantity,
+        cost: t.cost,
+        discount: t.discount.toString(),
+        discount_formate: t.discountType,
+        teeth_set: t.selectedTeeth.toString(),
+        status: "Completed",
+        date: t.procedureDate,
+        total_cost: t.total,
+        total_discount: t.discount.toString(),
+        notes: t.notes,
+        action: 'Update'
       });
-      
-      this.treatmentPlansService.updateInvoiceWithTreatmentPlan(treatment).subscribe(res => {
-        console.log('Invoice updated:', res);
-        this.fetchInvoices();
+    });
+
+    this.treatmentPlansService.updateInvoiceWithTreatmentPlan(treatment).subscribe(res => {
+      console.log('Invoice updated:', res);
+
+      // Update patientDataService dynamically
+      const existingData = this.patientDataService.getSnapshot() || {};
+      const updatedInvoices = res.data || []; // make sure API returns updated invoice objects
+      this.patientDataService.setData({
+        ...existingData,
+        invoices: { data: { rows: updatedInvoices } }
       });
-    } else {
-      this.treatmentForm.value.treatments.forEach((t: any) => {
-        treatment.procedures_list.push({
-          procedure_id: t.procedureId,
-          treatment_plan_id: t.id,
-          treatment_unique_id: t.unique_id,
-          doctor_id: t.doctorId,
-          quantity: t.quantity,
-          cost: t.cost,
-          discount: t.discount.toString(),
-          discount_formate: t.discountType,
-          teeth_set: t.selectedTeeth.toString(),
-          status: "Completed",
-          date: t.procedureDate,
-          total_cost: t.total,
-          total_discount: t.discount.toString(),
-          notes: t.notes,
-        });
+
+      this.fetchInvoices();
+    });
+  } else {
+    this.treatmentForm.value.treatments.forEach((t: any) => {
+      treatment.procedures_list.push({
+        procedure_id: t.procedureId,
+        treatment_plan_id: t.id,
+        treatment_unique_id: t.unique_id,
+        doctor_id: t.doctorId,
+        quantity: t.quantity,
+        cost: t.cost,
+        discount: t.discount.toString(),
+        discount_formate: t.discountType,
+        teeth_set: t.selectedTeeth.toString(),
+        status: "Completed",
+        date: t.procedureDate,
+        total_cost: t.total,
+        total_discount: t.discount.toString(),
+        notes: t.notes,
       });
-      
-      this.treatmentPlansService.addInvoiceWithTreatmentPlan(treatment).subscribe(res => {
-        console.log('Invoice created:', res);
-        this.fetchInvoices();
+    });
+
+    this.treatmentPlansService.addInvoiceWithTreatmentPlan(treatment).subscribe(res => {
+      console.log('Invoice created:', res);
+
+      // Update patientDataService dynamically
+      const existingData = this.patientDataService.getSnapshot() || {};
+      const newInvoices = res.data.map((item: any) => item.addedInvoice);
+      this.patientDataService.setData({
+        ...existingData,
+        invoices: { data: { rows: newInvoices } }
       });
-    }
+
+      this.fetchInvoices();
+    });
   }
+}
 
-  saveAndMakePayment() {
+saveAndMakePayment() {
   if (!this.treatmentForm.valid) return;
 
   const procedureLists: any[] = [];
@@ -620,18 +638,19 @@ export class AddInvoiceComponent implements OnInit {
   });
 
   this.treatmentPlansService.addInvoiceWithTreatmentPlan(treatment).subscribe(res => {
-    // Extract all invoice objects
     const invoices = res.data.map((item: any) => item.addedInvoice);
 
-    this.saveInvoices();
-    
-    // Create a Set of unique invoice IDs
-    const uniqueInvoiceIds = new Set(invoices.map((invoice: any) => invoice.invoice_id));
+    // Update patientDataService dynamically
+    const existingData = this.patientDataService.getSnapshot() || {};
+    this.patientDataService.setData({
+      ...existingData,
+      invoices: { data: { rows: invoices } }
+    });
 
-    // Build the selectedInvoiceList for navigation
-    this.selectedInvoiceList = Array.from(uniqueInvoiceIds).map((invoiceId: any) => ({
-      invoice_id: invoiceId
-    }));
+    this.saveInvoices();
+
+    const uniqueInvoiceIds = new Set(invoices.map((invoice: any) => invoice.invoice_id));
+    this.selectedInvoiceList = Array.from(uniqueInvoiceIds).map(invoiceId => ({ invoice_id: invoiceId }));
 
     this.router.navigate(
       ['patients', this.patientId, 'add-payment', this.uniqueCode],

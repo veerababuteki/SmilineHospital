@@ -210,14 +210,24 @@ export class TreatmentPlansComponent implements OnInit {
   }
 
 
-  markAsComplete() {
-    if (this.markCompleteList.length == 0) return;
-    this.treatmentPlansService.markAsComplete(this.markCompleteList).subscribe(res => {
-      if (this.patientId !== null && this.patientId !== undefined) {
-        this.loadPatientData(this.patientId);
-      }
-    })
-  }
+markAsComplete() {
+  if (this.markCompleteList.length === 0) return;
+
+  this.treatmentPlansService.markAsComplete(this.markCompleteList).subscribe(res => {
+    if (this.patientId !== null && this.patientId !== undefined) {
+      this.loadPatientData(this.patientId);
+
+      this.treatmentPlansService.getCompletedTreatmentPlans(Number(this.patientId)).subscribe(cpRes => {
+        const existingData = this.patientDataService.getSnapshot() || {};
+        const updatedData = {
+          ...existingData,
+          completedProcedures: cpRes
+        };
+        this.patientDataService.setData(updatedData); 
+      });
+    }
+  });
+}
 
   generateInvoice() {
     this.treatmentPlansService.generateInvoice(this.generateInvoiceList).subscribe(res => {
